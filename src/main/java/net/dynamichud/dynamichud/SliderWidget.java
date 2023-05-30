@@ -55,18 +55,20 @@ public class SliderWidget {
         // Check if the mouse is over the slider
         if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height) {
             // Update the value based on the mouse position
-            setValue(minValue + (float)(mouseX - x) / width * (maxValue - minValue)*1.0001f);
+            setValue(minValue + (float)(mouseX - x) / width * (maxValue - minValue)-0.001f);
             return true;
         }
         return false;
     }
 
-    public void mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY){
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY){
         // Check if the mouse is over the slider
         if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height) {
             // Update the value based on the mouse position
             setValue(minValue + (float)(mouseX - x) / width * (maxValue - minValue));
+            return true;
         }
+        return false;
     }
 
     public float getValue() {

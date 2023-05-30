@@ -14,7 +14,7 @@ public class TextWidget extends Widget {
     // In TextWidget class
     private int backgroundColor;
     private int color = Color.WHITE.getRGB();
-    protected static float rainbowSpeed = 10f;
+    protected static float rainbowSpeed = 15f;
 
 
     public TextWidget(MinecraftClient client, String text, float xPercent, float yPercent) {

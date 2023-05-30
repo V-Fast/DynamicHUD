@@ -9,6 +9,7 @@ import net.minecraft.util.math.Box;
 public class MoveScreen extends Screen {
     private final DynamicUtil dynamicutil;
     private Widget selectedWidget = null;
+    private TextWidget textWidget=null;
     private int dragStartX = 0;
     private int dragStartY = 0;
     private boolean showMenu=false;
@@ -49,16 +50,16 @@ public class MoveScreen extends Screen {
         // Check if the mouse is over any of the widgets
         for (Widget widget : dynamicutil.getWidgetManager().getWidgets()) {
             if (widget instanceof TextWidget textWidget) {
-                TextWidget.setRainbowSpeed(rainbowspeedslider.getValue());
                 int textWidth = client.textRenderer.getWidth(textWidget.getText());
                 int textHeight = client.textRenderer.fontHeight;
                 if (mouseX >= textWidget.getX() - textWidth / 2 && mouseX <= textWidget.getX() + textWidth / 2 && mouseY >= textWidget.getY() -textHeight / 2 && mouseY <= textWidget.getY() + textHeight / 2) {
                     if (button == 1) { // Right-click
                         selectedWidget = widget;
                         rainbowWidget=widget;
-                        rainbowspeedslider = new SliderWidget(MinecraftClient.getInstance(), selectedWidget.getX(), selectedWidget.getY(), 120, 20, "Rainbow Speed",TextWidget.getRainbowSpeed(), 1f, 20.0f);
+                        rainbowspeedslider = new SliderWidget(MinecraftClient.getInstance(), selectedWidget.getX(), selectedWidget.getY(), 105, 20, "Rainbow Speed", TextWidget.getRainbowSpeed(), 5f, 25.0f);
+                        TextWidget.setRainbowSpeed(rainbowspeedslider.getValue());
                         // Show context menu
-                         contextMenu = new ContextMenu(MinecraftClient.getInstance(), selectedWidget.getX(),  selectedWidget.getY() + 21);
+                         contextMenu = new ContextMenu(MinecraftClient.getInstance(), selectedWidget.getX(),  selectedWidget.getY() + 21,textWidget);
                             contextMenu.addOption("Shadow", () -> {
                                 // Toggle shadow
                                 textWidget.setShadow(!textWidget.hasShadow());
@@ -126,6 +127,10 @@ public class MoveScreen extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (rainbowWidget != null && rainbowspeedslider.mouseDragged(mouseX,mouseY,button,deltaX,deltaY)) {
+            // Update the scale of the widget while scaling
+            TextWidget.setRainbowSpeed(rainbowspeedslider.getValue());
+        }
         // Update the position of the widget while dragging
         if (selectedWidget != null) {
             int newX = (int) (mouseX - dragStartX);
@@ -161,12 +166,6 @@ public class MoveScreen extends Screen {
             } else if (selectedWidget instanceof ArmorWidget armorWidgetItemStack) {
                 armorWidgetItemStack.setX(newX);
                 armorWidgetItemStack.setY(newY);
-            }
-            if (rainbowWidget != null) {
-                // Update the scale of the widget while scaling
-                rainbowspeedslider.mouseDragged(mouseX,mouseY,button,deltaX,deltaY);
-                TextWidget.setRainbowSpeed(rainbowspeedslider.getValue());
-                return true;
             }
             return true;
         }

@@ -15,16 +15,27 @@ public class ContextMenu {
     private final int x;
     private final int y;
     private final List<ContextMenuOption> options = new ArrayList<>();
+    private TextWidget selectedWidget = null;
+
     private int color=0xFFFFFFFF;
 
-    public ContextMenu(MinecraftClient client, int x, int y) {
+    public ContextMenu(MinecraftClient client, int x, int y, TextWidget selectedWidget) {
         this.client = client;
         this.x = x;
         this.y = y;
+        this.selectedWidget = selectedWidget;
     }
 
     public void addOption(String label, Runnable action) {
-        options.add(new ContextMenuOption(label, action));
+        ContextMenuOption option = new ContextMenuOption(label, action);
+        if (selectedWidget != null) {
+            switch (label) {
+                case "Shadow" -> option.enabled = selectedWidget.hasShadow();
+                case "Rainbow" -> option.enabled = selectedWidget.hasRainbow();
+                case "Vertical Rainbow" -> option.enabled = selectedWidget.hasVerticalRainbow();
+            }
+        }
+        options.add(option);
     }
 
     public void render(MatrixStack matrices) {
@@ -61,19 +72,19 @@ public class ContextMenu {
         int buttonY = y;
         if (mouseX >= buttonX && mouseX <= buttonX + buttonSize && mouseY >= buttonY && mouseY <= buttonY + buttonSize) {
             // Close the context menu
-            return true;
+            return false;
         }
         TextRenderer textRenderer = client.textRenderer;
         int optionY = y + 2;
         for (ContextMenuOption option : options) {
             if (mouseX >= x && mouseX <= x + textRenderer.getWidth(option.label) + 10 && mouseY >= optionY && mouseY <= optionY + textRenderer.fontHeight + 2) {
                 // Run the action of the selected option
-                option.enabled=!option.enabled;
-                color=Color.GREEN.getGreen();
                 option.action.run();
+
+                option.enabled=!option.enabled;
+
                 return true;
             }
-            color=0xFFFFFFFF;
             optionY += textRenderer.fontHeight + 2;
         }
         return false;
