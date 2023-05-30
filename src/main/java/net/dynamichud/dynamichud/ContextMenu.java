@@ -5,15 +5,14 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ContextMenu {
     private final MinecraftClient client;
     private int width = 0;
-    private final int x;
-    private final int y;
+    private int x;
+    private int y;
     private final List<ContextMenuOption> options = new ArrayList<>();
     private TextWidget selectedWidget = null;
 
@@ -33,6 +32,7 @@ public class ContextMenu {
                 case "Shadow" -> option.enabled = selectedWidget.hasShadow();
                 case "Rainbow" -> option.enabled = selectedWidget.hasRainbow();
                 case "Vertical Rainbow" -> option.enabled = selectedWidget.hasVerticalRainbow();
+                case "Color" -> option.enabled = selectedWidget.isColorOptionEnabled();
             }
         }
         options.add(option);
@@ -49,11 +49,14 @@ public class ContextMenu {
         }
 
         // Draw the background
-        DrawableHelper.fill(matrices, x, y, x + width, y + height, 0xFF000000);
+        int backgroundColor = 0x40C0C0C0; // Semi-transparent light grey color
+        int cornerRadius = 5; // The radius of the rounded corners
+        int padding = 5; // The amount of padding around the rectangle
+        DrawHelper.fillRoundedRect(matrices.peek().getPositionMatrix(), x, y - padding, x + width + padding-1, y + height + padding, cornerRadius, backgroundColor);        //DrawableHelper.fill(matrices, x, y, x + width, y + height, 0xFF000000);
         int buttonSize = 10;
         int buttonX = x + width - buttonSize;
         int buttonY = y;
-        DrawableHelper.fill(matrices, buttonX, buttonY, buttonX + buttonSize, buttonY + buttonSize, 0xFF000000);
+        DrawableHelper.fill(matrices, buttonX, buttonY, buttonX + buttonSize, buttonY + buttonSize, backgroundColor);
         textRenderer.draw(matrices, "X", buttonX + 2, buttonY + 2, 0xFFFFFFFF);
 
         int optionY = y + 2;
@@ -65,9 +68,15 @@ public class ContextMenu {
 
     }
 
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+
     public boolean mouseClicked(double mouseX,double mouseY,int button){
         // Check if the mouse is over any of the options
-        int buttonSize = 5;
+        int buttonSize = 10;
         int buttonX = x + width - buttonSize;
         int buttonY = y;
         if (mouseX >= buttonX && mouseX <= buttonX + buttonSize && mouseY >= buttonY && mouseY <= buttonY + buttonSize) {

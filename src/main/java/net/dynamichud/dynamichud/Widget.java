@@ -34,4 +34,6 @@ public abstract class Widget {
     public void setY(int y) {
         this.yPercent = (float) y / client.getWindow().getScaledHeight();
     }
+    public int getHeight() {return client.textRenderer.fontHeight;}
+
 }

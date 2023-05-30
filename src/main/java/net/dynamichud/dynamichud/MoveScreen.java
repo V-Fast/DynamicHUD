@@ -4,7 +4,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Box;
 
 public class MoveScreen extends Screen {
     private final DynamicUtil dynamicutil;
@@ -17,7 +16,7 @@ public class MoveScreen extends Screen {
     private ColorPicker colorPicker=null;
     private Widget rainbowWidget = null;
     private SliderWidget rainbowspeedslider = null;
-
+    MinecraftClient mc = MinecraftClient.getInstance();
 
     public MoveScreen(DynamicUtil dynamicutil) {
         super(Text.literal("Move Widgets"));
@@ -56,10 +55,10 @@ public class MoveScreen extends Screen {
                     if (button == 1) { // Right-click
                         selectedWidget = widget;
                         rainbowWidget=widget;
-                        rainbowspeedslider = new SliderWidget(MinecraftClient.getInstance(), selectedWidget.getX(), selectedWidget.getY(), 105, 20, "Rainbow Speed", TextWidget.getRainbowSpeed(), 5f, 25.0f);
-                        TextWidget.setRainbowSpeed(rainbowspeedslider.getValue());
+                        int x=selectedWidget.getX();
+                        int y=selectedWidget.getY();
                         // Show context menu
-                         contextMenu = new ContextMenu(MinecraftClient.getInstance(), selectedWidget.getX(),  selectedWidget.getY() + 21,textWidget);
+                         contextMenu = new ContextMenu(mc, x,  y+textRenderer.fontHeight+2,textWidget);
                             contextMenu.addOption("Shadow", () -> {
                                 // Toggle shadow
                                 textWidget.setShadow(!textWidget.hasShadow());
@@ -72,12 +71,19 @@ public class MoveScreen extends Screen {
                                 // Toggle vertical rainbow
                                 textWidget.setVerticalRainbow(!textWidget.hasVerticalRainbow());
                             });
-                            contextMenu.addOption("Color", () -> {
-                                // Show color picker
-                                // Set the color of the text
-                                colorPicker = new ColorPicker(MinecraftClient.getInstance(), (int) mouseX, (int) mouseY + 66, textWidget.getColor(), textWidget::setColor);
-                            });
-                        TextWidget.setRainbowSpeed(rainbowspeedslider.getValue());
+                           contextMenu.addOption("Color", () -> {
+                            // Show color picker
+                            // Set the color of the text
+                            textWidget.toggleColorOption();
+                            if (textWidget.isColorOptionEnabled()) {
+                                // Set the color of the text widget
+                                colorPicker = new ColorPicker(mc, mc.getWindow().getScaledWidth()/2,mc.getWindow().getScaledHeight()/2, textWidget.getColor(), textWidget::setColor);
+                            }
+                            else colorPicker=null;
+                           });
+
+                        rainbowspeedslider = new SliderWidget(mc, x, y + 70, 105, 20, "Rainbow Speed", TextWidget.getRainbowSpeed(), 5f, 25.0f);
+                                TextWidget.setRainbowSpeed(rainbowspeedslider.getValue());
                         return true;
                     } else {
                         // Start dragging the widget
@@ -116,6 +122,17 @@ public class MoveScreen extends Screen {
     }
 
     @Override
+    public boolean shouldPause() {
+        return false;
+    }
+    @Override
+    public void mouseMoved(double mouseX, double mouseY) {
+        // Call the mouseMoved method of the ColorPicker object
+            ColorPicker.mouseMoved(mouseX, mouseY);
+    }
+
+
+    @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         // Stop dragging or scaling the widget
         if (selectedWidget != null) {
@@ -126,6 +143,12 @@ public class MoveScreen extends Screen {
     }
 
     @Override
+    public void resize(MinecraftClient client, int width, int height) {
+          return;
+    }
+
+
+    @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (rainbowWidget != null && rainbowspeedslider.mouseDragged(mouseX,mouseY,button,deltaX,deltaY)) {
             // Update the scale of the widget while scaling
@@ -133,6 +156,18 @@ public class MoveScreen extends Screen {
         }
         // Update the position of the widget while dragging
         if (selectedWidget != null) {
+            // Update the position of the context menu
+            if (this.contextMenu!=null)
+            {
+                if (selectedWidget instanceof TextWidget) {
+                    int textHeight = client.textRenderer.fontHeight;
+                    contextMenu.setPosition(selectedWidget.getX(), selectedWidget.getY() + textHeight+4);
+                    rainbowspeedslider.setPosition(selectedWidget.getX(), selectedWidget.getY() + textHeight+67);
+                } else {
+                    contextMenu.setPosition(selectedWidget.getX(), selectedWidget.getY());
+                }
+            }
+
             int newX = (int) (mouseX - dragStartX);
             int newY = (int) (mouseY - dragStartY);
             // Snap the position to a grid

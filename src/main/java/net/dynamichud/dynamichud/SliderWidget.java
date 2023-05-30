@@ -7,8 +7,8 @@ import net.minecraft.client.util.math.MatrixStack;
 
 public class SliderWidget {
     private final MinecraftClient client;
-    private final int x;
-    private final int y;
+    private int x;
+    private int y;
     private final int width;
     private final int height;
     private final String label;
@@ -29,9 +29,6 @@ public class SliderWidget {
     }
 
     public void render(MatrixStack matrices) {
-        // Draw the background
-        DrawableHelper.fill(matrices, x, y, x + width, y + height, 0xFF000000);
-
         // Draw the label
         TextRenderer textRenderer = client.textRenderer;
         textRenderer.draw(matrices, label + ": " + String.format("%.1f", value), x + 5, y + (height - textRenderer.fontHeight) / 2, 0xFFFFFFFF);
@@ -50,7 +47,10 @@ public class SliderWidget {
         float handleY = sliderY + (sliderHeight - handleHeight) / 2;
         DrawableHelper.fill(matrices, (int)handleX, (int)handleY, (int)(handleX + handleWidth), (int)(handleY + handleHeight), 0xFFFFFFFF);
     }
-
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
     public boolean mouseClicked(double mouseX,double mouseY,int button){
         // Check if the mouse is over the slider
         if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height) {

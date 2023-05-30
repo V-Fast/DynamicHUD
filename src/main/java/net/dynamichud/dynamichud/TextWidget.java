@@ -14,6 +14,7 @@ public class TextWidget extends Widget {
     // In TextWidget class
     private int backgroundColor;
     private int color = Color.WHITE.getRGB();
+    private boolean colorOptionEnabled = false;
     protected static float rainbowSpeed = 15f;
 
 
@@ -23,6 +24,11 @@ public class TextWidget extends Widget {
         this.xPercent = xPercent;
         this.yPercent = yPercent;
     }
+
+    public void toggleColorOption() {
+        colorOptionEnabled = !colorOptionEnabled;
+    }
+
 
     public void setRainbow(boolean rainbow) {
         this.rainbow = rainbow;
@@ -60,16 +66,15 @@ public class TextWidget extends Widget {
         return text;
     }
 
-    public void setBackgroundColor(int backgroundColor) {
-        this.backgroundColor = backgroundColor;
-    }
-
     public void setColor(int color) {
         this.color = color;
     }
 
     public int getColor() {
         return color;
+    }
+    public boolean isColorOptionEnabled() {
+        return colorOptionEnabled;
     }
     @Override
     public void render(MatrixStack matrices) {
@@ -103,5 +108,4 @@ public class TextWidget extends Widget {
             DrawHelper.drawText(matrices, client.textRenderer, text, getX() - textWidth / 2, getY() - 4, color);
 
     }
-
 }
