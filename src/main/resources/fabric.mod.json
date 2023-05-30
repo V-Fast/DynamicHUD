@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "dynamichud",
+  "version": "${version}",
+  "name": "DynamicHUD",
+  "description": "A simple Hud library",
+  "authors": [
+    "tanishisherewith"
+  ],
+  "contact": {
+    "repo": "https://github.com/tani/DynamicHUD"
+  },
+  "license": "All-Rights-Reserved",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "net.dynamichud.dynamichud.client.DynamicHUDClient",
+      "net.dynamichud.dynamichud.DynamicHUDmod"
+    ],
+    "main": [
+      "net.dynamichud.dynamichud.DynamicHUD"
+    ]
+  },
+  "mixins": [
+    "DynamicHUD.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
