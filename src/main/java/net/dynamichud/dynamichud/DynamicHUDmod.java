@@ -1,10 +1,12 @@
 package net.dynamichud.dynamichud;
 
+import net.dynamichud.dynamichud.Util.DynamicUtil;
+import net.dynamichud.dynamichud.Widget.ArmorWidget;
+import net.dynamichud.dynamichud.Widget.TextWidget;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.EquipmentSlot;
@@ -19,11 +21,15 @@ public class DynamicHUDmod implements ClientModInitializer {
                 "category.dynamicHud"
     ));
 
+    /*
+    This is an example
+     */
     @Override
     public void onInitializeClient() {
         MinecraftClient mc=MinecraftClient.getInstance();
         dynamicutil = new DynamicUtil(mc);
         // Add a text widget to the custom HUD
+
         TextWidget textWidget = new TextWidget(MinecraftClient.getInstance(), "Biome: ", 0.04f, 0.02f);
         dynamicutil.getWidgetManager().addWidget(textWidget);
         dynamicutil.getWidgetManager().addWidget(new TextWidget(mc, "Ping: ", 0.08f, 0.02f));

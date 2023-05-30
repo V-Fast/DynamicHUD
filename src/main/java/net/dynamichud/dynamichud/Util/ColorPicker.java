@@ -1,4 +1,4 @@
-package net.dynamichud.dynamichud;
+package net.dynamichud.dynamichud.Util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
@@ -13,17 +13,29 @@ import org.joml.Matrix4f;
 import java.awt.*;
 import java.util.function.Consumer;
 
+/**
+ * This class represents a color picker that allows the user to select a color.
+ */
 public class ColorPicker {
 
-    private final MinecraftClient client;
-    static int colorPickerWidth = 10;
-    static int colorPickerHeight = 100;
-    private static int x = 0;
-    private static int y = 0;
-    private static int hoveredColor = 0;
+    private final MinecraftClient client; // The Minecraft client instance
+    static int colorPickerWidth = 10; // The width of the color picker
+    static int colorPickerHeight = 100; // The height of the color picker
+    private static int x = 0; // The x position of the color picker
+    private static int y = 0; // The y position of the color picker
+    private static int hoveredColor = 0; // The currently hovered color
 
-    private final Consumer<Integer> onColorSelected;
+    private final Consumer<Integer> onColorSelected; // The callback to call when a color is selected
 
+    /**
+     * Constructs a ColorPicker object.
+     *
+     * @param client         The Minecraft client instance
+     * @param x              The x position of the color picker
+     * @param y              The y position of the color picker
+     * @param initialColor   The initial color of the color picker
+     * @param onColorSelected The callback to call when a color is selected
+     */
     public ColorPicker(MinecraftClient client, int x, int y, int initialColor, Consumer<Integer> onColorSelected) {
         this.client = client;
         ColorPicker.x = x;
@@ -31,6 +43,10 @@ public class ColorPicker {
         this.onColorSelected = onColorSelected;
     }
 
+    /**
+     * Renders this color picker on screen.
+     *@param matrices - MatrixStack used for rendering.
+     */
     public void render(MatrixStack matrices) {
         // Draw the background
         int backgroundColor = 0xFF000000; // Black color
@@ -57,7 +73,13 @@ public class ColorPicker {
             DrawableHelper.fill(matrices, boxX, boxY, boxX + boxSize, boxY + boxSize, hoveredColor);
         }
     }
-    public static void mouseMoved(double mouseX, double mouseY) {
+
+    /**
+     * Handles mouse movement on this screen.
+     *@param mouseX - X position of mouse cursor.
+     *@param mouseY - Y position of mouse cursor.
+     */
+    public static void mouseMoved(double mouseX,double mouseY) {
         // Check if the mouse is over any of the colors
         int numColors = 100;
         int colorWidth = colorPickerWidth;
@@ -74,8 +96,16 @@ public class ColorPicker {
         hoveredColor = 0;
     }
 
-
-
+    /**
+     * Fills a rectangle on screen with a gradient.
+     *@param matrix4f - Matrix4f used for rendering.
+     *@param x1 - X position of top left corner of rectangle.
+     *@param y1 - Y position of top left corner of rectangle.
+     *@param x2 - X position of bottom right corner of rectangle.
+     *@param y2 - Y position of bottom right corner of rectangle.
+     *@param topColor - Color at top of gradient.
+     *@param bottomColor - Color at bottom of gradient.
+     */
     private void fillGradient(Matrix4f matrix4f, int x1, int y1, int x2, int y2, int topColor, int bottomColor) {
         float topAlpha = (float)(topColor >> 24 & 255) / 255.0F;
         float topRed = (float)(topColor >> 16 & 255) / 255.0F;
@@ -90,14 +120,22 @@ public class ColorPicker {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        bufferBuilder.vertex(matrix4f,x1,y2 ,0).color(bottomRed ,bottomGreen ,bottomBlue ,bottomAlpha).next();
-        bufferBuilder.vertex(matrix4f,x2,y2 ,0).color(bottomRed ,bottomGreen ,bottomBlue ,bottomAlpha).next();
-        bufferBuilder.vertex(matrix4f,x2,y1 ,0).color(topRed ,topGreen ,topBlue,topAlpha ).next();
-        bufferBuilder.vertex(matrix4f,x1,y1 ,0).color(topRed ,topGreen ,topBlue,topAlpha ).next();
+        bufferBuilder.vertex(matrix4f, x1, y2, 0).color(topRed, topGreen, topBlue, topAlpha).next();
+        bufferBuilder.vertex(matrix4f, x2, y2, 0).color(topRed, topGreen, topBlue, topAlpha).next();
+        bufferBuilder.vertex(matrix4f, x2, y1, 0).color(bottomRed, bottomGreen, bottomBlue, bottomAlpha).next();
+        bufferBuilder.vertex(matrix4f,x1,y1 ,0).color(bottomRed,bottomGreen,bottomBlue,bottomAlpha).next();
         tessellator.draw();
         RenderSystem.disableBlend();
     }
 
+    /**
+     * Handles mouse clicks on this color picker.
+     *
+     * @param mouseX The current x position of the mouse cursor
+     * @param mouseY The current y position of the mouse cursor
+     * @param button The mouse button that was clicked
+     * @return True if the mouse click was handled by this color picker, false otherwise
+     */
     public boolean mouseClicked(double mouseX,double mouseY,int button){
         // Check if the mouse is over any of the colors
         int numColors = 100;
@@ -115,4 +153,5 @@ public class ColorPicker {
 
         return false;
     }
+
 }
