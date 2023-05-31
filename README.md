@@ -6,3 +6,9 @@ Current version: 0.0.0.01
 Dont look at the code. I warn you.
 
 Library not arranged, viewer discretion warned
+
+## [DynamicHUDmod.java](src/main/java/net/dynamichud/dynamichud/DynamicHUDmod.java) and [MoveScreen.java](src/main/java/net/dynamichud/dynamichud/hudscreen/MoveScreen.java) are two examples. 
+
+### [DynamicHUDmod.java](src/main/java/net/dynamichud/dynamichud/DynamicHUDmod.java) will be removed in later updates as it is currently only used for testing purposes.
+
+### [MoveScreen.java](src/main/java/net/dynamichud/dynamichud/hudscreen/MoveScreen.java) will stay in the library since it can be used directly.
