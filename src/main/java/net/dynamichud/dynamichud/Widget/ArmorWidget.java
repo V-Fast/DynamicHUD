@@ -22,11 +22,12 @@ public class ArmorWidget extends Widget {
      * @param xPercent The x position of the widget as a percentage of the screen width
      * @param yPercent The y position of the widget as a percentage of the screen height
      */
-    public ArmorWidget(MinecraftClient client, EquipmentSlot slot, float xPercent, float yPercent) {
+    public ArmorWidget(MinecraftClient client, EquipmentSlot slot, float xPercent, float yPercent,boolean enabled) {
         super(client);
         this.slot = slot;
         this.xPercent = xPercent;
         this.yPercent = yPercent;
+        this.enabled=enabled;
     }
 
     /**
@@ -43,7 +44,7 @@ public class ArmorWidget extends Widget {
 
     @Override
     public WidgetBox getWidgetBox() {
-        return new WidgetBox(getX(), getY());
+        return new WidgetBox(this.getX() - 2,this.getY() - 2,this.getX() + this.getWidth() + 2,this.getY() + this.getHeight() + 2);
     }
 
     /**
@@ -72,5 +73,6 @@ public class ArmorWidget extends Widget {
         tag.putFloat("yPercent", yPercent);
         tag.putFloat("yPercent", yPercent);
         tag.putString("slot", slot.getName());
+        tag.putBoolean("Enabled",this.enabled);
     }
 }

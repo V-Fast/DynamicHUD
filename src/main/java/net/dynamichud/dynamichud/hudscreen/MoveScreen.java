@@ -3,10 +3,7 @@ package net.dynamichud.dynamichud.hudscreen;
 import net.dynamichud.dynamichud.Util.ColorPicker;
 import net.dynamichud.dynamichud.Util.ContextMenu;
 import net.dynamichud.dynamichud.Util.DynamicUtil;
-import net.dynamichud.dynamichud.Widget.ArmorWidget;
-import net.dynamichud.dynamichud.Widget.SliderWidget;
-import net.dynamichud.dynamichud.Widget.TextWidget;
-import net.dynamichud.dynamichud.Widget.Widget;
+import net.dynamichud.dynamichud.Widget.*;
 import net.dynamichud.dynamichud.handlers.DefaultDragHandler;
 import net.dynamichud.dynamichud.handlers.DefaultMouseHandler;
 import net.dynamichud.dynamichud.handlers.DragHandler;
@@ -223,11 +220,18 @@ public class MoveScreen extends Screen {
             // Update the position of the context menu
             int newX = (int) (mouseX - dragStartX);
             int newY = (int) (mouseY - dragStartY);
+
+            // Snap the widget to the grid
+            int gridSize =3; // The size of each grid cell in pixels
+            newX = (newX / gridSize) * gridSize;
+            newY = (newY / gridSize) * gridSize;
+
             selectedWidget.setX(newX);
             selectedWidget.setY(newY);
             return true;
         }
         return false;
     }
+
 }
 

@@ -3,6 +3,7 @@ package net.dynamichud.dynamichud.Widget;
 import net.dynamichud.dynamichud.helpers.ColorHelper;
 import net.dynamichud.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 
@@ -31,7 +32,7 @@ public class TextWidget extends Widget {
      * @param xPercent The x position of the widget as a percentage of the screen width
      * @param yPercent The y position of the widget as a percentage of the screen height
      */
-    public TextWidget(MinecraftClient client, String text, float xPercent, float yPercent,boolean Shadow,boolean Rainbow,boolean VerticalRainbow,int color) {
+    public TextWidget(MinecraftClient client, String text, float xPercent, float yPercent,boolean Shadow,boolean Rainbow,boolean VerticalRainbow,int color,boolean enabled) {
         super(client);
         this.text = text;
         this.xPercent = xPercent;
@@ -40,6 +41,7 @@ public class TextWidget extends Widget {
         this.rainbow=Rainbow;
         this.verticalRainbow=VerticalRainbow;
         this.color=color;
+        this.enabled=enabled;
     }
 
     /**
@@ -149,7 +151,7 @@ public class TextWidget extends Widget {
     }
 
     /**
-     * Returns whether or not color options are enabled for this widget.
+     * Returns whether color options are enabled for this widget.
      *
      *@return true if color options are enabled for this widget, false otherwise.
      */
@@ -159,11 +161,12 @@ public class TextWidget extends Widget {
 
     @Override
     public WidgetBox getWidgetBox() {
-        MinecraftClient client = MinecraftClient.getInstance();
-        int textWidth = client.textRenderer.getWidth(getText());
-        int textHeight = client.textRenderer.fontHeight;
-        return new WidgetBox(textWidth, textHeight);
+        TextRenderer textRenderer = client.textRenderer;
+        int width = textRenderer.getWidth(text);
+        int height = textRenderer.fontHeight;
+        return new WidgetBox(width, height);
     }
+
 
     /**
      * Renders this widget on screen.
@@ -201,6 +204,7 @@ public class TextWidget extends Widget {
         tag.putBoolean("Shadow", hasShadow());
         tag.putBoolean("VerticalRainbow", hasVerticalRainbow());
         tag.putInt("Color", getColor());
+        tag.putBoolean("Enabled",this.enabled);
     }
 
     private void drawText(MatrixStack matrices, String text, int x, int y, int color) {

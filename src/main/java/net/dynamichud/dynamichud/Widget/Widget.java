@@ -1,8 +1,10 @@
 package net.dynamichud.dynamichud.Widget;
 
 import com.mojang.datafixers.types.templates.CompoundList;
+import net.dynamichud.dynamichud.Util.DynamicUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Box;
 
