@@ -40,6 +40,11 @@ public class ArmorWidget extends Widget {
         TextureHelper.drawItemTexture(matrices, itemRenderer, armorItem, getX(), getY());
     }
 
+    @Override
+    public WidgetBox getWidgetBox() {
+        return new WidgetBox(getWidth(), getHeight());
+    }
+
     /**
      * Returns the width of the widget.
      *

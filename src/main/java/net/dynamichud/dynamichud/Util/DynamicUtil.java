@@ -1,9 +1,6 @@
 package net.dynamichud.dynamichud.Util;
 
-import net.dynamichud.dynamichud.Widget.ArmorWidget;
-import net.dynamichud.dynamichud.Widget.TextWidget;
-import net.dynamichud.dynamichud.Widget.Widget;
-import net.dynamichud.dynamichud.Widget.WidgetManager;
+import net.dynamichud.dynamichud.Widget.*;
 import net.dynamichud.dynamichud.helpers.ColorHelper;
 import net.dynamichud.dynamichud.helpers.DrawHelper;
 import net.dynamichud.dynamichud.hudscreen.MoveScreen;
@@ -57,29 +54,12 @@ public class DynamicUtil extends DrawableHelper {
             // Draw a red box around the widget if the HUD is disabled
             if (MinecraftClient.getInstance().currentScreen instanceof MoveScreen) {
                 int backgroundColor = widget.isEnabled() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
-                int x1 = 0;
-                int y1 = 0;
-                int x2 = 0;
-                int y2 = 0;
-                TextRenderer textrenderer = MinecraftClient.getInstance().textRenderer;
-                if (widget instanceof TextWidget text) {
-                    int textWidth = textrenderer.getWidth(text.getText());
-                    x1 = text.getX() - textWidth / 2 - 2;
-                    y1 = text.getY() - 9 / 2 - 2;
-                    x2 = text.getX() + textWidth / 2 + 2;
-                    y2 = text.getY() + 9 / 2 + 2;
-
-                } else if (widget instanceof ArmorWidget armor) {
-                    x1 = (armor.getX() - 2);
-                    y1 = (armor.getY() - 2);
-                    x2 = (armor.getX() + armor.getWidth() + 2);
-                    y2 = (armor.getY() + armor.getHeight() + 2);
-                }
-
-                DrawHelper.fill(matrices, x1, y1, x2, y2, backgroundColor);
+                WidgetBox box = widget.getWidgetBox();
+                DrawHelper.drawBox(matrices, widget.getX(), widget.getY(), box.getWidth(), box.getHeight(), backgroundColor);
             }
         }
     }
+
 
     /**
      * Returns WidgetManager instance used by this class.

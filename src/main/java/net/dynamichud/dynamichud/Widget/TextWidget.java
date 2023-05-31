@@ -15,7 +15,6 @@ public class TextWidget extends Widget {
     private boolean shadow; // Whether to draw a shadow behind the text
     private boolean rainbow; // Whether to apply a rainbow effect to the text
     private boolean verticalRainbow; // Whether to apply a vertical rainbow effect to the text
-    private int backgroundColor;
     private int color = Color.WHITE.getRGB(); // The color of the text
     private boolean colorOptionEnabled = false;
     protected static float rainbowSpeed = 15f; // The speed of the rainbow effect
@@ -150,6 +149,14 @@ public class TextWidget extends Widget {
         return colorOptionEnabled;
     }
 
+    @Override
+    public WidgetBox getWidgetBox() {
+        MinecraftClient client = MinecraftClient.getInstance();
+        int textWidth = client.textRenderer.getWidth(getText());
+        int textHeight = client.textRenderer.fontHeight;
+        return new WidgetBox(textWidth, textHeight);
+    }
+
     /**
      * Renders this widget on screen.
      *@param matrices - MatrixStack used for rendering.
@@ -157,33 +164,29 @@ public class TextWidget extends Widget {
     @Override
     public void render(MatrixStack matrices) {
         int textWidth = client.textRenderer.getWidth(text);
+        int x = getX();
+        int y = getY();
         if (rainbow) {
-            int x = getX();
-            int y = getY();
             float hue = (System.currentTimeMillis() % 2000) / (rainbowSpeed*100f);
             for (int i = 0; i < text.length(); i++) {
                 int color = ColorHelper.getColorFromHue(hue);
                 String character = String.valueOf(text.charAt(i));
                 int characterWidth = client.textRenderer.getWidth(character);
-                if (shadow)
-                    DrawHelper.drawTextWithShadow(matrices, client.textRenderer, character, x-textWidth/2, y - 4, color);
-                else
-                    DrawHelper.drawText(matrices, client.textRenderer, character, x-textWidth/2, y - 4, color);
+                drawText(matrices, character, x-textWidth/2, y - 4, color);
                 x += characterWidth;
                 hue += verticalRainbow ? 0.05f : 0.1f;
                 if (hue > 1) hue -= 1;
             }
-        } else if (verticalRainbow){
-            int color = ColorHelper.getColorFromHue((System.currentTimeMillis() % 2000) / (rainbowSpeed*100f));
-            if (shadow)
-                DrawHelper.drawTextWithShadow(matrices, client.textRenderer, text, getX() - textWidth / 2, getY() - 4, color);
-            else
-                DrawHelper.drawText(matrices, client.textRenderer, text, getX() - textWidth / 2, getY() - 4, color);
+        } else {
+            int color = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 2000) / (rainbowSpeed*100f)) : this.color;
+            drawText(matrices, text, getX() - textWidth / 2, getY() - 4, color);
         }
-        else if (shadow)
-            DrawHelper.drawTextWithShadow(matrices, client.textRenderer, text, getX() - textWidth / 2, getY() - 4, color);
-        else
-            DrawHelper.drawText(matrices, client.textRenderer, text, getX() - textWidth / 2, getY() - 4, color);
+    }
 
+    private void drawText(MatrixStack matrices, String text, int x, int y, int color) {
+        if (shadow)
+            DrawHelper.drawTextWithShadow(matrices, client.textRenderer, text, x, y, color);
+        else
+            DrawHelper.drawText(matrices, client.textRenderer, text, x, y, color);
     }
 }

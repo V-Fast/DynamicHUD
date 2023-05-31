@@ -8,7 +8,7 @@
     "tanishisherewith"
   ],
   "contact": {
-    "repo": "https://github.com/tani/DynamicHUD"
+    "repo": "https://github.com/V-Fast/DynamicHUD"
   },
   "license": "All-Rights-Reserved",
   "environment": "client",
@@ -18,11 +18,15 @@
     ]
   },
   "mixins": [
-    "DynamicHUD.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
     "minecraft": "${minecraft_version}"
+  },
+  "custom": {
+    "modmenu": {
+      "badges": [ "library" ]
+    }
   }
 }

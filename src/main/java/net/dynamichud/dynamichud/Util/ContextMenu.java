@@ -34,6 +34,21 @@ public class ContextMenu {
         this.y = y;
         this.selectedWidget = selectedWidget;
     }
+    /**
+     * Sets the options to enable or disable based on values
+     * @param label The label of the option
+     * @param option Context Menu options
+     */
+    public void setOptions(String label,ContextMenuOption option)
+    {
+        //Add switch or if conditions to see if the context menu options should be enabled or not
+        switch (label) {
+            case "Shadow" -> option.enabled = selectedWidget.hasShadow();
+            case "Rainbow" -> option.enabled = selectedWidget.hasRainbow();
+            case "Vertical Rainbow" -> option.enabled = selectedWidget.hasVerticalRainbow();
+            case "Color" -> option.enabled = selectedWidget.isColorOptionEnabled();
+        }
+    }
 
     /**
      * Adds an option to the context menu.
@@ -44,12 +59,7 @@ public class ContextMenu {
     public void addOption(String label, Runnable action) {
         ContextMenuOption option = new ContextMenuOption(label, action);
         if (selectedWidget != null) {
-            switch (label) {
-                case "Shadow" -> option.enabled = selectedWidget.hasShadow();
-                case "Rainbow" -> option.enabled = selectedWidget.hasRainbow();
-                case "Vertical Rainbow" -> option.enabled = selectedWidget.hasVerticalRainbow();
-                case "Color" -> option.enabled = selectedWidget.isColorOptionEnabled();
-            }
+           setOptions(label,option);
         }
         options.add(option);
     }
@@ -73,6 +83,7 @@ public class ContextMenu {
         int cornerRadius = 5; // The radius of the rounded corners
         int padding = 5; // The amount of padding around the rectangle
         DrawHelper.fillRoundedRect(matrices.peek().getPositionMatrix(), x, y - padding, x + width + padding-1, y + height + padding, cornerRadius, backgroundColor);
+
         int buttonSize = 10;
         int buttonX = x + width - buttonSize;
         int buttonY = y;
@@ -85,7 +96,7 @@ public class ContextMenu {
             textRenderer.draw(matrices, option.label, x + 5, optionY, color);
             optionY += textRenderer.fontHeight + 2;
         }
-
+        if (selectedWidget != null) setPosition(selectedWidget.getX(), selectedWidget.getY() + textRenderer.fontHeight + 4);
     }
 
     /**
@@ -97,7 +108,6 @@ public class ContextMenu {
         this.x = x;
         this.y = y;
     }
-
 
     /**
      * Handles mouse clicks on this context menu.

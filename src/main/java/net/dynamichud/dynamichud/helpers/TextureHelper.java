@@ -44,4 +44,5 @@ public class TextureHelper {
         ItemStack mainHandItem = client.player.getMainHandStack();
         drawItemTexture(matrices, itemRenderer, mainHandItem, x, y);
     }
+
 }

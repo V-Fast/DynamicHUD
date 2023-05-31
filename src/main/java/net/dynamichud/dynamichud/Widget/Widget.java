@@ -23,6 +23,12 @@ public abstract class Widget {
     }
 
     /**
+     * Gets the box around the widget for collison purpose
+     */
+    public abstract WidgetBox getWidgetBox();
+
+
+    /**
      * Renders the widget on the screen.
      *
      * @param matrices The matrix stack used for rendering

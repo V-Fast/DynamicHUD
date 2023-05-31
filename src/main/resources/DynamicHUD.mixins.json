@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "net.dynamichud.dynamichud",
+  "package": "net.dynamichud.dynamichud.mixins",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
   ],

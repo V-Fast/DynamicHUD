@@ -1,7 +1,9 @@
 package net.dynamichud.dynamichud.Widget;
 
+import net.dynamichud.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 
@@ -18,6 +20,7 @@ public class SliderWidget {
     private float value; // The current value of the slider
     private final float minValue; // The minimum value of the slider
     private final float maxValue; // The maximum value of the slider
+    private Widget selectedWidget=null;
 
     /**
      * Constructs a SliderWidget object.
@@ -31,8 +34,9 @@ public class SliderWidget {
      * @param value    The initial value of the slider
      * @param minValue The minimum value of the slider
      * @param maxValue The maximum value of the slider
+     * @param selectedWidget The widget which was selected to display this slider
      */
-    public SliderWidget(MinecraftClient client, int x, int y, int width, int height, String label, float value, float minValue, float maxValue) {
+    public SliderWidget(MinecraftClient client, int x, int y, int width, int height, String label, float value, float minValue, float maxValue,Widget selectedWidget) {
         this.client = client;
         this.x = x;
         this.y = y;
@@ -42,6 +46,7 @@ public class SliderWidget {
         this.value = value;
         this.minValue = minValue;
         this.maxValue = maxValue;
+        this.selectedWidget=selectedWidget;
     }
 
     /**
@@ -52,21 +57,25 @@ public class SliderWidget {
     public void render(MatrixStack matrices) {
         // Draw the label
         TextRenderer textRenderer = client.textRenderer;
-        textRenderer.draw(matrices, label + ": " + String.format("%.1f", value), x + 5, y + (height - textRenderer.fontHeight) / 2, 0xFFFFFFFF);
+        textRenderer.draw(matrices, label + ": " + String.format("%.1f", value), x +1, y + (height - textRenderer.fontHeight) / 2, 0xFFFFFFFF);
 
         // Draw the slider
         int sliderWidth = width - 10;
         int sliderHeight = 2;
         int sliderX = x + 5;
         int sliderY = y + height - sliderHeight - 5;
-        DrawableHelper.fill(matrices, sliderX, sliderY, sliderX + sliderWidth, sliderY + sliderHeight, 0xFFFFFFFF);
+
+        DrawHelper.fillRoundedRect(matrices, sliderX, sliderY, sliderX + sliderWidth, sliderY + sliderHeight, 0xFFFFFFFF);
 
         // Draw the handle
         float handleWidth = 4;
         float handleHeight = 10;
         float handleX = sliderX + (value - minValue) / (maxValue - minValue) * (sliderWidth - handleWidth);
         float handleY = sliderY + (sliderHeight - handleHeight) / 2;
-        DrawableHelper.fill(matrices, (int)handleX, (int)handleY, (int)(handleX + handleWidth), (int)(handleY + handleHeight), 0xFFFFFFFF);
+
+        DrawHelper.fillRoundedRect(matrices, (int)handleX, (int)handleY, (int)(handleX + handleWidth), (int)(handleY + handleHeight), 0xFFFFFFFF);
+
+        if (selectedWidget!=null) setPosition(selectedWidget.getX(), selectedWidget.getY() + textRenderer.fontHeight + 67);
     }
 
     /**

@@ -7,6 +7,10 @@ import net.dynamichud.dynamichud.Widget.ArmorWidget;
 import net.dynamichud.dynamichud.Widget.SliderWidget;
 import net.dynamichud.dynamichud.Widget.TextWidget;
 import net.dynamichud.dynamichud.Widget.Widget;
+import net.dynamichud.dynamichud.handlers.DefaultDragHandler;
+import net.dynamichud.dynamichud.handlers.DefaultMouseHandler;
+import net.dynamichud.dynamichud.handlers.DragHandler;
+import net.dynamichud.dynamichud.handlers.MouseHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
@@ -24,6 +28,9 @@ public class MoveScreen extends Screen {
     private ColorPicker colorPicker = null; // The color picker that is currently displayed
     private Widget rainbowWidget = null; // The widget that is currently being edited by the rainbow speed slider
     private SliderWidget rainbowspeedslider = null; // The rainbow speed slider
+    private MouseHandler mouseHandler;
+    private DragHandler dragHandler;
+
 
     /**
      * Constructs a MoveScreen object.
@@ -33,6 +40,8 @@ public class MoveScreen extends Screen {
     public MoveScreen(DynamicUtil dynamicutil) {
         super(Text.literal("Move Widgets"));
         this.dynamicutil = dynamicutil;
+        updateMouseHandler();
+        dragHandler = new DefaultDragHandler();
     }
 
     /**
@@ -64,6 +73,48 @@ public class MoveScreen extends Screen {
         }
     }
 
+    private void updateMouseHandler() {
+        mouseHandler = new DefaultMouseHandler(colorPicker, contextMenu, rainbowspeedslider);
+    }
+    private void update(ColorPicker colorPicker,ContextMenu contextMenu,SliderWidget rainbowspeedslider)
+    {
+        this.colorPicker = colorPicker;
+        this.contextMenu = contextMenu;
+        this.rainbowspeedslider = rainbowspeedslider;
+        updateMouseHandler();
+    }
+
+    public void contextMenu(TextWidget textWidget,int x,int y)
+    {
+        contextMenu = new ContextMenu(mc, x, y + textRenderer.fontHeight + 2, textWidget);
+        contextMenu.addOption("Shadow", () -> {
+            // Toggle shadow
+            textWidget.setShadow(!textWidget.hasShadow());
+        });
+        contextMenu.addOption("Rainbow", () -> {
+            // Toggle rainbow
+            textWidget.setRainbow(!textWidget.hasRainbow());
+        });
+        contextMenu.addOption("Vertical Rainbow", () -> {
+            // Toggle vertical rainbow
+            textWidget.setVerticalRainbow(!textWidget.hasVerticalRainbow());
+        });
+        contextMenu.addOption("Color", () -> {
+            // Show color picker
+            // Set the color of the text
+            textWidget.toggleColorOption();
+            if (textWidget.isColorOptionEnabled()) {
+                // Set the color of the text widget
+                colorPicker = new ColorPicker(mc, mc.getWindow().getScaledWidth() / 2, mc.getWindow().getScaledHeight() / 2 - 50, textWidget.getColor(), textWidget::setColor);
+            } else colorPicker = null;
+        });
+        rainbowspeedslider = new SliderWidget(mc, x, y +60, 105, 20, "Rainbow Speed", TextWidget.getRainbowSpeed(), 5f, 25.0f,selectedWidget);
+
+        update(colorPicker,contextMenu,rainbowspeedslider);
+
+        TextWidget.setRainbowSpeed(rainbowspeedslider.getValue());
+    }
+
     /**
      * Handles mouse clicks on this screen.
      *@param mouseX - X position of mouse cursor.
@@ -74,74 +125,29 @@ public class MoveScreen extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         // Check if the mouse is over any of the widgets
+        // Handle mouse clicks on the context menu
+        if (mouseHandler.mouseClicked(mouseX,mouseY,button)) {
+            return true;
+        }
+
         for (Widget widget : dynamicutil.getWidgetManager().getWidgets()) {
-            if (widget instanceof TextWidget textWidget) {
-                int textWidth = client.textRenderer.getWidth(textWidget.getText());
-                int textHeight = client.textRenderer.fontHeight;
-                if (mouseX >= textWidget.getX() - textWidth / 2 && mouseX <= textWidget.getX() + textWidth / 2 && mouseY >= textWidget.getY() - textHeight / 2 && mouseY <= textWidget.getY() + textHeight / 2) {
-                    if (button == 1) { // Right-click
+            if (widget.getWidgetBox().contains(widget, mouseX, mouseY)) {
+                // Start dragging the widget
+                if (button == 1) { // Right-click
+                    if (widget instanceof TextWidget textWidget) {
                         selectedWidget = widget;
-                        rainbowWidget = widget;
+                        rainbowWidget = selectedWidget;
                         int x = selectedWidget.getX();
                         int y = selectedWidget.getY();
                         // Show context menu
-                        contextMenu = new ContextMenu(mc, x, y + textRenderer.fontHeight + 2, textWidget);
-                        contextMenu.addOption("Shadow", () -> {
-                            // Toggle shadow
-                            textWidget.setShadow(!textWidget.hasShadow());
-                        });
-                        contextMenu.addOption("Rainbow", () -> {
-                            // Toggle rainbow
-                            textWidget.setRainbow(!textWidget.hasRainbow());
-                        });
-                        contextMenu.addOption("Vertical Rainbow", () -> {
-                            // Toggle vertical rainbow
-                            textWidget.setVerticalRainbow(!textWidget.hasVerticalRainbow());
-                        });
-                        contextMenu.addOption("Color", () -> {
-                            // Show color picker
-                            // Set the color of the text
-                            textWidget.toggleColorOption();
-                            if (textWidget.isColorOptionEnabled()) {
-                                // Set the color of the text widget
-                                colorPicker = new ColorPicker(mc, mc.getWindow().getScaledWidth() / 2, mc.getWindow().getScaledHeight() / 2, textWidget.getColor(), textWidget::setColor);
-                            } else colorPicker = null;
-                        });
-
-                        rainbowspeedslider = new SliderWidget(mc, x, y + 70, 105, 20, "Rainbow Speed", TextWidget.getRainbowSpeed(), 5f, 25.0f);
-                        TextWidget.setRainbowSpeed(rainbowspeedslider.getValue());
-                        return true;
-                    } else {
-                        // Start dragging the widget
-                        selectedWidget = widget;
-                        dragStartX = (int) (mouseX - textWidget.getX());
-                        dragStartY = (int) (mouseY - textWidget.getY());
-
-                        if (button == 0) widget.enabled = !widget.enabled;
-
+                        contextMenu(textWidget,x,y);
                         return true;
                     }
-                }
-            } else if (widget instanceof ArmorWidget armorWidget) {
-                if (mouseX >= armorWidget.getX() - armorWidget.getWidth() / 2 && mouseX <= armorWidget.getX() + armorWidget.getWidth() / 2 && mouseY >= armorWidget.getY() - armorWidget.getHeight() / 2 && mouseY <= armorWidget.getY() + armorWidget.getHeight() / 2) {
-                    // Start dragging the widget
+                } else if (dragHandler.startDragging(widget, mouseX, mouseY)) {
+                    widget.enabled = !widget.enabled;
                     selectedWidget = widget;
-                    dragStartX = (int) (mouseX - armorWidget.getX());
-                    dragStartY = (int) (mouseY - armorWidget.getY());
-
-                    if (button == 0) widget.enabled = !widget.enabled;
                     return true;
                 }
-            }
-            if (contextMenu != null && contextMenu.mouseClicked(mouseX, mouseY, button)) {
-                return true;
-            }
-            // Check if the mouse is over the color picker
-            if (colorPicker != null && colorPicker.mouseClicked(mouseX, mouseY, button)) {
-                return true;
-            }
-            if (rainbowspeedslider != null && rainbowspeedslider.mouseClicked(mouseX, mouseY, button)) {
-                return true;
             }
         }
         return false;
@@ -197,6 +203,7 @@ public class MoveScreen extends Screen {
      */
     @Override
     public void resize(MinecraftClient client, int width, int height) {
+        return;
     }
 
 
@@ -211,23 +218,12 @@ public class MoveScreen extends Screen {
      */
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (rainbowWidget != null && rainbowspeedslider.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
-            // Update the scale of the widget while scaling
-            TextWidget.setRainbowSpeed(rainbowspeedslider.getValue());
+        if (mouseHandler.mouseDragged(mouseX,mouseY,button,deltaX,deltaY)) {
+            return true;
         }
         // Update the position of the widget while dragging
         if (selectedWidget != null) {
             // Update the position of the context menu
-            if (this.contextMenu != null) {
-                if (selectedWidget instanceof TextWidget) {
-                    int textHeight = client.textRenderer.fontHeight;
-                    contextMenu.setPosition(selectedWidget.getX(), selectedWidget.getY() + textHeight + 4);
-                    rainbowspeedslider.setPosition(selectedWidget.getX(), selectedWidget.getY() + textHeight + 67);
-                } else {
-                    contextMenu.setPosition(selectedWidget.getX(), selectedWidget.getY());
-                }
-            }
-
             int newX = (int) (mouseX - dragStartX);
             int newY = (int) (mouseY - dragStartY);
             selectedWidget.setX(newX);

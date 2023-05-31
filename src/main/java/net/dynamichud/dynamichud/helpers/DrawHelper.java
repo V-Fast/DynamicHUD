@@ -12,6 +12,24 @@ import org.joml.Matrix4f;
 
 public class DrawHelper extends DrawableHelper {
     /**
+     * Fills a box on the screen with a specified color.
+     *
+     * @param matrices The matrix stack used for rendering
+     * @param x       The x position of the rectangle
+     * @param y       The y position of the rectangle
+     * @param width       The width of the rectangle
+     * @param height       The height of the rectangle
+     * @param color    The color to fill the rectangle with
+     */
+    public static void drawBox(MatrixStack matrices, int x, int y, int width, int height, int color) {
+        int x1 = x - width / 2 - 2;
+        int y1 = y - height / 2 - 2;
+        int x2 = x + width / 2 + 2;
+        int y2 = y + height / 2 + 2;
+        fill(matrices, x1, y1, x2, y2, color);
+    }
+
+    /**
      * Fills a rectangle on the screen with a specified color.
      *
      * @param matrices The matrix stack used for rendering
@@ -113,5 +131,13 @@ public class DrawHelper extends DrawableHelper {
         }
         tessellator.draw();
         RenderSystem.disableBlend();
+    }
+
+    public static void fillRoundedRect(MatrixStack matrices, int left, int top, int right, int bottom, int color){
+        DrawableHelper.fill(matrices,left+1,top,right-1,top+1,color);
+        DrawableHelper.fill(matrices,left+1,bottom-1,right-1,bottom,color);
+        DrawableHelper.fill(matrices,left,top+1,left+1,bottom-1,color);
+        DrawableHelper.fill(matrices,right-1,top+1,right,bottom-1,color);
+        DrawableHelper.fill(matrices,left+1,top+1,right-1,bottom-1,color);
     }
 }
