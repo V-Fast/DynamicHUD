@@ -15,6 +15,6 @@ Library not arranged, viewer discretion warned
 
 
 TODO:
-- [] Save and load of widgets. Make that compatible with any widget.
-- [] Since this library is in testing phase, most of the methods are one way use, which means only the library can use them, and these methods are quite important for devlopers using this library. Make this methods open to all
-- [] Add more features and draw and helpers.
+-[] Save and load of widgets. Make that compatible with any widget.
+-[] Since this library is in testing phase, most of the methods are one way use, which means only the library can use them, and these methods are quite important for devlopers using this library. Make this methods open to all
+-[] Add more features and draw and helpers.
