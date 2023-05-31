@@ -131,39 +131,4 @@ public abstract class Widget {
             }
         }
     }
-
-    /**
-     * Reads the state of this widget from the given tag.
-     *
-     * @param tag The tag to read from
-     */
-    public void readFromTag(NbtCompound tag) {
-        for (Field field : getClass().getDeclaredFields()) {
-            if (Modifier.isStatic(field.getModifiers())) continue;
-
-            field.setAccessible(true);
-
-            try {
-                if (field.getType() == boolean.class) {
-                    field.setBoolean(this, tag.getBoolean(field.getName()));
-                } else if (field.getType() == byte.class) {
-                    field.setByte(this, tag.getByte(field.getName()));
-                } else if (field.getType() == short.class) {
-                    field.setShort(this, tag.getShort(field.getName()));
-                } else if (field.getType() == int.class) {
-                    field.setInt(this, tag.getInt(field.getName()));
-                } else if (field.getType() == long.class) {
-                    field.setLong(this, tag.getLong(field.getName()));
-                } else if (field.getType() == float.class) {
-                    field.setFloat(this, tag.getFloat(field.getName()));
-                } else if (field.getType() == double.class) {
-                    field.setDouble(this, tag.getDouble(field.getName()));
-                } else if (field.getType() == String.class) {
-                    field.set(this, tag.getString(field.getName()));
-                } // Add more cases here for other data types
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }

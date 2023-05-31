@@ -76,23 +76,7 @@ public class WidgetManager {
                 for (int i = 0; i < widgetList.size(); i++) {
                     NbtCompound widgetTag = widgetList.getCompound(i);
                     String className = widgetTag.getString("class");
-                    if (className.equals(TextWidget.class.getName())) {
-                        String text = widgetTag.getString("text");
-                        float xPercent = widgetTag.getFloat("xPercent");
-                        float yPercent = widgetTag.getFloat("yPercent");
-                        boolean rainbow = widgetTag.getBoolean("Rainbow");
-                        boolean shadow = widgetTag.getBoolean("Shadow");
-                        boolean verticalrainbow = widgetTag.getBoolean("VerticalRainbow");
-                        int color = widgetTag.getInt("Color");
-                        addWidget(new TextWidget(MinecraftClient.getInstance(), text, xPercent, yPercent,shadow,rainbow,verticalrainbow,color));
-                        System.out.println("Wigdet Added: ");
-                    } else if (className.equals(ArmorWidget.class.getName())) {
-                        EquipmentSlot slot = EquipmentSlot.byName(widgetTag.getString("slot"));
-                        float xPercent = widgetTag.getFloat("xPercent");
-                        float yPercent = widgetTag.getFloat("yPercent");
-                        addWidget(new ArmorWidget(MinecraftClient.getInstance(), slot, xPercent, yPercent));
-                        System.out.println("ArmorWigdet Added: ");
-                    }
+                    Widgetfactory.loadWidgetsFromTag(className,widgetTag);
                     System.out.println("Wigdets: "+widgets);
                 }
             } catch (IOException e) {
