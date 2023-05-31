@@ -1,8 +1,13 @@
 package net.dynamichud.dynamichud.Widget;
 
+import com.mojang.datafixers.types.templates.CompoundList;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Box;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 /**
  * This class represents a widget that can be displayed on the screen.
@@ -12,6 +17,8 @@ public abstract class Widget {
     public boolean enabled = true; // Whether the widget is enabled
     protected float xPercent; // The x position of the widget as a percentage of the screen width
     protected float yPercent; // The y position of the widget as a percentage of the screen height
+    protected static float rainbowSpeed = 15f; // The speed of the rainbow effect
+
 
     /**
      * Constructs a Widget object.
@@ -85,4 +92,78 @@ public abstract class Widget {
      *@return height of this widget.
      */
     public int getHeight() {return client.textRenderer.fontHeight;}
+
+    /**
+     * Writes the state of this widget to the given tag.
+     *
+     * @param tag The tag to write to
+     */
+    public void writeToTag(NbtCompound tag) {
+        tag.putString("class", getClass().getName());
+
+        for (Field field : getClass().getDeclaredFields()) {
+            if (Modifier.isStatic(field.getModifiers())) continue;
+
+            field.setAccessible(true);
+
+            try {
+                Object value = field.get(this);
+
+                if (value instanceof Boolean) {
+                    tag.putBoolean(field.getName(), (Boolean) value);
+                } else if (value instanceof Byte) {
+                    tag.putByte(field.getName(), (Byte) value);
+                } else if (value instanceof Short) {
+                    tag.putShort(field.getName(), (Short) value);
+                } else if (value instanceof Integer) {
+                    tag.putInt(field.getName(), (Integer) value);
+                } else if (value instanceof Long) {
+                    tag.putLong(field.getName(), (Long) value);
+                } else if (value instanceof Float) {
+                    tag.putFloat(field.getName(), (Float) value);
+                } else if (value instanceof Double) {
+                    tag.putDouble(field.getName(), (Double) value);
+                } else if (value instanceof String) {
+                    tag.putString(field.getName(), (String) value);
+                } // Add more cases here for other data types
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Reads the state of this widget from the given tag.
+     *
+     * @param tag The tag to read from
+     */
+    public void readFromTag(NbtCompound tag) {
+        for (Field field : getClass().getDeclaredFields()) {
+            if (Modifier.isStatic(field.getModifiers())) continue;
+
+            field.setAccessible(true);
+
+            try {
+                if (field.getType() == boolean.class) {
+                    field.setBoolean(this, tag.getBoolean(field.getName()));
+                } else if (field.getType() == byte.class) {
+                    field.setByte(this, tag.getByte(field.getName()));
+                } else if (field.getType() == short.class) {
+                    field.setShort(this, tag.getShort(field.getName()));
+                } else if (field.getType() == int.class) {
+                    field.setInt(this, tag.getInt(field.getName()));
+                } else if (field.getType() == long.class) {
+                    field.setLong(this, tag.getLong(field.getName()));
+                } else if (field.getType() == float.class) {
+                    field.setFloat(this, tag.getFloat(field.getName()));
+                } else if (field.getType() == double.class) {
+                    field.setDouble(this, tag.getDouble(field.getName()));
+                } else if (field.getType() == String.class) {
+                    field.set(this, tag.getString(field.getName()));
+                } // Add more cases here for other data types
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

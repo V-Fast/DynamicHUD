@@ -4,8 +4,13 @@ import net.dynamichud.dynamichud.helpers.ColorHelper;
 import net.dynamichud.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.nbt.NbtCompound;
 
 import java.awt.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * This class represents a text widget that displays a specified text on the screen.
@@ -17,7 +22,6 @@ public class TextWidget extends Widget {
     private boolean verticalRainbow; // Whether to apply a vertical rainbow effect to the text
     private int color = Color.WHITE.getRGB(); // The color of the text
     private boolean colorOptionEnabled = false;
-    protected static float rainbowSpeed = 15f; // The speed of the rainbow effect
 
     /**
      * Constructs a TextWidget object.
@@ -27,11 +31,15 @@ public class TextWidget extends Widget {
      * @param xPercent The x position of the widget as a percentage of the screen width
      * @param yPercent The y position of the widget as a percentage of the screen height
      */
-    public TextWidget(MinecraftClient client, String text, float xPercent, float yPercent) {
+    public TextWidget(MinecraftClient client, String text, float xPercent, float yPercent,boolean Shadow,boolean Rainbow,boolean VerticalRainbow,int color) {
         super(client);
         this.text = text;
         this.xPercent = xPercent;
         this.yPercent = yPercent;
+        this.shadow=Shadow;
+        this.rainbow=Rainbow;
+        this.verticalRainbow=VerticalRainbow;
+        this.color=color;
     }
 
     /**
@@ -64,7 +72,7 @@ public class TextWidget extends Widget {
      *
      * @return The speed of the rainbow effect
      */
-    public static float getRainbowSpeed() {
+    public float getRainbowSpeed() {
         return rainbowSpeed;
     }
 
@@ -182,6 +190,18 @@ public class TextWidget extends Widget {
             drawText(matrices, text, getX() - textWidth / 2, getY() - 4, color);
         }
     }
+    @Override
+    public void writeToTag(NbtCompound tag) {
+        super.writeToTag(tag);
+        tag.putString("class", getClass().getName());
+        tag.putString("text", text);
+        tag.putFloat("xPercent", xPercent);
+        tag.putFloat("yPercent", yPercent);
+        tag.putBoolean("Rainbow", hasRainbow());
+        tag.putBoolean("Shadow", hasShadow());
+        tag.putBoolean("VerticalRainbow", hasVerticalRainbow());
+        tag.putInt("Color", getColor());
+    }
 
     private void drawText(MatrixStack matrices, String text, int x, int y, int color) {
         if (shadow)
@@ -189,4 +209,6 @@ public class TextWidget extends Widget {
         else
             DrawHelper.drawText(matrices, client.textRenderer, text, x, y, color);
     }
+
+
 }

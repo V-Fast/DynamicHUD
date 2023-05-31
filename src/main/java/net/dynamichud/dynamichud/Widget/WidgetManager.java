@@ -1,5 +1,11 @@
 package net.dynamichud.dynamichud.Widget;
 
+import net.fabricmc.fabric.api.util.NbtType;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.nbt.*;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +13,7 @@ import java.util.List;
  * This class manages a list of widgets that can be added, removed and retrieved.
  */
 public class WidgetManager {
+
     private final List<Widget> widgets = new ArrayList<>(); // The list of widgets
 
     /**
@@ -33,5 +40,64 @@ public class WidgetManager {
      */
     public List<Widget> getWidgets() {
         return widgets;
+    }
+
+    /**
+     * Saves the state of all widgets to the given file.
+     *
+     * @param file The file to save to
+     */
+    public void saveWidgets(File file) {
+        NbtCompound rootTag = new NbtCompound();
+        NbtList widgetList = new NbtList();
+
+        System.out.println("Saving widgets");
+
+        for (Widget widget : widgets) {
+            NbtCompound widgetTag = new NbtCompound();
+            widget.writeToTag(widgetTag);
+            widgetList.add(widgetTag);
+        }
+
+        rootTag.put("widgets", widgetList);
+
+        try (DataOutputStream out = new DataOutputStream(new FileOutputStream(file))) {
+            NbtIo.writeCompressed(rootTag, out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void loadWigdets(File file) {
+        if (file.exists()) {
+            try (DataInputStream in = new DataInputStream(new FileInputStream(file))) {
+                NbtCompound rootTag = NbtIo.readCompressed(in);
+                NbtList widgetList = rootTag.getList("widgets", NbtType.COMPOUND);
+
+                for (int i = 0; i < widgetList.size(); i++) {
+                    NbtCompound widgetTag = widgetList.getCompound(i);
+                    String className = widgetTag.getString("class");
+                    if (className.equals(TextWidget.class.getName())) {
+                        String text = widgetTag.getString("text");
+                        float xPercent = widgetTag.getFloat("xPercent");
+                        float yPercent = widgetTag.getFloat("yPercent");
+                        boolean rainbow = widgetTag.getBoolean("Rainbow");
+                        boolean shadow = widgetTag.getBoolean("Shadow");
+                        boolean verticalrainbow = widgetTag.getBoolean("VerticalRainbow");
+                        int color = widgetTag.getInt("Color");
+                        addWidget(new TextWidget(MinecraftClient.getInstance(), text, xPercent, yPercent,shadow,rainbow,verticalrainbow,color));
+                        System.out.println("Wigdet Added: ");
+                    } else if (className.equals(ArmorWidget.class.getName())) {
+                        EquipmentSlot slot = EquipmentSlot.byName(widgetTag.getString("slot"));
+                        float xPercent = widgetTag.getFloat("xPercent");
+                        float yPercent = widgetTag.getFloat("yPercent");
+                        addWidget(new ArmorWidget(MinecraftClient.getInstance(), slot, xPercent, yPercent));
+                        System.out.println("ArmorWigdet Added: ");
+                    }
+                    System.out.println("Wigdets: "+widgets);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

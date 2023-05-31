@@ -103,16 +103,13 @@ public class MoveScreen extends Screen {
             // Show color picker
             // Set the color of the text
             textWidget.toggleColorOption();
-            if (textWidget.isColorOptionEnabled()) {
-                // Set the color of the text widget
-                colorPicker = new ColorPicker(mc, mc.getWindow().getScaledWidth() / 2, mc.getWindow().getScaledHeight() / 2 - 50, textWidget.getColor(), textWidget::setColor);
-            } else colorPicker = null;
+            colorPicker = new ColorPicker(mc, mc.getWindow().getScaledWidth() / 2, mc.getWindow().getScaledHeight() / 2 - 50, textWidget.getColor(), textWidget::setColor);
         });
-        rainbowspeedslider = new SliderWidget(mc, x, y +60, 105, 20, "Rainbow Speed", TextWidget.getRainbowSpeed(), 5f, 25.0f,selectedWidget);
+        rainbowspeedslider = new SliderWidget(mc, x, y +60, 105, 20, "Rainbow Speed", textWidget.getRainbowSpeed(), 5f, 25.0f,selectedWidget);
 
         update(colorPicker,contextMenu,rainbowspeedslider);
 
-        TextWidget.setRainbowSpeed(rainbowspeedslider.getValue());
+        textWidget.setRainbowSpeed(rainbowspeedslider.getValue());
     }
 
     /**
@@ -136,7 +133,7 @@ public class MoveScreen extends Screen {
                 if (button == 1) { // Right-click
                     if (widget instanceof TextWidget textWidget) {
                         selectedWidget = widget;
-                        rainbowWidget = selectedWidget;
+                        rainbowWidget = widget;
                         int x = selectedWidget.getX();
                         int y = selectedWidget.getY();
                         // Show context menu

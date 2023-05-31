@@ -6,6 +6,7 @@ import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 
 /**
  * This class represents a widget that displays the armor item in a specified equipment slot.
@@ -42,7 +43,7 @@ public class ArmorWidget extends Widget {
 
     @Override
     public WidgetBox getWidgetBox() {
-        return new WidgetBox(getWidth(), getHeight());
+        return new WidgetBox(getX(), getY());
     }
 
     /**
@@ -61,5 +62,15 @@ public class ArmorWidget extends Widget {
      */
     public int getHeight() {
         return 16; // The height of an item texture is 16 pixels
+    }
+
+    @Override
+    public void writeToTag(NbtCompound tag) {
+        super.writeToTag(tag);
+        tag.putString("class", getClass().getName());
+        tag.putFloat("xPercent", xPercent);
+        tag.putFloat("yPercent", yPercent);
+        tag.putFloat("yPercent", yPercent);
+        tag.putString("slot", slot.getName());
     }
 }

@@ -60,7 +60,7 @@ public class SliderWidget {
         textRenderer.draw(matrices, label + ": " + String.format("%.1f", value), x +1, y + (height - textRenderer.fontHeight) / 2, 0xFFFFFFFF);
 
         // Draw the slider
-        int sliderWidth = width - 10;
+        int sliderWidth = width - 9;
         int sliderHeight = 2;
         int sliderX = x + 5;
         int sliderY = y + height - sliderHeight - 5;

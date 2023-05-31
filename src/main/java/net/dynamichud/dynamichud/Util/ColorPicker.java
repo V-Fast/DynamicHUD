@@ -1,6 +1,7 @@
 package net.dynamichud.dynamichud.Util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.dynamichud.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.BufferBuilder;
@@ -61,7 +62,7 @@ public class ColorPicker {
             float hue = (float) i / numColors;
             int topColor = Color.HSBtoRGB(hue, 1.0f, 1.0f);
             int bottomColor = Color.HSBtoRGB(hue, 1.0f, 0.8f);
-            fillGradient(matrices.peek().getPositionMatrix(), x, y + i * colorHeight, x + colorWidth, y + (i + 1) * colorHeight, topColor, bottomColor);
+            DrawHelper.fillGradient(matrices.peek().getPositionMatrix(), x, y + i * colorHeight, x + colorWidth, y + (i + 1) * colorHeight, topColor, bottomColor);
         }
 
         // Draw a square box at the top right of the screen using the hovered color
@@ -94,38 +95,6 @@ public class ColorPicker {
         }
         // Reset the hovered color if the mouse is not over any of the colors
         hoveredColor = 0;
-    }
-
-    /**
-     * Fills a rectangle on screen with a gradient.
-     *@param matrix4f - Matrix4f used for rendering.
-     *@param x1 - X position of top left corner of rectangle.
-     *@param y1 - Y position of top left corner of rectangle.
-     *@param x2 - X position of bottom right corner of rectangle.
-     *@param y2 - Y position of bottom right corner of rectangle.
-     *@param topColor - Color at top of gradient.
-     *@param bottomColor - Color at bottom of gradient.
-     */
-    private void fillGradient(Matrix4f matrix4f, int x1, int y1, int x2, int y2, int topColor, int bottomColor) {
-        float topAlpha = (float)(topColor >> 24 & 255) / 255.0F;
-        float topRed = (float)(topColor >> 16 & 255) / 255.0F;
-        float topGreen = (float)(topColor >> 8 & 255) / 255.0F;
-        float topBlue = (float)(topColor & 255) / 255.0F;
-        float bottomAlpha = (float)(bottomColor >> 24 & 255) / 255.0F;
-        float bottomRed = (float)(bottomColor >> 16 & 255) / 255.0F;
-        float bottomGreen = (float)(bottomColor >> 8 & 255) / 255.0F;
-        float bottomBlue = (float)(bottomColor & 255) / 255.0F;
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        bufferBuilder.vertex(matrix4f, x1, y2, 0).color(topRed, topGreen, topBlue, topAlpha).next();
-        bufferBuilder.vertex(matrix4f, x2, y2, 0).color(topRed, topGreen, topBlue, topAlpha).next();
-        bufferBuilder.vertex(matrix4f, x2, y1, 0).color(bottomRed, bottomGreen, bottomBlue, bottomAlpha).next();
-        bufferBuilder.vertex(matrix4f,x1,y1 ,0).color(bottomRed,bottomGreen,bottomBlue,bottomAlpha).next();
-        tessellator.draw();
-        RenderSystem.disableBlend();
     }
 
     /**
