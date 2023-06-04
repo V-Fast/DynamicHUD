@@ -40,4 +40,14 @@ public class ColorHelper {
     public static int getColorFromHue(float hue) {
         return Color.HSBtoRGB(hue, 1.0f, 1.0f);
     }
+    /**
+     * Converts a color to an integer.
+     *
+     * @param color The color to convert
+     * @return The integer representation of the JWT color
+     */
+    public static int ColorToInt(Color color) {
+        return color.getRGB();
+    }
+
 }

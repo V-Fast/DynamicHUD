@@ -193,6 +193,7 @@ public class TextWidget extends Widget {
             drawText(matrices, text, getX() - textWidth / 2, getY() - 4, color);
         }
     }
+
     @Override
     public void writeToTag(NbtCompound tag) {
         super.writeToTag(tag);

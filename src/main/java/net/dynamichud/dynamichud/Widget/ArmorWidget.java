@@ -1,18 +1,24 @@
 package net.dynamichud.dynamichud.Widget;
 
+import net.dynamichud.dynamichud.helpers.ColorHelper;
 import net.dynamichud.dynamichud.helpers.TextureHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 
+import java.awt.*;
+
 /**
  * This class represents a widget that displays the armor item in a specified equipment slot.
  */
 public class ArmorWidget extends Widget {
     private final EquipmentSlot slot; // The equipment slot to display the armor item from
+    public final TextureHelper.Position[] currentTextPosition;
+    private String text;
 
     /**
      * Constructs an ArmorWidget object.
@@ -22,12 +28,14 @@ public class ArmorWidget extends Widget {
      * @param xPercent The x position of the widget as a percentage of the screen width
      * @param yPercent The y position of the widget as a percentage of the screen height
      */
-    public ArmorWidget(MinecraftClient client, EquipmentSlot slot, float xPercent, float yPercent,boolean enabled) {
+    public ArmorWidget(MinecraftClient client, EquipmentSlot slot, float xPercent, float yPercent, boolean enabled, TextureHelper.Position[] currentTextPosition,String text) {
         super(client);
         this.slot = slot;
         this.xPercent = xPercent;
         this.yPercent = yPercent;
-        this.enabled=enabled;
+        this.enabled = enabled;
+        this.currentTextPosition = currentTextPosition;
+        this.text=text;
     }
 
     /**
@@ -38,8 +46,10 @@ public class ArmorWidget extends Widget {
     @Override
     public void render(MatrixStack matrices) {
         ItemRenderer itemRenderer = client.getItemRenderer();
+        TextRenderer textRenderer=MinecraftClient.getInstance().textRenderer;
         ItemStack armorItem = client.player.getEquippedStack(slot);
-        TextureHelper.drawItemTexture(matrices, itemRenderer, armorItem, getX(), getY());
+        //TextureHelper.drawItemTexture(matrices, itemRenderer, armorItem, getX(), getY());
+        TextureHelper.drawItemTextureWithText(matrices, itemRenderer, textRenderer, armorItem, getX(), getY(), text, ColorHelper.ColorToInt(Color.YELLOW), currentTextPosition[0], 0.5f);
     }
 
     @Override

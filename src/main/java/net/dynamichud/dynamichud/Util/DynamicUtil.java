@@ -3,9 +3,8 @@ package net.dynamichud.dynamichud.Util;
 import net.dynamichud.dynamichud.Widget.*;
 import net.dynamichud.dynamichud.helpers.ColorHelper;
 import net.dynamichud.dynamichud.helpers.DrawHelper;
-import net.dynamichud.dynamichud.hudscreen.MoveScreen;
+import net.dynamichud.dynamichud.hudscreen.AbstractMoveableScreen;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.math.MatrixStack;
@@ -29,11 +28,11 @@ public class DynamicUtil extends DrawableHelper {
      * Opens the MoveScreen when the specified key is pressed.
      *
      * @param key         The key to listen for
-     * @param DynamicUtil The DynamicUtil instance to use
+     * @param screen      The AbstractMoveableScreen instance to use to set the screen
      */
-    public static void openDynamicScreen(KeyBinding key,DynamicUtil DynamicUtil) {
+    public static void openDynamicScreen(KeyBinding key, AbstractMoveableScreen screen) {
         while (key.wasPressed()) {
-            MinecraftClient.getInstance().setScreen(new MoveScreen(DynamicUtil));
+            MinecraftClient.getInstance().setScreen(screen);
         }
     }
 
@@ -45,17 +44,17 @@ public class DynamicUtil extends DrawableHelper {
     public void render(MatrixStack matrices, float tickDelta) {
         // Draw each widget
         for (Widget widget : widgetManager.getWidgets()) {
-            if (MinecraftClient.getInstance().currentScreen instanceof MoveScreen) {
+            if (MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
                 widget.render(matrices);
             } else if (widget.isEnabled()) {
                 widget.render(matrices);
             }
 
             // Draw a red box around the widget if the HUD is disabled
-            if (MinecraftClient.getInstance().currentScreen instanceof MoveScreen) {
+            if (MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
                 int backgroundColor = widget.isEnabled() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
                 WidgetBox box = widget.getWidgetBox();
-                if(widget instanceof TextWidget) DrawHelper.drawBox(matrices, widget.getX(), widget.getY(), box.getWidth(), box.getHeight(), backgroundColor);
+                if(widget instanceof TextWidget) DrawHelper.drawBox(matrices, widget.getX(), widget.getY(), box.getWidth()-1, box.getHeight(), backgroundColor);
                 if(widget instanceof ArmorWidget) DrawHelper.fill(matrices, box.x1, box.y1, box.x2, box.y2, backgroundColor);
             }
         }

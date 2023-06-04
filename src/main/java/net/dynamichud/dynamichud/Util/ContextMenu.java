@@ -1,14 +1,18 @@
 package net.dynamichud.dynamichud.Util;
 
+import net.dynamichud.dynamichud.Widget.ArmorWidget;
 import net.dynamichud.dynamichud.Widget.TextWidget;
+import net.dynamichud.dynamichud.Widget.Widget;
 import net.dynamichud.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class ContextMenu {
     private final MinecraftClient client; // The Minecraft client instance
@@ -16,9 +20,10 @@ public class ContextMenu {
     private int x; // The x position of the context menu
     private int y; // The y position of the context menu
     private final List<ContextMenuOption> options = new ArrayList<>(); // The list of options in the context menu
-    private TextWidget selectedWidget = null; // The widget that this context menu is associated with
-
-    private int color=0xFFFFFFFF; // The color of the context menu
+    private Widget selectedWidget = null; // The widget that this context menu is associated with
+    private int backgroundColor = 0x40C0C0C0;// Semi-transparent light grey color
+    private int cornerRadius = 5; // The radius of the rounded corners
+    private int padding = 5; // The amount of padding around the rectangle
 
     /**
      * Constructs a ContextMenu object.
@@ -28,7 +33,7 @@ public class ContextMenu {
      * @param y              The y position of the context menu
      * @param selectedWidget The widget that this context menu is associated with
      */
-    public ContextMenu(MinecraftClient client, int x, int y, TextWidget selectedWidget) {
+    public ContextMenu(MinecraftClient client, int x, int y, Widget selectedWidget) {
         this.client = client;
         this.x = x;
         this.y = y;
@@ -42,11 +47,17 @@ public class ContextMenu {
     public void setOptions(String label,ContextMenuOption option)
     {
         //Add switch or if conditions to see if the context menu options should be enabled or not
-        switch (label) {
-            case "Shadow" -> option.enabled = selectedWidget.hasShadow();
-            case "Rainbow" -> option.enabled = selectedWidget.hasRainbow();
-            case "Vertical Rainbow" -> option.enabled = selectedWidget.hasVerticalRainbow();
-            case "Color" -> option.enabled = selectedWidget.isColorOptionEnabled();
+        if (selectedWidget instanceof TextWidget textWidget) {
+            switch (label) {
+                case "Shadow" -> option.enabled = textWidget.hasShadow();
+                case "Rainbow" -> option.enabled = textWidget.hasRainbow();
+                case "Vertical Rainbow" -> option.enabled = textWidget.hasVerticalRainbow();
+                case "Color" -> option.enabled = textWidget.isColorOptionEnabled();
+            }
+        } else if (selectedWidget instanceof ArmorWidget armorWidget) {
+            if (label.equals("Position")) {
+                option.enabled = true;
+            }
         }
     }
 
@@ -64,6 +75,54 @@ public class ContextMenu {
         options.add(option);
     }
 
+    public void setBackgroundColor(int backgroundColor)
+    {
+     this.backgroundColor=backgroundColor;
+    }
+
+    /**
+     * Adds an option to the context menu that cycles through the values of an enum.
+     * <p>
+     * Usage Example:
+     * Position currentPosition = Position.ABOVE;
+     * <p>
+     * ContextMenu contextMenu = new ContextMenu(client, x, y);
+     * <p>
+     * contextMenu.addEnumCycleOption("Position", Position.values(), () -> currentPosition, newPosition -> {
+     *     currentPosition = newPosition;
+     * });
+     *
+     * @param labelPrefix  The label to display for this option in the context menu
+     * @param values An array of enum values that specifies the possible values that this option can cycle through
+     * @param getter A Supplier that returns the current value of the enum
+     * @param setter A Consumer that sets the new value of the enum
+     * @param <T>    The type of the enum
+     */
+    public <T extends Enum<T>> void addEnumCycleOption(String labelPrefix, T[] values, Supplier<T> getter, Consumer<T> setter) {
+        ContextMenuOption option = new EnumCycleContextMenuOption<>(labelPrefix, values, getter, () -> {
+            // Get the current value of the enum
+            T currentValue = getter.get();
+
+            // Find the index of the current value in the values array
+            int index = -1;
+            for (int i = 0; i < values.length; i++) {
+                if (values[i] == currentValue) {
+                    index = i;
+                    break;
+                }
+            }
+
+            // Increment the index and wrap around if necessary
+            index = (index + 1) % values.length;
+
+            // Set the new value of the enum
+            setter.accept(values[index]);
+        });
+        options.add(option);
+    }
+
+
+
     /**
      * Renders this context menu on screen.
      *@param matrices - MatrixStack used for rendering.
@@ -74,30 +133,24 @@ public class ContextMenu {
         width = 0;
         int height = 0;
         for (ContextMenuOption option : options) {
-            width = Math.max(width, textRenderer.getWidth(option.label) + 10);
+            width = Math.max(width, textRenderer.getWidth(option.label)+padding);
             height += textRenderer.fontHeight + 2;
         }
-
         // Draw the background
-        int backgroundColor = 0x40C0C0C0; // Semi-transparent light grey color
-        int cornerRadius = 5; // The radius of the rounded corners
-        int padding = 5; // The amount of padding around the rectangle
-        DrawHelper.fillRoundedRect(matrices.peek().getPositionMatrix(), x, y - padding, x + width + padding-1, y + height + padding, cornerRadius, backgroundColor);
-
-        int buttonSize = 10;
-        int buttonX = x + width - buttonSize;
-        int buttonY = y;
-        DrawableHelper.fill(matrices, buttonX, buttonY, buttonX + buttonSize, buttonY + buttonSize, backgroundColor);
-        textRenderer.draw(matrices, "X", buttonX + 2, buttonY + 2, 0xFFFFFFFF);
+        DrawHelper.fillRoundedRect(matrices.peek().getPositionMatrix(), x, y - padding,  x+width + padding-1,  y+height + padding,cornerRadius, backgroundColor);
 
         int optionY = y + 2;
         for (ContextMenuOption option : options) {
+            if (option instanceof EnumCycleContextMenuOption enumOption) {
+                enumOption.updateLabel();
+            }
             int color = option.enabled ? 0xFF00FF00 : 0xFFFF0000;
             textRenderer.draw(matrices, option.label, x + 5, optionY, color);
             optionY += textRenderer.fontHeight + 2;
         }
         if (selectedWidget != null) setPosition(selectedWidget.getX(), selectedWidget.getY() + textRenderer.fontHeight + 4);
     }
+
 
     /**
      * Sets position of this context menu.
@@ -107,6 +160,18 @@ public class ContextMenu {
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public void setPadding(int padding) {
+        this.padding = padding;
+    }
+
+    public void setCornerRadius(int cornerRadius) {
+        this.cornerRadius = cornerRadius;
+    }
+
+    public List<ContextMenuOption> getOptions() {
+        return options;
     }
 
     /**
@@ -143,7 +208,7 @@ public class ContextMenu {
 
 
     private static class ContextMenuOption {
-        private final String label; // The label of the option
+        String label; // The label of the option
         private final Runnable action; // The action to perform when the option is clicked
         private boolean enabled=false; // Whether the option is enabled
 
@@ -157,4 +222,21 @@ public class ContextMenu {
             this.action = action;
         }
     }
+    private static class EnumCycleContextMenuOption<T extends Enum<T>> extends ContextMenuOption {
+        private final String labelPrefix;
+        private final T[] values;
+        private final Supplier<T> getter;
+
+        public EnumCycleContextMenuOption(String labelPrefix, T[] values, Supplier<T> getter, Runnable action) {
+            super(labelPrefix + ": " + getter.get(), action);
+            this.labelPrefix = labelPrefix;
+            this.values = values;
+            this.getter = getter;
+        }
+
+        public void updateLabel() {
+            label = labelPrefix + ": " + getter.get();
+        }
+    }
+
 }

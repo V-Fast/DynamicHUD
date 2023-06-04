@@ -3,6 +3,8 @@ package net.dynamichud.dynamichud;
 import net.dynamichud.dynamichud.Util.DynamicUtil;
 import net.dynamichud.dynamichud.Widget.ArmorWidget;
 import net.dynamichud.dynamichud.Widget.TextWidget;
+import net.dynamichud.dynamichud.helpers.TextureHelper;
+import net.dynamichud.dynamichud.hudscreen.MoveableScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -14,6 +16,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
@@ -45,7 +48,7 @@ public class DynamicHUDmod implements ClientModInitializer,AddWigdets {
         // Register a HUD render callback to draw the custom HUD
         HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
             dynamicutil.render(matrices, tickDelta);
-            DynamicUtil.openDynamicScreen(moveScreenKeyBinding,dynamicutil);
+            DynamicUtil.openDynamicScreen(moveScreenKeyBinding,new MoveableScreen(Text.of("Move Screen"),dynamicutil));
         });
     }
 
@@ -59,9 +62,10 @@ public class DynamicHUDmod implements ClientModInitializer,AddWigdets {
         dynamicutil.getWidgetManager().addWidget(new TextWidget(mc, "Day/Night: ", 0.16f, 0.02f,false,false,false,-1,true));
 
         // Add an armor widget to the custom HUD
-        dynamicutil.getWidgetManager().addWidget(new ArmorWidget(mc, EquipmentSlot.CHEST, 0.01f, 0.01f,true));
-        dynamicutil.getWidgetManager().addWidget(new ArmorWidget(mc, EquipmentSlot.HEAD, 0.03f, 0.01f,true));
-        dynamicutil.getWidgetManager().addWidget(new ArmorWidget(mc, EquipmentSlot.LEGS, 0.05f, 0.01f,true));
+        String text="Yellow";
+        dynamicutil.getWidgetManager().addWidget(new ArmorWidget(mc, EquipmentSlot.CHEST, 0.01f, 0.01f,true, TextureHelper.Position.values(),text));
+        dynamicutil.getWidgetManager().addWidget(new ArmorWidget(mc, EquipmentSlot.HEAD, 0.03f, 0.01f,true,TextureHelper.Position.values(),text));
+        dynamicutil.getWidgetManager().addWidget(new ArmorWidget(mc, EquipmentSlot.LEGS, 0.05f, 0.01f,true,TextureHelper.Position.values(),text));
     }
 }
 

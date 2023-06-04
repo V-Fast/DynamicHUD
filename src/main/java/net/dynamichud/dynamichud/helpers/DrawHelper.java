@@ -3,12 +3,14 @@ package net.dynamichud.dynamichud.helpers;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11;
 
 public class DrawHelper extends DrawableHelper {
     /**
@@ -133,6 +135,7 @@ public class DrawHelper extends DrawableHelper {
         RenderSystem.disableBlend();
     }
 
+
     public static void fillRoundedRect(MatrixStack matrices, int left, int top, int right, int bottom, int color){
         DrawableHelper.fill(matrices,left+1,top,right-1,top+1,color);
         DrawableHelper.fill(matrices,left+1,bottom-1,right-1,bottom,color);
@@ -171,4 +174,23 @@ public class DrawHelper extends DrawableHelper {
         tessellator.draw();
         RenderSystem.disableBlend();
     }
+
+    /**
+     * Draws an outlined box on the screen.
+     *
+     * @param matrices The matrix stack used for rendering
+     * @param x1       The x position of the top left corner of the box
+     * @param y1       The y position of the top left corner of the box
+     * @param x2       The x position of the bottom right corner of the box
+     * @param y2       The y position of the bottom right corner of the box
+     * @param color    The color to draw the box with
+     */
+    public static void drawOutlinedBox(MatrixStack matrices, int x1, int y1, int x2, int y2, int color) {
+        fill(matrices, x1, y1, x2 - 1, y1 + 1, color);
+        fill(matrices, x1, y2 - 1, x2, y2, color);
+        fill(matrices, x1, y1 + 1, x1 + 1, y2 - 1, color);
+        fill(matrices, x2 - 1, y1 + 1, x2, y2 - 1, color);
+    }
+
+
 }

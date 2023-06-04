@@ -62,10 +62,10 @@ public class SliderWidget {
         // Draw the slider
         int sliderWidth = width - 9;
         int sliderHeight = 2;
-        int sliderX = x + 5;
+        int sliderX = x;
         int sliderY = y + height - sliderHeight - 5;
 
-        DrawHelper.fillRoundedRect(matrices, sliderX, sliderY, sliderX + sliderWidth, sliderY + sliderHeight, 0xFFFFFFFF);
+        DrawHelper.fillRoundedRect(matrices,sliderX, sliderY, sliderX + sliderWidth, sliderY + sliderHeight, 0xFFFFFFFF);
 
         // Draw the handle
         float handleWidth = 4;
@@ -73,7 +73,7 @@ public class SliderWidget {
         float handleX = sliderX + (value - minValue) / (maxValue - minValue) * (sliderWidth - handleWidth);
         float handleY = sliderY + (sliderHeight - handleHeight) / 2;
 
-        DrawHelper.fillRoundedRect(matrices, (int)handleX, (int)handleY, (int)(handleX + handleWidth), (int)(handleY + handleHeight), 0xFFFFFFFF);
+        DrawHelper.fillRoundedRect(matrices,(int)handleX, (int)handleY, (int)(handleX + handleWidth), (int)(handleY + handleHeight), 0xFFFFFFFF);
 
         if (selectedWidget!=null) setPosition(selectedWidget.getX(), selectedWidget.getY() + textRenderer.fontHeight + 67);
     }

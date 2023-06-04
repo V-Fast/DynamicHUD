@@ -19,10 +19,12 @@ public class WidgetBox {
     }
 
     public boolean contains(Widget widget, double x, double y) {
-        int x1 = widget.getX() - width / 2;
-        int y1 = widget.getY() - height / 2;
-        int x2 = widget.getX() + width / 2;
-        int y2 = widget.getY() + height / 2;
+        if(x1==0 || x2==0 || y1==0 || y2==0) {
+            x1 = widget.getX() - width / 2;
+            y1 = widget.getY() - height / 2;
+            x2 = widget.getX() + width / 2;
+            y2 = widget.getY() + height / 2;
+        }
         return x >= x1 && x <= x2 && y >= y1 && y <= y2;
     }
 

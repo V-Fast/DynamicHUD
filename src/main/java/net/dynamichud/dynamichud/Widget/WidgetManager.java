@@ -1,5 +1,6 @@
 package net.dynamichud.dynamichud.Widget;
 
+import net.dynamichud.dynamichud.helpers.TextureHelper;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EquipmentSlot;
@@ -58,7 +59,7 @@ public class WidgetManager {
             float xPercent = widgetTag.getFloat("xPercent");
             float yPercent = widgetTag.getFloat("yPercent");
             boolean enabled=widgetTag.getBoolean("Enabled");
-            addWidget(new ArmorWidget(MinecraftClient.getInstance(), slot, xPercent, yPercent,enabled));
+            addWidget(new ArmorWidget(MinecraftClient.getInstance(), slot, xPercent, yPercent,enabled, TextureHelper.Position.values()));
         }
     }
 
