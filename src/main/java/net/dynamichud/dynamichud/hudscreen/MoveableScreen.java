@@ -11,7 +11,7 @@ import net.dynamichud.dynamichud.helpers.TextureHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 
-public class MoveableScreen extends AbstractMoveableScreen{
+public class MoveableScreen extends AbstractMoveableScreen {
     /**
      * Constructs a AbstractMoveableScreen object.
      *
@@ -20,36 +20,37 @@ public class MoveableScreen extends AbstractMoveableScreen{
      */
     public MoveableScreen(Text title, DynamicUtil dynamicutil) {
         super(title, dynamicutil);
+        setGridSize(1);
+        setShouldPause(false);
+        setShouldBeAffectedByResize(false);
     }
 
     @Override
     protected boolean handleRightClickOnWidget(Widget widget) {
-            selectedWidget = widget;
-            sliderWigdet = widget;
-            int x = selectedWidget.getX();
-            int y = selectedWidget.getY();
-            // Show context menu
-            menu(widget,x,y);
-            return true;
+        selectedWidget = widget;
+        sliderWigdet = widget;
+        int x = selectedWidget.getX();
+        int y = selectedWidget.getY();
+        // Show context menu
+        menu(widget, x, y);
+        return true;
     }
 
     @Override
     protected void menu(Widget widget, int x, int y) {
-        if (widget instanceof ArmorWidget armorWidget)
-        {
-            Slider=null;
-            contextMenu=null;
-            contextMenu = new ContextMenu(mc, x, y + armorWidget.getWidgetBox().getHeight()+100, widget);
-
-            contextMenu.setPadding(2);
-            contextMenu.setCornerRadius(45);
+        contextMenu = new ContextMenu(mc, x, (y + widget.getWidgetBox().y2 + 5), widget);
+        if (widget instanceof ArmorWidget armorWidget) {
+            Slider = null;
+            contextMenu.setHeightfromwidget(15);
+            contextMenu.setPadding(5);
             contextMenu.addEnumCycleOption("Position", TextureHelper.Position.values(), () -> armorWidget.currentTextPosition[0], newPosition -> {
                 System.out.println("Position: " + newPosition);
                 armorWidget.currentTextPosition[0] = newPosition;
             });
         }
         if (widget instanceof TextWidget textWidget) {
-            contextMenu = new ContextMenu(mc, x, y + textWidget.getWidgetBox().getHeight()+3, widget);
+            contextMenu.setHeightfromwidget(2);
+            contextMenu.setPadding(5);
             contextMenu.addOption("Shadow", () -> {
                 // Toggle shadow
                 textWidget.setShadow(!textWidget.hasShadow());
@@ -68,28 +69,7 @@ public class MoveableScreen extends AbstractMoveableScreen{
                 textWidget.toggleColorOption();
                 colorPicker = new ColorPicker(mc, mc.getWindow().getScaledWidth() / 2, (mc.getWindow().getScaledHeight() / 2) - 50, textWidget.getColor(), textWidget::setColor);
             });
-            Slider = new SliderWidget(mc, x, y + 20, 105, 20, "Rainbow Speed", textWidget.getRainbowSpeed(), 5f, 25.0f, selectedWidget);
+            Slider = new SliderWidget(mc, x, y, 105, 10, "Rainbow Speed", textWidget.getRainbowSpeed(), 5f, 25.0f, selectedWidget);
         }
-    }
-    /**
-     * Returns whether this screen should pause the game when it is displayed.
-     *
-     * @return False to indicate that the game should not be paused
-     */
-    @Override
-    public boolean shouldPause() {
-        return false;
-    }
-
-    /**
-     * Called when this screen is resized.
-     *
-     * @param client The Minecraft client instance
-     * @param width  The new width of this screen in pixels
-     * @param height The new height of this screen in pixels
-     */
-    @Override
-    public void resize(MinecraftClient client, int width, int height) {
-        return;
     }
 }

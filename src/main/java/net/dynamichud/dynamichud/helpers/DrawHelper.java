@@ -4,11 +4,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
@@ -84,6 +82,8 @@ public class DrawHelper extends DrawableHelper {
 
     /**
      * Fills a rounded rectangle on screen with specified color.
+     * This causes a lot of problems and for some reason does not work for ArmorWidget when used for contextMenu
+     *
      *@param matrix4f - Matrix4f used for rendering.
      *@param x1 - X position of top left corner of rectangle.
      *@param y1 - Y position of top left corner of rectangle.
@@ -186,11 +186,10 @@ public class DrawHelper extends DrawableHelper {
      * @param color    The color to draw the box with
      */
     public static void drawOutlinedBox(MatrixStack matrices, int x1, int y1, int x2, int y2, int color) {
-        fill(matrices, x1, y1, x2 - 1, y1 + 1, color);
+        fill(matrices, x1, y1, x2, y1 + 1, color);
         fill(matrices, x1, y2 - 1, x2, y2, color);
         fill(matrices, x1, y1 + 1, x1 + 1, y2 - 1, color);
         fill(matrices, x2 - 1, y1 + 1, x2, y2 - 1, color);
     }
-
 
 }

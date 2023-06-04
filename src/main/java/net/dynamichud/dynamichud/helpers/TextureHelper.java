@@ -113,22 +113,22 @@ public class TextureHelper {
         int textX = 0;
         int textY = 0;
         switch (position) {
-            case ABOVE:
+            case ABOVE -> {
                 textX = x + (16 - textWidth) / 2;
-                textY = y - textHeight - 2;
-                break;
-            case BELOW:
-                textX = x + (16 - textWidth) / 2;
-                textY = y + 18;
-                break;
-            case LEFT:
+                textY = y - textHeight;
+            }
+            case BELOW -> {
+                textX = x + (17 - textWidth) / 2;
+                textY = y + 16;
+            }
+            case LEFT -> {
                 textX = x - textWidth - 2;
                 textY = y + (16 - textHeight) / 2;
-                break;
-            case RIGHT:
+            }
+            case RIGHT -> {
                 textX = x + 18;
                 textY = y + (16 - textHeight) / 2;
-                break;
+            }
         }
 
         // Draw the scaled text at the calculated position
@@ -144,10 +144,23 @@ public class TextureHelper {
     }
 
     public enum Position {
-        ABOVE,
-        BELOW,
-        LEFT,
-        RIGHT
+        ABOVE ("Above"),
+        BELOW("Below"),
+        LEFT("Left"),
+        RIGHT("Right");
+        private String name;
+
+        Position(String name) {
+            this.name = name;
+        }
+
+        public static Position getByUpperCaseName(String name) {
+            if (name == null || name.isEmpty()) {
+                return null;
+            }
+
+            return Position.valueOf(name.toUpperCase());
+        }
     }
 
 

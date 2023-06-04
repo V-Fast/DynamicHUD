@@ -54,7 +54,7 @@ public class DynamicUtil extends DrawableHelper {
             if (MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
                 int backgroundColor = widget.isEnabled() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
                 WidgetBox box = widget.getWidgetBox();
-                if(widget instanceof TextWidget) DrawHelper.drawBox(matrices, widget.getX(), widget.getY(), box.getWidth()-1, box.getHeight(), backgroundColor);
+                if(widget instanceof TextWidget) DrawHelper.drawBox(matrices, widget.getX(), widget.getY(), box.getWidth()+1, box.getHeight(), backgroundColor);
                 if(widget instanceof ArmorWidget) DrawHelper.fill(matrices, box.x1, box.y1, box.x2, box.y2, backgroundColor);
             }
         }

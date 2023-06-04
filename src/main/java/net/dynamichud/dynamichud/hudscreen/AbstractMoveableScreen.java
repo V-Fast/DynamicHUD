@@ -25,6 +25,10 @@ public abstract class AbstractMoveableScreen extends Screen {
     protected SliderWidget Slider = null; // The rainbow speed slider
     protected MouseHandler mouseHandler;
     protected DragHandler dragHandler;
+    protected int gridSize =3; // The size of each grid cell in pixels
+    protected boolean ShouldPause = false; // To pause if the screen is opened or not
+    protected boolean ShouldBeAffectedByResize=false; // If the stuff drawn on screen to be affected by screen resize or not
+
 
     /**
      * Constructs a AbstractMoveableScreen object.
@@ -59,7 +63,6 @@ public abstract class AbstractMoveableScreen extends Screen {
             int newY = (int) (mouseY - dragStartY);
 
             // Snap the widget to the grid
-            int gridSize =3; // The size of each grid cell in pixels
             newX = (newX / gridSize) * gridSize;
             newY = (newY / gridSize) * gridSize;
 
@@ -158,6 +161,28 @@ public abstract class AbstractMoveableScreen extends Screen {
         this.contextMenu = contextMenu;
         this.Slider = Slider;
         mouseHandler = new DefaultMouseHandler(colorPicker, contextMenu, Slider);
+    }
+
+    public void setGridSize(int gridSize) {
+        this.gridSize = gridSize;
+    }
+    public void setShouldPause(boolean shouldpause)
+    {
+        this.ShouldPause=shouldpause;
+    }
+
+    public void setShouldBeAffectedByResize(boolean shouldBeAffectedByResize) {
+        this.ShouldBeAffectedByResize = shouldBeAffectedByResize;
+    }
+
+    @Override
+    public void resize(MinecraftClient client, int width, int height) {
+        if (ShouldBeAffectedByResize) super.resize(client, width, height);
+        else return;
+    }
+    @Override
+    public boolean shouldPause() {
+        return ShouldPause;
     }
 
     protected abstract boolean handleRightClickOnWidget(Widget widget);

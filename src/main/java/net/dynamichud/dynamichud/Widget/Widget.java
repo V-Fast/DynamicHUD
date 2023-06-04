@@ -19,7 +19,6 @@ public abstract class Widget {
     public boolean enabled = true; // Whether the widget is enabled
     protected float xPercent; // The x position of the widget as a percentage of the screen width
     protected float yPercent; // The y position of the widget as a percentage of the screen height
-    protected static float rainbowSpeed = 15f; // The speed of the rainbow effect
 
 
     /**

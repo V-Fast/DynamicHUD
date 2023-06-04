@@ -12,17 +12,20 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.function.Supplier;
 
 /**
  * This class represents a text widget that displays a specified text on the screen.
  */
 public class TextWidget extends Widget {
-    private String text; // The text to display
+    private Supplier<String> textSupplier; // The supplier that provides the text to display
     private boolean shadow; // Whether to draw a shadow behind the text
     private boolean rainbow; // Whether to apply a rainbow effect to the text
     private boolean verticalRainbow; // Whether to apply a vertical rainbow effect to the text
-    private int color = Color.WHITE.getRGB(); // The color of the text
+    private int color; // The color of the text
     private boolean colorOptionEnabled = false;
+    protected static float rainbowSpeed = 15f; // The speed of the rainbow effect
+
 
     /**
      * Constructs a TextWidget object.
@@ -32,9 +35,9 @@ public class TextWidget extends Widget {
      * @param xPercent The x position of the widget as a percentage of the screen width
      * @param yPercent The y position of the widget as a percentage of the screen height
      */
-    public TextWidget(MinecraftClient client, String text, float xPercent, float yPercent,boolean Shadow,boolean Rainbow,boolean VerticalRainbow,int color,boolean enabled) {
+    public TextWidget(MinecraftClient client, Supplier<String> text, float xPercent, float yPercent,boolean Shadow,boolean Rainbow,boolean VerticalRainbow,int color,boolean enabled) {
         super(client);
-        this.text = text;
+        this.textSupplier = text;
         this.xPercent = xPercent;
         this.yPercent = yPercent;
         this.shadow=Shadow;
@@ -129,7 +132,7 @@ public class TextWidget extends Widget {
      * @return The text displayed by this widget
      */
     public String getText() {
-        return text;
+        return textSupplier.get();
     }
 
     /**
@@ -162,7 +165,7 @@ public class TextWidget extends Widget {
     @Override
     public WidgetBox getWidgetBox() {
         TextRenderer textRenderer = client.textRenderer;
-        int width = textRenderer.getWidth(text);
+        int width = textRenderer.getWidth(getText());
         int height = textRenderer.fontHeight;
         return new WidgetBox(width, height);
     }
@@ -174,14 +177,14 @@ public class TextWidget extends Widget {
      */
     @Override
     public void render(MatrixStack matrices) {
-        int textWidth = client.textRenderer.getWidth(text);
+        int textWidth = client.textRenderer.getWidth(getText());
         int x = getX();
         int y = getY();
         if (rainbow) {
             float hue = (System.currentTimeMillis() % 2000) / (rainbowSpeed*100f);
-            for (int i = 0; i < text.length(); i++) {
+            for (int i = 0; i < getText().length(); i++) {
                 int color = ColorHelper.getColorFromHue(hue);
-                String character = String.valueOf(text.charAt(i));
+                String character = String.valueOf(getText().charAt(i));
                 int characterWidth = client.textRenderer.getWidth(character);
                 drawText(matrices, character, x-textWidth/2, y - 4, color);
                 x += characterWidth;
@@ -190,7 +193,7 @@ public class TextWidget extends Widget {
             }
         } else {
             int color = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 2000) / (rainbowSpeed*100f)) : this.color;
-            drawText(matrices, text, getX() - textWidth / 2, getY() - 4, color);
+            drawText(matrices, getText(), getX() - textWidth / 2, getY() - 4, color);
         }
     }
 
@@ -198,13 +201,12 @@ public class TextWidget extends Widget {
     public void writeToTag(NbtCompound tag) {
         super.writeToTag(tag);
         tag.putString("class", getClass().getName());
-        tag.putString("text", text);
+        tag.putString("text", getText());
         tag.putFloat("xPercent", xPercent);
         tag.putFloat("yPercent", yPercent);
         tag.putBoolean("Rainbow", hasRainbow());
         tag.putBoolean("Shadow", hasShadow());
         tag.putBoolean("VerticalRainbow", hasVerticalRainbow());
-        tag.putInt("Color", getColor());
         tag.putBoolean("Enabled",this.enabled);
     }
 
@@ -214,6 +216,4 @@ public class TextWidget extends Widget {
         else
             DrawHelper.drawText(matrices, client.textRenderer, text, x, y, color);
     }
-
-
 }

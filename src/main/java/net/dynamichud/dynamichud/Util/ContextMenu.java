@@ -3,12 +3,14 @@ package net.dynamichud.dynamichud.Util;
 import net.dynamichud.dynamichud.Widget.ArmorWidget;
 import net.dynamichud.dynamichud.Widget.TextWidget;
 import net.dynamichud.dynamichud.Widget.Widget;
+import net.dynamichud.dynamichud.helpers.ColorHelper;
 import net.dynamichud.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -21,9 +23,11 @@ public class ContextMenu {
     private int y; // The y position of the context menu
     private final List<ContextMenuOption> options = new ArrayList<>(); // The list of options in the context menu
     private Widget selectedWidget = null; // The widget that this context menu is associated with
-    private int backgroundColor = 0x40C0C0C0;// Semi-transparent light grey color
+    private int backgroundColor = 0x80C0C0C0;// Semi-transparent light grey color
     private int cornerRadius = 5; // The radius of the rounded corners
     private int padding = 5; // The amount of padding around the rectangle
+    private int heightfromwidget = 5; // The amount of padding around the rectangle
+
 
     /**
      * Constructs a ContextMenu object.
@@ -137,9 +141,10 @@ public class ContextMenu {
             height += textRenderer.fontHeight + 2;
         }
         // Draw the background
-        DrawHelper.fillRoundedRect(matrices.peek().getPositionMatrix(), x, y - padding,  x+width + padding-1,  y+height + padding,cornerRadius, backgroundColor);
+        DrawHelper.fill(matrices, x-2, y+heightfromwidget-2,  x+width + 7,  y+height + heightfromwidget+2, backgroundColor);
+        DrawHelper.drawOutlinedBox(matrices, x-2, y+heightfromwidget-2,  x+width + 7,  y+height + heightfromwidget+2, ColorHelper.ColorToInt(Color.BLACK));
 
-        int optionY = y + 2;
+        int optionY = y + heightfromwidget + 2;
         for (ContextMenuOption option : options) {
             if (option instanceof EnumCycleContextMenuOption enumOption) {
                 enumOption.updateLabel();
@@ -166,8 +171,8 @@ public class ContextMenu {
         this.padding = padding;
     }
 
-    public void setCornerRadius(int cornerRadius) {
-        this.cornerRadius = cornerRadius;
+    public void setHeightfromwidget(int heightfromwidget) {
+        this.heightfromwidget = heightfromwidget;
     }
 
     public List<ContextMenuOption> getOptions() {
@@ -191,7 +196,7 @@ public class ContextMenu {
             return false;
         }
         TextRenderer textRenderer = client.textRenderer;
-        int optionY = y + 2;
+        int optionY = y+ heightfromwidget + 2;
         for (ContextMenuOption option : options) {
             if (mouseX >= x && mouseX <= x + textRenderer.getWidth(option.label) + 10 && mouseY >= optionY && mouseY <= optionY + textRenderer.fontHeight + 2) {
                 // Run the action of the selected option
