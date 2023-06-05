@@ -5,9 +5,13 @@ import net.dynamichud.dynamichud.Util.ContextMenu;
 import net.dynamichud.dynamichud.Util.ContextMenuBuilder;
 import net.dynamichud.dynamichud.Util.DynamicUtil;
 import net.dynamichud.dynamichud.Widget.*;
+import net.dynamichud.dynamichud.helpers.ColorHelper;
 import net.dynamichud.dynamichud.helpers.TextureHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+
+import java.awt.*;
 
 public class MoveableScreen extends AbstractMoveableScreen {
     /**
@@ -21,6 +25,12 @@ public class MoveableScreen extends AbstractMoveableScreen {
         setGridSize(1);
         setShouldPause(false);
         setShouldBeAffectedByResize(false);
+    }
+
+    @Override
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        super.render(matrices, mouseX, mouseY, delta);
+        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices,"Editor Screen",MinecraftClient.getInstance().getWindow().getScaledWidth()/2f,5, ColorHelper.ColorToInt(Color.WHITE),false);
     }
 
     @Override
