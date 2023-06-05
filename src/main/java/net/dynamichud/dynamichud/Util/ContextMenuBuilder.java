@@ -54,6 +54,7 @@ public class ContextMenuBuilder {
         contextMenu.setBackgroundColor(backgroundColor);
         contextMenu.setPadding(padding);
         contextMenu.setHeightfromwidget(heightfromwidget);
+        if (selectedWidget != null) contextMenu.setPosition(selectedWidget.getX(), selectedWidget.getY() + MinecraftClient.getInstance().textRenderer.fontHeight + 4);
         return contextMenu;
     }
 }

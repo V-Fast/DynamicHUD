@@ -50,18 +50,8 @@ public class ContextMenu {
      */
     public void setOptions(String label,ContextMenuOption option)
     {
-        //Add switch or if conditions to see if the context menu options should be enabled or not
-        if (selectedWidget instanceof TextWidget textWidget) {
-            switch (label) {
-                case "Shadow" -> option.enabled = textWidget.hasShadow();
-                case "Rainbow" -> option.enabled = textWidget.hasRainbow();
-                case "Vertical Rainbow" -> option.enabled = textWidget.hasVerticalRainbow();
-                case "Color" -> option.enabled = textWidget.isColorOptionEnabled();
-            }
-        } else if (selectedWidget instanceof ArmorWidget armorWidget) {
-            if (label.equals("Position")) {
-                option.enabled = true;
-            }
+        if (selectedWidget instanceof ContextMenuOptionsProvider optionsProvider) {
+            option.enabled = optionsProvider.isOptionEnabled(label);
         }
     }
 

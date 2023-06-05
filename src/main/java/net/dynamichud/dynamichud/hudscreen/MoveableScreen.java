@@ -36,13 +36,7 @@ public class MoveableScreen extends AbstractMoveableScreen {
 
     @Override
     protected void menu(Widget widget, int x, int y) {
-        contextMenu = new ContextMenuBuilder(client)
-                .setX(x)
-                .setY(y+widget.getHeight()+5)
-                .setHeightFromWidget(15)
-                .setPadding(5)
-                .build();
-
+        contextMenu = new ContextMenu(mc,x,y+widget.getHeight()+5,selectedWidget);
         if (widget instanceof ArmorWidget armorWidget) {
             Slider = null;
             contextMenu.setHeightfromwidget(15);
@@ -71,7 +65,9 @@ public class MoveableScreen extends AbstractMoveableScreen {
                 // Show color picker
                 // Set the color of the text
                 textWidget.toggleColorOption();
-                colorPicker = new ColorPicker(mc, mc.getWindow().getScaledWidth() / 2, (mc.getWindow().getScaledHeight() / 2) - 50, textWidget.getColor(), textWidget::setColor);
+                colorPicker=null;
+                if (textWidget.isColorOptionEnabled()) colorPicker = new ColorPicker(mc, mc.getWindow().getScaledWidth() / 2, (mc.getWindow().getScaledHeight() / 2) - 50, textWidget.getColor(), textWidget::setColor);
+                else colorPicker=null;
             });
             Slider = new SliderWidgetBuilder(client)
                     .setX(x)

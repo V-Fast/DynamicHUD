@@ -1,12 +1,8 @@
 package net.dynamichud.dynamichud.Widget;
 
-import com.google.common.io.CharStreams;
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-import net.dynamichud.dynamichud.Util.ContextMenu.ContextMenu;
 import net.dynamichud.dynamichud.helpers.TextureHelper;
 import net.fabricmc.fabric.api.util.NbtType;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.nbt.NbtCompound;
@@ -14,7 +10,6 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
 
 import java.io.*;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
