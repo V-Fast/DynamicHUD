@@ -2,11 +2,9 @@ package net.dynamichud.dynamichud.hudscreen;
 
 import net.dynamichud.dynamichud.Util.ColorPicker;
 import net.dynamichud.dynamichud.Util.ContextMenu;
+import net.dynamichud.dynamichud.Util.ContextMenuBuilder;
 import net.dynamichud.dynamichud.Util.DynamicUtil;
-import net.dynamichud.dynamichud.Widget.ArmorWidget;
-import net.dynamichud.dynamichud.Widget.SliderWidget;
-import net.dynamichud.dynamichud.Widget.TextWidget;
-import net.dynamichud.dynamichud.Widget.Widget;
+import net.dynamichud.dynamichud.Widget.*;
 import net.dynamichud.dynamichud.helpers.TextureHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
@@ -38,7 +36,13 @@ public class MoveableScreen extends AbstractMoveableScreen {
 
     @Override
     protected void menu(Widget widget, int x, int y) {
-        contextMenu = new ContextMenu(mc, x, (y + widget.getWidgetBox().y2 + 5), widget);
+        contextMenu = new ContextMenuBuilder(client)
+                .setX(x)
+                .setY(y+widget.getHeight()+5)
+                .setHeightFromWidget(15)
+                .setPadding(5)
+                .build();
+
         if (widget instanceof ArmorWidget armorWidget) {
             Slider = null;
             contextMenu.setHeightfromwidget(15);
@@ -69,7 +73,19 @@ public class MoveableScreen extends AbstractMoveableScreen {
                 textWidget.toggleColorOption();
                 colorPicker = new ColorPicker(mc, mc.getWindow().getScaledWidth() / 2, (mc.getWindow().getScaledHeight() / 2) - 50, textWidget.getColor(), textWidget::setColor);
             });
-            Slider = new SliderWidget(mc, x, y, 105, 10, "Rainbow Speed", textWidget.getRainbowSpeed(), 5f, 25.0f, selectedWidget);
+            Slider = new SliderWidgetBuilder(client)
+                    .setX(x)
+                    .setY(y)
+                    .setWidth(105)
+                    .setHeight(10)
+                    .setLabel("Rainbow Speed")
+                    .setValue(textWidget.getRainbowSpeed())
+                    .setMinValue(5f)
+                    .setMaxValue(25.0f)
+                    .setSelectedWidget(selectedWidget)
+                    .build();
         }
     }
 }
+
+

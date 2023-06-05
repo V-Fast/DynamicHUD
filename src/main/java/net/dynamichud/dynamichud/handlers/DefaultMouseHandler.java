@@ -1,10 +1,9 @@
 package net.dynamichud.dynamichud.handlers;
 
 import net.dynamichud.dynamichud.Util.ColorPicker;
-import net.dynamichud.dynamichud.Util.ContextMenu;
+import net.dynamichud.dynamichud.Util.ContextMenu.ContextMenu;
 import net.dynamichud.dynamichud.Widget.SliderWidget;
 import net.dynamichud.dynamichud.Widget.TextWidget;
-import net.dynamichud.dynamichud.Widget.Widget;
 
 public class DefaultMouseHandler implements MouseHandler {
     private final ColorPicker colorPicker;

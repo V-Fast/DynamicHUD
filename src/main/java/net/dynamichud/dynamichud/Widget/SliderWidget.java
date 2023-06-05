@@ -57,7 +57,7 @@ public class SliderWidget {
     public void render(MatrixStack matrices) {
         // Draw the label
         TextRenderer textRenderer = client.textRenderer;
-        textRenderer.draw(matrices, label + ": " + String.format("%.1f", value), x +1, y - height + (textRenderer.fontHeight)/2f, 0xFFFFFFFF);
+        textRenderer.draw(matrices, label + ": " + String.format("%.1f", value), x +1, y - height + (textRenderer.fontHeight)/3.5f, 0xFFFFFFFF);
 
         // Draw the slider
         int sliderWidth = width - 8;

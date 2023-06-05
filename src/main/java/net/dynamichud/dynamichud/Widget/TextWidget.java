@@ -1,5 +1,6 @@
 package net.dynamichud.dynamichud.Widget;
 
+import net.dynamichud.dynamichud.Util.ContextMenuOptionsProvider;
 import net.dynamichud.dynamichud.helpers.ColorHelper;
 import net.dynamichud.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.MinecraftClient;
@@ -7,17 +8,12 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 
-import java.awt.*;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.function.Supplier;
 
 /**
  * This class represents a text widget that displays a specified text on the screen.
  */
-public class TextWidget extends Widget {
+public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     private Supplier<String> textSupplier; // The supplier that provides the text to display
     private boolean shadow; // Whether to draw a shadow behind the text
     private boolean rainbow; // Whether to apply a rainbow effect to the text
@@ -215,5 +211,16 @@ public class TextWidget extends Widget {
             DrawHelper.drawTextWithShadow(matrices, client.textRenderer, text, x, y, color);
         else
             DrawHelper.drawText(matrices, client.textRenderer, text, x, y, color);
+    }
+
+    @Override
+    public boolean isOptionEnabled(String label) {
+        return switch (label) {
+            case "Shadow" -> hasShadow();
+            case "Rainbow" -> hasRainbow();
+            case "VerticalRainbow" -> hasVerticalRainbow();
+            case "Color" -> isColorOptionEnabled();
+            default -> false;
+        };
     }
 }
