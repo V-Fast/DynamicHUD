@@ -17,6 +17,7 @@ import java.util.function.Supplier;
  * This class represents a text widget that displays a specified text on the screen.
  */
 public class TextWidget extends Widget implements ContextMenuOptionsProvider {
+    protected static float rainbowSpeed = 15f; // The speed of the rainbow effect
     private Supplier<String> textSupplier; // The supplier that provides the text to display
     private TextGenerator textGenerator;
     private boolean shadow; // Whether to draw a shadow behind the text
@@ -24,27 +25,26 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     private boolean verticalRainbow; // Whether to apply a vertical rainbow effect to the text
     private int color; // The color of the text
     private boolean colorOptionEnabled = false;
-    protected static float rainbowSpeed = 15f; // The speed of the rainbow effect
 
 
     /**
      * Constructs a TextWidget object.
      *
-     * @param client   The Minecraft client instance
-     * @param textGenerator     The text to display
-     * @param xPercent The x position of the widget as a percentage of the screen width
-     * @param yPercent The y position of the widget as a percentage of the screen height
+     * @param client        The Minecraft client instance
+     * @param textGenerator The text to display
+     * @param xPercent      The x position of the widget as a percentage of the screen width
+     * @param yPercent      The y position of the widget as a percentage of the screen height
      */
-    public TextWidget(MinecraftClient client, TextGenerator textGenerator, float xPercent, float yPercent,boolean Shadow,boolean Rainbow,boolean VerticalRainbow,int color,boolean enabled) {
+    public TextWidget(MinecraftClient client, TextGenerator textGenerator, float xPercent, float yPercent, boolean Shadow, boolean Rainbow, boolean VerticalRainbow, int color, boolean enabled) {
         super(client);
         this.textGenerator = textGenerator;
         this.xPercent = xPercent;
         this.yPercent = yPercent;
-        this.shadow=Shadow;
-        this.rainbow=Rainbow;
-        this.verticalRainbow=VerticalRainbow;
-        this.color=color;
-        this.enabled=enabled;
+        this.shadow = Shadow;
+        this.rainbow = Rainbow;
+        this.verticalRainbow = VerticalRainbow;
+        this.color = color;
+        this.enabled = enabled;
     }
 
     /**
@@ -140,15 +140,6 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     }
 
     /**
-     * Sets the color of the text.
-     *
-     * @param color The new color of the text
-     */
-    public void setColor(int color) {
-        this.color = color;
-    }
-
-    /**
      * Returns the color of the text.
      *
      * @return The color of the text
@@ -158,9 +149,18 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     }
 
     /**
+     * Sets the color of the text.
+     *
+     * @param color The new color of the text
+     */
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    /**
      * Returns whether color options are enabled for this widget.
      *
-     *@return true if color options are enabled for this widget, false otherwise.
+     * @return true if color options are enabled for this widget, false otherwise.
      */
     public boolean isColorOptionEnabled() {
         return colorOptionEnabled;
@@ -177,7 +177,8 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
 
     /**
      * Renders this widget on screen.
-     *@param matrices - MatrixStack used for rendering.
+     *
+     * @param matrices - MatrixStack used for rendering.
      */
     @Override
     public void render(MatrixStack matrices) {
@@ -185,18 +186,18 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         int x = getX();
         int y = getY();
         if (rainbow) {
-            float hue = (System.currentTimeMillis() % 2000) / (rainbowSpeed*100f);
+            float hue = (System.currentTimeMillis() % 2000) / (rainbowSpeed * 100f);
             for (int i = 0; i < getText().length(); i++) {
                 int color = ColorHelper.getColorFromHue(hue);
                 String character = String.valueOf(getText().charAt(i));
                 int characterWidth = client.textRenderer.getWidth(character);
-                drawText(matrices, character, x-textWidth/2, y - 4, color);
+                drawText(matrices, character, x - textWidth / 2, y - 4, color);
                 x += characterWidth;
                 hue += verticalRainbow ? 0.05f : 0.1f;
                 if (hue > 1) hue -= 1;
             }
         } else {
-            int color = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 2000) / (rainbowSpeed*100f)) : this.color;
+            int color = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 2000) / (rainbowSpeed * 100f)) : this.color;
             drawText(matrices, getText(), getX() - textWidth / 2, getY() - 4, color);
         }
     }
@@ -211,8 +212,9 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         tag.putBoolean("Rainbow", hasRainbow());
         tag.putBoolean("Shadow", hasShadow());
         tag.putBoolean("VerticalRainbow", hasVerticalRainbow());
-        tag.putBoolean("Enabled",this.enabled);
+        tag.putBoolean("Enabled", this.enabled);
     }
+
     @Override
     public void readFromTag(NbtCompound tag) {
         super.readFromTag(tag);

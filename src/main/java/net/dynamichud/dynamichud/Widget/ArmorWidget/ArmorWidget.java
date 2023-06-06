@@ -19,8 +19,8 @@ import java.awt.*;
  * This class represents a widget that displays the armor item in a specified equipment slot.
  */
 public class ArmorWidget extends Widget {
+    public final TextureHelper.Position[] currentTextPosition = TextureHelper.Position.values();
     private EquipmentSlot slot; // The equipment slot to display the armor item from
-    public final TextureHelper.Position[] currentTextPosition= TextureHelper.Position.values();
     private TextGenerator textGenerator;
 
 
@@ -32,14 +32,14 @@ public class ArmorWidget extends Widget {
      * @param xPercent The x position of the widget as a percentage of the screen width
      * @param yPercent The y position of the widget as a percentage of the screen height
      */
-    public ArmorWidget(MinecraftClient client, EquipmentSlot slot, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition,TextGenerator textGenerator) {
+    public ArmorWidget(MinecraftClient client, EquipmentSlot slot, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator) {
         super(client);
         this.slot = slot;
         this.xPercent = xPercent;
         this.yPercent = yPercent;
         this.enabled = enabled;
         this.currentTextPosition[0] = currentTextPosition;
-        this.textGenerator=textGenerator;
+        this.textGenerator = textGenerator;
     }
 
     /**
@@ -50,7 +50,7 @@ public class ArmorWidget extends Widget {
     @Override
     public void render(MatrixStack matrices) {
         ItemRenderer itemRenderer = client.getItemRenderer();
-        TextRenderer textRenderer=MinecraftClient.getInstance().textRenderer;
+        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
         ItemStack armorItem = client.player.getEquippedStack(slot);
         //TextureHelper.drawItemTexture(matrices, itemRenderer, armorItem, getX(), getY());
         TextureHelper.drawItemTextureWithText(matrices, itemRenderer, textRenderer, armorItem, getX(), getY(), getText(), ColorHelper.ColorToInt(Color.YELLOW), currentTextPosition[0], 0.5f);
@@ -58,7 +58,7 @@ public class ArmorWidget extends Widget {
 
     @Override
     public WidgetBox getWidgetBox() {
-        return new WidgetBox(this.getX() - 2,this.getY() - 2,this.getX() + this.getWidth() + 2,this.getY() + this.getHeight() + 2);
+        return new WidgetBox(this.getX() - 2, this.getY() - 2, this.getX() + this.getWidth() + 2, this.getY() + this.getHeight() + 2);
     }
 
     /**
@@ -78,6 +78,7 @@ public class ArmorWidget extends Widget {
     public int getHeight() {
         return 16; // The height of an item texture is 16 pixels
     }
+
     /**
      * Returns the text displayed by this widget.
      *
@@ -99,9 +100,9 @@ public class ArmorWidget extends Widget {
         tag.putFloat("yPercent", yPercent);
         tag.putFloat("yPercent", yPercent);
         tag.putString("slot", slot.getName());
-        tag.putBoolean("Enabled",this.enabled);
+        tag.putBoolean("Enabled", this.enabled);
         tag.putString("Position", String.valueOf(this.currentTextPosition[0]));
-        tag.putString("text",getText());
+        tag.putString("text", getText());
     }
 
     @Override

@@ -7,7 +7,7 @@ public class DefaultDragHandler implements DragHandler {
     private int dragStartY = 0;
 
     @Override
-    public boolean startDragging(Widget widget,double mouseX,double mouseY) {
+    public boolean startDragging(Widget widget, double mouseX, double mouseY) {
         if (widget.getWidgetBox().contains(widget, mouseX, mouseY)) {
             dragStartX = (int) (mouseX - widget.getX());
             dragStartY = (int) (mouseY - widget.getY());
@@ -17,7 +17,7 @@ public class DefaultDragHandler implements DragHandler {
     }
 
     @Override
-    public void updateDragging(Widget widget,double mouseX,double mouseY) {
+    public void updateDragging(Widget widget, double mouseX, double mouseY) {
         int newX = (int) (mouseX - dragStartX);
         int newY = (int) (mouseY - dragStartY);
         widget.setX(newX);

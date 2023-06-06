@@ -14,6 +14,22 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+interface loading {
+    default Widget loadWidgetsFromTag(String className, NbtCompound widgetTag, WidgetManager widgetManager) {
+        if (className.equals(TextWidget.class.getName())) {
+            TextWidget widget = new TextWidget(MinecraftClient.getInstance(), () -> "", 0, 0, false, false, false, -1, true);
+            widget.readFromTag(widgetTag);
+            System.out.println("Widget in loadwidgetsfrom tag: " + widget);
+            return widget;
+        } else if (className.equals(ArmorWidget.class.getName())) {
+            ArmorWidget widget = new ArmorWidget(MinecraftClient.getInstance(), EquipmentSlot.CHEST, 0, 0, false, TextureHelper.Position.ABOVE, () -> "");
+            widget.readFromTag(widgetTag);
+            return widget;
+        }
+        return null;
+    }
+}
+
 /**
  * This class manages a list of widgets that can be added, removed and retrieved.
  */
@@ -82,12 +98,12 @@ public class WidgetManager implements loading {
             System.out.println("File exists");
             try (DataInputStream in = new DataInputStream(new FileInputStream(file))) {
                 NbtCompound rootTag = NbtIo.readCompressed(in);
-                NbtList widgetList = rootTag.getList("widgets",NbtType.COMPOUND);
-                System.out.println("WidgetList: "+widgetList);
+                NbtList widgetList = rootTag.getList("widgets", NbtType.COMPOUND);
+                System.out.println("WidgetList: " + widgetList);
                 for (int i = 0; i < widgetList.size(); i++) {
                     NbtCompound widgetTag = widgetList.getCompound(i);
                     String className = widgetTag.getString("class");
-                    widgets.add(loadWidgetsFromTag(className, widgetTag,this));
+                    widgets.add(loadWidgetsFromTag(className, widgetTag, this));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -95,20 +111,5 @@ public class WidgetManager implements loading {
         } else System.out.println("File does not exist");
         System.out.println("Wigdets: " + widgets);
         return widgets;
-    }
-}
-interface loading {
-    default Widget loadWidgetsFromTag(String className, NbtCompound widgetTag, WidgetManager widgetManager ) {
-            if (className.equals(TextWidget.class.getName())) {
-                TextWidget widget = new TextWidget(MinecraftClient.getInstance(), () -> "", 0, 0, false, false, false, -1, true);
-                widget.readFromTag(widgetTag);
-                System.out.println("Widget in loadwidgetsfrom tag: "+widget);
-                return widget;
-            } else if (className.equals(ArmorWidget.class.getName())) {
-                ArmorWidget widget = new ArmorWidget(MinecraftClient.getInstance(),EquipmentSlot.CHEST, 0, 0, false, TextureHelper.Position.ABOVE, () -> "");
-                widget.readFromTag(widgetTag);
-                return widget;
-            }
-        return null;
     }
 }

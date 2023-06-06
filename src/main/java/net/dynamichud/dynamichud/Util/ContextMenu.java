@@ -15,13 +15,13 @@ import java.util.function.Supplier;
 
 public class ContextMenu {
     private final MinecraftClient client; // The Minecraft client instance
+    private final List<ContextMenuOption> options = new ArrayList<>(); // The list of options in the context menu
     private int width = 0; // The width of the context menu
     private int x; // The x position of the context menu
     private int y; // The y position of the context menu
-    private final List<ContextMenuOption> options = new ArrayList<>(); // The list of options in the context menu
     private Widget selectedWidget = null; // The widget that this context menu is associated with
     private int backgroundColor = 0x80C0C0C0;// Semi-transparent light grey color
-    private int cornerRadius = 5; // The radius of the rounded corners
+    private final int cornerRadius = 5; // The radius of the rounded corners
     private int padding = 5; // The amount of padding around the rectangle
     private int heightfromwidget = 5; // The amount of padding around the rectangle
 
@@ -40,13 +40,14 @@ public class ContextMenu {
         this.y = y;
         this.selectedWidget = selectedWidget;
     }
+
     /**
      * Sets the options to enable or disable based on values
-     * @param label The label of the option
+     *
+     * @param label  The label of the option
      * @param option Context Menu options
      */
-    public void setOptions(String label,ContextMenuOption option)
-    {
+    public void setOptions(String label, ContextMenuOption option) {
         if (selectedWidget instanceof ContextMenuOptionsProvider optionsProvider) {
             option.enabled = optionsProvider.isOptionEnabled(label);
         }
@@ -61,14 +62,13 @@ public class ContextMenu {
     public void addOption(String label, Runnable action) {
         ContextMenuOption option = new ContextMenuOption(label, action);
         if (selectedWidget != null) {
-           setOptions(label,option);
+            setOptions(label, option);
         }
         options.add(option);
     }
 
-    public void setBackgroundColor(int backgroundColor)
-    {
-     this.backgroundColor=backgroundColor;
+    public void setBackgroundColor(int backgroundColor) {
+        this.backgroundColor = backgroundColor;
     }
 
     /**
@@ -80,14 +80,14 @@ public class ContextMenu {
      * ContextMenu contextMenu = new ContextMenu(client, x, y);
      * <p>
      * contextMenu.addEnumCycleOption("Position", Position.values(), () -> currentPosition, newPosition -> {
-     *     currentPosition = newPosition;
+     * currentPosition = newPosition;
      * });
      *
-     * @param labelPrefix  The label to display for this option in the context menu
-     * @param values An array of enum values that specifies the possible values that this option can cycle through
-     * @param getter A Supplier that returns the current value of the enum
-     * @param setter A Consumer that sets the new value of the enum
-     * @param <T>    The type of the enum
+     * @param labelPrefix The label to display for this option in the context menu
+     * @param values      An array of enum values that specifies the possible values that this option can cycle through
+     * @param getter      A Supplier that returns the current value of the enum
+     * @param setter      A Consumer that sets the new value of the enum
+     * @param <T>         The type of the enum
      */
     public <T extends Enum<T>> void addEnumCycleOption(String labelPrefix, T[] values, Supplier<T> getter, Consumer<T> setter) {
         ContextMenuOption option = new EnumCycleContextMenuOption<>(labelPrefix, values, getter, () -> {
@@ -113,10 +113,10 @@ public class ContextMenu {
     }
 
 
-
     /**
      * Renders this context menu on screen.
-     *@param matrices - MatrixStack used for rendering.
+     *
+     * @param matrices - MatrixStack used for rendering.
      */
     public void render(MatrixStack matrices) {
         TextRenderer textRenderer = client.textRenderer;
@@ -124,12 +124,12 @@ public class ContextMenu {
         width = 0;
         int height = 0;
         for (ContextMenuOption option : options) {
-            width = Math.max(width, textRenderer.getWidth(option.label)+padding);
+            width = Math.max(width, textRenderer.getWidth(option.label) + padding);
             height += textRenderer.fontHeight + 2;
         }
         // Draw the background
-        DrawHelper.fill(matrices, x-2, y+heightfromwidget-2,  x+width + 7,  y+height + heightfromwidget+2, backgroundColor);
-        DrawHelper.drawOutlinedBox(matrices, x-2, y+heightfromwidget-2,  x+width + 7,  y+height + heightfromwidget+2, ColorHelper.ColorToInt(Color.BLACK));
+        DrawHelper.fill(matrices, x - 2, y + heightfromwidget - 2, x + width + 7, y + height + heightfromwidget + 2, backgroundColor);
+        DrawHelper.drawOutlinedBox(matrices, x - 2, y + heightfromwidget - 2, x + width + 7, y + height + heightfromwidget + 2, ColorHelper.ColorToInt(Color.BLACK));
 
         int optionY = y + heightfromwidget + 2;
         for (ContextMenuOption option : options) {
@@ -140,14 +140,16 @@ public class ContextMenu {
             textRenderer.draw(matrices, option.label, x + 5, optionY, color);
             optionY += textRenderer.fontHeight + 2;
         }
-        if (selectedWidget != null) setPosition(selectedWidget.getX(), selectedWidget.getY() + textRenderer.fontHeight + 4);
+        if (selectedWidget != null)
+            setPosition(selectedWidget.getX(), selectedWidget.getY() + textRenderer.fontHeight + 4);
     }
 
 
     /**
      * Sets position of this context menu.
-     *@param x - X position to set.
-     *@param y - Y position to set.
+     *
+     * @param x - X position to set.
+     * @param y - Y position to set.
      */
     public void setPosition(int x, int y) {
         this.x = x;
@@ -168,12 +170,13 @@ public class ContextMenu {
 
     /**
      * Handles mouse clicks on this context menu.
-     *@param mouseX - X position of mouse cursor.
-     *@param mouseY - Y position of mouse cursor.
-     *@param button - Mouse button that was clicked.
-     *@return true if mouse click was handled by this context menu.
+     *
+     * @param mouseX - X position of mouse cursor.
+     * @param mouseY - Y position of mouse cursor.
+     * @param button - Mouse button that was clicked.
+     * @return true if mouse click was handled by this context menu.
      */
-    public boolean mouseClicked(double mouseX,double mouseY,int button){
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         // Check if the mouse is over any of the options
         int buttonSize = 10;
         int buttonX = x + width - buttonSize;
@@ -183,13 +186,13 @@ public class ContextMenu {
             return false;
         }
         TextRenderer textRenderer = client.textRenderer;
-        int optionY = y+ heightfromwidget + 2;
+        int optionY = y + heightfromwidget + 2;
         for (ContextMenuOption option : options) {
             if (mouseX >= x && mouseX <= x + textRenderer.getWidth(option.label) + 10 && mouseY >= optionY && mouseY <= optionY + textRenderer.fontHeight + 2) {
                 // Run the action of the selected option
                 option.action.run();
 
-                option.enabled=!option.enabled;
+                option.enabled = !option.enabled;
 
                 return true;
             }
@@ -200,20 +203,22 @@ public class ContextMenu {
 
 
     private static class ContextMenuOption {
-        String label; // The label of the option
         private final Runnable action; // The action to perform when the option is clicked
-        private boolean enabled=false; // Whether the option is enabled
+        String label; // The label of the option
+        private boolean enabled = false; // Whether the option is enabled
 
         /**
          * Constructs a ContextMenuOption object.
-         *@param label - Label of this option.
-         *@param action - Action to perform when this option is clicked.
+         *
+         * @param label  - Label of this option.
+         * @param action - Action to perform when this option is clicked.
          */
         public ContextMenuOption(String label, Runnable action) {
             this.label = label;
             this.action = action;
         }
     }
+
     private static class EnumCycleContextMenuOption<T extends Enum<T>> extends ContextMenuOption {
         private final String labelPrefix;
         private final T[] values;

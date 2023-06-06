@@ -25,9 +25,9 @@ public abstract class AbstractMoveableScreen extends Screen {
     protected SliderWidget Slider = null; // The rainbow speed slider
     protected MouseHandler mouseHandler;
     protected DragHandler dragHandler;
-    protected int gridSize =3; // The size of each grid cell in pixels
+    protected int gridSize = 3; // The size of each grid cell in pixels
     protected boolean ShouldPause = false; // To pause if the screen is opened or not
-    protected boolean ShouldBeAffectedByResize=false; // If the stuff drawn on screen to be affected by screen resize or not
+    protected boolean ShouldBeAffectedByResize = false; // If the stuff drawn on screen to be affected by screen resize or not
 
 
     /**
@@ -38,22 +38,23 @@ public abstract class AbstractMoveableScreen extends Screen {
     public AbstractMoveableScreen(Text title, DynamicUtil dynamicutil) {
         super(title);
         this.dynamicutil = dynamicutil;
-        updateMouseHandler(this.colorPicker, this.contextMenu,this.Slider);
+        updateMouseHandler(this.colorPicker, this.contextMenu, this.Slider);
         dragHandler = new DefaultDragHandler();
     }
 
     /**
      * Handles mouse dragging on this screen.
-     *@param mouseX - Current X position of mouse cursor.
-     *@param mouseY - Current Y position of mouse cursor.
-     *@param button - Mouse button being dragged.
-     *@param deltaX - Change in X position since last call to this method.
-     *@param deltaY - Change in Y position since last call to this method.
-     *@return true if mouse dragging was handled by this screen.
+     *
+     * @param mouseX - Current X position of mouse cursor.
+     * @param mouseY - Current Y position of mouse cursor.
+     * @param button - Mouse button being dragged.
+     * @param deltaX - Change in X position since last call to this method.
+     * @param deltaY - Change in Y position since last call to this method.
+     * @return true if mouse dragging was handled by this screen.
      */
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (mouseHandler.mouseDragged(mouseX,mouseY,button,deltaX,deltaY)) {
+        if (mouseHandler.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
             return true;
         }
         // Update the position of the widget while dragging
@@ -99,14 +100,15 @@ public abstract class AbstractMoveableScreen extends Screen {
 
     /**
      * Handles mouse clicks on this screen.
-     *@param mouseX - X position of mouse cursor.
-     *@param mouseY - Y position of mouse cursor.
-     *@param button - Mouse button that was clicked.
-     *@return true if mouse click was handled by this screen, false otherwise.
+     *
+     * @param mouseX - X position of mouse cursor.
+     * @param mouseY - Y position of mouse cursor.
+     * @param button - Mouse button that was clicked.
+     * @return true if mouse click was handled by this screen, false otherwise.
      */
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (mouseHandler.mouseClicked(mouseX,mouseY,button)) {
+        if (mouseHandler.mouseClicked(mouseX, mouseY, button)) {
             return true;
         }
 
@@ -152,11 +154,11 @@ public abstract class AbstractMoveableScreen extends Screen {
         if (colorPicker != null) {
             colorPicker.render(matrices);
         }
-        updateMouseHandler(colorPicker,contextMenu,Slider);
+        updateMouseHandler(colorPicker, contextMenu, Slider);
     }
 
     // Pass null if you dont want certain stuff
-    private void updateMouseHandler(ColorPicker colorPicker,ContextMenu contextMenu,SliderWidget Slider) {
+    private void updateMouseHandler(ColorPicker colorPicker, ContextMenu contextMenu, SliderWidget Slider) {
         this.colorPicker = colorPicker;
         this.contextMenu = contextMenu;
         this.Slider = Slider;
@@ -166,9 +168,9 @@ public abstract class AbstractMoveableScreen extends Screen {
     public void setGridSize(int gridSize) {
         this.gridSize = gridSize;
     }
-    public void setShouldPause(boolean shouldpause)
-    {
-        this.ShouldPause=shouldpause;
+
+    public void setShouldPause(boolean shouldpause) {
+        this.ShouldPause = shouldpause;
     }
 
     public void setShouldBeAffectedByResize(boolean shouldBeAffectedByResize) {
@@ -178,8 +180,10 @@ public abstract class AbstractMoveableScreen extends Screen {
     @Override
     public void resize(MinecraftClient client, int width, int height) {
         if (ShouldBeAffectedByResize) super.resize(client, width, height);
-        else return;
+        else {
+        }
     }
+
     @Override
     public boolean shouldPause() {
         return ShouldPause;
