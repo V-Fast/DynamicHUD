@@ -11,15 +11,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 
 import java.awt.*;
-import java.util.function.Supplier;
 
 /**
  * This class represents a widget that displays the armor item in a specified equipment slot.
  */
 public class ArmorWidget extends Widget {
-    private final EquipmentSlot slot; // The equipment slot to display the armor item from
+    private EquipmentSlot slot; // The equipment slot to display the armor item from
     public final TextureHelper.Position[] currentTextPosition= TextureHelper.Position.values();
-    private Supplier<String> text;
+    private TextGenerator textGenerator;
+
 
     /**
      * Constructs an ArmorWidget object.
@@ -29,14 +29,14 @@ public class ArmorWidget extends Widget {
      * @param xPercent The x position of the widget as a percentage of the screen width
      * @param yPercent The y position of the widget as a percentage of the screen height
      */
-    public ArmorWidget(MinecraftClient client, EquipmentSlot slot, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition,Supplier<String> text) {
+    public ArmorWidget(MinecraftClient client, EquipmentSlot slot, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition,TextGenerator textGenerator) {
         super(client);
         this.slot = slot;
         this.xPercent = xPercent;
         this.yPercent = yPercent;
         this.enabled = enabled;
         this.currentTextPosition[0] = currentTextPosition;
-        this.text=text;
+        this.textGenerator=textGenerator;
     }
 
     /**
@@ -81,7 +81,11 @@ public class ArmorWidget extends Widget {
      * @return The text displayed by this widget
      */
     public String getText() {
-        return text.get();
+        return textGenerator.generateText();
+    }
+
+    public void setTextGenerator(TextGenerator textGenerator) {
+        this.textGenerator = textGenerator;
     }
 
     @Override
@@ -95,6 +99,19 @@ public class ArmorWidget extends Widget {
         tag.putBoolean("Enabled",this.enabled);
         tag.putString("Position", String.valueOf(this.currentTextPosition[0]));
         tag.putString("text",getText());
+    }
 
+    @Override
+    public void readFromTag(NbtCompound tag) {
+        super.readFromTag(tag);
+        slot = EquipmentSlot.byName(tag.getString("slot"));
+        xPercent = tag.getFloat("xPercent");
+        yPercent = tag.getFloat("yPercent");
+        enabled = tag.getBoolean("Enabled");
+        String Position = tag.getString("Position");
+        if (TextureHelper.Position.getByUpperCaseName(Position) != null && !tag.getString("Position").isEmpty())
+            currentTextPosition[0] = TextureHelper.Position.getByUpperCaseName(Position);
+        else
+            currentTextPosition[0] = TextureHelper.Position.ABOVE;
     }
 }

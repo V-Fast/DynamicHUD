@@ -1,5 +1,6 @@
-package net.dynamichud.dynamichud.Widget;
+package net.dynamichud.dynamichud.Widget.SliderWidget;
 
+import net.dynamichud.dynamichud.Widget.Widget;
 import net.minecraft.client.MinecraftClient;
 
 public class SliderWidgetBuilder {

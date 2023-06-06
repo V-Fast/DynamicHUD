@@ -15,6 +15,7 @@ import java.util.function.Supplier;
  */
 public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     private Supplier<String> textSupplier; // The supplier that provides the text to display
+    private TextGenerator textGenerator;
     private boolean shadow; // Whether to draw a shadow behind the text
     private boolean rainbow; // Whether to apply a rainbow effect to the text
     private boolean verticalRainbow; // Whether to apply a vertical rainbow effect to the text
@@ -27,13 +28,13 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
      * Constructs a TextWidget object.
      *
      * @param client   The Minecraft client instance
-     * @param text     The text to display
+     * @param textGenerator     The text to display
      * @param xPercent The x position of the widget as a percentage of the screen width
      * @param yPercent The y position of the widget as a percentage of the screen height
      */
-    public TextWidget(MinecraftClient client, Supplier<String> text, float xPercent, float yPercent,boolean Shadow,boolean Rainbow,boolean VerticalRainbow,int color,boolean enabled) {
+    public TextWidget(MinecraftClient client, TextGenerator textGenerator, float xPercent, float yPercent,boolean Shadow,boolean Rainbow,boolean VerticalRainbow,int color,boolean enabled) {
         super(client);
-        this.textSupplier = text;
+        this.textGenerator = textGenerator;
         this.xPercent = xPercent;
         this.yPercent = yPercent;
         this.shadow=Shadow;
@@ -128,7 +129,11 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
      * @return The text displayed by this widget
      */
     public String getText() {
-        return textSupplier.get();
+        return textGenerator.generateText();
+    }
+
+    public void setTextGenerator(TextGenerator textGenerator) {
+        this.textGenerator = textGenerator;
     }
 
     /**
@@ -204,6 +209,17 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         tag.putBoolean("Shadow", hasShadow());
         tag.putBoolean("VerticalRainbow", hasVerticalRainbow());
         tag.putBoolean("Enabled",this.enabled);
+    }
+    @Override
+    public void readFromTag(NbtCompound tag) {
+        super.readFromTag(tag);
+        xPercent = tag.getFloat("xPercent");
+        yPercent = tag.getFloat("yPercent");
+        shadow = tag.getBoolean("shadow");
+        rainbow = tag.getBoolean("rainbow");
+        verticalRainbow = tag.getBoolean("verticalRainbow");
+        color = tag.getInt("color");
+        enabled = tag.getBoolean("Enabled");
     }
 
     private void drawText(MatrixStack matrices, String text, int x, int y, int color) {

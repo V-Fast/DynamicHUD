@@ -47,7 +47,6 @@ public class WidgetManager implements loading {
         return widgets;
     }
 
-    private static final Gson gson = new Gson();
 
     /**
      * Saves the state of all widgets to the given file.
@@ -76,50 +75,39 @@ public class WidgetManager implements loading {
         }
     }
 
-    public void loadWigdets(File file) {
+    public List<Widget> loadWigdets(File file) {
+        List<Widget> widgets = new ArrayList<>();
         if (file.exists()) {
             System.out.println("File exists");
             try (DataInputStream in = new DataInputStream(new FileInputStream(file))) {
                 NbtCompound rootTag = NbtIo.readCompressed(in);
-                NbtList widgetList = rootTag.getList("widgets", NbtType.COMPOUND);
-
+                NbtList widgetList = rootTag.getList("widgets",NbtType.COMPOUND);
+                System.out.println("WidgetList: "+widgetList);
                 for (int i = 0; i < widgetList.size(); i++) {
                     NbtCompound widgetTag = widgetList.getCompound(i);
                     String className = widgetTag.getString("class");
-                    loadWidgetsFromTag(className, widgetTag,this);
-                    System.out.println("Wigdets: " + widgets);
+                    widgets.add(loadWidgetsFromTag(className, widgetTag,this));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else System.out.println("File does not exist");
+        System.out.println("Wigdets: " + widgets);
+        return widgets;
     }
 }
 interface loading {
-    default void loadWidgetsFromTag(String className, NbtCompound widgetTag, WidgetManager widgetManager ) {
-        if (className.equals(TextWidget.class.getName())) {
-            String text = widgetTag.getString("text");
-            float xPercent = widgetTag.getFloat("xPercent");
-            float yPercent = widgetTag.getFloat("yPercent");
-            boolean rainbow = widgetTag.getBoolean("Rainbow");
-            boolean shadow = widgetTag.getBoolean("Shadow");
-            boolean verticalrainbow = widgetTag.getBoolean("VerticalRainbow");
-            int color = widgetTag.getInt("color");
-            boolean enabled = widgetTag.getBoolean("Enabled");
-            widgetManager.addWidget(new TextWidget(MinecraftClient.getInstance(), () -> text, xPercent, yPercent, shadow, rainbow, verticalrainbow, color, enabled));
-        } else if (className.equals(ArmorWidget.class.getName())) {
-            TextureHelper.Position position;
-            EquipmentSlot slot = EquipmentSlot.byName(widgetTag.getString("slot"));
-            float xPercent = widgetTag.getFloat("xPercent");
-            float yPercent = widgetTag.getFloat("yPercent");
-            boolean enabled = widgetTag.getBoolean("Enabled");
-            String Position = widgetTag.getString("Position");
-            String text = widgetTag.getString("text");
-            if (TextureHelper.Position.getByUpperCaseName(Position) != null && !widgetTag.getString("Position").isEmpty())
-                position = TextureHelper.Position.getByUpperCaseName(Position);
-            else
-                position = TextureHelper.Position.ABOVE;
-            widgetManager.addWidget(new ArmorWidget(MinecraftClient.getInstance(), slot, xPercent, yPercent, enabled, position, () -> text));
-        }
+    default Widget loadWidgetsFromTag(String className, NbtCompound widgetTag, WidgetManager widgetManager ) {
+            if (className.equals(TextWidget.class.getName())) {
+                TextWidget widget = new TextWidget(MinecraftClient.getInstance(), () -> "", 0, 0, false, false, false, -1, true);
+                widget.readFromTag(widgetTag);
+                System.out.println("Widget in loadwidgetsfrom tag: "+widget);
+                return widget;
+            } else if (className.equals(ArmorWidget.class.getName())) {
+                ArmorWidget widget = new ArmorWidget(MinecraftClient.getInstance(),EquipmentSlot.CHEST, 0, 0, false, TextureHelper.Position.ABOVE, () -> "");
+                widget.readFromTag(widgetTag);
+                return widget;
+            }
+        return null;
     }
 }

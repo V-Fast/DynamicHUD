@@ -1,5 +1,6 @@
-package net.dynamichud.dynamichud.Widget;
+package net.dynamichud.dynamichud.Widget.SliderWidget;
 
+import net.dynamichud.dynamichud.Widget.Widget;
 import net.dynamichud.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;

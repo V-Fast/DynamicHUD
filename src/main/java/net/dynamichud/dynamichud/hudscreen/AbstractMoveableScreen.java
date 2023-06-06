@@ -3,7 +3,7 @@ package net.dynamichud.dynamichud.hudscreen;
 import net.dynamichud.dynamichud.Util.ColorPicker;
 import net.dynamichud.dynamichud.Util.ContextMenu;
 import net.dynamichud.dynamichud.Util.DynamicUtil;
-import net.dynamichud.dynamichud.Widget.SliderWidget;
+import net.dynamichud.dynamichud.Widget.SliderWidget.SliderWidget;
 import net.dynamichud.dynamichud.Widget.Widget;
 import net.dynamichud.dynamichud.handlers.DefaultDragHandler;
 import net.dynamichud.dynamichud.handlers.DefaultMouseHandler;

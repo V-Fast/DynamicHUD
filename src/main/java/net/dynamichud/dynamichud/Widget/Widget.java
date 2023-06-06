@@ -92,6 +92,9 @@ public abstract class Widget {
      */
     public int getHeight() {return client.textRenderer.fontHeight;}
 
+    public void readFromTag(NbtCompound tag) {
+    }
+
     /**
      * Writes the state of this widget to the given tag.
      *

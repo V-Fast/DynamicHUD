@@ -23,7 +23,10 @@ dependencies {
 
         // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    }
+    implementation 'org.graalvm.js:js:21.3.0'
+    implementation 'org.graalvm.js:js-scriptengine:21.3.0'
+
+}
 
 processResources {
     inputs.property "version", project.version
