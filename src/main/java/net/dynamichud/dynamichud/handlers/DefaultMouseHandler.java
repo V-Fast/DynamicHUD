@@ -18,21 +18,18 @@ public class DefaultMouseHandler implements MouseHandler {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (contextMenuClicked(mouseX,mouseY,button)) {
+        if (contextMenuClicked(mouseX, mouseY, button)) {
             return true;
         }
-        if (colorPickerClicked(mouseX,mouseY,button)) {
+        if (colorPickerClicked(mouseX, mouseY, button)) {
             return true;
         }
-        if (sliderClicked(mouseX,mouseY,button)) {
-            return true;
-        }
-        return false;
+        return sliderClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public boolean mouseDragged(double mouseX,double mouseY,int button,double deltaX,double deltaY) {
-        if (sliderWidget != null && sliderWidget.mouseDragged(mouseX,mouseY,button,deltaX,deltaY)) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (sliderWidget != null && sliderWidget.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
             TextWidget.setRainbowSpeed(sliderWidget.getValue());
             return true;
         }
@@ -40,17 +37,17 @@ public class DefaultMouseHandler implements MouseHandler {
     }
 
     @Override
-    public boolean contextMenuClicked(double mouseX,double mouseY,int button) {
-        return contextMenu != null && contextMenu.mouseClicked(mouseX,mouseY,button);
+    public boolean contextMenuClicked(double mouseX, double mouseY, int button) {
+        return contextMenu != null && contextMenu.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public boolean colorPickerClicked(double mouseX,double mouseY,int button) {
-        return colorPicker != null && colorPicker.mouseClicked(mouseX,mouseY,button);
+    public boolean colorPickerClicked(double mouseX, double mouseY, int button) {
+        return colorPicker != null && colorPicker.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public boolean sliderClicked(double mouseX,double mouseY,int button) {
-        return sliderWidget != null && sliderWidget.mouseClicked(mouseX,mouseY,button);
+    public boolean sliderClicked(double mouseX, double mouseY, int button) {
+        return sliderWidget != null && sliderWidget.mouseClicked(mouseX, mouseY, button);
     }
 }

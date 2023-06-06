@@ -1,8 +1,10 @@
 package net.dynamichud.dynamichud.Util;
 
-import net.dynamichud.dynamichud.Widget.*;
 import net.dynamichud.dynamichud.Widget.ArmorWidget.ArmorWidget;
 import net.dynamichud.dynamichud.Widget.TextWidget.TextWidget;
+import net.dynamichud.dynamichud.Widget.Widget;
+import net.dynamichud.dynamichud.Widget.WidgetBox;
+import net.dynamichud.dynamichud.Widget.WidgetManager;
 import net.dynamichud.dynamichud.helpers.ColorHelper;
 import net.dynamichud.dynamichud.helpers.DrawHelper;
 import net.dynamichud.dynamichud.hudscreen.AbstractMoveableScreen;
@@ -29,8 +31,8 @@ public class DynamicUtil extends DrawableHelper {
     /**
      * Opens the MoveScreen when the specified key is pressed.
      *
-     * @param key         The key to listen for
-     * @param screen      The AbstractMoveableScreen instance to use to set the screen
+     * @param key    The key to listen for
+     * @param screen The AbstractMoveableScreen instance to use to set the screen
      */
     public static void openDynamicScreen(KeyBinding key, AbstractMoveableScreen screen) {
         while (key.wasPressed()) {
@@ -40,8 +42,9 @@ public class DynamicUtil extends DrawableHelper {
 
     /**
      * Renders widgets on screen.
-     *@param matrices - MatrixStack used for rendering.
-     *@param tickDelta - Time elapsed since last frame in seconds.
+     *
+     * @param matrices  - MatrixStack used for rendering.
+     * @param tickDelta - Time elapsed since last frame in seconds.
      */
     public void render(MatrixStack matrices, float tickDelta) {
         // Draw each widget
@@ -56,8 +59,10 @@ public class DynamicUtil extends DrawableHelper {
             if (MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
                 int backgroundColor = widget.isEnabled() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
                 WidgetBox box = widget.getWidgetBox();
-                if(widget instanceof TextWidget) DrawHelper.drawBox(matrices, widget.getX(), widget.getY(), box.getWidth()+1, box.getHeight(), backgroundColor);
-                if(widget instanceof ArmorWidget) DrawHelper.fill(matrices, box.x1, box.y1, box.x2, box.y2, backgroundColor);
+                if (widget instanceof TextWidget)
+                    DrawHelper.drawBox(matrices, widget.getX(), widget.getY(), box.getWidth() + 1, box.getHeight(), backgroundColor);
+                if (widget instanceof ArmorWidget)
+                    DrawHelper.fill(matrices, box.x1, box.y1, box.x2, box.y2, backgroundColor);
             }
         }
     }
@@ -65,7 +70,8 @@ public class DynamicUtil extends DrawableHelper {
 
     /**
      * Returns WidgetManager instance used by this class.
-     *@return WidgetManager instance used by this class.
+     *
+     * @return WidgetManager instance used by this class.
      */
     public WidgetManager getWidgetManager() {
         return widgetManager;

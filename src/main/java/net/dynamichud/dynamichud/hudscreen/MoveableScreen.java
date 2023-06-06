@@ -3,10 +3,10 @@ package net.dynamichud.dynamichud.hudscreen;
 import net.dynamichud.dynamichud.Util.ColorPicker;
 import net.dynamichud.dynamichud.Util.ContextMenu;
 import net.dynamichud.dynamichud.Util.DynamicUtil;
-import net.dynamichud.dynamichud.Widget.*;
 import net.dynamichud.dynamichud.Widget.ArmorWidget.ArmorWidget;
 import net.dynamichud.dynamichud.Widget.SliderWidget.SliderWidgetBuilder;
 import net.dynamichud.dynamichud.Widget.TextWidget.TextWidget;
+import net.dynamichud.dynamichud.Widget.Widget;
 import net.dynamichud.dynamichud.helpers.ColorHelper;
 import net.dynamichud.dynamichud.helpers.TextureHelper;
 import net.minecraft.client.MinecraftClient;
@@ -32,7 +32,7 @@ public class MoveableScreen extends AbstractMoveableScreen {
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         super.render(matrices, mouseX, mouseY, delta);
-        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices,"Editor Screen",MinecraftClient.getInstance().getWindow().getScaledWidth()/2f - textRenderer.getWidth("Editor Screen")/2f,5, ColorHelper.ColorToInt(Color.WHITE),false);
+        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, "Editor Screen", MinecraftClient.getInstance().getWindow().getScaledWidth() / 2f - textRenderer.getWidth("Editor Screen") / 2f, 5, ColorHelper.ColorToInt(Color.WHITE), false);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class MoveableScreen extends AbstractMoveableScreen {
 
     @Override
     protected void menu(Widget widget, int x, int y) {
-        contextMenu = new ContextMenu(mc,x,y+widget.getHeight()+5,selectedWidget);
+        contextMenu = new ContextMenu(mc, x, y + widget.getHeight() + 5, selectedWidget);
         if (widget instanceof ArmorWidget armorWidget) {
             Slider = null;
             contextMenu.setHeightfromwidget(15);
@@ -72,8 +72,9 @@ public class MoveableScreen extends AbstractMoveableScreen {
             });
             contextMenu.addOption("Color", () -> {
                 textWidget.toggleColorOption();
-                if (textWidget.isColorOptionEnabled()) colorPicker = new ColorPicker(mc, mc.getWindow().getScaledWidth() / 2, (mc.getWindow().getScaledHeight() / 2) - 50, textWidget.getColor(), textWidget::setColor);
-                else colorPicker=null;
+                if (textWidget.isColorOptionEnabled())
+                    colorPicker = new ColorPicker(mc, mc.getWindow().getScaledWidth() / 2, (mc.getWindow().getScaledHeight() / 2) - 50, textWidget.getColor(), textWidget::setColor);
+                else colorPicker = null;
             });
             Slider = new SliderWidgetBuilder(client)
                     .setX(x)

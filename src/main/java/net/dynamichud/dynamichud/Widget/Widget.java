@@ -1,9 +1,7 @@
 package net.dynamichud.dynamichud.Widget;
 
-import net.dynamichud.dynamichud.helpers.TextureHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.nbt.NbtCompound;
 
 import java.lang.reflect.Field;
@@ -60,21 +58,21 @@ public abstract class Widget {
     }
 
     /**
-     * Returns the y position of the widget.
-     *
-     * @return The y position of the widget in pixels
-     */
-    public int getY() {
-        return (int) (client.getWindow().getScaledHeight() * yPercent);
-    }
-
-    /**
      * Sets the x position of the widget.
      *
      * @param x The new x position of the widget in pixels
      */
     public void setX(int x) {
         this.xPercent = (float) x / client.getWindow().getScaledWidth();
+    }
+
+    /**
+     * Returns the y position of the widget.
+     *
+     * @return The y position of the widget in pixels
+     */
+    public int getY() {
+        return (int) (client.getWindow().getScaledHeight() * yPercent);
     }
 
     /**
@@ -88,9 +86,12 @@ public abstract class Widget {
 
     /**
      * Returns height of this widget.
-     *@return height of this widget.
+     *
+     * @return height of this widget.
      */
-    public int getHeight() {return client.textRenderer.fontHeight;}
+    public int getHeight() {
+        return client.textRenderer.fontHeight;
+    }
 
     public void readFromTag(NbtCompound tag) {
     }
