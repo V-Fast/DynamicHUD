@@ -1,5 +1,8 @@
-package net.dynamichud.dynamichud.Widget;
+package net.dynamichud.dynamichud.Widget.ArmorWidget;
 
+import net.dynamichud.dynamichud.Widget.TextGenerator;
+import net.dynamichud.dynamichud.Widget.Widget;
+import net.dynamichud.dynamichud.Widget.WidgetBox;
 import net.dynamichud.dynamichud.helpers.ColorHelper;
 import net.dynamichud.dynamichud.helpers.TextureHelper;
 import net.minecraft.client.MinecraftClient;

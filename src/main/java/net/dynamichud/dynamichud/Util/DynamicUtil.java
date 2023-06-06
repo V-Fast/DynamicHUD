@@ -1,6 +1,8 @@
 package net.dynamichud.dynamichud.Util;
 
 import net.dynamichud.dynamichud.Widget.*;
+import net.dynamichud.dynamichud.Widget.ArmorWidget.ArmorWidget;
+import net.dynamichud.dynamichud.Widget.TextWidget.TextWidget;
 import net.dynamichud.dynamichud.helpers.ColorHelper;
 import net.dynamichud.dynamichud.helpers.DrawHelper;
 import net.dynamichud.dynamichud.hudscreen.AbstractMoveableScreen;

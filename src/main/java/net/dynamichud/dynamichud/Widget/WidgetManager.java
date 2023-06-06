@@ -1,6 +1,7 @@
 package net.dynamichud.dynamichud.Widget;
 
-import com.google.gson.Gson;
+import net.dynamichud.dynamichud.Widget.ArmorWidget.ArmorWidget;
+import net.dynamichud.dynamichud.Widget.TextWidget.TextWidget;
 import net.dynamichud.dynamichud.helpers.TextureHelper;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.client.MinecraftClient;

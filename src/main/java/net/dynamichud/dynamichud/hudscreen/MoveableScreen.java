@@ -4,7 +4,9 @@ import net.dynamichud.dynamichud.Util.ColorPicker;
 import net.dynamichud.dynamichud.Util.ContextMenu;
 import net.dynamichud.dynamichud.Util.DynamicUtil;
 import net.dynamichud.dynamichud.Widget.*;
+import net.dynamichud.dynamichud.Widget.ArmorWidget.ArmorWidget;
 import net.dynamichud.dynamichud.Widget.SliderWidget.SliderWidgetBuilder;
+import net.dynamichud.dynamichud.Widget.TextWidget.TextWidget;
 import net.dynamichud.dynamichud.helpers.ColorHelper;
 import net.dynamichud.dynamichud.helpers.TextureHelper;
 import net.minecraft.client.MinecraftClient;
@@ -60,22 +62,16 @@ public class MoveableScreen extends AbstractMoveableScreen {
             contextMenu.setHeightfromwidget(2);
             contextMenu.setPadding(5);
             contextMenu.addOption("Shadow", () -> {
-                // Toggle shadow
                 textWidget.setShadow(!textWidget.hasShadow());
             });
             contextMenu.addOption("Rainbow", () -> {
-                // Toggle rainbow
                 textWidget.setRainbow(!textWidget.hasRainbow());
             });
             contextMenu.addOption("Vertical Rainbow", () -> {
-                // Toggle vertical rainbow
                 textWidget.setVerticalRainbow(!textWidget.hasVerticalRainbow());
             });
             contextMenu.addOption("Color", () -> {
-                // Show color picker
-                // Set the color of the text
                 textWidget.toggleColorOption();
-                colorPicker=null;
                 if (textWidget.isColorOptionEnabled()) colorPicker = new ColorPicker(mc, mc.getWindow().getScaledWidth() / 2, (mc.getWindow().getScaledHeight() / 2) - 50, textWidget.getColor(), textWidget::setColor);
                 else colorPicker=null;
             });

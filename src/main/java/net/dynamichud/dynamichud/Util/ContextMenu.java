@@ -1,14 +1,11 @@
 package net.dynamichud.dynamichud.Util;
 
-import net.dynamichud.dynamichud.Widget.ArmorWidget;
-import net.dynamichud.dynamichud.Widget.TextWidget;
 import net.dynamichud.dynamichud.Widget.Widget;
 import net.dynamichud.dynamichud.helpers.ColorHelper;
 import net.dynamichud.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.ArrayList;
