@@ -19,7 +19,6 @@ interface loading {
         if (className.equals(TextWidget.class.getName())) {
             TextWidget widget = new TextWidget(MinecraftClient.getInstance(), () -> "", 0, 0, false, false, false, -1, true);
             widget.readFromTag(widgetTag);
-            System.out.println("Widget in loadwidgetsfrom tag: " + widget);
             return widget;
         } else if (className.equals(ArmorWidget.class.getName())) {
             ArmorWidget widget = new ArmorWidget(MinecraftClient.getInstance(), EquipmentSlot.CHEST, 0, 0, false, TextureHelper.Position.ABOVE, () -> "");
@@ -78,6 +77,7 @@ public class WidgetManager implements loading {
 
         for (Widget widget : widgets) {
             NbtCompound widgetTag = new NbtCompound();
+            System.out.println("Writing Widgets");
             widget.writeToTag(widgetTag);
             widgetList.add(widgetTag);
         }

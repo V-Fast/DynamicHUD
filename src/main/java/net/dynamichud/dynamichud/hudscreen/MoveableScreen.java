@@ -42,6 +42,7 @@ public class MoveableScreen extends AbstractMoveableScreen {
         int x = selectedWidget.getX();
         int y = selectedWidget.getY();
         // Show context menu
+        contextMenu=null;
         menu(widget, x, y);
         return true;
     }
@@ -54,7 +55,6 @@ public class MoveableScreen extends AbstractMoveableScreen {
             contextMenu.setHeightfromwidget(15);
             contextMenu.setPadding(5);
             contextMenu.addEnumCycleOption("Position", TextureHelper.Position.values(), () -> armorWidget.currentTextPosition[0], newPosition -> {
-                System.out.println("Position: " + newPosition);
                 armorWidget.currentTextPosition[0] = newPosition;
             });
         }

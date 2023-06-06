@@ -2,7 +2,7 @@ package net.dynamichud.dynamichud;
 
 import net.dynamichud.dynamichud.Util.DynamicUtil;
 import net.dynamichud.dynamichud.hudscreen.AbstractMoveableScreen;
-import net.fabricmc.api.ModInitializer;
+import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -14,37 +14,28 @@ import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
 
-public class DynamicHUD implements ModInitializer {
+public class DynamicHUD implements ClientModInitializer {
 
-    private static String filename = "DynamicWidgets.nbt";
+    private static String filename = "widgets.nbt";
     public static final File WIDGETS_FILE = new File(FabricLoader.getInstance().getConfigDir().toFile(), filename);
-    private final KeyBinding EditorScreenKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+    static AbstractMoveableScreen Screen;
+    public static final KeyBinding EditorScreenKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
             "DynamicHud Editor Screen",
             InputUtil.Type.KEYSYM,
             GLFW.GLFW_KEY_RIGHT_SHIFT,
             "DynamicHud"
     ));
     private DynamicUtil dynamicutil;
-    private AbstractMoveableScreen screen;
 
-    @Override
-    public void onInitialize() {
-        dynamicutil = new DynamicUtil(MinecraftClient.getInstance());
-
-        ServerLifecycleEvents.SERVER_STOPPING.register(client -> dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE));
-
-        // Register a HUD render callback to draw the custom HUD
-        HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
-            dynamicutil.render(matrices, tickDelta);
-            DynamicUtil.openDynamicScreen(EditorScreenKeyBinding, screen);
-        });
-    }
-
-    public void setFilename(String filename) {
+    public static void setFilename(String filename) {
         DynamicHUD.filename = filename;
     }
 
-    public void setScreen(AbstractMoveableScreen screen) {
-        this.screen = screen;
+    public static void setAbstractScreen(AbstractMoveableScreen screen) {
+        Screen = screen;
+    }
+
+    @Override
+    public void onInitializeClient() {
     }
 }
