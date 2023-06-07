@@ -1,6 +1,6 @@
 package net.dynamichud.dynamichud.Widget.ItemWidget;
 
-import net.dynamichud.dynamichud.Widget.TextGenerator;
+import net.dynamichud.dynamichud.Util.TextGenerator;
 import net.dynamichud.dynamichud.Widget.Widget;
 import net.dynamichud.dynamichud.Widget.WidgetBox;
 import net.dynamichud.dynamichud.helpers.ColorHelper;
@@ -12,8 +12,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
 
 import java.awt.*;
 

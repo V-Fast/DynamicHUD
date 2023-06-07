@@ -1,6 +1,8 @@
 package net.dynamichud.dynamichud;
 
 import net.dynamichud.dynamichud.Util.DynamicUtil;
+import net.dynamichud.dynamichud.Util.TextGenerator;
+import net.dynamichud.dynamichud.Util.loading;
 import net.dynamichud.dynamichud.Widget.*;
 import net.dynamichud.dynamichud.Widget.ArmorWidget.ArmorWidget;
 import net.dynamichud.dynamichud.Widget.ItemWidget.ItemWidget;
@@ -12,7 +14,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
@@ -40,6 +41,7 @@ public class DynamicHUDmod implements ClientModInitializer, Wigdets, loading {
         loadWigdets(dynamicutil);
 
         DynamicHUD.setAbstractScreen(new MoveableScreen(Text.of("Editor Screen"), dynamicutil));
+        ServerLifecycleEvents.SERVER_STOPPING.register(client -> dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE));
 
         HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
             dynamicutil.render(matrices, tickDelta);
@@ -52,11 +54,11 @@ public class DynamicHUDmod implements ClientModInitializer, Wigdets, loading {
     public void addWigdets(DynamicUtil dynamicUtil) {
         System.out.println("Widgets Added");
 
-        widgets.add(new TextWidget(mc, () -> "FPS: " + mc.fpsDebugString.split(" ")[0], 0.5f, 0.5f, true, true, false, -1, true));
-        widgets.add(new TextWidget(mc, () -> "Biome: " + mc.world.getBiome(mc.player.getBlockPos()), 0.7f, 0.3f, false, false, false, -1, true));
-        widgets.add(new TextWidget(mc, () -> "Ping: ", 0.08f, 0.5f, false, false, false, -1, true));
-        widgets.add(new TextWidget(mc, () -> "Position: ", 0.4f, 0.8f, false, false, false, -1, true));
-        widgets.add(new TextWidget(mc, () -> "Day/Night: ", 0.83f, 0.8f, false, false, false, -1, true));
+        widgets.add(new TextWidget(mc, "FPS: ",()->mc.fpsDebugString.split(" ")[0], 0.5f, 0.5f, true, true, false, -1, -1,true));
+        widgets.add(new TextWidget(mc, "Biome: ",() -> "PLAINS", 0.7f, 0.3f, false, false, false, -1, -1,true));
+        widgets.add(new TextWidget(mc, "Ping: ",() -> "", 0.08f, 0.5f, false, false, false, -1,-1, true));
+        widgets.add(new TextWidget(mc, "Position: ",() -> "", 0.4f, 0.8f, false, false, false, -1,-1, true));
+        widgets.add(new TextWidget(mc, "Day/Night: ",() -> "", 0.83f, 0.8f, false, false, false, -1, -1,true));
 
         // Add an armor widget to the custom HUD
         String text = "Yellow";
@@ -79,15 +81,11 @@ public class DynamicHUDmod implements ClientModInitializer, Wigdets, loading {
         int textIndex = 0;
         int armorIndex = 0;
         TextGenerator[] TextWidgettext = new TextGenerator[]{
-                () -> "FPS: " + mc.getCurrentFps(),
-                () -> {
-                    assert mc.player != null;
-                    assert mc.world != null;
-                    return "Biome: " + mc.world.getBiome(mc.player.getBlockPos());
-                },
-                () -> "Ping: ",
-                () -> "Position: ",
-                () -> "Day/Night: "
+                () -> String.valueOf(mc.getCurrentFps()),
+                () -> "PLAINS",
+                () -> "",
+                () -> "",
+                () -> ""
         };
         TextGenerator[] ArmorWidgettext = new TextGenerator[]{
                 () -> String.valueOf(mc.getCurrentFps()),
@@ -98,7 +96,7 @@ public class DynamicHUDmod implements ClientModInitializer, Wigdets, loading {
         for (Widget widget : widgets) {
             if (widget instanceof TextWidget textWidget) {
                 TextGenerator textGenerator = TextWidgettext[textIndex++];
-                textWidget.setTextGenerator(textGenerator);
+                textWidget.setDataTextGenerator(textGenerator);
                 dynamicutil.getWidgetManager().addWidget(textWidget);
             }
             if (widget instanceof ArmorWidget armorWidget) {
@@ -115,7 +113,7 @@ public class DynamicHUDmod implements ClientModInitializer, Wigdets, loading {
     @Override
     public Widget loadWidgetsFromTag(String className, NbtCompound widgetTag) {
 
-        //SAMPLE CODE:
+        //SAMPLE CODE EXAMPLE :
         /*if (className.equals(ItemWidget.class.getName())) {
             ItemWidget widget = new ItemWidget(MinecraftClient.getInstance(), ItemStack.EMPTY, 0, 0, true, TextureHelper.Position.ABOVE, () -> "", Color.BLUE);
             widget.readFromTag(widgetTag);

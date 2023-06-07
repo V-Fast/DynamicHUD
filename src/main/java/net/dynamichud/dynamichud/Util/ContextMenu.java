@@ -21,9 +21,9 @@ public class ContextMenu {
     private int y; // The y position of the context menu
     private Widget selectedWidget = null; // The widget that this context menu is associated with
     private int backgroundColor = 0x80C0C0C0;// Semi-transparent light grey color
-    private final int cornerRadius = 5; // The radius of the rounded corners
     private int padding = 5; // The amount of padding around the rectangle
     private int heightfromwidget = 5; // The amount of padding around the rectangle
+    private static int optionY;
 
 
     /**
@@ -128,16 +128,19 @@ public class ContextMenu {
             height += textRenderer.fontHeight + 2;
         }
         // Draw the background
-        DrawHelper.fill(matrices, x - 2, y + heightfromwidget - 2, x + width + 7, y + height + heightfromwidget + 2, backgroundColor);
-        DrawHelper.drawOutlinedBox(matrices, x - 2, y + heightfromwidget - 2, x + width + 7, y + height + heightfromwidget + 2, ColorHelper.ColorToInt(Color.BLACK));
+        DrawHelper.fill(matrices, x - 2, y + heightfromwidget - 2, x + width + 12, y + height + heightfromwidget + 2, backgroundColor);
+        DrawHelper.drawOutlinedBox(matrices, x - 2, y + heightfromwidget - 2, x + width + 12, y + height + heightfromwidget + 2, ColorHelper.ColorToInt(Color.BLACK));
 
-        int optionY = y + heightfromwidget + 2;
+        optionY = y + heightfromwidget + 2;
         for (ContextMenuOption option : options) {
             if (option instanceof EnumCycleContextMenuOption enumOption) {
                 enumOption.updateLabel();
             }
             int color = option.enabled ? 0xFF00FF00 : 0xFFFF0000;
             textRenderer.draw(matrices, option.label, x + 5, optionY, color);
+            DrawHelper.drawBox(matrices, x + 5 + width,optionY+textRenderer.fontHeight,5,5, ColorHelper.ColorToInt(Color.BLACK));
+            if (option.enabled)
+                DrawHelper.drawBox(matrices, x + 5 + width,optionY+textRenderer.fontHeight,2,2, ColorHelper.ColorToInt(Color.WHITE));
             optionY += textRenderer.fontHeight + 2;
         }
         if (selectedWidget != null)
@@ -154,6 +157,11 @@ public class ContextMenu {
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public static int getOptionY()
+    {
+        return optionY;
     }
 
     public void setPadding(int padding) {

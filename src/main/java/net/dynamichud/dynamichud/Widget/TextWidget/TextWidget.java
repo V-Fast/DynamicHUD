@@ -1,7 +1,7 @@
 package net.dynamichud.dynamichud.Widget.TextWidget;
 
 import net.dynamichud.dynamichud.Util.ContextMenuOptionsProvider;
-import net.dynamichud.dynamichud.Widget.TextGenerator;
+import net.dynamichud.dynamichud.Util.TextGenerator;
 import net.dynamichud.dynamichud.Widget.Widget;
 import net.dynamichud.dynamichud.Widget.WidgetBox;
 import net.dynamichud.dynamichud.helpers.ColorHelper;
@@ -18,40 +18,51 @@ import java.util.function.Supplier;
  */
 public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     protected static float rainbowSpeed = 15f; // The speed of the rainbow effect
-    private Supplier<String> textSupplier; // The supplier that provides the text to display
-    private TextGenerator textGenerator;
+    private String text;
+    private TextGenerator dataText;
     private boolean shadow; // Whether to draw a shadow behind the text
     private boolean rainbow; // Whether to apply a rainbow effect to the text
     private boolean verticalRainbow; // Whether to apply a vertical rainbow effect to the text
-    private int color; // The color of the text
-    private boolean colorOptionEnabled = false;
+    private int Textcolor; // The color of the text
+    private int Datacolor; // The color of the Data
+    private boolean TextcolorOptionEnabled = false;
+    private boolean DatacolorOptionEnabled = false;
 
 
     /**
      * Constructs a TextWidget object.
      *
      * @param client        The Minecraft client instance
-     * @param textGenerator The text to display
+     * @param text The text to display
      * @param xPercent      The x position of the widget as a percentage of the screen width
      * @param yPercent      The y position of the widget as a percentage of the screen height
      */
-    public TextWidget(MinecraftClient client, TextGenerator textGenerator, float xPercent, float yPercent, boolean Shadow, boolean Rainbow, boolean VerticalRainbow, int color, boolean enabled) {
+    public TextWidget(MinecraftClient client, String text,TextGenerator dataText, float xPercent, float yPercent, boolean Shadow, boolean Rainbow, boolean VerticalRainbow, int Textcolor, int Datacolor, boolean enabled) {
         super(client);
-        this.textGenerator = textGenerator;
+        this.text = text;
+        this.dataText = dataText;
         this.xPercent = xPercent;
         this.yPercent = yPercent;
         this.shadow = Shadow;
         this.rainbow = Rainbow;
         this.verticalRainbow = VerticalRainbow;
-        this.color = color;
+        this.Textcolor = Textcolor;
+        this.Datacolor = Datacolor;
         this.enabled = enabled;
     }
 
     /**
-     * Toggles whether the color option is enabled.
+     * Toggles whether the Data color option is enabled.
      */
-    public void toggleColorOption() {
-        colorOptionEnabled = !colorOptionEnabled;
+    public void toggleTextColorOption() {
+        TextcolorOptionEnabled = !TextcolorOptionEnabled;
+    }
+
+    /**
+     * Toggles whether the Text color option is enabled.
+     */
+    public void toggleDataColorOption() {
+        DatacolorOptionEnabled = !DatacolorOptionEnabled;
     }
 
     /**
@@ -132,11 +143,20 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
      * @return The text displayed by this widget
      */
     public String getText() {
-        return textGenerator.generateText();
+        return text;
+    }
+    /**
+     * Returns the text displayed by this widget.
+     *
+     * @return The text displayed by this widget
+     */
+    public String getDataText() {
+        return dataText.generateText();
     }
 
-    public void setTextGenerator(TextGenerator textGenerator) {
-        this.textGenerator = textGenerator;
+
+    public void setDataTextGenerator(TextGenerator textGenerator) {
+        this.dataText = textGenerator;
     }
 
     /**
@@ -144,8 +164,17 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
      *
      * @return The color of the text
      */
-    public int getColor() {
-        return color;
+    public int getTextcolor() {
+        return Textcolor;
+    }
+
+    /**
+     * Returns the color of the Data.
+     *
+     * @return The color of the Data
+     */
+    public int getDatacolor() {
+        return Datacolor;
     }
 
     /**
@@ -153,8 +182,27 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
      *
      * @param color The new color of the text
      */
-    public void setColor(int color) {
-        this.color = color;
+    public void setTextColor(int color) {
+        this.Textcolor = color;
+    }
+
+    /**
+     * Sets the color of the text.
+     *
+     * @param color The new color of the text
+     */
+    public void setDataColor(int color) {
+        this.Datacolor = color;
+    }
+
+
+    /**
+     * Returns whether color options are enabled for this widget.
+     *
+     * @return true if color options are enabled for this widget, false otherwise.
+     */
+    public boolean isTextcolorOptionEnabled() {
+        return TextcolorOptionEnabled;
     }
 
     /**
@@ -162,16 +210,16 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
      *
      * @return true if color options are enabled for this widget, false otherwise.
      */
-    public boolean isColorOptionEnabled() {
-        return colorOptionEnabled;
+    public boolean isDatacolorOptionEnabled() {
+        return DatacolorOptionEnabled;
     }
 
     @Override
     public WidgetBox getWidgetBox() {
         TextRenderer textRenderer = client.textRenderer;
-        int width = textRenderer.getWidth(getText());
+        int Width=textRenderer.getWidth(getText())+textRenderer.getWidth(getDataText());
         int height = textRenderer.fontHeight;
-        return new WidgetBox(width, height);
+        return new WidgetBox(Width, height);
     }
 
 
@@ -182,37 +230,43 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
      */
     @Override
     public void render(MatrixStack matrices) {
-        int textWidth = client.textRenderer.getWidth(getText());
+        int textWidth = client.textRenderer.getWidth(getText())+client.textRenderer.getWidth(getDataText());
         int x = getX();
         int y = getY();
+        String CombinedText=getText()+getDataText();
         if (rainbow) {
             float hue = (System.currentTimeMillis() % 2000) / (rainbowSpeed * 100f);
-            for (int i = 0; i < getText().length(); i++) {
+            for (int i = 0; i < CombinedText.length(); i++) {
                 int color = ColorHelper.getColorFromHue(hue);
-                String character = String.valueOf(getText().charAt(i));
+                String character = String.valueOf(CombinedText.charAt(i));
                 int characterWidth = client.textRenderer.getWidth(character);
                 drawText(matrices, character, x - textWidth / 2, y - 4, color);
                 x += characterWidth;
                 hue += verticalRainbow ? 0.05f : 0.1f;
-                if (hue > 1) hue -= 1;
+                if (hue >= 1) hue -= 1;
             }
         } else {
-            int color = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 2000) / (rainbowSpeed * 100f)) : this.color;
-            drawText(matrices, getText(), getX() - textWidth / 2, getY() - 4, color);
+            int Textcolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 2000) / (rainbowSpeed * 100f)) : this.Textcolor;
+            int Datacolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 2000) / (rainbowSpeed * 100f)) : this.Datacolor;
+            drawText(matrices, getText(), getX() - textWidth/2, getY() - 4, Textcolour);
+            drawText(matrices, getDataText(),getX()+textWidth/2-client.textRenderer.getWidth(getDataText()), getY() - 4, Datacolour);
         }
     }
+
 
     @Override
     public void writeToTag(NbtCompound tag) {
         super.writeToTag(tag);
         tag.putString("class", getClass().getName());
-        tag.putString("text", getText());
         tag.putFloat("xPercent", xPercent);
         tag.putFloat("yPercent", yPercent);
         tag.putBoolean("Rainbow", hasRainbow());
         tag.putBoolean("Shadow", hasShadow());
         tag.putBoolean("VerticalRainbow", hasVerticalRainbow());
         tag.putBoolean("Enabled", this.enabled);
+        tag.putInt("TextColor",Textcolor);
+        tag.putInt("DataColor",Datacolor);
+        tag.putString("Text",text);
     }
 
     @Override
@@ -223,8 +277,10 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         shadow = tag.getBoolean("shadow");
         rainbow = tag.getBoolean("rainbow");
         verticalRainbow = tag.getBoolean("verticalRainbow");
-        color = tag.getInt("color");
+        Textcolor = tag.getInt("TextColor");
+        Datacolor = tag.getInt("DataColor");
         enabled = tag.getBoolean("Enabled");
+        text=tag.getString("Text");
     }
 
     private void drawText(MatrixStack matrices, String text, int x, int y, int color) {
@@ -239,8 +295,9 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         return switch (label) {
             case "Shadow" -> hasShadow();
             case "Rainbow" -> hasRainbow();
-            case "VerticalRainbow" -> hasVerticalRainbow();
-            case "Color" -> isColorOptionEnabled();
+            case "Vertical Rainbow" -> hasVerticalRainbow();
+            case "TextColor" -> isTextcolorOptionEnabled();
+            case "DataColor" -> isDatacolorOptionEnabled();
             default -> false;
         };
     }

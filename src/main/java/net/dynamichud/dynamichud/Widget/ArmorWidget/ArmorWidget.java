@@ -1,6 +1,6 @@
 package net.dynamichud.dynamichud.Widget.ArmorWidget;
 
-import net.dynamichud.dynamichud.Widget.TextGenerator;
+import net.dynamichud.dynamichud.Util.TextGenerator;
 import net.dynamichud.dynamichud.Widget.Widget;
 import net.dynamichud.dynamichud.Widget.WidgetBox;
 import net.dynamichud.dynamichud.helpers.ColorHelper;

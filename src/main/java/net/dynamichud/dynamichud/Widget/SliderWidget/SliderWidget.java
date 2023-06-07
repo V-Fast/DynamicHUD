@@ -1,5 +1,6 @@
 package net.dynamichud.dynamichud.Widget.SliderWidget;
 
+import net.dynamichud.dynamichud.Util.ContextMenu;
 import net.dynamichud.dynamichud.Widget.Widget;
 import net.dynamichud.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.MinecraftClient;
@@ -12,7 +13,7 @@ import net.minecraft.client.util.math.MatrixStack;
 public class SliderWidget {
     private final MinecraftClient client;
     private final int width; // The width of the widget
-    private final int height; // The height of the widget
+    private int height; // The height of the widget
     private final String label; // The label displayed above the slider
     private final float minValue; // The minimum value of the slider
     private final float maxValue; // The maximum value of the slider
@@ -70,7 +71,7 @@ public class SliderWidget {
         float handleWidth = 4;
         float handleHeight = 10;
         float handleX = sliderX + (value - minValue) / (maxValue - minValue) * (sliderWidth - handleWidth);
-        float handleY = sliderY + (sliderHeight - handleHeight) / 2;
+        float handleY = sliderY + ((sliderHeight - handleHeight) / 2 );
 
         DrawHelper.fillRoundedRect(matrices, (int) handleX, (int) handleY, (int) (handleX + handleWidth), (int) (handleY + handleHeight), 0xFFFFFFFF);
 

@@ -50,6 +50,7 @@ public class MoveableScreen extends AbstractMoveableScreen {
 
     @Override
     protected void menu(Widget widget, int x, int y) {
+        colorPicker = null;
         contextMenu = new ContextMenu(mc, x, y + widget.getHeight() + 5, selectedWidget);
         if (widget instanceof ArmorWidget armorWidget) {
             Slider = null;
@@ -76,17 +77,23 @@ public class MoveableScreen extends AbstractMoveableScreen {
             contextMenu.addOption("Vertical Rainbow", () -> {
                 textWidget.setVerticalRainbow(!textWidget.hasVerticalRainbow());
             });
-            contextMenu.addOption("Color", () -> {
-                textWidget.toggleColorOption();
-                if (textWidget.isColorOptionEnabled())
-                    colorPicker = new ColorPicker(mc, mc.getWindow().getScaledWidth() / 2, (mc.getWindow().getScaledHeight() / 2) - 50, textWidget.getColor(), textWidget::setColor);
-                else colorPicker = null;
+            contextMenu.addOption("TextColor", () -> {
+                textWidget.toggleTextColorOption();
+                colorPicker = null;
+                if (textWidget.isTextcolorOptionEnabled())
+                    colorPicker = new ColorPicker(mc, mc.getWindow().getScaledWidth() / 2, (mc.getWindow().getScaledHeight() / 2) - 50, textWidget.getTextcolor(), textWidget::setTextColor);
+            });
+            contextMenu.addOption("DataColor", () -> {
+                textWidget.toggleDataColorOption();
+                colorPicker = null;
+                if (textWidget.isDatacolorOptionEnabled())
+                    colorPicker = new ColorPicker(mc, mc.getWindow().getScaledWidth() / 2, (mc.getWindow().getScaledHeight() / 2) - 50, textWidget.getDatacolor(), textWidget::setDataColor);
             });
             Slider = new SliderWidgetBuilder(client)
                     .setX(x)
                     .setY(y)
                     .setWidth(105)
-                    .setHeight(10)
+                    .setHeight(15)
                     .setLabel("Rainbow Speed")
                     .setValue(textWidget.getRainbowSpeed())
                     .setMinValue(5f)
