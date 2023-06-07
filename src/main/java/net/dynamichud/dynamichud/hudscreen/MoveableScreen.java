@@ -4,6 +4,7 @@ import net.dynamichud.dynamichud.Util.ColorPicker;
 import net.dynamichud.dynamichud.Util.ContextMenu;
 import net.dynamichud.dynamichud.Util.DynamicUtil;
 import net.dynamichud.dynamichud.Widget.ArmorWidget.ArmorWidget;
+import net.dynamichud.dynamichud.Widget.ItemWidget.ItemWidget;
 import net.dynamichud.dynamichud.Widget.SliderWidget.SliderWidgetBuilder;
 import net.dynamichud.dynamichud.Widget.TextWidget.TextWidget;
 import net.dynamichud.dynamichud.Widget.Widget;
@@ -57,6 +58,11 @@ public class MoveableScreen extends AbstractMoveableScreen {
             contextMenu.addEnumCycleOption("Position", TextureHelper.Position.values(), () -> armorWidget.currentTextPosition[0], newPosition -> {
                 armorWidget.currentTextPosition[0] = newPosition;
             });
+        }
+        if(widget instanceof ItemWidget)
+        {
+            contextMenu=null;
+            return;
         }
         if (widget instanceof TextWidget textWidget) {
             contextMenu.setHeightfromwidget(2);

@@ -1,6 +1,7 @@
 package net.dynamichud.dynamichud.Util;
 
 import net.dynamichud.dynamichud.Widget.ArmorWidget.ArmorWidget;
+import net.dynamichud.dynamichud.Widget.ItemWidget.ItemWidget;
 import net.dynamichud.dynamichud.Widget.TextWidget.TextWidget;
 import net.dynamichud.dynamichud.Widget.Widget;
 import net.dynamichud.dynamichud.Widget.WidgetBox;
@@ -61,7 +62,7 @@ public class DynamicUtil extends DrawableHelper {
                 WidgetBox box = widget.getWidgetBox();
                 if (widget instanceof TextWidget)
                     DrawHelper.drawBox(matrices, widget.getX(), widget.getY(), box.getWidth() + 1, box.getHeight(), backgroundColor);
-                if (widget instanceof ArmorWidget)
+                if (widget instanceof ArmorWidget || widget instanceof ItemWidget)
                     DrawHelper.fill(matrices, box.x1, box.y1, box.x2, box.y2, backgroundColor);
             }
         }

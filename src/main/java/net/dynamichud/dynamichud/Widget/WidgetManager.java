@@ -1,15 +1,18 @@
 package net.dynamichud.dynamichud.Widget;
 
 import net.dynamichud.dynamichud.Widget.ArmorWidget.ArmorWidget;
+import net.dynamichud.dynamichud.Widget.ItemWidget.ItemWidget;
 import net.dynamichud.dynamichud.Widget.TextWidget.TextWidget;
 import net.dynamichud.dynamichud.helpers.TextureHelper;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
 
+import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +25,10 @@ interface loading {
             return widget;
         } else if (className.equals(ArmorWidget.class.getName())) {
             ArmorWidget widget = new ArmorWidget(MinecraftClient.getInstance(), EquipmentSlot.CHEST, 0, 0, false, TextureHelper.Position.ABOVE, () -> "");
+            widget.readFromTag(widgetTag);
+            return widget;
+        } else if (className.equals(ItemWidget.class.getName())) {
+            ItemWidget widget = new ItemWidget(MinecraftClient.getInstance(), ItemStack.EMPTY, 0, 0, true, TextureHelper.Position.ABOVE, () -> "", Color.BLUE);
             widget.readFromTag(widgetTag);
             return widget;
         }
@@ -77,7 +84,6 @@ public class WidgetManager implements loading {
 
         for (Widget widget : widgets) {
             NbtCompound widgetTag = new NbtCompound();
-            System.out.println("Writing Widgets");
             widget.writeToTag(widgetTag);
             widgetList.add(widgetTag);
         }
@@ -95,11 +101,10 @@ public class WidgetManager implements loading {
     public List<Widget> loadWigdets(File file) {
         List<Widget> widgets = new ArrayList<>();
         if (file.exists()) {
-            System.out.println("File exists");
+            System.out.println("Widgets File exists");
             try (DataInputStream in = new DataInputStream(new FileInputStream(file))) {
                 NbtCompound rootTag = NbtIo.readCompressed(in);
                 NbtList widgetList = rootTag.getList("widgets", NbtType.COMPOUND);
-                System.out.println("WidgetList: " + widgetList);
                 for (int i = 0; i < widgetList.size(); i++) {
                     NbtCompound widgetTag = widgetList.getCompound(i);
                     String className = widgetTag.getString("class");
@@ -108,7 +113,7 @@ public class WidgetManager implements loading {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else System.out.println("File does not exist");
+        } else System.out.println("Widgets File does not exist");
         System.out.println("Wigdets: " + widgets);
         return widgets;
     }

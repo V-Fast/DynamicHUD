@@ -14,8 +14,8 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "net.dynamichud.dynamichud.DynamicHUD",
-      "net.dynamichud.dynamichud.DynamicHUDmod"
+      "net.dynamichud.dynamichud.DynamicHUDmod",
+      "net.dynamichud.dynamichud.DynamicHUD"
     ]
   },
   "mixins": [
