@@ -1,40 +1,13 @@
 package net.dynamichud.dynamichud.Widget;
 
-import net.dynamichud.dynamichud.Widget.ArmorWidget.ArmorWidget;
-import net.dynamichud.dynamichud.Widget.ItemWidget.ItemWidget;
-import net.dynamichud.dynamichud.Widget.TextWidget.TextWidget;
-import net.dynamichud.dynamichud.helpers.TextureHelper;
 import net.fabricmc.fabric.api.util.NbtType;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
 
-import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-
-interface loading {
-    default Widget loadWidgetsFromTag(String className, NbtCompound widgetTag, WidgetManager widgetManager) {
-        if (className.equals(TextWidget.class.getName())) {
-            TextWidget widget = new TextWidget(MinecraftClient.getInstance(), () -> "", 0, 0, false, false, false, -1, true);
-            widget.readFromTag(widgetTag);
-            return widget;
-        } else if (className.equals(ArmorWidget.class.getName())) {
-            ArmorWidget widget = new ArmorWidget(MinecraftClient.getInstance(), EquipmentSlot.CHEST, 0, 0, false, TextureHelper.Position.ABOVE, () -> "");
-            widget.readFromTag(widgetTag);
-            return widget;
-        } else if (className.equals(ItemWidget.class.getName())) {
-            ItemWidget widget = new ItemWidget(MinecraftClient.getInstance(), ItemStack.EMPTY, 0, 0, true, TextureHelper.Position.ABOVE, () -> "", Color.BLUE);
-            widget.readFromTag(widgetTag);
-            return widget;
-        }
-        return null;
-    }
-}
 
 /**
  * This class manages a list of widgets that can be added, removed and retrieved.
@@ -108,7 +81,7 @@ public class WidgetManager implements loading {
                 for (int i = 0; i < widgetList.size(); i++) {
                     NbtCompound widgetTag = widgetList.getCompound(i);
                     String className = widgetTag.getString("class");
-                    widgets.add(loadWidgetsFromTag(className, widgetTag, this));
+                    widgets.add(loadWidgetsFromTag(className, widgetTag));
                 }
             } catch (IOException e) {
                 e.printStackTrace();

@@ -1,12 +1,10 @@
 package net.dynamichud.dynamichud;
 
 import net.dynamichud.dynamichud.Util.DynamicUtil;
+import net.dynamichud.dynamichud.Widget.*;
 import net.dynamichud.dynamichud.Widget.ArmorWidget.ArmorWidget;
 import net.dynamichud.dynamichud.Widget.ItemWidget.ItemWidget;
-import net.dynamichud.dynamichud.Widget.TextGenerator;
 import net.dynamichud.dynamichud.Widget.TextWidget.TextWidget;
-import net.dynamichud.dynamichud.Widget.Widget;
-import net.dynamichud.dynamichud.Widget.Wigdets;
 import net.dynamichud.dynamichud.helpers.TextureHelper;
 import net.dynamichud.dynamichud.hudscreen.MoveableScreen;
 import net.fabricmc.api.ClientModInitializer;
@@ -14,7 +12,9 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 
 import java.awt.*;
@@ -23,7 +23,7 @@ import java.util.List;
 
 import static net.dynamichud.dynamichud.DynamicHUD.*;
 
-public class DynamicHUDmod implements ClientModInitializer, Wigdets {
+public class DynamicHUDmod implements ClientModInitializer, Wigdets, loading {
     MinecraftClient mc = MinecraftClient.getInstance();
     List<Widget> widgets = new ArrayList<>();
     private DynamicUtil dynamicutil;
@@ -112,6 +112,17 @@ public class DynamicHUDmod implements ClientModInitializer, Wigdets {
         }
     }
 
+    @Override
+    public Widget loadWidgetsFromTag(String className, NbtCompound widgetTag) {
+
+        //SAMPLE CODE:
+        /*if (className.equals(ItemWidget.class.getName())) {
+            ItemWidget widget = new ItemWidget(MinecraftClient.getInstance(), ItemStack.EMPTY, 0, 0, true, TextureHelper.Position.ABOVE, () -> "", Color.BLUE);
+            widget.readFromTag(widgetTag);
+            return widget;
+        }*/
+        return loading.super.loadWidgetsFromTag(className, widgetTag);
+    }
 }
 
 
