@@ -94,7 +94,7 @@ public abstract class AbstractMoveableScreen extends Screen {
         }
         return contextMenu != null;
     }
-    
+
 
     /**
      * Handles mouse clicks on this screen.

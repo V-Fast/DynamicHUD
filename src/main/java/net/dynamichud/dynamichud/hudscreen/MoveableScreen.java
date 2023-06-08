@@ -58,11 +58,10 @@ public class MoveableScreen extends AbstractMoveableScreen {
                 armorWidget.currentTextPosition[0] = newPosition;
             });
         }
-        if(widget instanceof ItemWidget)
-        {
-            contextMenu=null;
-            Slider=null;
-            colorPicker=null;
+        if (widget instanceof ItemWidget) {
+            contextMenu = null;
+            Slider = null;
+            colorPicker = null;
             return;
         }
         if (widget instanceof TextWidget textWidget) {
@@ -83,16 +82,18 @@ public class MoveableScreen extends AbstractMoveableScreen {
                 colorPicker = null;
 
                 if (textWidget.isTextcolorOptionEnabled())
-                    colorPicker = new ColorGradientPicker(mc, x + 30, y + widget.getHeight() + 5, textWidget.getTextcolor(), textWidget::setTextColor,50,100,selectedWidget);
+                    colorPicker = new ColorGradientPicker(mc, x + 110, y + widget.getHeight() + 5, textWidget.getTextcolor(), textWidget::setTextColor, 50, 100, selectedWidget);
             });
-            contextMenu.addOption("DataColor", () -> {
-                textWidget.toggleDataColorOption();
+            if (!textWidget.getDataText().trim().isEmpty()) {
+                contextMenu.addOption("DataColor", () -> {
+                    textWidget.toggleDataColorOption();
 
-                colorPicker = null;
+                    colorPicker = null;
 
-                if (textWidget.isDatacolorOptionEnabled())
-                    colorPicker = new ColorGradientPicker(mc, x + 30, y + widget.getHeight() + 5, textWidget.getDatacolor(), textWidget::setDataColor,50,100,selectedWidget);
-            });
+                    if (textWidget.isDatacolorOptionEnabled())
+                        colorPicker = new ColorGradientPicker(mc, x + 110, y + widget.getHeight() + 5, textWidget.getDatacolor(), textWidget::setDataColor, 50, 100, selectedWidget);
+                });
+            }
             Slider = new SliderWidgetBuilder(client)
                     .setX(x)
                     .setY(y)
