@@ -136,7 +136,6 @@ public class DrawHelper extends DrawableHelper {
         RenderSystem.disableBlend();
     }
 
-
     public static void fillRoundedRect(MatrixStack matrices, int left, int top, int right, int bottom, int color) {
         DrawableHelper.fill(matrices, left + 1, top, right - 1, top + 1, color);
         DrawableHelper.fill(matrices, left + 1, bottom - 1, right - 1, bottom, color);

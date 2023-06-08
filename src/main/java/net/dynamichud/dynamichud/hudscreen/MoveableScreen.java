@@ -1,7 +1,7 @@
 package net.dynamichud.dynamichud.hudscreen;
 
-import net.dynamichud.dynamichud.Util.ColorPicker;
-import net.dynamichud.dynamichud.Util.ContextMenu;
+import net.dynamichud.dynamichud.Util.ColorPicker.ColorGradientPicker;
+import net.dynamichud.dynamichud.Util.ContextMenu.ContextMenu;
 import net.dynamichud.dynamichud.Util.DynamicUtil;
 import net.dynamichud.dynamichud.Widget.ArmorWidget.ArmorWidget;
 import net.dynamichud.dynamichud.Widget.ItemWidget.ItemWidget;
@@ -43,14 +43,12 @@ public class MoveableScreen extends AbstractMoveableScreen {
         int x = selectedWidget.getX();
         int y = selectedWidget.getY();
         // Show context menu
-        contextMenu=null;
         menu(widget, x, y);
         return true;
     }
 
     @Override
     protected void menu(Widget widget, int x, int y) {
-        colorPicker = null;
         contextMenu = new ContextMenu(mc, x, y + widget.getHeight() + 5, selectedWidget);
         if (widget instanceof ArmorWidget armorWidget) {
             Slider = null;
@@ -63,6 +61,8 @@ public class MoveableScreen extends AbstractMoveableScreen {
         if(widget instanceof ItemWidget)
         {
             contextMenu=null;
+            Slider=null;
+            colorPicker=null;
             return;
         }
         if (widget instanceof TextWidget textWidget) {
@@ -79,15 +79,19 @@ public class MoveableScreen extends AbstractMoveableScreen {
             });
             contextMenu.addOption("TextColor", () -> {
                 textWidget.toggleTextColorOption();
+
                 colorPicker = null;
+
                 if (textWidget.isTextcolorOptionEnabled())
-                    colorPicker = new ColorPicker(mc, mc.getWindow().getScaledWidth() / 2, (mc.getWindow().getScaledHeight() / 2) - 50, textWidget.getTextcolor(), textWidget::setTextColor);
+                    colorPicker = new ColorGradientPicker(mc, x + 30, y + widget.getHeight() + 5, textWidget.getTextcolor(), textWidget::setTextColor,50,100,selectedWidget);
             });
             contextMenu.addOption("DataColor", () -> {
                 textWidget.toggleDataColorOption();
+
                 colorPicker = null;
+
                 if (textWidget.isDatacolorOptionEnabled())
-                    colorPicker = new ColorPicker(mc, mc.getWindow().getScaledWidth() / 2, (mc.getWindow().getScaledHeight() / 2) - 50, textWidget.getDatacolor(), textWidget::setDataColor);
+                    colorPicker = new ColorGradientPicker(mc, x + 30, y + widget.getHeight() + 5, textWidget.getDatacolor(), textWidget::setDataColor,50,100,selectedWidget);
             });
             Slider = new SliderWidgetBuilder(client)
                     .setX(x)

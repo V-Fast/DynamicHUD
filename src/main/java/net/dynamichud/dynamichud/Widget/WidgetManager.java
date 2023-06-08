@@ -1,6 +1,6 @@
 package net.dynamichud.dynamichud.Widget;
 
-import net.dynamichud.dynamichud.Util.loading;
+import net.dynamichud.dynamichud.Util.WidgetLoading;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * This class manages a list of widgets that can be added, removed and retrieved.
  */
-public class WidgetManager implements loading {
+public class WidgetManager implements WidgetLoading {
 
     private final List<Widget> widgets = new ArrayList<>(); // The list of widgets
 

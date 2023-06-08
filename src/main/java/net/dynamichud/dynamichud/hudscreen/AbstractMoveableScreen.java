@@ -1,7 +1,7 @@
 package net.dynamichud.dynamichud.hudscreen;
 
-import net.dynamichud.dynamichud.Util.ColorPicker;
-import net.dynamichud.dynamichud.Util.ContextMenu;
+import net.dynamichud.dynamichud.Util.ColorPicker.ColorGradientPicker;
+import net.dynamichud.dynamichud.Util.ContextMenu.ContextMenu;
 import net.dynamichud.dynamichud.Util.DynamicUtil;
 import net.dynamichud.dynamichud.Widget.SliderWidget.SliderWidget;
 import net.dynamichud.dynamichud.Widget.Widget;
@@ -20,7 +20,7 @@ public abstract class AbstractMoveableScreen extends Screen {
     protected Widget selectedWidget = null; // The currently selected widget
     protected int dragStartX = 0, dragStartY = 0; // The starting position of a drag operation
     protected ContextMenu contextMenu = null; // The context menu that is currently displayed
-    protected ColorPicker colorPicker = null; // The color picker that is currently displayed
+    protected ColorGradientPicker colorPicker = null; // The color picker that is currently displayed
     protected Widget sliderWigdet = null; // The widget that is currently being edited by the slider
     protected SliderWidget Slider = null; // The rainbow speed slider
     protected MouseHandler mouseHandler;
@@ -85,6 +85,9 @@ public abstract class AbstractMoveableScreen extends Screen {
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         // Stop dragging or scaling the widget
+        if (mouseHandler.mouseReleased(mouseX, mouseY, button)) {
+            return true;
+        }
         if (selectedWidget != null) {
             selectedWidget = null;
             return true;
@@ -115,6 +118,9 @@ public abstract class AbstractMoveableScreen extends Screen {
         for (Widget widget : dynamicutil.getWidgetManager().getWidgets()) {
             if (widget.getWidgetBox().contains(widget, mouseX, mouseY)) {
                 // Start dragging the widget
+                colorPicker = null;
+                contextMenu=null;
+                Slider=null;
                 if (button == 1) { // Right-click
                     handleRightClickOnWidget(widget);
                 } else if (dragHandler.startDragging(widget, mouseX, mouseY)) {
@@ -158,7 +164,7 @@ public abstract class AbstractMoveableScreen extends Screen {
     }
 
     // Pass null if you dont want certain stuff
-    private void updateMouseHandler(ColorPicker colorPicker, ContextMenu contextMenu, SliderWidget Slider) {
+    private void updateMouseHandler(ColorGradientPicker colorPicker, ContextMenu contextMenu, SliderWidget Slider) {
         this.colorPicker = colorPicker;
         this.contextMenu = contextMenu;
         this.Slider = Slider;
@@ -181,6 +187,7 @@ public abstract class AbstractMoveableScreen extends Screen {
     public void resize(MinecraftClient client, int width, int height) {
         if (ShouldBeAffectedByResize) super.resize(client, width, height);
         else {
+            return;
         }
     }
 

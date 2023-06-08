@@ -1,4 +1,4 @@
-package net.dynamichud.dynamichud.Util;
+package net.dynamichud.dynamichud.Util.ContextMenu;
 
 import net.dynamichud.dynamichud.Widget.Widget;
 import net.dynamichud.dynamichud.helpers.ColorHelper;
@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ContextMenu {
+    private static int optionY;
     private final MinecraftClient client; // The Minecraft client instance
     private final List<ContextMenuOption> options = new ArrayList<>(); // The list of options in the context menu
     private int width = 0; // The width of the context menu
@@ -23,8 +24,8 @@ public class ContextMenu {
     private int backgroundColor = 0x80C0C0C0;// Semi-transparent light grey color
     private int padding = 5; // The amount of padding around the rectangle
     private int heightfromwidget = 5; // The amount of padding around the rectangle
-    private static int optionY;
-
+    private float scale = 0.0f;
+    private final float scaleSpeed = 0.1f;
 
     /**
      * Constructs a ContextMenu object.
@@ -39,6 +40,10 @@ public class ContextMenu {
         this.x = x;
         this.y = y;
         this.selectedWidget = selectedWidget;
+    }
+
+    public static int getOptionY() {
+        return optionY;
     }
 
     /**
@@ -112,6 +117,13 @@ public class ContextMenu {
         options.add(option);
     }
 
+    public void tick() {
+        // Update the scale
+        scale += scaleSpeed;
+        if (scale > 1.0f) {
+            scale = 1.0f;
+        }
+    }
 
     /**
      * Renders this context menu on screen.
@@ -119,6 +131,7 @@ public class ContextMenu {
      * @param matrices - MatrixStack used for rendering.
      */
     public void render(MatrixStack matrices) {
+        tick();
         TextRenderer textRenderer = client.textRenderer;
         // Calculate the size of the context menu
         width = 0;
@@ -127,6 +140,11 @@ public class ContextMenu {
             width = Math.max(width, textRenderer.getWidth(option.label) + padding);
             height += textRenderer.fontHeight + 2;
         }
+        // Apply the scale
+        matrices.push();
+        matrices.translate(x + width / 2.0f + 5, y + height / 2.0f + heightfromwidget, 0);
+        matrices.scale(scale, scale, 1.0f);
+        matrices.translate(-(x + width / 2.0f + 5), -(y + height / 2.0f + heightfromwidget), 0);
         // Draw the background
         DrawHelper.fill(matrices, x - 2, y + heightfromwidget - 2, x + width + 12, y + height + heightfromwidget + 2, backgroundColor);
         DrawHelper.drawOutlinedBox(matrices, x - 2, y + heightfromwidget - 2, x + width + 12, y + height + heightfromwidget + 2, ColorHelper.ColorToInt(Color.BLACK));
@@ -138,15 +156,16 @@ public class ContextMenu {
             }
             int color = option.enabled ? 0xFF00FF00 : 0xFFFF0000;
             textRenderer.draw(matrices, option.label, x + 5, optionY, color);
-            DrawHelper.drawBox(matrices, x + 5 + width,optionY+textRenderer.fontHeight,5,5, ColorHelper.ColorToInt(Color.BLACK));
+            DrawHelper.drawBox(matrices, x + 5 + width, optionY + 4, 5, 5, ColorHelper.ColorToInt(Color.BLACK));
             if (option.enabled)
-                DrawHelper.drawBox(matrices, x + 5 + width,optionY+textRenderer.fontHeight,2,2, ColorHelper.ColorToInt(Color.WHITE));
+                DrawHelper.drawBox(matrices, x + 5 + width, optionY + 4, 2, 2, ColorHelper.ColorToInt(Color.WHITE));
             optionY += textRenderer.fontHeight + 2;
         }
         if (selectedWidget != null)
             setPosition(selectedWidget.getX(), selectedWidget.getY() + textRenderer.fontHeight + 4);
-    }
 
+        matrices.pop();
+    }
 
     /**
      * Sets position of this context menu.
@@ -157,11 +176,6 @@ public class ContextMenu {
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
-    }
-
-    public static int getOptionY()
-    {
-        return optionY;
     }
 
     public void setPadding(int padding) {

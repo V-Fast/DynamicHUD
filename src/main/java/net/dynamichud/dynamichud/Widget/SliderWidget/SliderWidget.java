@@ -1,6 +1,5 @@
 package net.dynamichud.dynamichud.Widget.SliderWidget;
 
-import net.dynamichud.dynamichud.Util.ContextMenu;
 import net.dynamichud.dynamichud.Widget.Widget;
 import net.dynamichud.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.MinecraftClient;
@@ -49,23 +48,48 @@ public class SliderWidget {
         this.selectedWidget = selectedWidget;
     }
 
+
+    private float progress = 0.0f;
+    private float progressSpeed = 0.1f;
+    private float textProgress = 0.0f;
+    private float textProgressSpeed = 0.05f;
+
+    public void tick() {
+        // Update the progress
+        progress += progressSpeed;
+        if (progress > 1.0f) {
+            progress = 1.0f;
+        }
+        // Update the text progress
+        textProgress += textProgressSpeed;
+        if (textProgress > 1.0f) {
+            textProgress = 1.0f;
+        }
+    }
+
     /**
      * Renders the widget on the screen.
      *
      * @param matrices The matrix stack used for rendering
      */
     public void render(MatrixStack matrices) {
+        tick();
         // Draw the label
         TextRenderer textRenderer = client.textRenderer;
-        textRenderer.draw(matrices, label + ": " + String.format("%.1f", value), x + 1, y - height + (textRenderer.fontHeight) / 3.5f, 0xFFFFFFFF);
+        String labelText = label + ": " + String.format("%.1f", value);
+        int labelWidth = textRenderer.getWidth(labelText);
+        int labelX = (int) (x + (width - labelWidth) / 2.0f * textProgress)-1;
+        int labelY = y + height - textRenderer.fontHeight - 6;
+        textRenderer.draw(matrices, labelText, labelX, labelY, 0xFFFFFFFF);
 
         // Draw the slider
         int sliderWidth = width - 8;
         int sliderHeight = 2;
         int sliderX = x;
-        int sliderY = y + height - sliderHeight - 8;
+        int sliderY = y + height - sliderHeight;
 
-        DrawHelper.fillRoundedRect(matrices, sliderX, sliderY, sliderX + sliderWidth, sliderY + sliderHeight, 0xFFFFFFFF);
+        int visibleSliderWidth = (int) (sliderWidth * progress);
+        DrawHelper.fillRoundedRect(matrices, sliderX, sliderY, sliderX + visibleSliderWidth, sliderY + sliderHeight, 0xFFFFFFFF);
 
         // Draw the handle
         float handleWidth = 4;
@@ -73,11 +97,15 @@ public class SliderWidget {
         float handleX = sliderX + (value - minValue) / (maxValue - minValue) * (sliderWidth - handleWidth);
         float handleY = sliderY + ((sliderHeight - handleHeight) / 2 );
 
-        DrawHelper.fillRoundedRect(matrices, (int) handleX, (int) handleY, (int) (handleX + handleWidth), (int) (handleY + handleHeight), 0xFFFFFFFF);
+        if (progress >= 1.0f) {
+            DrawHelper.fillRoundedRect(matrices, (int) handleX, (int) handleY, (int) (handleX + handleWidth), (int) (handleY + handleHeight), 0xFFFFFFFF);
+        }
 
         if (selectedWidget != null)
             setPosition(selectedWidget.getX(), selectedWidget.getY() + textRenderer.fontHeight + 67);
     }
+
+
 
     /**
      * Sets the position of the widget.

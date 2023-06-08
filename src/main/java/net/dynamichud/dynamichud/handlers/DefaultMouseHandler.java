@@ -1,16 +1,16 @@
 package net.dynamichud.dynamichud.handlers;
 
-import net.dynamichud.dynamichud.Util.ColorPicker;
-import net.dynamichud.dynamichud.Util.ContextMenu;
+import net.dynamichud.dynamichud.Util.ColorPicker.ColorGradientPicker;
+import net.dynamichud.dynamichud.Util.ContextMenu.ContextMenu;
 import net.dynamichud.dynamichud.Widget.SliderWidget.SliderWidget;
 import net.dynamichud.dynamichud.Widget.TextWidget.TextWidget;
 
 public class DefaultMouseHandler implements MouseHandler {
-    private final ColorPicker colorPicker;
+    private final ColorGradientPicker colorPicker;
     private final ContextMenu contextMenu;
     private final SliderWidget sliderWidget;
 
-    public DefaultMouseHandler(ColorPicker colorPicker, ContextMenu contextMenu, SliderWidget sliderWidget) {
+    public DefaultMouseHandler(ColorGradientPicker colorPicker, ContextMenu contextMenu, SliderWidget sliderWidget) {
         this.colorPicker = colorPicker;
         this.contextMenu = contextMenu;
         this.sliderWidget = sliderWidget;
@@ -21,9 +21,9 @@ public class DefaultMouseHandler implements MouseHandler {
         if (contextMenuClicked(mouseX, mouseY, button)) {
             return true;
         }
-        if (colorPickerClicked(mouseX, mouseY, button)) {
-            return true;
-        }
+            if (colorPickerClicked(mouseX, mouseY, button)) {
+                return true;
+            }
         return sliderClicked(mouseX, mouseY, button);
     }
 
@@ -33,8 +33,23 @@ public class DefaultMouseHandler implements MouseHandler {
             TextWidget.setRainbowSpeed(sliderWidget.getValue());
             return true;
         }
+            if (this.colorPicker!=null) {
+                colorPicker.mouseDragged(mouseX, mouseY, button);
+                return true;
+            }
         return false;
     }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (this.colorPicker!=null)
+        {
+            colorPicker.mouseReleased(mouseX,mouseY,button);
+            return true;
+        }
+        return false;
+    }
+
 
     @Override
     public boolean contextMenuClicked(double mouseX, double mouseY, int button) {

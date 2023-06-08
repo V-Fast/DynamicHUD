@@ -2,7 +2,7 @@ package net.dynamichud.dynamichud;
 
 import net.dynamichud.dynamichud.Util.DynamicUtil;
 import net.dynamichud.dynamichud.Util.TextGenerator;
-import net.dynamichud.dynamichud.Util.loading;
+import net.dynamichud.dynamichud.Util.WidgetLoading;
 import net.dynamichud.dynamichud.Widget.*;
 import net.dynamichud.dynamichud.Widget.ArmorWidget.ArmorWidget;
 import net.dynamichud.dynamichud.Widget.ItemWidget.ItemWidget;
@@ -24,7 +24,7 @@ import java.util.List;
 
 import static net.dynamichud.dynamichud.DynamicHUD.*;
 
-public class DynamicHUDmod implements ClientModInitializer, Wigdets, loading {
+public class DynamicHUDmod implements ClientModInitializer, Wigdets, WidgetLoading {
     MinecraftClient mc = MinecraftClient.getInstance();
     List<Widget> widgets = new ArrayList<>();
     private DynamicUtil dynamicutil;
@@ -119,7 +119,7 @@ public class DynamicHUDmod implements ClientModInitializer, Wigdets, loading {
             widget.readFromTag(widgetTag);
             return widget;
         }*/
-        return loading.super.loadWidgetsFromTag(className, widgetTag);
+        return WidgetLoading.super.loadWidgetsFromTag(className, widgetTag);
     }
 }
 

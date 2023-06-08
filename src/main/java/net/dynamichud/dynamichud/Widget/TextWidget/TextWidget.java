@@ -1,6 +1,6 @@
 package net.dynamichud.dynamichud.Widget.TextWidget;
 
-import net.dynamichud.dynamichud.Util.ContextMenuOptionsProvider;
+import net.dynamichud.dynamichud.Util.ContextMenu.ContextMenuOptionsProvider;
 import net.dynamichud.dynamichud.Util.TextGenerator;
 import net.dynamichud.dynamichud.Widget.Widget;
 import net.dynamichud.dynamichud.Widget.WidgetBox;
@@ -10,8 +10,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
-
-import java.util.function.Supplier;
 
 /**
  * This class represents a text widget that displays a specified text on the screen.
