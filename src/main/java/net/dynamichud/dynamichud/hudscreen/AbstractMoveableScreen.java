@@ -94,12 +94,7 @@ public abstract class AbstractMoveableScreen extends Screen {
         }
         return contextMenu != null;
     }
-
-    @Override
-    public void mouseMoved(double mouseX, double mouseY) {
-        // Call the mouseMoved method of the ColorPicker object
-        ColorPicker.mouseMoved(mouseX, mouseY);
-    }
+    
 
     /**
      * Handles mouse clicks on this screen.
