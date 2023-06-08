@@ -15,10 +15,11 @@ import java.awt.*;
 public interface WidgetLoading {
     default Widget loadWidgetsFromTag(String className, NbtCompound widgetTag) {
         if (className.equals(TextWidget.class.getName())) {
-            TextWidget widget = new TextWidget(MinecraftClient.getInstance(), "",() -> "", 0, 0, false, false, false, -1, -1,true);
+            TextWidget widget = new TextWidget(MinecraftClient.getInstance(), "", () -> "", 0, 0, false, false, false, -1, -1, true);
             widget.readFromTag(widgetTag);
             return widget;
-        } if (className.equals(ArmorWidget.class.getName())) {
+        }
+        if (className.equals(ArmorWidget.class.getName())) {
             ArmorWidget widget = new ArmorWidget(MinecraftClient.getInstance(), EquipmentSlot.CHEST, 0, 0, false, TextureHelper.Position.ABOVE, () -> "");
             widget.readFromTag(widgetTag);
             return widget;

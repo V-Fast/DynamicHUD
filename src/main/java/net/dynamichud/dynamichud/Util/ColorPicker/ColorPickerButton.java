@@ -5,10 +5,10 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 
 public class ColorPickerButton {
-    private int x;
-    private int y;
-    private int width;
-    private int height;
+    private final int x;
+    private final int y;
+    private final int width;
+    private final int height;
     private boolean isPicking = false;
 
     public ColorPickerButton(int x, int y, int width, int height) {
@@ -24,10 +24,10 @@ public class ColorPickerButton {
         DrawableHelper.drawCenteredTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, "Pick", x + width / 2, y + (height - 8) / 2, 0xFFFFFFFF);
     }
 
-    public boolean onClick(double mouseX,double mouseY,int button){
-        if(button==0){
-            if(mouseX>=x&&mouseX<=x+width&&mouseY>=y&&mouseY<=y+height){
-                isPicking=true;
+    public boolean onClick(double mouseX, double mouseY, int button) {
+        if (button == 0) {
+            if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height) {
+                isPicking = true;
                 return true;
             }
         }

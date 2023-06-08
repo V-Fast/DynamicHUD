@@ -17,6 +17,7 @@ public class ContextMenu {
     private static int optionY;
     private final MinecraftClient client; // The Minecraft client instance
     private final List<ContextMenuOption> options = new ArrayList<>(); // The list of options in the context menu
+    private final float scaleSpeed = 0.1f;
     private int width = 0; // The width of the context menu
     private int x; // The x position of the context menu
     private int y; // The y position of the context menu
@@ -25,7 +26,6 @@ public class ContextMenu {
     private int padding = 5; // The amount of padding around the rectangle
     private int heightfromwidget = 5; // The amount of padding around the rectangle
     private float scale = 0.0f;
-    private final float scaleSpeed = 0.1f;
 
     /**
      * Constructs a ContextMenu object.

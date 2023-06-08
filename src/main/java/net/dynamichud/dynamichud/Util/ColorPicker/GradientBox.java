@@ -1,6 +1,5 @@
 package net.dynamichud.dynamichud.Util.ColorPicker;
 
-import net.dynamichud.dynamichud.Widget.TextWidget.TextWidget;
 import net.dynamichud.dynamichud.Widget.Widget;
 import net.dynamichud.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.MinecraftClient;
@@ -10,16 +9,16 @@ import net.minecraft.client.util.math.MatrixStack;
 import java.awt.*;
 
 public class GradientBox {
+    private final int size;
+    private final float alphaSpeed = 0.05f;
+    private final Widget selectedWidget;
     private int x;
     private int y;
-    private final int size;
     private float hue = 0.0f;
     private float saturation = 1.0f;
     private float value = 1.0f;
     private boolean isDragging = false;
     private float alpha = 0.0f;
-    private final float alphaSpeed = 0.05f;
-    private final Widget selectedWidget;
 
 
     public GradientBox(int x, int y, int size, Widget selectedWidget) {

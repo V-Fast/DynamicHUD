@@ -9,17 +9,17 @@ import net.minecraft.client.util.math.MatrixStack;
 import java.awt.*;
 
 public class GradientSlider {
-    private int x;
-    private int y;
     private final int width;
     private final int height;
-    private float hue = 0.0f;
-    private float progress = 0.0f;
     private final float progressSpeed = 0.1f;
-    private boolean isDragging = false;
-    private float alpha = 0.0f;
     private final float alphaSpeed = 0.05f;
     private final Widget selectedWidget;
+    private int x;
+    private int y;
+    private float hue = 0.0f;
+    private float progress = 0.0f;
+    private boolean isDragging = false;
+    private float alpha = 0.0f;
 
     public GradientSlider(int x, int y, int width, int height, Widget selectedWidget) {
         this.x = x;
@@ -54,9 +54,6 @@ public class GradientSlider {
         this.y = y;
     }
 
-    public void setHue(float hue) {
-        this.hue = hue;
-    }
     public void render(MatrixStack matrices) {
 
         DrawHelper.drawOutlinedBox(matrices, x - 2, y - 2, x + width + 2, y + height + 2, -1);
@@ -117,6 +114,10 @@ public class GradientSlider {
 
     public float getHue() {
         return hue;
+    }
+
+    public void setHue(float hue) {
+        this.hue = hue;
     }
 }
 
