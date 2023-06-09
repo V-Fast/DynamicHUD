@@ -49,8 +49,8 @@ public class DynamicHUDmod implements ClientModInitializer, Wigdets, WidgetLoadi
         });
 
         DynamicHUD.setAbstractScreen(new MoveableScreen(Text.of("Editor Screen"), dynamicutil));
+
         ServerLifecycleEvents.SERVER_STOPPING.register(client -> {
-            dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE);
             WidgetLoaded=false;
             WidgetAdded=false;
         });
