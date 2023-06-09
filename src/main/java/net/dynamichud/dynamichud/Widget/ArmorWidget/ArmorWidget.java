@@ -22,7 +22,7 @@ public class ArmorWidget extends Widget{
     public final TextureHelper.Position[] currentTextPosition = TextureHelper.Position.values();
     private EquipmentSlot slot; // The equipment slot to display the armor item from
     private TextGenerator textGenerator;
-
+    private Color color;
 
     /**
      * Constructs an ArmorWidget object.
@@ -32,7 +32,7 @@ public class ArmorWidget extends Widget{
      * @param xPercent The x position of the widget as a percentage of the screen width
      * @param yPercent The y position of the widget as a percentage of the screen height
      */
-    public ArmorWidget(MinecraftClient client, EquipmentSlot slot, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator) {
+    public ArmorWidget(MinecraftClient client, EquipmentSlot slot, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator,Color color) {
         super(client);
         this.slot = slot;
         this.xPercent = xPercent;
@@ -40,6 +40,7 @@ public class ArmorWidget extends Widget{
         this.enabled = enabled;
         this.currentTextPosition[0] = currentTextPosition;
         this.textGenerator = textGenerator;
+        this.color=color;
     }
 
     /**
@@ -53,7 +54,7 @@ public class ArmorWidget extends Widget{
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
         ItemStack armorItem = client.player.getEquippedStack(slot);
         //TextureHelper.drawItemTexture(matrices, itemRenderer, armorItem, getX(), getY());
-        TextureHelper.drawItemTextureWithText(matrices, itemRenderer, textRenderer, armorItem, getX(), getY(), getText(), ColorHelper.ColorToInt(Color.YELLOW), currentTextPosition[0], 0.5f);
+        TextureHelper.drawItemTextureWithText(matrices, itemRenderer, textRenderer, armorItem, getX(), getY(), getText(), ColorHelper.ColorToInt(color), currentTextPosition[0], 0.5f);
     }
 
     @Override
@@ -90,6 +91,14 @@ public class ArmorWidget extends Widget{
 
     public void setTextGenerator(TextGenerator textGenerator) {
         this.textGenerator = textGenerator;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     @Override

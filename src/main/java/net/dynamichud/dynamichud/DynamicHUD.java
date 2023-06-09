@@ -34,6 +34,10 @@ public class DynamicHUD implements ClientModInitializer {
         Screen = screen;
     }
 
+    public static AbstractMoveableScreen getScreen()
+    {
+        return Screen;
+    }
     @Override
     public void onInitializeClient() {
     }
