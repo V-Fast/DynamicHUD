@@ -18,9 +18,9 @@ import java.util.function.Supplier;
 
 public class ItemWidget extends Widget {
     public final TextureHelper.Position[] currentTextPosition = TextureHelper.Position.values();
-    private TextGenerator textGenerator;
-    private Supplier<ItemStack> itemStack;
-    private final Color color;
+    protected TextGenerator textGenerator;
+    protected Supplier<ItemStack> itemStack;
+    protected final Color color;
 
     /**
      * Constructs a Widget object.

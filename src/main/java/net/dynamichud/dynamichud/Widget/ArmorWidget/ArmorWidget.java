@@ -20,9 +20,9 @@ import java.awt.*;
  */
 public class ArmorWidget extends Widget{
     public final TextureHelper.Position[] currentTextPosition = TextureHelper.Position.values();
-    private EquipmentSlot slot; // The equipment slot to display the armor item from
-    private TextGenerator textGenerator;
-    private Color color;
+    protected EquipmentSlot slot; // The equipment slot to display the armor item from
+    protected TextGenerator textGenerator;
+    protected Color color;
 
     /**
      * Constructs an ArmorWidget object.

@@ -16,15 +16,15 @@ import net.minecraft.nbt.NbtCompound;
  */
 public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     protected static float rainbowSpeed = 15f; // The speed of the rainbow effect
-    private String text;
-    private TextGenerator dataText;
-    private boolean shadow; // Whether to draw a shadow behind the text
-    private boolean rainbow; // Whether to apply a rainbow effect to the text
-    private boolean verticalRainbow; // Whether to apply a vertical rainbow effect to the text
-    private int Textcolor; // The color of the text
-    private int Datacolor; // The color of the Data
-    private boolean TextcolorOptionEnabled = false;
-    private boolean DatacolorOptionEnabled = false;
+    protected String text;
+    protected TextGenerator dataText;
+    protected boolean shadow; // Whether to draw a shadow behind the text
+    protected boolean rainbow; // Whether to apply a rainbow effect to the text
+    protected boolean verticalRainbow; // Whether to apply a vertical rainbow effect to the text
+    protected int Textcolor; // The color of the text
+    protected int Datacolor; // The color of the Data
+    protected boolean TextcolorOptionEnabled = false;
+    protected boolean DatacolorOptionEnabled = false;
 
 
     /**
