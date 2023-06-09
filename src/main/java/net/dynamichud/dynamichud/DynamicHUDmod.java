@@ -27,7 +27,7 @@ import static net.dynamichud.dynamichud.DynamicHUD.*;
 
 public class DynamicHUDmod implements ClientModInitializer, Wigdets, WidgetLoading {
     MinecraftClient mc = MinecraftClient.getInstance();
-    List<Widget> widgets = new ArrayList<>();
+    protected List<Widget> widgets = new ArrayList<>();
     private DynamicUtil dynamicutil;
     protected boolean WidgetAdded=false;
     protected boolean WidgetLoaded=false;
@@ -56,6 +56,7 @@ public class DynamicHUDmod implements ClientModInitializer, Wigdets, WidgetLoadi
         });
 
         HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
+            dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE);
             dynamicutil.render(matrices, tickDelta);
             DynamicUtil.openDynamicScreen(EditorScreenKeyBinding, Screen);
         });
@@ -64,7 +65,7 @@ public class DynamicHUDmod implements ClientModInitializer, Wigdets, WidgetLoadi
 
     @Override
     public void addWigdets(DynamicUtil dynamicUtil) {
-            System.out.println("Widgets Added");
+
             widgets.add(new TextWidget(mc, "FPS: ", () -> mc.fpsDebugString.split(" ")[0], 0.5f, 0.5f, true, true, false, -1, -1, true));
             widgets.add(new TextWidget(mc, "Biome: ", () -> "PLAINS", 0.7f, 0.3f, false, false, false, -1, -1, true));
             widgets.add(new TextWidget(mc, "Ping: ", () -> "", 0.08f, 0.5f, false, false, false, -1, -1, true));
