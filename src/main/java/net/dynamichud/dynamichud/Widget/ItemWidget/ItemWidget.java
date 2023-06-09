@@ -14,12 +14,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 
 import java.awt.*;
+import java.util.function.Supplier;
 
 public class ItemWidget extends Widget {
     public final TextureHelper.Position[] currentTextPosition = TextureHelper.Position.values();
     private TextGenerator textGenerator;
-    private ItemStack itemStack;
-    private ItemStack displayStack;
+    private Supplier<ItemStack> itemStack;
     private final Color color;
 
     /**
@@ -27,7 +27,7 @@ public class ItemWidget extends Widget {
      *
      * @param client The Minecraft client instance
      */
-    public ItemWidget(MinecraftClient client, ItemStack itemStack, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator, Color color) {
+    public ItemWidget(MinecraftClient client, Supplier<ItemStack> itemStack, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator, Color color) {
         super(client);
         this.xPercent = xPercent;
         this.yPercent = yPercent;
@@ -61,6 +61,10 @@ public class ItemWidget extends Widget {
         return 16; // The height of an item texture is 16 pixels
     }
 
+    public ItemStack getItemStack() {
+        return itemStack.get();
+    }
+
     /**
      * Returns the text displayed by this widget.
      *
@@ -83,8 +87,8 @@ public class ItemWidget extends Widget {
         tag.putFloat("yPercent", yPercent);
         tag.putBoolean("Enabled", this.enabled);
         tag.putString("Position", String.valueOf(this.currentTextPosition[0]));
-        tag.putInt("ItemID", Item.getRawId(itemStack.getItem()));
-        tag.putInt("ItemCount", itemStack.getItem().getMaxCount());
+        tag.putInt("ItemID", Item.getRawId(getItemStack().getItem()));
+        tag.putInt("ItemCount", getItemStack().getMaxCount());
         tag.putString("text", getText());
     }
 
@@ -99,7 +103,7 @@ public class ItemWidget extends Widget {
 
         int itemID = tag.getInt("ItemID");
         int itemCount=tag.getInt("ItemCount");
-        itemStack = getItemStack(itemID,itemCount);
+        itemStack = () -> getItemStack(itemID,itemCount);
 
         if (TextureHelper.Position.getByUpperCaseName(Position) != null && !tag.getString("Position").isEmpty())
             currentTextPosition[0] = TextureHelper.Position.getByUpperCaseName(Position);
@@ -116,7 +120,6 @@ public class ItemWidget extends Widget {
     public void render(MatrixStack matrices) {
         ItemRenderer itemRenderer = client.getItemRenderer();
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        displayStack=itemStack;
-        TextureHelper.drawItemTextureWithText(matrices, itemRenderer, textRenderer, displayStack, getX(), getY(), getText(), ColorHelper.ColorToInt(color), currentTextPosition[0], 0.5f);
+        TextureHelper.drawItemTextureWithText(matrices, itemRenderer, textRenderer, getItemStack(), getX(), getY(), getText(), ColorHelper.ColorToInt(color), currentTextPosition[0], 0.5f);
     }
 }
