@@ -19,6 +19,7 @@ public class ItemWidget extends Widget {
     public final TextureHelper.Position[] currentTextPosition = TextureHelper.Position.values();
     private TextGenerator textGenerator;
     private ItemStack itemStack;
+    private ItemStack displayStack;
     private final Color color;
 
     /**
@@ -115,6 +116,7 @@ public class ItemWidget extends Widget {
     public void render(MatrixStack matrices) {
         ItemRenderer itemRenderer = client.getItemRenderer();
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        TextureHelper.drawItemTextureWithText(matrices, itemRenderer, textRenderer, itemStack, getX(), getY(), getText(), ColorHelper.ColorToInt(color), currentTextPosition[0], 0.5f);
+        displayStack=itemStack;
+        TextureHelper.drawItemTextureWithText(matrices, itemRenderer, textRenderer, displayStack, getX(), getY(), getText(), ColorHelper.ColorToInt(color), currentTextPosition[0], 0.5f);
     }
 }
