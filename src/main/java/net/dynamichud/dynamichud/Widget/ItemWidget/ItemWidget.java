@@ -20,14 +20,14 @@ public class ItemWidget extends Widget {
     public final TextureHelper.Position[] currentTextPosition = TextureHelper.Position.values();
     protected TextGenerator textGenerator;
     protected Supplier<ItemStack> itemStack;
-    protected final Color color;
+    protected final Supplier<Color> color;
 
     /**
      * Constructs a Widget object.
      *
      * @param client The Minecraft client instance
      */
-    public ItemWidget(MinecraftClient client, Supplier<ItemStack> itemStack, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator, Color color) {
+    public ItemWidget(MinecraftClient client, Supplier<ItemStack> itemStack, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator, Supplier<Color> color) {
         super(client);
         this.xPercent = xPercent;
         this.yPercent = yPercent;
@@ -120,6 +120,6 @@ public class ItemWidget extends Widget {
     public void render(MatrixStack matrices) {
         ItemRenderer itemRenderer = client.getItemRenderer();
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        TextureHelper.drawItemTextureWithText(matrices, itemRenderer, textRenderer, getItemStack(), getX(), getY(), getText(), ColorHelper.ColorToInt(color), currentTextPosition[0], 0.5f);
+        TextureHelper.drawItemTextureWithText(matrices, itemRenderer, textRenderer, getItemStack(), getX(), getY(), getText(), ColorHelper.ColorToInt(color.get()), currentTextPosition[0], 0.5f);
     }
 }
