@@ -70,7 +70,7 @@ public class GradientSlider {
         if (progress >= 1.0f) {
             float handleWidth = 3;
             float handleHeight = height + 4;
-            float handleX = x + hue * width - handleWidth / 2.0f;
+            float handleX = x + hue * width - handleWidth / 2.0f + 3;
             float handleY = y - (handleHeight - height) / 2.0f;
 
             DrawHelper.fillRoundedRect(matrices, (int) handleX, (int) handleY, (int) (handleX + handleWidth), (int) (handleY + handleHeight), -1);

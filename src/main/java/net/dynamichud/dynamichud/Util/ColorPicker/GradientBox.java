@@ -51,7 +51,7 @@ public class GradientBox {
         }
 
         // Draw the handle
-        float handleSize = 5;
+        float handleSize = 3;
         float handleX = x + saturation * size - handleSize / 2.0f;
         float handleY = y + (1.0f - value) * size - handleSize / 2.0f;
 
