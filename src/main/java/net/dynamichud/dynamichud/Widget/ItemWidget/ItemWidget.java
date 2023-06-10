@@ -78,6 +78,10 @@ public class ItemWidget extends Widget {
         this.textGenerator = textGenerator;
     }
 
+    public void setItemStack(Supplier<ItemStack> itemStack) {
+        this.itemStack = itemStack;
+    }
+
     @Override
     public void writeToTag(NbtCompound tag) {
         super.writeToTag(tag);
