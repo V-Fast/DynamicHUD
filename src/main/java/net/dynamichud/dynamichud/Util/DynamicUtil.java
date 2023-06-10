@@ -81,7 +81,7 @@ public class DynamicUtil extends DrawableHelper {
                 else if (widget instanceof ArmorWidget || widget instanceof ItemWidget)
                     DrawHelper.fill(matrices, box.x1, box.y1, box.x2, box.y2, backgroundColor);
                 else
-                    DrawHelper.drawBox(matrices, box.x1, box.y1, box.getWidth() + 1, box.getHeight(), backgroundColor);
+                    DrawHelper.drawBox(matrices, box.x1, box.y1, box.x2, box.y2, backgroundColor);
             }
         }
     }
