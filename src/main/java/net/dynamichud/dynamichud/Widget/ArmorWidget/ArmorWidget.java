@@ -112,7 +112,7 @@ public class ArmorWidget extends Widget {
         tag.putString("slot", slot.getName());
         tag.putBoolean("Enabled", this.enabled);
         tag.putString("Position", String.valueOf(this.currentTextPosition[0]));
-        tag.putString("text", getText());
+        if(this.getText()!=null) tag.putString("text",this.getText());
     }
 
     @Override
