@@ -145,6 +145,7 @@ public class ContextMenu {
         matrices.translate(x + width / 2.0f + 5, y + height / 2.0f + heightfromwidget, 0);
         matrices.scale(scale, scale, 1.0f);
         matrices.translate(-(x + width / 2.0f + 5), -(y + height / 2.0f + heightfromwidget), 0);
+
         // Draw the background
         DrawHelper.fill(matrices, x - 2, y + heightfromwidget - 2, x + width + 12, y + height + heightfromwidget + 2, backgroundColor);
         DrawHelper.drawOutlinedBox(matrices, x - 2, y + heightfromwidget - 2, x + width + 12, y + height + heightfromwidget + 2, ColorHelper.ColorToInt(Color.BLACK));
@@ -156,9 +157,9 @@ public class ContextMenu {
             }
             int color = option.enabled ? 0xFF00FF00 : 0xFFFF0000;
             textRenderer.draw(matrices, option.label, x + 5, optionY, color);
-            DrawHelper.drawBox(matrices, x + 5 + width, optionY + 4, 5, 5, ColorHelper.ColorToInt(Color.BLACK));
+            DrawHelper.drawBox(matrices, x + 5 + width, optionY + 3, 5, 5, ColorHelper.ColorToInt(Color.BLACK));
             if (option.enabled)
-                DrawHelper.drawBox(matrices, x + 5 + width, optionY + 4, 2, 2, ColorHelper.ColorToInt(Color.WHITE));
+                DrawHelper.drawBox(matrices, x + 5 + width, optionY + 3, 2, 2, ColorHelper.ColorToInt(Color.WHITE));
             optionY += textRenderer.fontHeight + 2;
         }
         if (selectedWidget != null)
