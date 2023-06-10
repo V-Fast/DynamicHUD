@@ -78,7 +78,7 @@ import static net.dynamichud.dynamichud.DynamicHUD.*;
             widgets.add(new ArmorWidget(mc, EquipmentSlot.HEAD, 0.03f, 0.01f, true, TextureHelper.Position.BELOW, () -> text, Color.BLACK));
             widgets.add(new ArmorWidget(mc, EquipmentSlot.LEGS, 0.05f, 0.01f, true, TextureHelper.Position.LEFT, () -> String.valueOf(MinecraftClient.getInstance().getCurrentFps()), Color.WHITE));
 
-            widgets.add(new ItemWidget(mc,() -> mc.player != null ? mc.player.getInventory().getStack(3) : Items.DIAMOND_AXE.getDefaultStack(), 0.15f, 0.15f, true, TextureHelper.Position.ABOVE, () -> "", Color.RED));
+            widgets.add(new ItemWidget(mc,() -> mc.player != null ? mc.player.getInventory().getStack(3) : Items.DIAMOND_AXE.getDefaultStack(), 0.15f, 0.15f, true, TextureHelper.Position.ABOVE, () -> "",()-> Color.RED));
 
     }
 
