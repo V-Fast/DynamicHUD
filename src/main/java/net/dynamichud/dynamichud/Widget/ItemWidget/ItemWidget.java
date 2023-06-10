@@ -18,9 +18,9 @@ import java.util.function.Supplier;
 
 public class ItemWidget extends Widget {
     public final TextureHelper.Position[] currentTextPosition = TextureHelper.Position.values();
+    protected Supplier<Color> color;
     protected TextGenerator textGenerator;
     protected Supplier<ItemStack> itemStack;
-    protected final Supplier<Color> color;
 
     /**
      * Constructs a Widget object.
@@ -65,6 +65,10 @@ public class ItemWidget extends Widget {
         return itemStack.get();
     }
 
+    public void setItemStack(Supplier<ItemStack> itemStack) {
+        this.itemStack = itemStack;
+    }
+
     /**
      * Returns the text displayed by this widget.
      *
@@ -78,8 +82,11 @@ public class ItemWidget extends Widget {
         this.textGenerator = textGenerator;
     }
 
-    public void setItemStack(Supplier<ItemStack> itemStack) {
-        this.itemStack = itemStack;
+    public Supplier<Color> getColor() {
+        return color;
+    }
+    public void setColor(Supplier<Color> color) {
+        this.color=color;
     }
 
     @Override
@@ -106,8 +113,8 @@ public class ItemWidget extends Widget {
         String Position = tag.getString("Position");
 
         int itemID = tag.getInt("ItemID");
-        int itemCount=tag.getInt("ItemCount");
-        itemStack = () -> getItemStack(itemID,itemCount);
+        int itemCount = tag.getInt("ItemCount");
+        itemStack = () -> getItemStack(itemID, itemCount);
 
         if (TextureHelper.Position.getByUpperCaseName(Position) != null && !tag.getString("Position").isEmpty())
             currentTextPosition[0] = TextureHelper.Position.getByUpperCaseName(Position);
@@ -115,7 +122,7 @@ public class ItemWidget extends Widget {
             currentTextPosition[0] = TextureHelper.Position.ABOVE;
     }
 
-    public ItemStack getItemStack(int itemID,int itemCount) {
+    public ItemStack getItemStack(int itemID, int itemCount) {
         Item item = Item.byRawId(itemID);
         return new ItemStack(item, itemCount);
     }

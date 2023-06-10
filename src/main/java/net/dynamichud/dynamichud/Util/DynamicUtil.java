@@ -1,5 +1,6 @@
 package net.dynamichud.dynamichud.Util;
 
+import net.dynamichud.dynamichud.DynamicHUD;
 import net.dynamichud.dynamichud.Widget.ArmorWidget.ArmorWidget;
 import net.dynamichud.dynamichud.Widget.ItemWidget.ItemWidget;
 import net.dynamichud.dynamichud.Widget.TextWidget.TextWidget;
@@ -8,11 +9,26 @@ import net.dynamichud.dynamichud.Widget.WidgetBox;
 import net.dynamichud.dynamichud.Widget.WidgetManager;
 import net.dynamichud.dynamichud.helpers.ColorHelper;
 import net.dynamichud.dynamichud.helpers.DrawHelper;
+import net.dynamichud.dynamichud.helpers.TextureHelper;
 import net.dynamichud.dynamichud.hudscreen.AbstractMoveableScreen;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Text;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static net.dynamichud.dynamichud.DynamicHUD.WIDGETS_FILE;
 
 /**
  * This class provides utility methods for working with the DynamicHUD mod.
@@ -62,10 +78,10 @@ public class DynamicUtil extends DrawableHelper {
                 WidgetBox box = widget.getWidgetBox();
                 if (widget instanceof TextWidget)
                     DrawHelper.drawBox(matrices, widget.getX(), widget.getY(), box.getWidth() + 1, box.getHeight(), backgroundColor);
-                 else if (widget instanceof ArmorWidget || widget instanceof ItemWidget)
+                else if (widget instanceof ArmorWidget || widget instanceof ItemWidget)
                     DrawHelper.fill(matrices, box.x1, box.y1, box.x2, box.y2, backgroundColor);
                 else
-                    DrawHelper.drawBox(matrices, widget.getX(),widget.getY(), box.getWidth() + 1, box.getHeight(), backgroundColor);
+                    DrawHelper.drawBox(matrices, box.x1, box.y1, box.getWidth() + 1, box.getHeight(), backgroundColor);
             }
         }
     }
@@ -79,4 +95,5 @@ public class DynamicUtil extends DrawableHelper {
     public WidgetManager getWidgetManager() {
         return widgetManager;
     }
+
 }

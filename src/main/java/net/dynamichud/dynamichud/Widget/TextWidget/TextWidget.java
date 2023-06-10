@@ -30,12 +30,12 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     /**
      * Constructs a TextWidget object.
      *
-     * @param client        The Minecraft client instance
-     * @param text The text to display
-     * @param xPercent      The x position of the widget as a percentage of the screen width
-     * @param yPercent      The y position of the widget as a percentage of the screen height
+     * @param client   The Minecraft client instance
+     * @param text     The text to display
+     * @param xPercent The x position of the widget as a percentage of the screen width
+     * @param yPercent The y position of the widget as a percentage of the screen height
      */
-    public TextWidget(MinecraftClient client, String text,TextGenerator dataText, float xPercent, float yPercent, boolean Shadow, boolean Rainbow, boolean VerticalRainbow, int Textcolor, int Datacolor, boolean enabled) {
+    public TextWidget(MinecraftClient client, String text, TextGenerator dataText, float xPercent, float yPercent, boolean Shadow, boolean Rainbow, boolean VerticalRainbow, int Textcolor, int Datacolor, boolean enabled) {
         super(client);
         this.text = text;
         this.dataText = dataText;
@@ -143,6 +143,7 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     public String getText() {
         return text;
     }
+
     /**
      * Returns the text displayed by this widget.
      *
@@ -215,7 +216,7 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     @Override
     public WidgetBox getWidgetBox() {
         TextRenderer textRenderer = client.textRenderer;
-        int Width=textRenderer.getWidth(getText())+textRenderer.getWidth(getDataText());
+        int Width = textRenderer.getWidth(getText()) + textRenderer.getWidth(getDataText());
         int height = textRenderer.fontHeight;
         return new WidgetBox(Width, height);
     }
@@ -228,12 +229,12 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
      */
     @Override
     public void render(MatrixStack matrices) {
-        int textWidth = client.textRenderer.getWidth(getText())+client.textRenderer.getWidth(getDataText());
+        int textWidth = client.textRenderer.getWidth(getText()) + client.textRenderer.getWidth(getDataText());
         int x = getX();
         int y = getY();
-        String CombinedText=getText()+getDataText();
+        String CombinedText = getText() + getDataText();
         if (rainbow) {
-            float hue = (System.currentTimeMillis() % 2000) / (rainbowSpeed * 100f);
+            float hue = (System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f);
             for (int i = 0; i < CombinedText.length(); i++) {
                 int color = ColorHelper.getColorFromHue(hue);
                 String character = String.valueOf(CombinedText.charAt(i));
@@ -244,10 +245,10 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
                 if (hue >= 1) hue -= 1;
             }
         } else {
-            int Textcolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 2000) / (rainbowSpeed * 100f)) : this.Textcolor;
-            int Datacolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 2000) / (rainbowSpeed * 100f)) : this.Datacolor;
-            drawText(matrices, getText(), getX() - textWidth/2, getY() - 4, Textcolour);
-            drawText(matrices, getDataText(),getX()+textWidth/2-client.textRenderer.getWidth(getDataText()), getY() - 4, Datacolour);
+            int Textcolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Textcolor;
+            int Datacolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Datacolor;
+            drawText(matrices, getText(), getX() - textWidth / 2, getY() - 4, Textcolour);
+            drawText(matrices, getDataText(), getX() + textWidth / 2 - client.textRenderer.getWidth(getDataText()), getY() - 4, Datacolour);
         }
     }
 
@@ -262,9 +263,9 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         tag.putBoolean("Shadow", hasShadow());
         tag.putBoolean("VerticalRainbow", hasVerticalRainbow());
         tag.putBoolean("Enabled", this.enabled);
-        tag.putInt("TextColor",Textcolor);
-        tag.putInt("DataColor",Datacolor);
-        tag.putString("Text",text);
+        tag.putInt("TextColor", Textcolor);
+        tag.putInt("DataColor", Datacolor);
+        tag.putString("Text", text);
     }
 
     @Override
@@ -278,7 +279,7 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         Textcolor = tag.getInt("TextColor");
         Datacolor = tag.getInt("DataColor");
         enabled = tag.getBoolean("Enabled");
-        text=tag.getString("Text");
+        text = tag.getString("Text");
     }
 
     private void drawText(MatrixStack matrices, String text, int x, int y, int color) {

@@ -157,9 +157,9 @@ public class ContextMenu {
             }
             int color = option.enabled ? 0xFF00FF00 : 0xFFFF0000;
             textRenderer.draw(matrices, option.label, x + 5, optionY, color);
-            DrawHelper.drawBox(matrices, x + 5 + width, optionY + 3, 5, 5, ColorHelper.ColorToInt(Color.BLACK));
+            DrawHelper.drawBox(matrices, x + 5 + width, optionY + 3/2, 5, 5, ColorHelper.ColorToInt(Color.BLACK));
             if (option.enabled)
-                DrawHelper.drawBox(matrices, x + 5 + width, optionY + 3, 2, 2, ColorHelper.ColorToInt(Color.WHITE));
+                DrawHelper.drawBox(matrices, x + 5 + width, optionY + 3/2, 2, 2, ColorHelper.ColorToInt(Color.WHITE));
             optionY += textRenderer.fontHeight + 2;
         }
         if (selectedWidget != null)

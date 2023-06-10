@@ -9,7 +9,6 @@ import net.minecraft.nbt.NbtList;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * This class manages a list of widgets that can be added, removed and retrieved.
@@ -17,6 +16,9 @@ import java.util.function.Supplier;
 public class WidgetManager {
 
     private final List<Widget> widgets = new ArrayList<>(); // The list of widgets
+    private WidgetLoading widgetLoading = new WidgetLoading() {
+    };
+
     /**
      * Adds a widget to the list.
      *
@@ -26,11 +28,10 @@ public class WidgetManager {
         widgets.add(widget);
     }
 
-    private WidgetLoading widgetLoading = new WidgetLoading() {};
-
     public void setWidgetLoading(WidgetLoading widgetLoading) {
         this.widgetLoading = widgetLoading;
     }
+
     /**
      * Removes a widget from the list.
      *
