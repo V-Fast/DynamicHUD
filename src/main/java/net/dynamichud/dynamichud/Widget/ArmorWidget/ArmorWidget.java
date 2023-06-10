@@ -123,7 +123,7 @@ public class ArmorWidget extends Widget {
         yPercent = tag.getFloat("yPercent");
         enabled = tag.getBoolean("Enabled");
         String Position = tag.getString("Position");
-        if (TextureHelper.Position.getByUpperCaseName(Position) != null && !tag.getString("Position").isEmpty())
+        if (TextureHelper.Position.getByUpperCaseName(Position) != null && !(tag.getString("Position") ==null) && !tag.getString("Position").isEmpty())
             currentTextPosition[0] = TextureHelper.Position.getByUpperCaseName(Position);
         else
             currentTextPosition[0] = TextureHelper.Position.ABOVE;
