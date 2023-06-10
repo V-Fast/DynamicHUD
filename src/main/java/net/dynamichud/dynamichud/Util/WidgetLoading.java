@@ -4,8 +4,11 @@ import net.dynamichud.dynamichud.Widget.ArmorWidget.ArmorWidget;
 import net.dynamichud.dynamichud.Widget.ItemWidget.ItemWidget;
 import net.dynamichud.dynamichud.Widget.TextWidget.TextWidget;
 import net.dynamichud.dynamichud.Widget.Widget;
+import net.dynamichud.dynamichud.Widget.WidgetBox;
+import net.dynamichud.dynamichud.Widget.WidgetManager;
 import net.dynamichud.dynamichud.helpers.TextureHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -20,7 +23,7 @@ public interface WidgetLoading {
             return widget;
         }
         if (className.equals(ArmorWidget.class.getName())) {
-            ArmorWidget widget = new ArmorWidget(MinecraftClient.getInstance(), EquipmentSlot.CHEST, 0, 0, false, TextureHelper.Position.ABOVE, () -> "",Color.RED);
+            ArmorWidget widget = new ArmorWidget(MinecraftClient.getInstance(), EquipmentSlot.CHEST, 0, 0, false, TextureHelper.Position.ABOVE, () -> "",()->Color.RED);
             widget.readFromTag(widgetTag);
             return widget;
         }

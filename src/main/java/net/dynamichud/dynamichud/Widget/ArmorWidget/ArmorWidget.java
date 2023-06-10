@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 
 import java.awt.*;
+import java.util.function.Supplier;
 
 /**
  * This class represents a widget that displays the armor item in a specified equipment slot.
@@ -22,7 +23,7 @@ public class ArmorWidget extends Widget{
     public final TextureHelper.Position[] currentTextPosition = TextureHelper.Position.values();
     protected EquipmentSlot slot; // The equipment slot to display the armor item from
     protected TextGenerator textGenerator;
-    protected Color color;
+    protected Supplier<Color> color;
 
     /**
      * Constructs an ArmorWidget object.
@@ -32,7 +33,7 @@ public class ArmorWidget extends Widget{
      * @param xPercent The x position of the widget as a percentage of the screen width
      * @param yPercent The y position of the widget as a percentage of the screen height
      */
-    public ArmorWidget(MinecraftClient client, EquipmentSlot slot, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator,Color color) {
+    public ArmorWidget(MinecraftClient client, EquipmentSlot slot, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator,Supplier<Color> color) {
         super(client);
         this.slot = slot;
         this.xPercent = xPercent;
@@ -54,7 +55,7 @@ public class ArmorWidget extends Widget{
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
         ItemStack armorItem = client.player.getEquippedStack(slot);
         //TextureHelper.drawItemTexture(matrices, itemRenderer, armorItem, getX(), getY());
-        TextureHelper.drawItemTextureWithText(matrices, itemRenderer, textRenderer, armorItem, getX(), getY(), getText(), ColorHelper.ColorToInt(color), currentTextPosition[0], 0.5f);
+        TextureHelper.drawItemTextureWithText(matrices, itemRenderer, textRenderer, armorItem, getX(), getY(), getText(), ColorHelper.ColorToInt(getColor()), currentTextPosition[0], 0.5f);
     }
 
     @Override
@@ -94,10 +95,10 @@ public class ArmorWidget extends Widget{
     }
 
     public Color getColor() {
-        return color;
+        return color.get();
     }
 
-    public void setColor(Color color) {
+    public void setColor(Supplier<Color> color) {
         this.color = color;
     }
 
