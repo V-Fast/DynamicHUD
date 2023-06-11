@@ -113,6 +113,7 @@ public class ArmorWidget extends Widget {
         tag.putBoolean("Enabled", this.enabled);
         tag.putString("Position", String.valueOf(this.currentTextPosition[0]));
         if(this.getText()!=null) tag.putString("text",this.getText());
+        tag.putInt("Color",this.getColor().getRGB());
     }
 
     @Override
@@ -123,6 +124,7 @@ public class ArmorWidget extends Widget {
         yPercent = tag.getFloat("yPercent");
         enabled = tag.getBoolean("Enabled");
         String Position = tag.getString("Position");
+        color= ()->ColorHelper.getColorFromInt(tag.getInt("Color"));
         if (TextureHelper.Position.getByUpperCaseName(Position) != null && !(tag.getString("Position") ==null) && !tag.getString("Position").isEmpty())
             currentTextPosition[0] = TextureHelper.Position.getByUpperCaseName(Position);
         else

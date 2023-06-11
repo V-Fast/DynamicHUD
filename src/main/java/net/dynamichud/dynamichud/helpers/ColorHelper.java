@@ -31,6 +31,13 @@ public class ColorHelper {
         return (alpha << 24) | (red << 16) | (green << 8) | blue;
     }
 
+    public static Color getColorFromInt(int color) {
+        int red = (color >> 16) & 0xFF;
+        int green = (color >> 8) & 0xFF;
+        int blue = color & 0xFF;
+        return new Color(red, green, blue);
+    }
+
     /**
      * Returns a color as an integer value given its hue.
      *
