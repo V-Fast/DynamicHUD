@@ -37,26 +37,24 @@ import static net.dynamichud.dynamichud.DynamicHUD.*;
         dynamicutil = new DynamicUtil(mc);
         widgets.clear();
 
-        // Add default widgets if this is the first run
         ClientTickEvents.START_CLIENT_TICK.register(server -> {
-            if (!WIDGETS_FILE.exists() && mc.player!=null && !WidgetAdded) {
+            if (!WIDGETS_FILE.exists() && mc.player != null && !WidgetAdded) {
                 addWigdets(dynamicutil);
             }
-            if(!WidgetLoaded) {
+            if (WIDGETS_FILE.exists() && mc.player != null && !WidgetLoaded) {
                 loadWigdets(dynamicutil);
-                WidgetLoaded=true;
+                WidgetLoaded = true;
             }
         });
 
         DynamicHUD.setAbstractScreen(new MoveableScreen(Text.of("Editor Screen"), dynamicutil));
 
         ServerLifecycleEvents.SERVER_STOPPING.register(client -> {
-            WidgetLoaded=false;
+            dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE);
             WidgetAdded=false;
         });
 
         HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
-            dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE);
             dynamicutil.render(matrices, tickDelta);
             DynamicUtil.openDynamicScreen(EditorScreenKeyBinding, Screen);
         });

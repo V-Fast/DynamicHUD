@@ -140,15 +140,15 @@ public class ContextMenu {
             width = Math.max(width, textRenderer.getWidth(option.label) + padding);
             height += textRenderer.fontHeight + 2;
         }
-
-            int windowWidth = client.getWindow().getScaledWidth();
-            int windowHeight = client.getWindow().getScaledHeight();
-            if (x + width + 12 > windowWidth) {
-                x = windowWidth - width - 12;
-            }
-            if (y + height + heightfromwidget + 2 > windowHeight) {
-                y = windowHeight - height - heightfromwidget - 2;
-            }
+        // Check if the context menu is being drawn outside the window and adjust its position if necessary
+        int windowWidth = client.getWindow().getScaledWidth();
+        int windowHeight = client.getWindow().getScaledHeight();
+        if (x + width + 12 > windowWidth) {
+            x = windowWidth - width - 12;
+        }
+        if (y + height + heightfromwidget + 2 > windowHeight) {
+            y = windowHeight - height - heightfromwidget - 2;
+        }
         // Apply the scale
         matrices.push();
         matrices.translate(x + width / 2.0f + 5, y + height / 2.0f + heightfromwidget, 0);
@@ -171,6 +171,7 @@ public class ContextMenu {
                 DrawHelper.drawBox(matrices, x + 5 + width, optionY + 3, 2, 2, ColorHelper.ColorToInt(Color.WHITE));
             optionY += textRenderer.fontHeight + 2;
         }
+
         if (selectedWidget != null)
             setPosition(selectedWidget.getX(), selectedWidget.getY() + textRenderer.fontHeight + 4);
 
@@ -230,8 +231,16 @@ public class ContextMenu {
             }
             optionY += textRenderer.fontHeight + 2;
         }
+
+        // Update the position of the context menu if it is being dragged by the user
+        if (button == 0) {
+            setPosition((int) mouseX - width / 2, (int) mouseY - heightfromwidget / 2);
+            return true;
+        }
+
         return false;
     }
+
 
 
     private static class ContextMenuOption {
