@@ -236,11 +236,13 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         if (rainbow) {
             float hue = (System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f);
             if (xPercent > 0.5 && getDataText() != null && !getDataText().isEmpty()) {
+                int xOffset = x - client.textRenderer.getWidth(getText()) / 2;
                 for (int i = 0; i < getDataText().length(); i++) {
                     int color = ColorHelper.getColorFromHue(hue);
                     String character = String.valueOf(getDataText().charAt(i));
                     int characterWidth = client.textRenderer.getWidth(character);
-                    drawText(matrices, character, x + client.textRenderer.getWidth(getText()) / 2 + characterWidth * i, y - 4, color);
+                    drawText(matrices, character, xOffset, y - 4, color);
+                    xOffset += characterWidth;
                     hue += verticalRainbow ? 0.05f : 0.1f;
                     if (hue >= 1) hue -= 1;
                 }
@@ -248,32 +250,36 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
                     int color = ColorHelper.getColorFromHue(hue);
                     String character = String.valueOf(getText().charAt(i));
                     int characterWidth = client.textRenderer.getWidth(character);
-                    drawText(matrices, character, x - client.textRenderer.getWidth(getText()) / 2 + characterWidth * i, y - 4, color);
+                    drawText(matrices, character, xOffset, y - 4, color);
+                    xOffset += characterWidth;
                     hue += verticalRainbow ? 0.05f : 0.1f;
                     if (hue >= 1) hue -= 1;
                 }
             } else {
+                int xOffset = x - textWidth / 2;
                 for (int i = 0; i < CombinedText.length(); i++) {
                     int color = ColorHelper.getColorFromHue(hue);
                     String character = String.valueOf(CombinedText.charAt(i));
                     int characterWidth = client.textRenderer.getWidth(character);
-                    drawText(matrices, character, x - textWidth / 2 + characterWidth * i, y - 4, color);
+                    drawText(matrices, character, xOffset, y - 4, color);
+                    xOffset += characterWidth;
                     hue += verticalRainbow ? 0.05f : 0.1f;
                     if (hue >= 1) hue -= 1;
                 }
-            }
-        } else {
+            } 
+    } else {
             int Textcolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Textcolor;
             int Datacolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Datacolor;
             if (xPercent > 0.5 && getDataText() != null && !getDataText().isEmpty()) {
                 drawText(matrices, getDataText(), getX() - client.textRenderer.getWidth(getText()) / 2, getY() - 4, Datacolour);
-                drawText(matrices, getText(), getX() - client.textRenderer.getWidth(getText()) / 2, getY() - 4, Textcolour);
+                drawText(matrices, getText(), getX() - client.textRenderer.getWidth(getText()) / 2 + client.textRenderer.getWidth(getDataText()), getY() - 4, Textcolour);
             } else {
                 drawText(matrices, getText(), getX() - client.textRenderer.getWidth(getText()) / 2, getY() - 4, Textcolour);
                 drawText(matrices, getDataText(), getX() + client.textRenderer.getWidth(getText()) / 2, getY() - 4, Datacolour);
             }
         }
     }
+
 
 
     @Override
