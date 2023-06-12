@@ -229,7 +229,7 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
      */
     @Override
     public void render(MatrixStack matrices) {
-        int textWidth = client.textRenderer.getWidth(getText());
+        int textWidth = client.textRenderer.getWidth(getText())+client.textRenderer.getWidth(getDataText());
         int x = getX();
         int y = getY();
         String CombinedText = getText() + getDataText();
@@ -239,7 +239,7 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
                 int color = ColorHelper.getColorFromHue(hue);
                 String character = String.valueOf(CombinedText.charAt(i));
                 int characterWidth = client.textRenderer.getWidth(character);
-                drawText(matrices, character, x - textWidth/2 - client.textRenderer.getWidth(getDataText()), y - 4, color);
+                drawText(matrices, character, x - textWidth/2 , y - 4, color);
                 x += characterWidth;
                 hue += verticalRainbow ? 0.05f : 0.1f;
                 if (hue >= 1) hue -= 1;
@@ -247,10 +247,11 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         } else {
             int Textcolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Textcolor;
             int Datacolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Datacolor;
-            drawText(matrices, getText(), getX() - textWidth/2 - client.textRenderer.getWidth(getDataText()), getY() - 4, Textcolour);
-            drawText(matrices, getDataText(), getX() + textWidth/2 - client.textRenderer.getWidth(getDataText()), getY() - 4, Datacolour);
+            drawText(matrices, getText(), getX() - textWidth/2, getY() - 4, Textcolour);
+            drawText(matrices, getDataText(), getX() + textWidth/2, getY() - 4, Datacolour);
         }
     }
+
 
 
 
