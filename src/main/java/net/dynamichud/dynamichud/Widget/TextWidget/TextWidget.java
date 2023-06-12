@@ -246,6 +246,8 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
                     hue += verticalRainbow ? 0.05f : 0.1f;
                     if (hue >= 1) hue -= 1;
                 }
+                // Add a space between the data text and the regular text
+                xOffset += client.textRenderer.getWidth(" ");
                 for (int i = 0; i < getText().length(); i++) {
                     int color = ColorHelper.getColorFromHue(hue);
                     String character = String.valueOf(getText().charAt(i));
@@ -266,12 +268,12 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
                     hue += verticalRainbow ? 0.05f : 0.1f;
                     if (hue >= 1) hue -= 1;
                 }
-            } 
+            }
     } else {
             int Textcolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Textcolor;
             int Datacolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Datacolor;
             if (xPercent > 0.5 && getDataText() != null && !getDataText().isEmpty()) {
-                drawText(matrices, getDataText(), getX() - client.textRenderer.getWidth(getText()) / 2, getY() - 4, Datacolour);
+                drawText(matrices, getDataText(), getX() + client.textRenderer.getWidth(getText()) / 2, getY() - 4, Datacolour);
                 drawText(matrices, getText(), getX() - client.textRenderer.getWidth(getText()) / 2 + client.textRenderer.getWidth(getDataText()), getY() - 4, Textcolour);
             } else {
                 drawText(matrices, getText(), getX() - client.textRenderer.getWidth(getText()) / 2, getY() - 4, Textcolour);
