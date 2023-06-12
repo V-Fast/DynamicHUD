@@ -235,20 +235,43 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         String CombinedText = getText() + getDataText();
         if (rainbow) {
             float hue = (System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f);
-            for (int i = 0; i < CombinedText.length(); i++) {
-                int color = ColorHelper.getColorFromHue(hue);
-                String character = String.valueOf(CombinedText.charAt(i));
-                int characterWidth = client.textRenderer.getWidth(character);
-                drawText(matrices, character, x - textWidth / 2, y - 4, color);
-                x += characterWidth;
-                hue += verticalRainbow ? 0.05f : 0.1f;
-                if (hue >= 1) hue -= 1;
+            if (xPercent > 0.5 && getDataText() != null && !getDataText().isEmpty()) {
+                for (int i = 0; i < getDataText().length(); i++) {
+                    int color = ColorHelper.getColorFromHue(hue);
+                    String character = String.valueOf(getDataText().charAt(i));
+                    int characterWidth = client.textRenderer.getWidth(character);
+                    drawText(matrices, character, x - client.textRenderer.getWidth(getText()) / 2 + characterWidth * i, y - 4, color);
+                    hue += verticalRainbow ? 0.05f : 0.1f;
+                    if (hue >= 1) hue -= 1;
+                }
+                for (int i = 0; i < getText().length(); i++) {
+                    int color = ColorHelper.getColorFromHue(hue);
+                    String character = String.valueOf(getText().charAt(i));
+                    int characterWidth = client.textRenderer.getWidth(character);
+                    drawText(matrices, character, x - client.textRenderer.getWidth(getText()) / 2 + characterWidth * i, y - 4, color);
+                    hue += verticalRainbow ? 0.05f : 0.1f;
+                    if (hue >= 1) hue -= 1;
+                }
+            } else {
+                for (int i = 0; i < CombinedText.length(); i++) {
+                    int color = ColorHelper.getColorFromHue(hue);
+                    String character = String.valueOf(CombinedText.charAt(i));
+                    int characterWidth = client.textRenderer.getWidth(character);
+                    drawText(matrices, character, x - textWidth / 2 + characterWidth * i, y - 4, color);
+                    hue += verticalRainbow ? 0.05f : 0.1f;
+                    if (hue >= 1) hue -= 1;
+                }
             }
         } else {
             int Textcolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Textcolor;
             int Datacolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Datacolor;
-            drawText(matrices, getText(), getX() - textWidth / 2, getY() - 4, Textcolour);
-            drawText(matrices, getDataText(), getX() + textWidth / 2 - client.textRenderer.getWidth(getDataText()), getY() - 4, Datacolour);
+            if (xPercent > 0.5 && getDataText() != null && !getDataText().isEmpty()) {
+                drawText(matrices, getDataText(), getX() + client.textRenderer.getWidth(getText()) / 2, getY() - 4, Datacolour);
+                drawText(matrices, getText(), getX() - client.textRenderer.getWidth(getText()) / 2, getY() - 4, Textcolour);
+            } else {
+                drawText(matrices, getText(), getX() - client.textRenderer.getWidth(getText()) / 2, getY() - 4, Textcolour);
+                drawText(matrices, getDataText(), getX() + client.textRenderer.getWidth(getText()) / 2, getY() - 4, Datacolour);
+            }
         }
     }
 
