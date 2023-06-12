@@ -229,7 +229,8 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
      */
     @Override
     public void render(MatrixStack matrices) {
-        int textWidth = client.textRenderer.getWidth(getText())+client.textRenderer.getWidth(getDataText());
+        int textWidth = client.textRenderer.getWidth(getText());
+        int dataTextWidth=+client.textRenderer.getWidth(getDataText());
         int x = getX();
         int y = getY();
         String CombinedText = getText() + getDataText();
@@ -247,8 +248,8 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         } else {
             int Textcolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Textcolor;
             int Datacolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Datacolor;
-            drawText(matrices, getText(), getX() - textWidth/2, getY() - 4, Textcolour);
-            drawText(matrices, getDataText(), getX() + textWidth/2, getY() - 4, Datacolour);
+            drawText(matrices, getText(), getX() - textWidth/2 , getY() - 4, Textcolour);
+            drawText(matrices, getDataText(), getX() + textWidth+dataTextWidth/2 + client.textRenderer.getWidth(getDataText()), getY() - 4, Datacolour);
         }
     }
 
