@@ -76,14 +76,16 @@ public class MoveableScreen extends AbstractMoveableScreen {
             contextMenu.addOption("Vertical Rainbow", () -> {
                 textWidget.setVerticalRainbow(!textWidget.hasVerticalRainbow());
             });
-            contextMenu.addOption("TextColor", () -> {
-                textWidget.toggleTextColorOption();
+            if (!textWidget.getDataText().trim().isEmpty()) {
+                contextMenu.addOption("TextColor", () -> {
+                    textWidget.toggleTextColorOption();
 
-                colorPicker = null;
+                    colorPicker = null;
 
-                if (textWidget.isTextcolorOptionEnabled())
-                    colorPicker = new ColorGradientPicker(mc, x + 110, y + widget.getHeight() + 5, textWidget.getTextcolor(), textWidget::setTextColor, 50, 100, selectedWidget);
-            });
+                    if (textWidget.isTextcolorOptionEnabled())
+                        colorPicker = new ColorGradientPicker(mc, x + 110, y + widget.getHeight() + 5, textWidget.getTextcolor(), textWidget::setTextColor, 50, 100, selectedWidget);
+                });
+            }
             if (!textWidget.getDataText().trim().isEmpty()) {
                 contextMenu.addOption("DataColor", () -> {
                     textWidget.toggleDataColorOption();
