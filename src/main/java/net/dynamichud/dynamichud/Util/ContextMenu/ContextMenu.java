@@ -17,11 +17,10 @@ public class ContextMenu {
     private static int optionY;
     private final MinecraftClient client; // The Minecraft client instance
     private final List<ContextMenuOption> options = new ArrayList<>(); // The list of options in the context menu
-    private final float scaleSpeed = 0.1f;
     private int width = 0; // The width of the context menu
     private int x; // The x position of the context menu
     private int y; // The y position of the context menu
-    private Widget selectedWidget = null; // The widget that this context menu is associated with
+    private Widget selectedWidget; // The widget that this context menu is associated with
     private int backgroundColor = 0x80C0C0C0;// Semi-transparent light grey color
     private int padding = 5; // The amount of padding around the rectangle
     private int heightfromwidget = 5; // The amount of padding around the rectangle
@@ -119,6 +118,7 @@ public class ContextMenu {
 
     public void tick() {
         // Update the scale
+        float scaleSpeed = 0.1f;
         scale += scaleSpeed;
         if (scale > 1.0f) {
             scale = 1.0f;
@@ -139,15 +139,6 @@ public class ContextMenu {
         for (ContextMenuOption option : options) {
             width = Math.max(width, textRenderer.getWidth(option.label) + padding);
             height += textRenderer.fontHeight + 2;
-        }
-        // Check if the context menu is being drawn outside the window and adjust its position if necessary
-        int windowWidth = client.getWindow().getScaledWidth();
-        int windowHeight = client.getWindow().getScaledHeight();
-        if (x + width + 12 > windowWidth) {
-            x = windowWidth - width - 12;
-        }
-        if (y + height + heightfromwidget + 2 > windowHeight) {
-            y = windowHeight - height - heightfromwidget - 2;
         }
         // Apply the scale
         matrices.push();
@@ -210,14 +201,6 @@ public class ContextMenu {
      * @return true if mouse click was handled by this context menu.
      */
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        // Check if the mouse is over any of the options
-        int buttonSize = 10;
-        int buttonX = x + width - buttonSize;
-        int buttonY = y;
-        if (mouseX >= buttonX && mouseX <= buttonX + buttonSize && mouseY >= buttonY && mouseY <= buttonY + buttonSize) {
-            // Close the context menu
-            return false;
-        }
         TextRenderer textRenderer = client.textRenderer;
         int optionY = y + heightfromwidget + 2;
         for (ContextMenuOption option : options) {
@@ -230,12 +213,6 @@ public class ContextMenu {
                 return true;
             }
             optionY += textRenderer.fontHeight + 2;
-        }
-
-        // Update the position of the context menu if it is being dragged by the user
-        if (button == 0) {
-            setPosition((int) mouseX - width / 2, (int) mouseY - heightfromwidget / 2);
-            return true;
         }
 
         return false;
