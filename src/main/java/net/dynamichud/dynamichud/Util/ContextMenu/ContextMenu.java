@@ -140,6 +140,15 @@ public class ContextMenu {
             width = Math.max(width, textRenderer.getWidth(option.label) + padding);
             height += textRenderer.fontHeight + 2;
         }
+
+            int windowWidth = client.getWindow().getScaledWidth();
+            int windowHeight = client.getWindow().getScaledHeight();
+            if (x + width + 12 > windowWidth) {
+                x = windowWidth - width - 12;
+            }
+            if (y + height + heightfromwidget + 2 > windowHeight) {
+                y = windowHeight - height - heightfromwidget - 2;
+            }
         // Apply the scale
         matrices.push();
         matrices.translate(x + width / 2.0f + 5, y + height / 2.0f + heightfromwidget, 0);
