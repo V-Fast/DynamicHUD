@@ -266,7 +266,7 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
             int Textcolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Textcolor;
             int Datacolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Datacolor;
             if (xPercent > 0.5 && getDataText() != null && !getDataText().isEmpty()) {
-                drawText(matrices, getDataText(), getX() + client.textRenderer.getWidth(getText()) / 2, getY() - 4, Datacolour);
+                drawText(matrices, getDataText(), getX() - client.textRenderer.getWidth(getText()) / 2, getY() - 4, Datacolour);
                 drawText(matrices, getText(), getX() - client.textRenderer.getWidth(getText()) / 2, getY() - 4, Textcolour);
             } else {
                 drawText(matrices, getText(), getX() - client.textRenderer.getWidth(getText()) / 2, getY() - 4, Textcolour);
