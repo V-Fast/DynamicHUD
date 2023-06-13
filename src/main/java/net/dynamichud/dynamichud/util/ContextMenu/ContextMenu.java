@@ -1,6 +1,6 @@
-package net.dynamichud.dynamichud.Util.ContextMenu;
+package net.dynamichud.dynamichud.util.ContextMenu;
 
-import net.dynamichud.dynamichud.Widget.Widget;
+import net.dynamichud.dynamichud.widget.Widget;
 import net.dynamichud.dynamichud.helpers.ColorHelper;
 import net.dynamichud.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.MinecraftClient;

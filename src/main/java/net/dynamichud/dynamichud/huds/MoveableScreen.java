@@ -1,13 +1,13 @@
-package net.dynamichud.dynamichud.hudscreen;
+package net.dynamichud.dynamichud.huds;
 
-import net.dynamichud.dynamichud.Util.ColorPicker.ColorGradientPicker;
-import net.dynamichud.dynamichud.Util.ContextMenu.ContextMenu;
-import net.dynamichud.dynamichud.Util.DynamicUtil;
-import net.dynamichud.dynamichud.Widget.ArmorWidget.ArmorWidget;
-import net.dynamichud.dynamichud.Widget.ItemWidget.ItemWidget;
-import net.dynamichud.dynamichud.Widget.SliderWidget.SliderWidgetBuilder;
-import net.dynamichud.dynamichud.Widget.TextWidget.TextWidget;
-import net.dynamichud.dynamichud.Widget.Widget;
+import net.dynamichud.dynamichud.util.ColorPicker.ColorGradientPicker;
+import net.dynamichud.dynamichud.util.ContextMenu.ContextMenu;
+import net.dynamichud.dynamichud.util.DynamicUtil;
+import net.dynamichud.dynamichud.widget.ArmorWidget.ArmorWidget;
+import net.dynamichud.dynamichud.widget.ItemWidget.ItemWidget;
+import net.dynamichud.dynamichud.widget.SliderWidget.SliderWidgetBuilder;
+import net.dynamichud.dynamichud.widget.TextWidget.TextWidget;
+import net.dynamichud.dynamichud.widget.Widget;
 import net.dynamichud.dynamichud.helpers.ColorHelper;
 import net.dynamichud.dynamichud.helpers.TextureHelper;
 import net.minecraft.client.MinecraftClient;

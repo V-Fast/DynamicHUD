@@ -1,6 +1,6 @@
-package net.dynamichud.dynamichud.Util.ColorPicker;
+package net.dynamichud.dynamichud.util.ColorPicker;
 
-import net.dynamichud.dynamichud.Widget.Widget;
+import net.dynamichud.dynamichud.widget.Widget;
 import net.dynamichud.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;

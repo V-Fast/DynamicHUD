@@ -1,4 +1,4 @@
-package net.dynamichud.dynamichud.Util.ColorPicker;
+package net.dynamichud.dynamichud.util.ColorPicker;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;

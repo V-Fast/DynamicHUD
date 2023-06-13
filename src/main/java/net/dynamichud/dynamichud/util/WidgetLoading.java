@@ -1,9 +1,9 @@
-package net.dynamichud.dynamichud.Util;
+package net.dynamichud.dynamichud.util;
 
-import net.dynamichud.dynamichud.Widget.ArmorWidget.ArmorWidget;
-import net.dynamichud.dynamichud.Widget.ItemWidget.ItemWidget;
-import net.dynamichud.dynamichud.Widget.TextWidget.TextWidget;
-import net.dynamichud.dynamichud.Widget.Widget;
+import net.dynamichud.dynamichud.widget.ArmorWidget.ArmorWidget;
+import net.dynamichud.dynamichud.widget.ItemWidget.ItemWidget;
+import net.dynamichud.dynamichud.widget.TextWidget.TextWidget;
+import net.dynamichud.dynamichud.widget.Widget;
 import net.dynamichud.dynamichud.helpers.TextureHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EquipmentSlot;

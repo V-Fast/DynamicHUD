@@ -1,4 +1,4 @@
-package net.dynamichud.dynamichud.Util.ContextMenu;
+package net.dynamichud.dynamichud.util.ContextMenu;
 
 public interface ContextMenuOptionsProvider {
     boolean isOptionEnabled(String label);

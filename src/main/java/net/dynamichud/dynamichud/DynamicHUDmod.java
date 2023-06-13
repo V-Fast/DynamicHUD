@@ -1,14 +1,14 @@
 package net.dynamichud.dynamichud;
 
-import net.dynamichud.dynamichud.Util.DynamicUtil;
-import net.dynamichud.dynamichud.Util.TextGenerator;
-import net.dynamichud.dynamichud.Util.WidgetLoading;
-import net.dynamichud.dynamichud.Widget.*;
-import net.dynamichud.dynamichud.Widget.ArmorWidget.ArmorWidget;
-import net.dynamichud.dynamichud.Widget.ItemWidget.ItemWidget;
-import net.dynamichud.dynamichud.Widget.TextWidget.TextWidget;
+import net.dynamichud.dynamichud.util.DynamicUtil;
+import net.dynamichud.dynamichud.util.TextGenerator;
+import net.dynamichud.dynamichud.util.WidgetLoading;
+import net.dynamichud.dynamichud.widget.*;
+import net.dynamichud.dynamichud.widget.ArmorWidget.ArmorWidget;
+import net.dynamichud.dynamichud.widget.ItemWidget.ItemWidget;
+import net.dynamichud.dynamichud.widget.TextWidget.TextWidget;
 import net.dynamichud.dynamichud.helpers.TextureHelper;
-import net.dynamichud.dynamichud.hudscreen.MoveableScreen;
+import net.dynamichud.dynamichud.huds.MoveableScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;

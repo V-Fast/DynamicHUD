@@ -1,4 +1,4 @@
-package net.dynamichud.dynamichud.Widget;
+package net.dynamichud.dynamichud.widget;
 
 public class WidgetBox {
     private final int width;

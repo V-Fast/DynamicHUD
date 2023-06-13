@@ -1,6 +1,6 @@
 package net.dynamichud.dynamichud.handlers;
 
-import net.dynamichud.dynamichud.Widget.Widget;
+import net.dynamichud.dynamichud.widget.Widget;
 
 public class DefaultDragHandler implements DragHandler {
     private int dragStartX = 0;

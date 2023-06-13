@@ -1,10 +1,10 @@
-package net.dynamichud.dynamichud.hudscreen;
+package net.dynamichud.dynamichud.huds;
 
-import net.dynamichud.dynamichud.Util.ColorPicker.ColorGradientPicker;
-import net.dynamichud.dynamichud.Util.ContextMenu.ContextMenu;
-import net.dynamichud.dynamichud.Util.DynamicUtil;
-import net.dynamichud.dynamichud.Widget.SliderWidget.SliderWidget;
-import net.dynamichud.dynamichud.Widget.Widget;
+import net.dynamichud.dynamichud.util.ColorPicker.ColorGradientPicker;
+import net.dynamichud.dynamichud.util.ContextMenu.ContextMenu;
+import net.dynamichud.dynamichud.util.DynamicUtil;
+import net.dynamichud.dynamichud.widget.SliderWidget.SliderWidget;
+import net.dynamichud.dynamichud.widget.Widget;
 import net.dynamichud.dynamichud.handlers.DefaultDragHandler;
 import net.dynamichud.dynamichud.handlers.DefaultMouseHandler;
 import net.dynamichud.dynamichud.handlers.DragHandler;

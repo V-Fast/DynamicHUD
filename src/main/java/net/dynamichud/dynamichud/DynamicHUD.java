@@ -1,13 +1,11 @@
 package net.dynamichud.dynamichud;
 
-import net.dynamichud.dynamichud.Util.DynamicUtil;
-import net.dynamichud.dynamichud.hudscreen.AbstractMoveableScreen;
+import net.dynamichud.dynamichud.util.DynamicUtil;
+import net.dynamichud.dynamichud.huds.AbstractMoveableScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;

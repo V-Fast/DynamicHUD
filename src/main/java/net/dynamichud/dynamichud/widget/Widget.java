@@ -1,4 +1,4 @@
-package net.dynamichud.dynamichud.Widget;
+package net.dynamichud.dynamichud.widget;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;

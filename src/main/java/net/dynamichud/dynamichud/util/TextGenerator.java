@@ -1,4 +1,4 @@
-package net.dynamichud.dynamichud.Util;
+package net.dynamichud.dynamichud.util;
 
 @FunctionalInterface
 public interface TextGenerator {

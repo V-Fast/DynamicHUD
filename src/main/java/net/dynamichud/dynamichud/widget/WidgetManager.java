@@ -1,6 +1,6 @@
-package net.dynamichud.dynamichud.Widget;
+package net.dynamichud.dynamichud.widget;
 
-import net.dynamichud.dynamichud.Util.WidgetLoading;
+import net.dynamichud.dynamichud.util.WidgetLoading;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;

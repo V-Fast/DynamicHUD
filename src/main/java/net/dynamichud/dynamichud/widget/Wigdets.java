@@ -1,6 +1,6 @@
-package net.dynamichud.dynamichud.Widget;
+package net.dynamichud.dynamichud.widget;
 
-import net.dynamichud.dynamichud.Util.DynamicUtil;
+import net.dynamichud.dynamichud.util.DynamicUtil;
 
 public interface Wigdets {
 

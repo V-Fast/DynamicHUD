@@ -1,9 +1,9 @@
-package net.dynamichud.dynamichud.Widget.TextWidget;
+package net.dynamichud.dynamichud.widget.TextWidget;
 
-import net.dynamichud.dynamichud.Util.ContextMenu.ContextMenuOptionsProvider;
-import net.dynamichud.dynamichud.Util.TextGenerator;
-import net.dynamichud.dynamichud.Widget.Widget;
-import net.dynamichud.dynamichud.Widget.WidgetBox;
+import net.dynamichud.dynamichud.util.ContextMenu.ContextMenuOptionsProvider;
+import net.dynamichud.dynamichud.util.TextGenerator;
+import net.dynamichud.dynamichud.widget.Widget;
+import net.dynamichud.dynamichud.widget.WidgetBox;
 import net.dynamichud.dynamichud.helpers.ColorHelper;
 import net.dynamichud.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.MinecraftClient;

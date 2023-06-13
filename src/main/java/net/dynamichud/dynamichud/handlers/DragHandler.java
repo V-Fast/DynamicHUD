@@ -1,6 +1,6 @@
 package net.dynamichud.dynamichud.handlers;
 
-import net.dynamichud.dynamichud.Widget.Widget;
+import net.dynamichud.dynamichud.widget.Widget;
 
 public interface DragHandler {
     boolean startDragging(Widget widget, double mouseX, double mouseY);
