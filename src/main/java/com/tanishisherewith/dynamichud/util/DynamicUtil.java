@@ -1,11 +1,12 @@
-package net.dynamichud.dynamichud.Util;
+package com.tanishisherewith.dynamichud.util;
 
-import net.dynamichud.dynamichud.Widget.Widget;
-import net.dynamichud.dynamichud.Widget.WidgetBox;
-import net.dynamichud.dynamichud.Widget.WidgetManager;
-import net.dynamichud.dynamichud.helpers.ColorHelper;
-import net.dynamichud.dynamichud.helpers.DrawHelper;
-import net.dynamichud.dynamichud.hudscreen.AbstractMoveableScreen;
+
+import com.tanishisherewith.dynamichud.helpers.ColorHelper;
+import com.tanishisherewith.dynamichud.helpers.DrawHelper;
+import com.tanishisherewith.dynamichud.huds.AbstractMoveableScreen;
+import com.tanishisherewith.dynamichud.widget.Widget;
+import com.tanishisherewith.dynamichud.widget.WidgetBox;
+import com.tanishisherewith.dynamichud.widget.WidgetManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.option.KeyBinding;
