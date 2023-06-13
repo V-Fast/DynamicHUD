@@ -240,7 +240,7 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
                 int color = ColorHelper.getColorFromHue(hue);
                 String character = String.valueOf(CombinedText.charAt(i));
                 int characterWidth = client.textRenderer.getWidth(character);
-                drawText(matrices, character, x - (client.textRenderer.getWidth(getText())+client.textRenderer.getWidth(getDataText()))/2, y - 4, color);
+                drawText(matrices, character, x + 2, y - 4, color);
                 x += characterWidth;
                 hue += verticalRainbow ? 0.05f : 0.1f;
                 if (hue >= 1) hue -= 1;
