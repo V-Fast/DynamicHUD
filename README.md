@@ -1,6 +1,6 @@
 # DynamicHUD
 A library to create HUD elements and display them on the screen. **Fabric only**\
-_Current version: 0.0.0.01_
+_Current version:1.5.0_
 
 # Examples
 - [MoveableScreen.java](src/main/java/com/tanishisherewith/dynamichud/huds/MoveableScreen.java)
