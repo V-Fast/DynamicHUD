@@ -35,39 +35,36 @@ public class DynamicHUDmod implements ClientModInitializer, Wigdets, WidgetLoadi
     MinecraftClient mc = MinecraftClient.getInstance();
     protected List<Widget> widgets = new ArrayList<>();
     private DynamicUtil dynamicutil;
-    protected boolean WidgetAdded=false;
-    protected boolean WidgetLoaded=false;
+
 
     @Override
     public void onInitializeClient() {
         dynamicutil = new DynamicUtil(mc);
         widgets.clear();
 
-        ClientTickEvents.START_CLIENT_TICK.register(server -> {
-            if (!WIDGETS_FILE.exists() && mc.player != null && !WidgetAdded) {
-                addWigdets(dynamicutil);
-            }
-            if (WIDGETS_FILE.exists() && mc.player != null && !WidgetLoaded) {
-                loadWigdets(dynamicutil);
-                WidgetLoaded = true;
-            }
-        });
-
         DynamicHUD.setAbstractScreen(new MoveableScreen(Text.of("Editor Screen"), dynamicutil));
 
-        ServerPlayConnectionEvents.DISCONNECT.register((handler,packetSender) -> {
-            dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE);
-        });
 
+        ClientTickEvents.START_CLIENT_TICK.register(server -> {
+            if (mc.player!=null) {
+                if (!WIDGETS_FILE.exists() && !dynamicutil.WidgetAdded) {
+                    addWigdets(dynamicutil);
+                    dynamicutil.WidgetAdded = true;
+
+                }
+                if (WIDGETS_FILE.exists() && !dynamicutil.WidgetLoaded) {
+                    loadWigdets(dynamicutil);
+                    dynamicutil.WidgetLoaded = true;
+                }
+            }
+        });
         HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
             dynamicutil.render(matrices, tickDelta);
         });
-
     }
 
     @Override
     public void addWigdets(DynamicUtil dynamicUtil) {
-
             widgets.add(new TextWidget(mc, "FPS: ", () -> mc.fpsDebugString.split(" ")[0], 0.5f, 0.5f, true, true, false, -1, -1, true));
             widgets.add(new TextWidget(mc, "Biome: ", () -> "PLAINS", 0.7f, 0.3f, false, false, false, -1, -1, true));
             widgets.add(new TextWidget(mc, "Ping: ", () -> "", 0.08f, 0.5f, false, false, false, -1, -1, true));
@@ -83,8 +80,6 @@ public class DynamicHUDmod implements ClientModInitializer, Wigdets, WidgetLoadi
         for (Widget wigdet : widgets) {
             dynamicutil.getWidgetManager().addWidget(wigdet);
         }
-        WidgetAdded = true;
-
     }
 
     @Override
