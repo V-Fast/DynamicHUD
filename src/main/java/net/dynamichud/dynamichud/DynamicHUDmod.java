@@ -12,8 +12,13 @@ import net.dynamichud.dynamichud.hudscreen.MoveableScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -49,7 +54,7 @@ import static net.dynamichud.dynamichud.DynamicHUD.*;
 
         DynamicHUD.setAbstractScreen(new MoveableScreen(Text.of("Editor Screen"), dynamicutil));
 
-        ServerLifecycleEvents.SERVER_STOPPING.register(client -> {
+        ServerPlayConnectionEvents.DISCONNECT.register((handler,packetSender) -> {
             dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE);
         });
 
