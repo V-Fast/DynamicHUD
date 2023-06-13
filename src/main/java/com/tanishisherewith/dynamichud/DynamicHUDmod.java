@@ -2,15 +2,14 @@ package com.tanishisherewith.dynamichud;
 
 import com.tanishisherewith.dynamichud.helpers.TextureHelper;
 import com.tanishisherewith.dynamichud.huds.MoveableScreen;
-import com.tanishisherewith.dynamichud.widget.armor.ArmorWidget;
-import com.tanishisherewith.dynamichud.widget.item.ItemWidget;
-import com.tanishisherewith.dynamichud.widget.text.TextWidget;
-import com.tanishisherewith.dynamichud.widget.Widget;
-import com.tanishisherewith.dynamichud.widget.Wigdets;
 import com.tanishisherewith.dynamichud.util.DynamicUtil;
 import com.tanishisherewith.dynamichud.util.TextGenerator;
 import com.tanishisherewith.dynamichud.util.WidgetLoading;
-import net.dynamichud.dynamichud.widget.*;
+import com.tanishisherewith.dynamichud.widget.Widget;
+import com.tanishisherewith.dynamichud.widget.Wigdets;
+import com.tanishisherewith.dynamichud.widget.armor.ArmorWidget;
+import com.tanishisherewith.dynamichud.widget.item.ItemWidget;
+import com.tanishisherewith.dynamichud.widget.text.TextWidget;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -25,9 +24,9 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.tanishisherewith.dynamichud.DynamicHUD.*;
+import static com.tanishisherewith.dynamichud.DynamicHUD.WIDGETS_FILE;
 
-  public class DynamicHUDmod implements ClientModInitializer, Wigdets, WidgetLoading {
+public class DynamicHUDmod implements ClientModInitializer, Wigdets, WidgetLoading {
     MinecraftClient mc = MinecraftClient.getInstance();
     protected List<Widget> widgets = new ArrayList<>();
     private DynamicUtil dynamicutil;
