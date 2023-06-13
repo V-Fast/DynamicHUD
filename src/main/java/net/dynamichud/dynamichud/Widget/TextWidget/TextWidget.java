@@ -253,11 +253,6 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         }
     }
 
-
-
-
-
-
     @Override
     public void writeToTag(NbtCompound tag) {
         super.writeToTag(tag);

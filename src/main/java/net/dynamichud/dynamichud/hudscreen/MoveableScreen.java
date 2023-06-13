@@ -54,7 +54,7 @@ public class MoveableScreen extends AbstractMoveableScreen {
             Slider = null;
             contextMenu.setHeightfromwidget(15);
             contextMenu.setPadding(5);
-            contextMenu.addEnumCycleOption("Position", TextureHelper.Position.values(), () -> armorWidget.currentTextPosition[0], newPosition -> {
+            contextMenu.addEnumCycleOption("", TextureHelper.Position.values(), () -> armorWidget.currentTextPosition[0], newPosition -> {
                 armorWidget.currentTextPosition[0] = newPosition;
             });
         }

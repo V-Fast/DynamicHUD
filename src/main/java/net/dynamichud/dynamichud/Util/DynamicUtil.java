@@ -66,25 +66,19 @@ public class DynamicUtil extends DrawableHelper {
     public void render(MatrixStack matrices, float tickDelta) {
         // Draw each widget
         for (Widget widget : widgetManager.getWidgets()) {
-            if (MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
-                widget.render(matrices);
-            } else if (widget.isEnabled()) {
-                widget.render(matrices);
+            if(!MinecraftClient.getInstance().options.debugEnabled || MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
+                if (MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
+                    widget.render(matrices);
+                } else if (widget.isEnabled()) {
+                    widget.render(matrices);
+                }
             }
 
             // Draw a red box around the widget if the HUD is disabled
             if (MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
                 int backgroundColor = widget.isEnabled() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
                 WidgetBox box = widget.getWidgetBox();
-                /*if (widget instanceof TextWidget textWidget) {
-                    MinecraftClient client=MinecraftClient.getInstance();
-                    int x1 = textWidget.getX(); //- client.textRenderer.getWidth(textWidget.getText());
-                    int x2 = textWidget.getX() +client.textRenderer.getWidth(textWidget.getDataText())+ client.textRenderer.getWidth(textWidget.getText()) + client.textRenderer.getWidth(" ");
-                    int y1 = textWidget.getY() - client.textRenderer.fontHeight/2 - 2;
-                    int y2 = textWidget.getY() + client.textRenderer.fontHeight/2 + 2;
-                    DrawHelper.fill(matrices, x1, y1, x2, y2, backgroundColor);
-                } else {*/
-                    DrawHelper.fill(matrices, box.x1, box.y1, box.x2, box.y2, backgroundColor);
+                DrawHelper.fill(matrices, box.x1, box.y1, box.x2, box.y2, backgroundColor);
             }
         }
     }

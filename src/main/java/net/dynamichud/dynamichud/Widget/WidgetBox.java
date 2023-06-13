@@ -5,6 +5,10 @@ public class WidgetBox {
     private final int height;
     public int x1 = 0, x2 = 0, y1 = 0, y2 = 0;
 
+    /**
+     Don't use, since you can't render anything using this basically
+     */
+    @Deprecated
     public WidgetBox(int width, int height) {
         this.width = width;
         this.height = height;
