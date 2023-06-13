@@ -51,12 +51,10 @@ import static net.dynamichud.dynamichud.DynamicHUD.*;
 
         ServerLifecycleEvents.SERVER_STOPPING.register(client -> {
             dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE);
-            WidgetAdded=false;
         });
 
         HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
             dynamicutil.render(matrices, tickDelta);
-            DynamicUtil.openDynamicScreen(EditorScreenKeyBinding, Screen);
         });
 
     }
@@ -76,6 +74,10 @@ import static net.dynamichud.dynamichud.DynamicHUD.*;
             widgets.add(new ArmorWidget(mc, EquipmentSlot.LEGS, 0.05f, 0.01f, true, TextureHelper.Position.LEFT, () -> String.valueOf(MinecraftClient.getInstance().getCurrentFps()),()->Color.WHITE));
 
             widgets.add(new ItemWidget(mc,() -> mc.player != null ? mc.player.getInventory().getStack(3) : Items.DIAMOND_AXE.getDefaultStack(), 0.15f, 0.15f, true, TextureHelper.Position.ABOVE, () -> "",()-> Color.RED));
+        for (Widget wigdet : widgets) {
+            dynamicutil.getWidgetManager().addWidget(wigdet);
+        }
+        WidgetAdded = true;
 
     }
 

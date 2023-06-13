@@ -76,7 +76,7 @@ public class MoveableScreen extends AbstractMoveableScreen {
             contextMenu.addOption("Vertical Rainbow", () -> {
                 textWidget.setVerticalRainbow(!textWidget.hasVerticalRainbow());
             });
-            if (!textWidget.getDataText().trim().isEmpty()) {
+            if (!textWidget.getText().trim().isEmpty()) {
                 contextMenu.addOption("TextColor", () -> {
                     textWidget.toggleTextColorOption();
 
