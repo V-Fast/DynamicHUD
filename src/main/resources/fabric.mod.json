@@ -3,7 +3,7 @@
   "id": "dynamichud",
   "version": "${version}",
   "name": "DynamicHUD",
-  "description": "A simple Hud library",
+  "description": "A simple HUD library",
   "authors": [
     "tanishisherewith"
   ],
@@ -14,7 +14,7 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "net.dynamichud.dynamichud.DynamicHUD"
+      "com.tanishisherewith.dynamichud.DynamicHUD"
     ]
   },
   "mixins": [
