@@ -250,7 +250,7 @@ public class ContextMenu {
         }
 
         public void updateLabel() {
-            label = labelPrefix + ": " + getter.get();
+            label = labelPrefix + getter.get();
         }
     }
 
