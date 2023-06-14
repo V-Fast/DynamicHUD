@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.util;
 
+
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.huds.AbstractMoveableScreen;
@@ -16,6 +17,8 @@ import net.minecraft.client.option.KeyBinding;
  */
 public class DynamicUtil extends DrawHelper {
     private final WidgetManager widgetManager; // The WidgetManager instance used by this class
+    public boolean WidgetAdded = false;
+    public boolean WidgetLoaded = false;
 
     /**
      * Constructs a DynamicUtil object.
@@ -47,7 +50,7 @@ public class DynamicUtil extends DrawHelper {
     public void render(DrawContext context, float delta) {
         // Draw each widget
         for (Widget widget : widgetManager.getWidgets()) {
-            if(!MinecraftClient.getInstance().options.debugEnabled || MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
+            if (!MinecraftClient.getInstance().options.debugEnabled || MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
                 if (MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
                     widget.render(context.getMatrices());
                 } else if (widget.isEnabled()) {

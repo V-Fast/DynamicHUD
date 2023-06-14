@@ -2,7 +2,7 @@ package com.tanishisherewith.dynamichud.widget;
 
 import com.tanishisherewith.dynamichud.util.DynamicUtil;
 
-public interface Wigdets {
+public interface IWigdets {
 
     void addWigdets(DynamicUtil dynamicUtil);
 
