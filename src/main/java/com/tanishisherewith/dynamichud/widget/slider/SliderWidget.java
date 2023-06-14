@@ -21,6 +21,11 @@ public class SliderWidget {
     private float value; // The current value of the slider
     private Widget selectedWidget = null;
 
+    private float progress = 0.0f;
+    private float progressSpeed = 0.1f;
+    private float textProgress = 0.0f;
+    private float textProgressSpeed = 0.05f;
+
     /**
      * Constructs a SliderWidget object.
      *
@@ -47,12 +52,6 @@ public class SliderWidget {
         this.maxValue = maxValue;
         this.selectedWidget = selectedWidget;
     }
-
-
-    private float progress = 0.0f;
-    private float progressSpeed = 0.1f;
-    private float textProgress = 0.0f;
-    private float textProgressSpeed = 0.05f;
 
     public void tick() {
         // Update the progress

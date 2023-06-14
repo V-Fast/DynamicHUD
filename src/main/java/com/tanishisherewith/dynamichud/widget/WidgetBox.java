@@ -8,11 +8,11 @@ public class WidgetBox {
     /**
      Don't use, since you can't render anything using this basically
      */
-    @Deprecated
-    public WidgetBox(int width, int height) {
-        this.width = width;
-        this.height = height;
-    }
+//    @Deprecated
+//    public WidgetBox(int width, int height) {
+//        this.width = width;
+//        this.height = height;
+//    }
 
     public WidgetBox(int x1, int y1, int x2, int y2) {
         this.width = x2 - x1;
