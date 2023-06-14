@@ -17,8 +17,9 @@ import net.minecraft.client.util.math.MatrixStack;
  */
 public class DynamicUtil extends DrawableHelper {
     private final WidgetManager widgetManager; // The WidgetManager instance used by this class
-    public boolean WidgetAdded=false;
-    public boolean WidgetLoaded=false;
+    public boolean WidgetAdded = false;
+    public boolean WidgetLoaded = false;
+
     /**
      * Constructs a DynamicUtil object.
      *

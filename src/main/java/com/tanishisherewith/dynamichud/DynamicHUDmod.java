@@ -5,21 +5,13 @@ import com.tanishisherewith.dynamichud.huds.MoveableScreen;
 import com.tanishisherewith.dynamichud.util.DynamicUtil;
 import com.tanishisherewith.dynamichud.util.TextGenerator;
 import com.tanishisherewith.dynamichud.util.WidgetLoading;
+import com.tanishisherewith.dynamichud.widget.IWigdets;
 import com.tanishisherewith.dynamichud.widget.Widget;
-import com.tanishisherewith.dynamichud.widget.Wigdets;
 import com.tanishisherewith.dynamichud.widget.armor.ArmorWidget;
 import com.tanishisherewith.dynamichud.widget.item.ItemWidget;
 import com.tanishisherewith.dynamichud.widget.text.TextWidget;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -31,7 +23,7 @@ import java.util.List;
 
 import static com.tanishisherewith.dynamichud.DynamicHUD.WIDGETS_FILE;
 
-public class DynamicHUDmod implements ClientModInitializer, Wigdets, WidgetLoading {
+public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoading {
     MinecraftClient mc = MinecraftClient.getInstance();
     protected List<Widget> widgets = new ArrayList<>();
     private DynamicUtil dynamicutil;
@@ -39,34 +31,20 @@ public class DynamicHUDmod implements ClientModInitializer, Wigdets, WidgetLoadi
 
     @Override
     public void onInitializeClient() {
-        dynamicutil = new DynamicUtil(mc);
+        dynamicutil = DynamicHUD.getDynamicUtil();
+
         widgets.clear();
 
-        DynamicHUD.setAbstractScreen(new MoveableScreen(Text.of("Editor Screen"), dynamicutil));
+        DynamicHUD.setAbstractScreen(new MoveableScreen(Text.of("Editor Screen"),dynamicutil));
 
-
-        ClientTickEvents.START_CLIENT_TICK.register(server -> {
-            if (mc.player!=null) {
-                if (!WIDGETS_FILE.exists() && !dynamicutil.WidgetAdded) {
-                    addWigdets(dynamicutil);
-                    dynamicutil.WidgetAdded = true;
-
-                }
-                if (WIDGETS_FILE.exists() && !dynamicutil.WidgetLoaded) {
-                    loadWigdets(dynamicutil);
-                    dynamicutil.WidgetLoaded = true;
-                }
-            }
-        });
-        HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
-            dynamicutil.render(matrices, tickDelta);
-        });
+        DynamicHUD.setIWigdets(new DynamicHUDmod());
     }
 
     @Override
     public void addWigdets(DynamicUtil dynamicUtil) {
+        System.out.println("Added widgets");
             widgets.add(new TextWidget(mc, "FPS: ", () -> mc.fpsDebugString.split(" ")[0], 0.5f, 0.5f, true, true, false, -1, -1, true));
-            widgets.add(new TextWidget(mc, "Biome: ", () -> "PLAINS", 0.7f, 0.3f, false, false, false, -1, -1, true));
+            widgets.add(new TextWidget(mc, "Dynamic", () -> "HUD", 0.7f, 0.3f, false, false, false, -1, -1, true));
             widgets.add(new TextWidget(mc, "Ping: ", () -> "", 0.08f, 0.5f, false, false, false, -1, -1, true));
             widgets.add(new TextWidget(mc, "Position: ", () -> "", 0.4f, 0.8f, false, false, false, -1, -1, true));
             widgets.add(new TextWidget(mc, "Day/Night: ", () -> "", 0.83f, 0.8f, false, false, false, -1, -1, true));
@@ -77,9 +55,9 @@ public class DynamicHUDmod implements ClientModInitializer, Wigdets, WidgetLoadi
             widgets.add(new ArmorWidget(mc, EquipmentSlot.LEGS, 0.05f, 0.01f, true, TextureHelper.Position.LEFT, () -> String.valueOf(MinecraftClient.getInstance().getCurrentFps()),()->Color.WHITE));
 
             widgets.add(new ItemWidget(mc,() -> mc.player != null ? mc.player.getInventory().getStack(3) : Items.DIAMOND_AXE.getDefaultStack(), 0.15f, 0.15f, true, TextureHelper.Position.ABOVE, () -> "",()-> Color.RED));
-        for (Widget wigdet : widgets) {
-            dynamicutil.getWidgetManager().addWidget(wigdet);
-        }
+            for (Widget wigdet : widgets) {
+                dynamicUtil.getWidgetManager().addWidget(wigdet);
+            }
     }
 
     @Override
@@ -104,15 +82,15 @@ public class DynamicHUDmod implements ClientModInitializer, Wigdets, WidgetLoadi
                 if (widget instanceof TextWidget textWidget) {
                     TextGenerator textGenerator = TextWidgettext[textIndex++];
                     textWidget.setDataTextGenerator(textGenerator);
-                    dynamicutil.getWidgetManager().addWidget(textWidget);
+                    dynamicUtil.getWidgetManager().addWidget(textWidget);
                 }
                 if (widget instanceof ArmorWidget armorWidget) {
                     TextGenerator textGenerator = ArmorWidgettext[armorIndex++];
                     armorWidget.setTextGenerator(textGenerator);
-                    dynamicutil.getWidgetManager().addWidget(armorWidget);
+                    dynamicUtil.getWidgetManager().addWidget(armorWidget);
                 }
                 if (widget instanceof ItemWidget itemWidget) {
-                    dynamicutil.getWidgetManager().addWidget(itemWidget);
+                    dynamicUtil.getWidgetManager().addWidget(itemWidget);
                 }
             }
         }

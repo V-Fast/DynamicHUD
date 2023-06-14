@@ -2,6 +2,7 @@ package com.tanishisherewith.dynamichud;
 
 import com.tanishisherewith.dynamichud.huds.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.util.DynamicUtil;
+import com.tanishisherewith.dynamichud.widget.IWigdets;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -25,31 +26,60 @@ public class DynamicHUD implements ClientModInitializer {
     ));
     static AbstractMoveableScreen Screen;
     private static String filename = "widgets.nbt";
-    public static final File WIDGETS_FILE = new File(FabricLoader.getInstance().getConfigDir().toFile(), filename);
-    private DynamicUtil dynamicutil;
+    private static File fileDirectory = FabricLoader.getInstance().getConfigDir().toFile();
+    public static final File WIDGETS_FILE = new File(fileDirectory, filename);
+    private static DynamicUtil dynamicutil;
+    private static IWigdets iWigdets;
+    MinecraftClient mc = MinecraftClient.getInstance();
 
     public static void setFilename(String filename) {
         DynamicHUD.filename = filename;
+    }
+
+    public static void setFileDirectory(File fileDirectory) {
+        DynamicHUD.fileDirectory = fileDirectory;
     }
 
     public static void setAbstractScreen(AbstractMoveableScreen screen) {
         Screen = screen;
     }
 
-    public static AbstractMoveableScreen getScreen()
-    {
+    public static AbstractMoveableScreen getScreen() {
         return Screen;
     }
-    MinecraftClient mc=MinecraftClient.getInstance();
+
+    public static void setIWigdets(IWigdets iWigdets) {
+        DynamicHUD.iWigdets = iWigdets;
+    }
+
+    public static DynamicUtil getDynamicUtil() {
+        return dynamicutil;
+    }
+
     @Override
     public void onInitializeClient() {
         dynamicutil = new DynamicUtil(mc);
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> DynamicUtil.openDynamicScreen(EditorScreenKeyBinding, Screen));
 
+        ClientTickEvents.START_CLIENT_TICK.register(server -> {
+            if (mc.player != null && iWigdets != null) {
+                if (!WIDGETS_FILE.exists() && !dynamicutil.WidgetAdded) {
+                    iWigdets.addWigdets(dynamicutil);
+                    dynamicutil.WidgetAdded = true;
+
+                }
+                if (WIDGETS_FILE.exists() && !dynamicutil.WidgetLoaded) {
+                    iWigdets.loadWigdets(dynamicutil);
+                    dynamicutil.WidgetLoaded = true;
+                }
+            }
+        });
         ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> {
             dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE);
         });
-
+        HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
+            dynamicutil.render(matrices, tickDelta);
+        });
     }
 }
