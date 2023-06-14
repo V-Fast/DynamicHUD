@@ -133,9 +133,9 @@ public class TextureHelper extends DrawContext {
         }
 
         // Draw semi-opaque black rectangle
-        if (textBackground) {
-            int backgroundColor = 0x80000000; // ARGB format: 50% opaque black
-            drawContext.fill(textX, textY, textX + textWidth, textY + textHeight, backgroundColor);
+        if (textBackground && !text.trim().isEmpty()) {
+            int backgroundColor = 0x40000000; // ARGB format: 50% opaque black
+            drawContext.fill(textX-1, textY-1, textX + textWidth+1, textY + textHeight+1, backgroundColor);
         }
 
         // Draw the scaled text at the calculated position

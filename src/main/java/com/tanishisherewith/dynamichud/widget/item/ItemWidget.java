@@ -21,13 +21,14 @@ public class ItemWidget extends Widget {
     protected Supplier<Color> color;
     protected TextGenerator textGenerator;
     protected Supplier<ItemStack> itemStack;
+    protected boolean TextBackground;
 
     /**
      * Constructs a Widget object.
      *
      * @param client The Minecraft client instance
      */
-    public ItemWidget(MinecraftClient client, Supplier<ItemStack> itemStack, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator, Supplier<Color> color) {
+    public ItemWidget(MinecraftClient client, Supplier<ItemStack> itemStack, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator, Supplier<Color> color,boolean Textbackground) {
         super(client);
         this.xPercent = xPercent;
         this.yPercent = yPercent;
@@ -36,6 +37,7 @@ public class ItemWidget extends Widget {
         this.currentTextPosition[0] = currentTextPosition;
         this.textGenerator = textGenerator;
         this.color = color;
+        this.TextBackground=Textbackground;
     }
 
     @Override
@@ -101,6 +103,7 @@ public class ItemWidget extends Widget {
         tag.putInt("ItemID", Item.getRawId(getItemStack().getItem()));
         tag.putInt("ItemCount", getItemStack().getMaxCount());
         tag.putString("text", getText());
+        tag.putBoolean("TextBackground",this.TextBackground);
     }
 
     @Override
@@ -120,6 +123,7 @@ public class ItemWidget extends Widget {
             currentTextPosition[0] = TextureHelper.Position.getByUpperCaseName(Position);
         else
             currentTextPosition[0] = TextureHelper.Position.ABOVE;
+        TextBackground=tag.getBoolean("TextBackground");
     }
 
     public ItemStack getItemStack(int itemID, int itemCount) {
@@ -131,6 +135,6 @@ public class ItemWidget extends Widget {
     public void render(DrawContext drawContext) {
         ItemRenderer itemRenderer = client.getItemRenderer();
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        TextureHelper.drawItemTextureWithText(drawContext.getMatrices(),drawContext, itemRenderer, textRenderer, getItemStack(), getX(), getY(), getText(), ColorHelper.ColorToInt(color.get()), currentTextPosition[0], 0.5f);
+        TextureHelper.drawItemTextureWithText(drawContext.getMatrices(),drawContext, itemRenderer, textRenderer, getItemStack(), getX(), getY(), getText(), ColorHelper.ColorToInt(color.get()), currentTextPosition[0], 0.5f,TextBackground);
     }
 }
