@@ -106,7 +106,9 @@ public class TextureHelper {
                                                String text,
                                                int color,
                                                Position position,
-                                               float scale) {
+                                               float scale,
+                                               boolean textBackground
+                                               ) {
         // Calculate the position of the text based on its size and the specified position
         int textWidth = (int) (textRenderer.getWidth(text) * scale);
         int textHeight = (int) (textRenderer.fontHeight * scale);
@@ -129,6 +131,11 @@ public class TextureHelper {
                 textX = x + 18;
                 textY = y + (16 - textHeight) / 2;
             }
+        }
+        // Draw semi-opaque black rectangle
+        if (textBackground) {
+            int backgroundColor = 0x80000000; // ARGB format: 50% opaque black
+            DrawableHelper.fill(matrices, textX, textY, textX + textWidth, textY + textHeight, backgroundColor);
         }
 
         // Draw the scaled text at the calculated position
