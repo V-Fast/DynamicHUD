@@ -7,8 +7,8 @@ import com.tanishisherewith.dynamichud.widget.WidgetBox;
 import com.tanishisherewith.dynamichud.util.TextGenerator;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -128,9 +128,9 @@ public class ItemWidget extends Widget {
     }
 
     @Override
-    public void render(MatrixStack matrices) {
+    public void render(DrawContext drawContext) {
         ItemRenderer itemRenderer = client.getItemRenderer();
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        TextureHelper.drawItemTextureWithText(matrices, itemRenderer, textRenderer, getItemStack(), getX(), getY(), getText(), ColorHelper.ColorToInt(color.get()), currentTextPosition[0], 0.5f);
+        TextureHelper.drawItemTextureWithText(drawContext.getMatrices(),drawContext, itemRenderer, textRenderer, getItemStack(), getX(), getY(), getText(), ColorHelper.ColorToInt(color.get()), currentTextPosition[0], 0.5f);
     }
 }

@@ -1,7 +1,7 @@
 package com.tanishisherewith.dynamichud.widget;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
 
 import java.lang.reflect.Field;
@@ -35,9 +35,8 @@ public abstract class Widget {
     /**
      * Renders the widget on the screen.
      *
-     * @param matrices The matrix stack used for rendering
      */
-    public abstract void render(MatrixStack matrices);
+    public abstract void render(DrawContext drawContext);
 
     /**
      * Returns whether the widget is enabled.

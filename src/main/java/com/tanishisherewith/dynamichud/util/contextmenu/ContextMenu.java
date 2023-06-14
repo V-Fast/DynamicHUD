@@ -5,7 +5,7 @@ import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -128,9 +128,9 @@ public class ContextMenu {
     /**
      * Renders this context menu on screen.
      *
-     * @param matrices - MatrixStack used for rendering.
+     * @param drawContext - MatrixStack used for rendering.
      */
-    public void render(MatrixStack matrices) {
+    public void render(DrawContext drawContext) {
         tick();
         TextRenderer textRenderer = client.textRenderer;
         // Calculate the size of the context menu
@@ -141,14 +141,14 @@ public class ContextMenu {
             height += textRenderer.fontHeight + 2;
         }
         // Apply the scale
-        matrices.push();
-        matrices.translate(x + width / 2.0f + 5, y + height / 2.0f + heightfromwidget, 0);
-        matrices.scale(scale, scale, 1.0f);
-        matrices.translate(-(x + width / 2.0f + 5), -(y + height / 2.0f + heightfromwidget), 0);
+        drawContext.getMatrices().push();
+        drawContext.getMatrices().translate(x + width / 2.0f + 5, y + height / 2.0f + heightfromwidget, 0);
+        drawContext.getMatrices().scale(scale, scale, 1.0f);
+        drawContext.getMatrices().translate(-(x + width / 2.0f + 5), -(y + height / 2.0f + heightfromwidget), 0);
 
         // Draw the background
-        DrawHelper.fill(matrices, x - 2, y + heightfromwidget - 2, x + width + 12, y + height + heightfromwidget + 2, backgroundColor);
-        DrawHelper.drawOutlinedBox(matrices, x - 2, y + heightfromwidget - 2, x + width + 12, y + height + heightfromwidget + 2, ColorHelper.ColorToInt(Color.BLACK));
+        DrawHelper.fill(drawContext, x - 2, y + heightfromwidget - 2, x + width + 12, y + height + heightfromwidget + 2, backgroundColor);
+        DrawHelper.drawOutlinedBox(drawContext, x - 2, y + heightfromwidget - 2, x + width + 12, y + height + heightfromwidget + 2, ColorHelper.ColorToInt(Color.BLACK));
 
         optionY = y + heightfromwidget + 2;
         for (ContextMenuOption option : options) {
@@ -156,17 +156,17 @@ public class ContextMenu {
                 enumOption.updateLabel();
             }
             int color = option.enabled ? 0xFF00FF00 : 0xFFFF0000;
-            textRenderer.draw(matrices, option.label, x + 5, optionY, color);
-            DrawHelper.drawBox(matrices, x + 5 + width, optionY + 3, 5, 5, ColorHelper.ColorToInt(Color.BLACK));
+            drawContext.drawText(textRenderer, option.label, x + 5, optionY, color,false);
+            DrawHelper.drawBox(drawContext, x + 5 + width, optionY + 3, 5, 5, ColorHelper.ColorToInt(Color.BLACK));
             if (option.enabled)
-                DrawHelper.drawBox(matrices, x + 5 + width, optionY + 3, 2, 2, ColorHelper.ColorToInt(Color.WHITE));
+                DrawHelper.drawBox(drawContext, x + 5 + width, optionY + 3, 2, 2, ColorHelper.ColorToInt(Color.WHITE));
             optionY += textRenderer.fontHeight + 2;
         }
 
         if (selectedWidget != null)
             setPosition(selectedWidget.getX(), selectedWidget.getY() + textRenderer.fontHeight + 4);
 
-        matrices.pop();
+        drawContext.getMatrices().pop();
     }
 
     /**

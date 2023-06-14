@@ -4,7 +4,7 @@ import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 
 /**
  * This class represents a slider widget that allows the user to select a value within a specified range.
@@ -70,9 +70,9 @@ public class SliderWidget {
     /**
      * Renders the widget on the screen.
      *
-     * @param matrices The matrix stack used for rendering
+     * @param drawContext The matrix stack used for rendering
      */
-    public void render(MatrixStack matrices) {
+    public void render(DrawContext drawContext) {
         tick();
         // Draw the label
         TextRenderer textRenderer = client.textRenderer;
@@ -80,7 +80,7 @@ public class SliderWidget {
         int labelWidth = textRenderer.getWidth(labelText);
         int labelX = (int) (x + (width - labelWidth) / 2.0f * textProgress)-1;
         int labelY = y + height - textRenderer.fontHeight - 6;
-        textRenderer.draw(matrices, labelText, labelX, labelY, 0xFFFFFFFF);
+        drawContext.drawTextWithShadow(textRenderer,labelText, labelX, labelY, 0xFFFFFFFF);
 
         // Draw the slider
         int sliderWidth = width - 8;
@@ -89,7 +89,7 @@ public class SliderWidget {
         int sliderY = y + height - sliderHeight;
 
         int visibleSliderWidth = (int) (sliderWidth * progress);
-        DrawHelper.fillRoundedRect(matrices, sliderX, sliderY, sliderX + visibleSliderWidth, sliderY + sliderHeight, 0xFFFFFFFF);
+        DrawHelper.fillRoundedRect(drawContext, sliderX, sliderY, sliderX + visibleSliderWidth, sliderY + sliderHeight, 0xFFFFFFFF);
 
         // Draw the handle
         float handleWidth = 4;
@@ -98,7 +98,7 @@ public class SliderWidget {
         float handleY = sliderY + ((sliderHeight - handleHeight) / 2 );
 
         if (progress >= 1.0f) {
-            DrawHelper.fillRoundedRect(matrices, (int) handleX, (int) handleY, (int) (handleX + handleWidth), (int) (handleY + handleHeight), 0xFFFFFFFF);
+            DrawHelper.fillRoundedRect(drawContext, (int) handleX, (int) handleY, (int) (handleX + handleWidth), (int) (handleY + handleHeight), 0xFFFFFFFF);
         }
 
         if (selectedWidget != null)

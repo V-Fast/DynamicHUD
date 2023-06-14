@@ -11,7 +11,7 @@ import com.tanishisherewith.dynamichud.widget.slider.SliderWidgetBuilder;
 import com.tanishisherewith.dynamichud.widget.text.TextWidget;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
 import java.awt.*;
@@ -31,9 +31,9 @@ public class MoveableScreen extends AbstractMoveableScreen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        super.render(matrices, mouseX, mouseY, delta);
-        MinecraftClient.getInstance().textRenderer.drawWithShadow(matrices, "Editor Screen", MinecraftClient.getInstance().getWindow().getScaledWidth() / 2f - textRenderer.getWidth("Editor Screen") / 2f, 5, ColorHelper.ColorToInt(Color.WHITE), false);
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+        super.render(drawContext, mouseX, mouseY, delta);
+        drawContext.drawTextWithShadow(textRenderer,"Editors Screen", (int) (MinecraftClient.getInstance().getWindow().getScaledWidth() / 2f - textRenderer.getWidth("Editor Screen") / 2f),5,ColorHelper.ColorToInt(Color.WHITE));
     }
 
     @Override

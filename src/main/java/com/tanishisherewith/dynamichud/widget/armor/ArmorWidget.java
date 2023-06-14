@@ -7,8 +7,8 @@ import com.tanishisherewith.dynamichud.widget.WidgetBox;
 import com.tanishisherewith.dynamichud.util.TextGenerator;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -47,15 +47,13 @@ public class ArmorWidget extends Widget {
     /**
      * Renders the widget on the screen.
      *
-     * @param matrices The matrix stack used for rendering
      */
     @Override
-    public void render(MatrixStack matrices) {
+    public void render(DrawContext drawContext) {
         ItemRenderer itemRenderer = client.getItemRenderer();
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
         ItemStack armorItem = client.player.getEquippedStack(slot);
-        //TextureHelper.drawItemTexture(matrices, itemRenderer, armorItem, getX(), getY());
-        TextureHelper.drawItemTextureWithText(matrices, itemRenderer, textRenderer, armorItem, getX(), getY(), getText(), ColorHelper.ColorToInt(getColor()), currentTextPosition[0], 0.5f);
+        TextureHelper.drawItemTextureWithText(drawContext.getMatrices(),drawContext, itemRenderer, textRenderer, armorItem, getX(), getY(), getText(), ColorHelper.ColorToInt(getColor()), currentTextPosition[0], 0.5f);
     }
 
     @Override

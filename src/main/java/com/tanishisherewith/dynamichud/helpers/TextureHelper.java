@@ -3,54 +3,53 @@ package com.tanishisherewith.dynamichud.helpers;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
 
 /**
  * This class provides helper methods for drawing textures on the screen.
  */
-public class TextureHelper {
+public class TextureHelper extends DrawContext {
+    public TextureHelper(MinecraftClient client, VertexConsumerProvider.Immediate vertexConsumers) {
+        super(client, vertexConsumers);
+    }
+
     /**
      * Draws an item texture on the screen.
      *
-     * @param matrices    The matrix stack used for rendering
-     * @param itemRenderer The item renderer instance used for rendering the item texture
      * @param itemStack   The item stack to render the texture for
      * @param x           The x position to draw the texture at
      * @param y           The y position to draw the texture at
      */
-    public static void drawItemTexture(MatrixStack matrices,
-                                       ItemRenderer itemRenderer,
+    public static void drawItemTexture(DrawContext drawContext,
                                        ItemStack itemStack,
                                        int x,
                                        int y) {
-        itemRenderer.renderInGui(matrices,itemStack, x, y);
+        drawContext.drawItem(itemStack,x,y);
     }
 
     /**
      * Draws the texture of the item in the player's main hand on the screen.
      *
-     * @param matrices    The matrix stack used for rendering
-     * @param itemRenderer The item renderer instance used for rendering the item texture
      * @param client      The Minecraft client instance
      * @param x           The x position to draw the texture at
      * @param y           The y position to draw the texture at
      */
-    public static void drawMainHandTexture(MatrixStack matrices,
-                                           ItemRenderer itemRenderer,
+    public static void drawMainHandTexture(DrawContext drawContext,
                                            MinecraftClient client,
                                            int x,
                                            int y) {
         assert client.player != null;
         ItemStack mainHandItem = client.player.getMainHandStack();
-        drawItemTexture(matrices, itemRenderer, mainHandItem, x, y);
+        drawItemTexture(drawContext,mainHandItem, x, y);
     }
     /**
      * Draws a textured rectangle on the screen.
      *
-     * @param matrices The matrix stack used for rendering
      * @param x        The x position of the top left corner of the rectangle
      * @param y        The y position of the top left corner of the rectangle
      * @param u        The x position of the texture within the texture image
@@ -60,14 +59,13 @@ public class TextureHelper {
      * @param textureWidth  The width of the texture image
      * @param textureHeight The height of the texture image
      */
-    public static void drawTexture(MatrixStack matrices, int x, int y, int u, int v, int width, int height, int textureWidth, int textureHeight) {
-        DrawableHelper.drawTexture(matrices, x, y, u, v, width, height, textureWidth, textureHeight);
+    public static void drawTexture(DrawContext drawContext, Identifier texture, int x, int y, int u, int v, int width, int height, int textureWidth, int textureHeight) {
+        drawContext.drawTexture(texture, x, y, u, v, width, height, textureWidth, textureHeight);
     }
 
     /**
      * Draws a textured rectangle on the screen with a specified color.
      *
-     * @param matrices The matrix stack used for rendering
      * @param x        The x position of the top left corner of the rectangle
      * @param y        The y position of the top left corner of the rectangle
      * @param u        The x position of the texture within the texture image
@@ -76,12 +74,12 @@ public class TextureHelper {
      * @param height   The height of the rectangle
      * @param color    The color to draw the rectangle with
      */
-    public static void drawTexturedRect(MatrixStack matrices, int x, int y, int u, int v, int width, int height, int color) {
+    public static void drawTexturedRect(DrawContext drawContext,Identifier texture, int x, int y, int u, int v, int width, int height, int color) {
         RenderSystem.setShaderColor((color >> 16 & 255) / 255.0F,
                 (color >> 8 & 255) / 255.0F,
                 (color & 255) / 255.0F,
                 (color >> 24 & 255) / 255.0F);
-        DrawableHelper.drawTexture(matrices, x, y, u, v, width, height);
+        drawContext.drawTexture(texture, x, y, u, v, width, height);
     }
     /**
      * Draws an item texture on the screen with text at a specified position relative to it.
@@ -98,6 +96,7 @@ public class TextureHelper {
      * @param scale       The scale factor to apply to the text (1.0 is normal size)
      */
     public static void drawItemTextureWithText(MatrixStack matrices,
+                                               DrawContext drawContext,
                                                ItemRenderer itemRenderer,
                                                TextRenderer textRenderer,
                                                ItemStack itemStack,
@@ -136,11 +135,11 @@ public class TextureHelper {
         matrices.scale(scale, scale, 1.0f);
         float scaledX = textX / scale;
         float scaledY = textY / scale;
-        textRenderer.draw(matrices, text, scaledX, scaledY, color);
+        drawContext.drawText(textRenderer, text, (int) scaledX, (int) scaledY, color,false);
         matrices.pop();
 
         // Draw the item texture
-        itemRenderer.renderInGui(matrices,itemStack, x, y);
+        drawContext.drawItem(itemStack, x, y);
     }
 
     public enum Position {

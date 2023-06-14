@@ -5,7 +5,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
-import net.minecraft.client.util.math.MatrixStack;
 import org.joml.Matrix4f;
 
 public class DrawHelper extends DrawContext {
@@ -16,19 +15,19 @@ public class DrawHelper extends DrawContext {
     /**
      * Fills a box on the screen with a specified color.
      *
-     * @param matrices The matrix stack used for rendering
+     * @param drawContext The matrix stack used for rendering
      * @param x        The x position of the rectangle
      * @param y        The y position of the rectangle
      * @param width    The width of the rectangle
      * @param height   The height of the rectangle
      * @param color    The color to fill the rectangle with
      */
-    public static void drawBox(MatrixStack matrices, int x, int y, int width, int height, int color) {
+    public static void drawBox(DrawContext drawContext, int x, int y, int width, int height, int color) {
         int x1 = x - width / 2 - 2;
         int y1 = y - height / 2 - 2;
         int x2 = x + width / 2 + 2;
         int y2 = y + height / 2 + 2;
-        fill(matrices, x1, y1, x2, y2, color);
+        drawContext.fill(x1, y1, x2, y2, color);
     }
 
     /**
@@ -40,32 +39,12 @@ public class DrawHelper extends DrawContext {
      * @param y2       The y position of the bottom right corner of the rectangle
      * @param color    The color to fill the rectangle with
      */
-    public void fill(int x1, int y1, int x2, int y2, int color) {
-        this.fill(RenderLayer.getGui(), x1, y1, x2, y2, color);
-    }
-
-    /**
-     * Draws text on the screen with a shadow.
-     *
-     * @param matrices     The matrix stack used for rendering
-     * @param textRenderer The text renderer instance used for rendering the text
-     * @param text         The text to draw
-     * @param x            The x position to draw the text at
-     * @param y            The y position to draw the text at
-     * @param color        The color to draw the text with
-     */
-    public static void drawTextWithShadow(MatrixStack matrices,
-                                          TextRenderer textRenderer,
-                                          String text,
-                                          int x,
-                                          int y,
-                                          int color) {
-        textRenderer.drawWithShadow(matrices, text, x, y, color);
+    public static void fill(DrawContext drawContext, int x1, int y1, int x2, int y2, int color) {
+        drawContext.fill(x1, y1, x2, y2, color);
     }
 
     /**
      * Draws text on screen.
-     * TODO: Also fix this
      *
      * @param textRenderer - TextRenderer instance used for rendering.
      * @param text         - Text to be drawn.
@@ -73,13 +52,14 @@ public class DrawHelper extends DrawContext {
      * @param y            - Y position to draw at.
      * @param color        - Color to draw with.
      */
-    public static void drawText(TextRenderer textRenderer,
+    public static void drawText(DrawContext drawContext,
+                                TextRenderer textRenderer,
                                 String text,
                                 int x,
                                 int y,
                                 int color,
                                 boolean shadow) {
-        textRenderer.draw(text, x, y, color, shadow);
+        drawContext.drawText(textRenderer,text, x, y, color, shadow);
     }
 
     /**
@@ -137,12 +117,12 @@ public class DrawHelper extends DrawContext {
         RenderSystem.disableBlend();
     }
 
-    public void fillRoundedRect(MatrixStack matrices, int left, int top, int right, int bottom, int color) {
-        fill(RenderLayer.getGui(), left + 1, top, right - 1, top + 1, color);
-        fill(RenderLayer.getGui(), left + 1, bottom - 1, right - 1, bottom, color);
-        fill(RenderLayer.getGui(), left, top + 1, left + 1, bottom - 1, color);
-        fill(RenderLayer.getGui(), right - 1, top + 1, right, bottom - 1, color);
-        fill(RenderLayer.getGui(), left + 1, top + 1, right - 1, bottom - 1, color);
+    public static void fillRoundedRect(DrawContext drawContext, int left, int top, int right, int bottom, int color) {
+        drawContext.fill( left + 1, top, right - 1, top + 1, color);
+        drawContext.fill( left + 1, bottom - 1, right - 1, bottom, color);
+        drawContext.fill(left, top + 1, left + 1, bottom - 1, color);
+        drawContext.fill(right - 1, top + 1, right, bottom - 1, color);
+        drawContext.fill(left + 1, top + 1, right - 1, bottom - 1, color);
     }
 
     /**
@@ -181,18 +161,17 @@ public class DrawHelper extends DrawContext {
     /**
      * Draws an outlined box on the screen.
      *
-     * @param matrices The matrix stack used for rendering
      * @param x1       The x position of the top left corner of the box
      * @param y1       The y position of the top left corner of the box
      * @param x2       The x position of the bottom right corner of the box
      * @param y2       The y position of the bottom right corner of the box
      * @param color    The color to draw the box with
      */
-    public void drawOutlinedBox(MatrixStack matrices, int x1, int y1, int x2, int y2, int color) {
-        fill(RenderLayer.getGui(), x1, y1, x2, y1 + 1, color);
-        fill(RenderLayer.getGui(), x1, y2 - 1, x2, y2, color);
-        fill(RenderLayer.getGui(), x1, y1 + 1, x1 + 1, y2 - 1, color);
-        fill(RenderLayer.getGui(), x2 - 1, y1 + 1, x2, y2 - 1, color);
+    public static void drawOutlinedBox(DrawContext drawContext, int x1, int y1, int x2, int y2, int color) {
+        drawContext.fill( x1, y1, x2, y1 + 1, color);
+        drawContext.fill( x1, y2 - 1, x2, y2, color);
+        drawContext.fill( x1, y1 + 1, x1 + 1, y2 - 1, color);
+        drawContext.fill( x2 - 1, y1 + 1, x2, y2 - 1, color);
     }
 
 }

@@ -1,8 +1,7 @@
 package com.tanishisherewith.dynamichud.util.colorpicker;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 
 public class ColorPickerButton {
     private final int x;
@@ -18,10 +17,10 @@ public class ColorPickerButton {
         this.height = height;
     }
 
-    public void render(MatrixStack matrices) {
+    public void render(DrawContext drawContext) {
         // Draw the button
-        DrawableHelper.fill(matrices, x, y, x + width, y + height, 0xFFAAAAAA);
-        DrawableHelper.drawCenteredTextWithShadow(matrices, MinecraftClient.getInstance().textRenderer, "Pick", x + width / 2, y + (height - 8) / 2, 0xFFFFFFFF);
+        drawContext.fill( x, y, x + width, y + height, 0xFFAAAAAA);
+        drawContext.drawCenteredTextWithShadow( MinecraftClient.getInstance().textRenderer, "Pick", x + width / 2, y + (height - 8) / 2, 0xFFFFFFFF);
     }
 
     public boolean onClick(double mouseX, double mouseY, int button) {

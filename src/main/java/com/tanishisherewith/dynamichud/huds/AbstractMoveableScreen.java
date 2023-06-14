@@ -12,7 +12,6 @@ import com.tanishisherewith.dynamichud.widget.Widget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 public abstract class AbstractMoveableScreen extends Screen {
@@ -143,18 +142,18 @@ public abstract class AbstractMoveableScreen extends Screen {
 
         // Draw each widget
         for (Widget widget : dynamicutil.getWidgetManager().getWidgets()) {
-            widget.render(drawContext.getMatrices());
+            widget.render(drawContext);
         }
 
         // Draw the slider and other stuff
         if (Slider != null) {
-            Slider.render(drawContext.getMatrices());
+            Slider.render(drawContext);
         }
         if (contextMenu != null) {
-            contextMenu.render(drawContext.getMatrices());
+            contextMenu.render(drawContext);
         }
         if (colorPicker != null) {
-            colorPicker.render(drawContext.getMatrices());
+            colorPicker.render(drawContext);
         }
         updateMouseHandler(colorPicker, contextMenu, Slider);
     }

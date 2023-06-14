@@ -3,9 +3,8 @@ package com.tanishisherewith.dynamichud.util.colorpicker;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.GlAllocationUtils;
-import net.minecraft.client.util.math.MatrixStack;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -46,11 +45,11 @@ public class ColorGradientPicker {
         gradientBox.tick();
     }
 
-    public void render(MatrixStack matrices) {
+    public void render(DrawContext drawContext) {
         tick();
-        gradientSlider.render(matrices);
-        gradientBox.render(matrices);
-        colorPickerButton.render(matrices);
+        gradientSlider.render(drawContext);
+        gradientBox.render(drawContext);
+        colorPickerButton.render(drawContext);
         if (colorPickerButton.isPicking()) {
             // Draw the cursor
             double mouseX = client.mouse.getX() * client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
@@ -66,8 +65,8 @@ public class ColorGradientPicker {
             int green = buffer.get(1) & 0xFF;
             int blue = buffer.get(2) & 0xFF;
 
-            DrawableHelper.fill(matrices, (int) mouseX + 10, (int) mouseY, (int) mouseX + 26, (int) mouseY + 16, -1);
-            DrawableHelper.fill(matrices, (int) mouseX + 11, (int) mouseY + 1, (int) mouseX + 25, (int) mouseY + 15, (red << 16) | (green << 8) | blue | 0xFF000000);
+            drawContext.fill( (int) mouseX + 10, (int) mouseY, (int) mouseX + 26, (int) mouseY + 16, -1);
+            drawContext.fill( (int) mouseX + 11, (int) mouseY + 1, (int) mouseX + 25, (int) mouseY + 15, (red << 16) | (green << 8) | blue | 0xFF000000);
         }
     }
 
