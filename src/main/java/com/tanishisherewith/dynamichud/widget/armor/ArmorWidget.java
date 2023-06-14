@@ -24,7 +24,7 @@ public class ArmorWidget extends Widget {
     protected EquipmentSlot slot; // The equipment slot to display the armor item from
     protected TextGenerator textGenerator;
     protected Supplier<Color> color;
-
+    protected boolean TextBackground;
     /**
      * Constructs an ArmorWidget object.
      *
@@ -33,7 +33,7 @@ public class ArmorWidget extends Widget {
      * @param xPercent The x position of the widget as a percentage of the screen width
      * @param yPercent The y position of the widget as a percentage of the screen height
      */
-    public ArmorWidget(MinecraftClient client, EquipmentSlot slot, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator, Supplier<Color> color) {
+    public ArmorWidget(MinecraftClient client, EquipmentSlot slot, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator, Supplier<Color> color,boolean Textbackground) {
         super(client);
         this.slot = slot;
         this.xPercent = xPercent;
@@ -42,6 +42,7 @@ public class ArmorWidget extends Widget {
         this.currentTextPosition[0] = currentTextPosition;
         this.textGenerator = textGenerator;
         this.color = color;
+        this.TextBackground=Textbackground;
     }
 
     /**
@@ -53,8 +54,9 @@ public class ArmorWidget extends Widget {
         ItemRenderer itemRenderer = client.getItemRenderer();
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
         ItemStack armorItem = client.player.getEquippedStack(slot);
-        TextureHelper.drawItemTextureWithText(drawContext.getMatrices(),drawContext, itemRenderer, textRenderer, armorItem, getX(), getY(), getText(), ColorHelper.ColorToInt(getColor()), currentTextPosition[0], 0.5f);
+        TextureHelper.drawItemTextureWithText(drawContext.getMatrices(),drawContext, itemRenderer, textRenderer, armorItem, getX(), getY(), getText(), ColorHelper.ColorToInt(getColor()), currentTextPosition[0], 0.5f,TextBackground);
     }
+
 
     @Override
     public WidgetBox getWidgetBox() {
@@ -112,6 +114,7 @@ public class ArmorWidget extends Widget {
         tag.putString("Position", String.valueOf(this.currentTextPosition[0]));
         if(this.getText()!=null) tag.putString("text",this.getText());
         tag.putInt("Color",this.getColor().getRGB());
+        tag.putBoolean("TextBackground",this.TextBackground);
     }
 
     @Override
@@ -127,5 +130,6 @@ public class ArmorWidget extends Widget {
             currentTextPosition[0] = TextureHelper.Position.getByUpperCaseName(Position);
         else
             currentTextPosition[0] = TextureHelper.Position.ABOVE;
+        TextBackground=tag.getBoolean("TextBackground");
     }
 }

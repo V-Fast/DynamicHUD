@@ -243,7 +243,7 @@ public class ContextMenu {
         private final Supplier<T> getter;
 
         public EnumCycleContextMenuOption(String labelPrefix, T[] values, Supplier<T> getter, Runnable action) {
-            super(labelPrefix + ": " + getter.get(), action);
+            super(labelPrefix + getter.get(), action);
             this.labelPrefix = labelPrefix;
             this.values = values;
             this.getter = getter;

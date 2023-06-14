@@ -20,7 +20,7 @@ public interface WidgetLoading {
             return widget;
         }
         if (className.equals(ArmorWidget.class.getName())) {
-            ArmorWidget widget = new ArmorWidget(MinecraftClient.getInstance(), EquipmentSlot.CHEST, 0, 0, false, TextureHelper.Position.ABOVE, () -> "", () -> Color.RED);
+            ArmorWidget widget = new ArmorWidget(MinecraftClient.getInstance(), EquipmentSlot.CHEST, 0, 0, false, TextureHelper.Position.ABOVE, () -> "", () -> Color.RED,true);
             widget.readFromTag(widgetTag);
             return widget;
         }

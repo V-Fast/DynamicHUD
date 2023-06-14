@@ -105,7 +105,9 @@ public class TextureHelper extends DrawContext {
                                                String text,
                                                int color,
                                                Position position,
-                                               float scale) {
+                                               float scale,
+                                               boolean textBackground
+                                              ) {
         // Calculate the position of the text based on its size and the specified position
         int textWidth = (int) (textRenderer.getWidth(text) * scale);
         int textHeight = (int) (textRenderer.fontHeight * scale);
@@ -130,6 +132,12 @@ public class TextureHelper extends DrawContext {
             }
         }
 
+        // Draw semi-opaque black rectangle
+        if (textBackground) {
+            int backgroundColor = 0x80000000; // ARGB format: 50% opaque black
+            drawContext.fill(textX, textY, textX + textWidth, textY + textHeight, backgroundColor);
+        }
+
         // Draw the scaled text at the calculated position
         matrices.push();
         matrices.scale(scale, scale, 1.0f);
@@ -141,6 +149,7 @@ public class TextureHelper extends DrawContext {
         // Draw the item texture
         drawContext.drawItem(itemStack, x, y);
     }
+
 
     public enum Position {
         ABOVE ("Above"),
