@@ -7,14 +7,14 @@ import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
 import com.tanishisherewith.dynamichud.widget.WidgetManager;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.math.MatrixStack;
 
 /**
  * This class provides utility methods for working with the DynamicHUD mod.
  */
-public class DynamicUtil extends DrawableHelper {
+public class DynamicUtil extends DrawHelper {
     private final WidgetManager widgetManager; // The WidgetManager instance used by this class
 
     /**
@@ -41,17 +41,17 @@ public class DynamicUtil extends DrawableHelper {
     /**
      * Renders widgets on screen.
      *
-     * @param matrices  - MatrixStack used for rendering.
-     * @param tickDelta - Time elapsed since last frame in seconds.
+     * @param context   - MatrixStack used for rendering.
+     * @param delta - Time elapsed since last frame in seconds.
      */
-    public void render(MatrixStack matrices, float tickDelta) {
+    public void render(DrawContext context, float delta) {
         // Draw each widget
         for (Widget widget : widgetManager.getWidgets()) {
             if(!MinecraftClient.getInstance().options.debugEnabled || MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
                 if (MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
-                    widget.render(matrices);
+                    widget.render(context.getMatrices());
                 } else if (widget.isEnabled()) {
-                    widget.render(matrices);
+                    widget.render(context.getMatrices());
                 }
             }
 
@@ -59,7 +59,7 @@ public class DynamicUtil extends DrawableHelper {
             if (MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
                 int backgroundColor = widget.isEnabled() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
                 WidgetBox box = widget.getWidgetBox();
-                DrawHelper.fill(matrices, box.x1, box.y1, box.x2, box.y2, backgroundColor);
+                DrawHelper.fill(context.getMatrices(), box.x1, box.y1, box.x2, box.y2, backgroundColor);
             }
         }
     }

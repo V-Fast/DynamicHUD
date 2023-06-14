@@ -1,16 +1,18 @@
 package com.tanishisherewith.dynamichud.helpers;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import org.joml.Matrix4f;
 
-public class DrawHelper extends DrawableHelper {
+public class DrawHelper extends DrawContext {
+    public DrawHelper(MinecraftClient client, VertexConsumerProvider.Immediate vertexConsumers) {
+        super(client, vertexConsumers);
+    }
+
     /**
      * Fills a box on the screen with a specified color.
      *
@@ -32,15 +34,14 @@ public class DrawHelper extends DrawableHelper {
     /**
      * Fills a rectangle on the screen with a specified color.
      *
-     * @param matrices The matrix stack used for rendering
      * @param x1       The x position of the top left corner of the rectangle
      * @param y1       The y position of the top left corner of the rectangle
      * @param x2       The x position of the bottom right corner of the rectangle
      * @param y2       The y position of the bottom right corner of the rectangle
      * @param color    The color to fill the rectangle with
      */
-    public static void fill(MatrixStack matrices, int x1, int y1, int x2, int y2, int color) {
-        DrawableHelper.fill(matrices, x1, y1, x2, y2, color);
+    public void fill(int x1, int y1, int x2, int y2, int color) {
+        this.fill(RenderLayer.getGui(), x1, y1, x2, y2, color);
     }
 
     /**
@@ -64,21 +65,21 @@ public class DrawHelper extends DrawableHelper {
 
     /**
      * Draws text on screen.
+     * TODO: Also fix this
      *
-     * @param matrices     - MatrixStack used for rendering.
      * @param textRenderer - TextRenderer instance used for rendering.
      * @param text         - Text to be drawn.
      * @param x            - X position to draw at.
      * @param y            - Y position to draw at.
      * @param color        - Color to draw with.
      */
-    public static void drawText(MatrixStack matrices,
-                                TextRenderer textRenderer,
+    public static void drawText(TextRenderer textRenderer,
                                 String text,
                                 int x,
                                 int y,
-                                int color) {
-        textRenderer.draw(matrices, text, x, y, color);
+                                int color,
+                                boolean shadow) {
+        textRenderer.draw(text, x, y, color, shadow);
     }
 
     /**
@@ -136,12 +137,12 @@ public class DrawHelper extends DrawableHelper {
         RenderSystem.disableBlend();
     }
 
-    public static void fillRoundedRect(MatrixStack matrices, int left, int top, int right, int bottom, int color) {
-        DrawableHelper.fill(matrices, left + 1, top, right - 1, top + 1, color);
-        DrawableHelper.fill(matrices, left + 1, bottom - 1, right - 1, bottom, color);
-        DrawableHelper.fill(matrices, left, top + 1, left + 1, bottom - 1, color);
-        DrawableHelper.fill(matrices, right - 1, top + 1, right, bottom - 1, color);
-        DrawableHelper.fill(matrices, left + 1, top + 1, right - 1, bottom - 1, color);
+    public void fillRoundedRect(MatrixStack matrices, int left, int top, int right, int bottom, int color) {
+        fill(RenderLayer.getGui(), left + 1, top, right - 1, top + 1, color);
+        fill(RenderLayer.getGui(), left + 1, bottom - 1, right - 1, bottom, color);
+        fill(RenderLayer.getGui(), left, top + 1, left + 1, bottom - 1, color);
+        fill(RenderLayer.getGui(), right - 1, top + 1, right, bottom - 1, color);
+        fill(RenderLayer.getGui(), left + 1, top + 1, right - 1, bottom - 1, color);
     }
 
     /**
@@ -187,11 +188,11 @@ public class DrawHelper extends DrawableHelper {
      * @param y2       The y position of the bottom right corner of the box
      * @param color    The color to draw the box with
      */
-    public static void drawOutlinedBox(MatrixStack matrices, int x1, int y1, int x2, int y2, int color) {
-        fill(matrices, x1, y1, x2, y1 + 1, color);
-        fill(matrices, x1, y2 - 1, x2, y2, color);
-        fill(matrices, x1, y1 + 1, x1 + 1, y2 - 1, color);
-        fill(matrices, x2 - 1, y1 + 1, x2, y2 - 1, color);
+    public void drawOutlinedBox(MatrixStack matrices, int x1, int y1, int x2, int y2, int color) {
+        fill(RenderLayer.getGui(), x1, y1, x2, y1 + 1, color);
+        fill(RenderLayer.getGui(), x1, y2 - 1, x2, y2, color);
+        fill(RenderLayer.getGui(), x1, y1 + 1, x1 + 1, y2 - 1, color);
+        fill(RenderLayer.getGui(), x2 - 1, y1 + 1, x2, y2 - 1, color);
     }
 
 }

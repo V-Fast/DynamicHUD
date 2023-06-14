@@ -10,6 +10,7 @@ import com.tanishisherewith.dynamichud.util.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.util.DynamicUtil;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
@@ -131,29 +132,29 @@ public abstract class AbstractMoveableScreen extends Screen {
     /**
      * Renders this screen and its widgets on the screen.
      *
-     * @param matrices The matrix stack used for rendering
-     * @param mouseX   The current x position of the mouse cursor
-     * @param mouseY   The current y position of the mouse cursor
-     * @param delta    The time elapsed since the last frame in seconds
+     * @param drawContext The matrix stack used for rendering
+     * @param mouseX      The current x position of the mouse cursor
+     * @param mouseY      The current y position of the mouse cursor
+     * @param delta       The time elapsed since the last frame in seconds
      */
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        super.render(matrices, mouseX, mouseY, delta);
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+        super.render(drawContext, mouseX, mouseY, delta);
 
         // Draw each widget
         for (Widget widget : dynamicutil.getWidgetManager().getWidgets()) {
-            widget.render(matrices);
+            widget.render(drawContext.getMatrices());
         }
 
         // Draw the slider and other stuff
         if (Slider != null) {
-            Slider.render(matrices);
+            Slider.render(drawContext.getMatrices());
         }
         if (contextMenu != null) {
-            contextMenu.render(matrices);
+            contextMenu.render(drawContext.getMatrices());
         }
         if (colorPicker != null) {
-            colorPicker.render(matrices);
+            colorPicker.render(drawContext.getMatrices());
         }
         updateMouseHandler(colorPicker, contextMenu, Slider);
     }

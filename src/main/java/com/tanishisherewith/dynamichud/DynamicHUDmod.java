@@ -54,9 +54,9 @@ public class DynamicHUDmod implements ClientModInitializer, Wigdets, WidgetLoadi
             dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE);
         });
 
-        HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
-            dynamicutil.render(matrices, tickDelta);
-        });
+        HudRenderCallback.EVENT.register(((drawContext, tickDelta) -> {
+            dynamicutil.render(drawContext, tickDelta);
+        }));
 
     }
 
