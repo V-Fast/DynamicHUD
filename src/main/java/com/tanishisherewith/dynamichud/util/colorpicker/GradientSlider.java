@@ -3,8 +3,7 @@ package com.tanishisherewith.dynamichud.util.colorpicker;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 
@@ -54,16 +53,16 @@ public class GradientSlider {
         this.y = y;
     }
 
-    public void render(MatrixStack matrices) {
+    public void render(DrawContext drawContext) {
 
-        DrawHelper.drawOutlinedBox(matrices, x - 2, y - 2, x + width + 2, y + height + 2, -1);
+        DrawHelper.drawOutlinedBox(drawContext, x - 2, y - 2, x + width + 2, y + height + 2, -1);
 
         // Draw the gradient
         for (int i = 0; i < width; i++) {
             float hue = (float) i / width;
             int color = Color.HSBtoRGB(hue, 1.0f, 1.0f);
             color = (color & 0x00FFFFFF) | ((int) (alpha * 255) << 24);
-            DrawableHelper.fill(matrices, x + i, y, x + i + 1, y + height, color);
+            drawContext.fill( x + i, y, x + i + 1, y + height, color);
         }
 
         // Draw the handle
@@ -73,7 +72,7 @@ public class GradientSlider {
             float handleX = x + hue * width - handleWidth / 2.0f;
             float handleY = y - (handleHeight - height) / 2.0f;
 
-            DrawHelper.fillRoundedRect(matrices, (int) handleX, (int) handleY, (int) (handleX + handleWidth), (int) (handleY + handleHeight), -1);
+            DrawHelper.fillRoundedRect(drawContext, (int) handleX, (int) handleY, (int) (handleX + handleWidth), (int) (handleY + handleHeight), -1);
         }
         if (this.selectedWidget != null)
             setPosition(selectedWidget.getX() + 30, selectedWidget.getY() + MinecraftClient.getInstance().textRenderer.fontHeight + 4);

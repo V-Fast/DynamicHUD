@@ -8,6 +8,7 @@ import com.tanishisherewith.dynamichud.widget.WidgetBox;
 import com.tanishisherewith.dynamichud.util.TextGenerator;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 
@@ -227,10 +228,9 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     /**
      * Renders this widget on screen.
      *
-     * @param matrices - MatrixStack used for rendering.
      */
     @Override
-    public void render(MatrixStack matrices) {
+    public void render(DrawContext drawContext) {
         int x = getX();
         int y = getY();
         String CombinedText = getText() + getDataText();
@@ -240,7 +240,7 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
                 int color = ColorHelper.getColorFromHue(hue);
                 String character = String.valueOf(CombinedText.charAt(i));
                 int characterWidth = client.textRenderer.getWidth(character);
-                drawText(matrices, character, x + 2, y - 4, color);
+                drawText(drawContext, character, x + 2, y - 4, color);
                 x += characterWidth;
                 hue += verticalRainbow ? 0.05f : 0.1f;
                 if (hue >= 1) hue -= 1;
@@ -248,8 +248,8 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         } else {
             int Textcolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Textcolor;
             int Datacolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Datacolor;
-            drawText(matrices, getText(), getX() + 2, getY() - 4, Textcolour);
-            drawText(matrices, getDataText(), getX() + client.textRenderer.getWidth(getText()) + 2, getY() - 4, Datacolour);
+            drawText(drawContext, getText(), getX() + 2, getY() - 4, Textcolour);
+            drawText(drawContext, getDataText(), getX() + client.textRenderer.getWidth(getText()) + 2, getY() - 4, Datacolour);
         }
     }
 
@@ -282,11 +282,8 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         text = tag.getString("Text");
     }
 
-    private void drawText(MatrixStack matrices, String text, int x, int y, int color) {
-        if (shadow)
-            DrawHelper.drawTextWithShadow(matrices, client.textRenderer, text, x, y, color);
-        else
-            DrawHelper.drawText(matrices, client.textRenderer, text, x, y, color);
+    private void drawText(DrawContext drawContext, String text, int x, int y, int color) {
+            DrawHelper.drawText(drawContext,client.textRenderer, text, x, y, color,shadow);
     }
 
     @Override

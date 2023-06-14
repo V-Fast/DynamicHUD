@@ -78,8 +78,8 @@ public class DynamicHUD implements ClientModInitializer {
         ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> {
             dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE);
         });
-        HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
-            dynamicutil.render(matrices, tickDelta);
+        HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
+            dynamicutil.render(drawContext, tickDelta);
         });
     }
 }

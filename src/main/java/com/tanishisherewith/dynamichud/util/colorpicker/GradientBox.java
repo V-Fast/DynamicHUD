@@ -3,8 +3,7 @@ package com.tanishisherewith.dynamichud.util.colorpicker;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 
@@ -36,8 +35,8 @@ public class GradientBox {
         }
     }
 
-    public void render(MatrixStack matrices) {
-        DrawHelper.drawOutlinedBox(matrices, x - 2, y - 2, x + size + 2, y + size + 2, -1);
+    public void render(DrawContext drawContext) {
+        DrawHelper.drawOutlinedBox(drawContext, x - 2, y - 2, x + size + 2, y + size + 2, -1);
 
         // Draw the gradient
         for (int i = 0; i < size; i++) {
@@ -46,7 +45,7 @@ public class GradientBox {
                 float value = 1.0f - (float) j / size;
                 int color = Color.HSBtoRGB(hue, saturation, value);
                 color = (color & 0x00FFFFFF) | ((int) (alpha * 255) << 24);
-                DrawableHelper.fill(matrices, x + i, y + j, x + i + 1, y + j + 1, color);
+                drawContext.fill( x + i, y + j, x + i + 1, y + j + 1, color);
             }
         }
 
@@ -55,7 +54,7 @@ public class GradientBox {
         float handleX = x + saturation * size - handleSize / 2.0f;
         float handleY = y + (1.0f - value) * size - handleSize / 2.0f;
 
-        DrawHelper.fillRoundedRect(matrices, (int) handleX, (int) handleY, (int) (handleX + handleSize), (int) (handleY + handleSize), -1);
+        DrawHelper.fillRoundedRect(drawContext, (int) handleX, (int) handleY, (int) (handleX + handleSize), (int) (handleY + handleSize), -1);
         if (this.selectedWidget != null)
             setPosition(selectedWidget.getX() + 30, selectedWidget.getY() + MinecraftClient.getInstance().textRenderer.fontHeight + 4);
     }
