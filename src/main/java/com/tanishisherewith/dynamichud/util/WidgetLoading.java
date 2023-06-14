@@ -25,7 +25,7 @@ public interface WidgetLoading {
             return widget;
         }
         if (className.equals(ItemWidget.class.getName())) {
-            ItemWidget widget = new ItemWidget(MinecraftClient.getInstance(), () -> ItemStack.EMPTY, 0, 0, true, TextureHelper.Position.ABOVE, () -> "", () -> Color.WHITE);
+            ItemWidget widget = new ItemWidget(MinecraftClient.getInstance(), () -> ItemStack.EMPTY, 0, 0, true, TextureHelper.Position.ABOVE, () -> "", () -> Color.WHITE,true);
             widget.readFromTag(widgetTag);
             return widget;
         }
