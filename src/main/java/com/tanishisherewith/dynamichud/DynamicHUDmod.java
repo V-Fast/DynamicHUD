@@ -54,7 +54,7 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoadi
             widgets.add(new ArmorWidget(mc, EquipmentSlot.CHEST, 0.01f, 0.01f, true, TextureHelper.Position.ABOVE, () -> text, ()->Color.RED,true));
             widgets.add(new ArmorWidget(mc, EquipmentSlot.LEGS, 0.05f, 0.01f, true, TextureHelper.Position.LEFT, () -> String.valueOf(MinecraftClient.getInstance().getCurrentFps()),()->Color.WHITE,true));
 
-            widgets.add(new ItemWidget(mc,() -> mc.player != null ? mc.player.getInventory().getStack(3) : Items.DIAMOND_AXE.getDefaultStack(), 0.15f, 0.15f, true, TextureHelper.Position.ABOVE, () -> "",()-> Color.RED,true));
+            widgets.add(new ItemWidget(mc, Items.DIAMOND_AXE::getDefaultStack, 0.15f, 0.15f, true, TextureHelper.Position.ABOVE, () -> "",()-> Color.RED,true));
             for (Widget wigdet : widgets) {
                 dynamicUtil.getWidgetManager().addWidget(wigdet);
             }
@@ -68,15 +68,15 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoadi
             int armorIndex = 0;
             TextGenerator[] TextWidgettext = new TextGenerator[]{
                     () -> String.valueOf(mc.getCurrentFps()),
-                    () -> "PLAINS",
+                    () -> " Hud",
                     () -> "",
                     () -> "",
                     () -> ""
             };
             TextGenerator[] ArmorWidgettext = new TextGenerator[]{
                     () -> String.valueOf(mc.getCurrentFps()),
-                    () -> "",
-                    () -> ""
+                    () -> "DynamicHud",
+                    () -> "True"
             };
             for (Widget widget : widgets) {
                 if (widget instanceof TextWidget textWidget) {
