@@ -10,7 +10,7 @@
   "contributors": [
     "LumaaDev"
   ],
-  "icons": "assets/DynamicHUD/DynamicHud-logo.png",
+  "icon": "assets/DynamicHUD/DynamicHud-logo.png",
   "contact": {
     "repo": "https://github.com/V-Fast/DynamicHUD",
     "issues": "https://github.com/V-Fast/DynamicHUD/issues"
