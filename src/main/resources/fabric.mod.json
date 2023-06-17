@@ -7,15 +7,18 @@
   "authors": [
     "tanishisherewith"
   ],
+  "contributors": [
+    "LumaaDev"
+  ],
   "contact": {
-    "repo": "https://github.com/V-Fast/DynamicHUD"
+    "repo": "https://github.com/V-Fast/DynamicHUD",
+    "issues": "https://github.com/V-Fast/DynamicHUD/issues"
   },
   "license": "All-Rights-Reserved",
   "environment": "client",
   "entrypoints": {
     "client": [
-      "com.tanishisherewith.dynamichud.DynamicHUD",
-      "com.tanishisherewith.dynamichud.DynamicHUDmod"
+      "com.tanishisherewith.dynamichud.DynamicHUD"
     ]
   },
   "mixins": [
@@ -23,7 +26,7 @@
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
-  "minecraft": "~${minecraft_version}"
+    "minecraft": "~${minecraft_version}"
   },
   "custom": {
     "modmenu": {
