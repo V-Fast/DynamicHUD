@@ -6,7 +6,16 @@ _Current version: 1.5.0_
 - [MoveableScreen.java](src/main/java/com/tanishisherewith/dynamichud/huds/MoveableScreen.java)
 - [_DynamicHUDmod.java_](src/main/java/com/tanishisherewith/dynamichud/DynamicHUDmod.java)
 
-# Work to do
+# Demo:
+https://github.com/V-Fast/DynamicHUD/assets/120117618/04de9319-69cd-4456-a555-c026c7e053a2
 
-- [ ] Make the library open to all and make methods less one-use only
-- [ ] Add more features and draw and helpers.
+
+
+
+
+
+
+
+
+
+
