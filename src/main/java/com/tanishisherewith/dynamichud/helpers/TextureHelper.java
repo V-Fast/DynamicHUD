@@ -133,19 +133,20 @@ public class TextureHelper extends DrawContext {
         }
 
         // Draw semi-opaque black rectangle
-        if (textBackground && !text.trim().isEmpty()) {
-            int backgroundColor = 0x40000000; // ARGB format: 50% opaque black
-            drawContext.fill(textX-1, textY-1, textX + textWidth+1, textY + textHeight+1, backgroundColor);
+        if(text!=null) {
+            if (textBackground && !text.trim().isEmpty()) {
+                int backgroundColor = 0x40000000; // ARGB format: 50% opaque black
+                drawContext.fill(textX - 1, textY - 1, textX + textWidth + 1, textY + textHeight + 1, backgroundColor);
+            }
+
+            // Draw the scaled text at the calculated position
+            matrices.push();
+            matrices.scale(scale, scale, 1.0f);
+            float scaledX = textX / scale;
+            float scaledY = textY / scale;
+            drawContext.drawText(textRenderer, text, (int) scaledX, (int) scaledY, color, false);
+            matrices.pop();
         }
-
-        // Draw the scaled text at the calculated position
-        matrices.push();
-        matrices.scale(scale, scale, 1.0f);
-        float scaledX = textX / scale;
-        float scaledY = textY / scale;
-        drawContext.drawText(textRenderer, text, (int) scaledX, (int) scaledY, color,false);
-        matrices.pop();
-
         // Draw the item texture
         drawContext.drawItem(itemStack, x, y);
     }

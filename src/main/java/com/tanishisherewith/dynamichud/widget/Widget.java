@@ -62,7 +62,13 @@ public abstract class Widget {
      * @param x The new x position of the widget in pixels
      */
     public void setX(int x) {
-        this.xPercent = (float) x / client.getWindow().getScaledWidth();
+        int screenWidth = client.getWindow().getScaledWidth();
+        if (x < 0) {
+            x = 0;
+        } else if (x + getWidgetBox().getWidth() > screenWidth) {
+            x = screenWidth - getWidgetBox().getWidth()+(getWidgetBox().getWidth()/2);
+        }
+        this.xPercent = (float) x / screenWidth;
     }
 
     /**
@@ -80,18 +86,19 @@ public abstract class Widget {
      * @param y The new y position of the widget in pixels
      */
     public void setY(int y) {
-        this.yPercent = (float) y / client.getWindow().getScaledHeight();
+        int screenHeight = client.getWindow().getScaledHeight();
+        if (y < 0) {
+            y = 0;
+        } else if (y - getWidgetBox().getHeight() > screenHeight) {
+            y = screenHeight - getWidgetBox().getHeight()+(getWidgetBox().getHeight()/2);
+        }
+        this.yPercent = (float) y / screenHeight;
     }
 
-    /**
-     * Returns height of this widget.
-     *
-     * @return height of this widget.
-     */
-    public int getHeight() {
+    public int getHeight()
+    {
         return client.textRenderer.fontHeight;
     }
-
     public void readFromTag(NbtCompound tag) {
     }
 

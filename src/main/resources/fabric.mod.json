@@ -19,7 +19,8 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "com.tanishisherewith.dynamichud.DynamicHUD"
+      "com.tanishisherewith.dynamichud.DynamicHUD",
+      "com.tanishisherewith.dynamichud.DynamicHUDmod"
     ]
   },
   "depends": {

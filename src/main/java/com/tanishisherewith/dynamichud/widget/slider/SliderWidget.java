@@ -103,6 +103,16 @@ public class SliderWidget {
         if (selectedWidget != null)
             setPosition(selectedWidget.getX(), selectedWidget.getY() + textRenderer.fontHeight + 67);
     }
+    /**
+     * Returns whether the given point is within the bounds of this widget.
+     *
+     * @param x - X position of the point.
+     * @param y - Y position of the point.
+     * @return true if the point is within the bounds of this context menu, false otherwise.
+     */
+    public boolean contains(double x, double y) {
+        return x >= this.x+2 && x <= this.x-2 + width && y >= this.y+2 && y <= this.y - 2 + height;
+    }
 
 
 

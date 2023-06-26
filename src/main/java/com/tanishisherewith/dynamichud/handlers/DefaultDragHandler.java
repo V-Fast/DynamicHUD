@@ -18,10 +18,10 @@ public class DefaultDragHandler implements DragHandler {
 
     @Override
     public void updateDragging(Widget widget, double mouseX, double mouseY) {
-        int newX = (int) (mouseX - dragStartX);
-        int newY = (int) (mouseY - dragStartY);
-        widget.setX(newX);
-        widget.setY(newY);
+        int newX = (int) (dragStartX+mouseX);
+        int newY = (int) (dragStartY+mouseY);
+        widget.setX(newX+(newX/2));
+        widget.setY(newY+(newY/2));
     }
 
     @Override

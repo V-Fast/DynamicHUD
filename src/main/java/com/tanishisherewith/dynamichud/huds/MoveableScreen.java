@@ -51,63 +51,74 @@ public class MoveableScreen extends AbstractMoveableScreen {
     protected void menu(Widget widget, int x, int y) {
         contextMenu = new ContextMenu(mc, x, y + widget.getHeight() + 5, selectedWidget);
         if (widget instanceof ArmorWidget armorWidget) {
-            Slider = null;
-            contextMenu.setHeightfromwidget(15);
-            contextMenu.setPadding(5);
-            contextMenu.addEnumCycleOption("", TextureHelper.Position.values(), () -> armorWidget.currentTextPosition[0], newPosition -> {
-                armorWidget.currentTextPosition[0] = newPosition;
-            });
+          ArmorWidgetMenu(armorWidget,x,y);
         }
-        if (widget instanceof ItemWidget) {
-            contextMenu = null;
-            Slider = null;
-            colorPicker = null;
-            return;
+        if (widget instanceof ItemWidget itemWidget) {
+            ItemWidgetMenu(itemWidget,x,y);
         }
         if (widget instanceof TextWidget textWidget) {
-            contextMenu.setHeightfromwidget(2);
-            contextMenu.setPadding(5);
-            contextMenu.addOption("Shadow", () -> {
-                textWidget.setShadow(!textWidget.hasShadow());
-            });
-            contextMenu.addOption("Rainbow", () -> {
-                textWidget.setRainbow(!textWidget.hasRainbow());
-            });
-            contextMenu.addOption("Vertical Rainbow", () -> {
-                textWidget.setVerticalRainbow(!textWidget.hasVerticalRainbow());
-            });
-            if (!textWidget.getText().trim().isEmpty()) {
-                contextMenu.addOption("TextColor", () -> {
-                    textWidget.toggleTextColorOption();
-
-                    colorPicker = null;
-
-                    if (textWidget.isTextcolorOptionEnabled())
-                        colorPicker = new ColorGradientPicker(mc, x + 110, y + widget.getHeight() + 5, textWidget.getTextcolor(), textWidget::setTextColor, 50, 100, selectedWidget);
-                });
-            }
-            if (!textWidget.getDataText().trim().isEmpty()) {
-                contextMenu.addOption("DataColor", () -> {
-                    textWidget.toggleDataColorOption();
-
-                    colorPicker = null;
-
-                    if (textWidget.isDatacolorOptionEnabled())
-                        colorPicker = new ColorGradientPicker(mc, x + 110, y + widget.getHeight() + 5, textWidget.getDatacolor(), textWidget::setDataColor, 50, 100, selectedWidget);
-                });
-            }
-            Slider = new SliderWidgetBuilder(client)
-                    .setX(x)
-                    .setY(y)
-                    .setWidth(105)
-                    .setHeight(15)
-                    .setLabel("Rainbow Speed")
-                    .setValue(textWidget.getRainbowSpeed())
-                    .setMinValue(5f)
-                    .setMaxValue(25.0f)
-                    .setSelectedWidget(selectedWidget)
-                    .build();
+           TextWidgetMenu(textWidget,x,y);
         }
+    }
+    protected void ItemWidgetMenu(ItemWidget itemWidget,int x, int y)
+    {
+        Slider = null;
+        colorPicker = null;
+        contextMenu=null;
+    }
+    protected void ArmorWidgetMenu(ArmorWidget armorWidget,int x, int y)
+    {
+        Slider = null;
+        contextMenu.setHeightfromwidget(15);
+        contextMenu.setPadding(5);
+        contextMenu.addEnumCycleOption("", TextureHelper.Position.values(), () -> armorWidget.currentTextPosition[0], newPosition -> {
+            armorWidget.currentTextPosition[0] = newPosition;
+        });
+    }
+    protected void TextWidgetMenu(TextWidget textWidget,int x, int y)
+    {
+        contextMenu.setHeightfromwidget(2);
+        contextMenu.setPadding(5);
+        contextMenu.addOption("Shadow", () -> {
+            textWidget.setShadow(!textWidget.hasShadow());
+        });
+        contextMenu.addOption("Rainbow", () -> {
+            textWidget.setRainbow(!textWidget.hasRainbow());
+        });
+        contextMenu.addOption("Vertical Rainbow", () -> {
+            textWidget.setVerticalRainbow(!textWidget.hasVerticalRainbow());
+        });
+        if (!textWidget.getText().trim().isEmpty()) {
+            contextMenu.addOption("TextColor", () -> {
+                textWidget.toggleTextColorOption();
+
+                colorPicker = null;
+
+                if (textWidget.isTextcolorOptionEnabled())
+                    colorPicker = new ColorGradientPicker(mc, x + 110, y + textWidget.getHeight() + 5, textWidget.getTextcolor(), textWidget::setTextColor, 50, 100, selectedWidget);
+            });
+        }
+        if (!textWidget.getDataText().trim().isEmpty()) {
+            contextMenu.addOption("DataColor", () -> {
+                textWidget.toggleDataColorOption();
+
+                colorPicker = null;
+
+                if (textWidget.isDatacolorOptionEnabled())
+                    colorPicker = new ColorGradientPicker(mc, x + 110, y + textWidget.getHeight() + 5, textWidget.getDatacolor(), textWidget::setDataColor, 50, 100, selectedWidget);
+            });
+        }
+        Slider = new SliderWidgetBuilder(client)
+                .setX(x)
+                .setY(y)
+                .setWidth(105)
+                .setHeight(15)
+                .setLabel("Rainbow Speed")
+                .setValue(textWidget.getRainbowSpeed())
+                .setMinValue(5f)
+                .setMaxValue(25.0f)
+                .setSelectedWidget(selectedWidget)
+                .build();
     }
 }
 

@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.util.contextmenu;
 
+import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.widget.Widget;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+
 public class ContextMenu {
     private static int optionY;
     private final MinecraftClient client; // The Minecraft client instance
@@ -21,10 +23,12 @@ public class ContextMenu {
     private int x; // The x position of the context menu
     private int y; // The y position of the context menu
     private Widget selectedWidget; // The widget that this context menu is associated with
-    private int backgroundColor = 0x80C0C0C0;// Semi-transparent light grey color
+    private int backgroundColor = 0x90C0C0C0;// Semi-transparent light grey color
     private int padding = 5; // The amount of padding around the rectangle
     private int heightfromwidget = 5; // The amount of padding around the rectangle
     private float scale = 0.0f;
+    private int height = 0;
+
 
     /**
      * Constructs a ContextMenu object.
@@ -73,6 +77,16 @@ public class ContextMenu {
 
     public void setBackgroundColor(int backgroundColor) {
         this.backgroundColor = backgroundColor;
+    }
+    /**
+     * Returns whether the given point is within the bounds of this context menu.
+     *
+     * @param x - X position of the point.
+     * @param y - Y position of the point.
+     * @return true if the point is within the bounds of this context menu, false otherwise.
+     */
+    public boolean contains(double x, double y) {
+        return x >= this.x - 3 && x <= this.x + width + 13 && y >= this.y + heightfromwidget - 3 && y <= this.y + height + heightfromwidget + 3;
     }
 
     /**
@@ -124,6 +138,23 @@ public class ContextMenu {
             scale = 1.0f;
         }
     }
+    /**
+     * Updates the position of this context menu to avoid overlapping with other widgets.
+     */
+    public void updatePosition() {
+        // Check if the context menu is outside the bounds of the screen
+        int screenWidth = client.getWindow().getScaledWidth();
+        int screenHeight = client.getWindow().getScaledHeight();
+        if (x + width + 12 > screenWidth) {
+            x = screenWidth - width - 12;
+        }
+        if (y + heightfromwidget - 2 < 0) {
+            y = heightfromwidget + 2;
+        }
+        if (y + height + heightfromwidget + 2 > screenHeight) {
+            y = screenHeight - height - heightfromwidget - 2;
+        }
+    }
 
     /**
      * Renders this context menu on screen.
@@ -135,21 +166,20 @@ public class ContextMenu {
         TextRenderer textRenderer = client.textRenderer;
         // Calculate the size of the context menu
         width = 0;
-        int height = 0;
+        height=0;
         for (ContextMenuOption option : options) {
             width = Math.max(width, textRenderer.getWidth(option.label) + padding);
             height += textRenderer.fontHeight + 2;
         }
         // Apply the scale
         drawContext.getMatrices().push();
-        drawContext.getMatrices().translate(x + width / 2.0f + 5, y + height / 2.0f + heightfromwidget, 0);
+        drawContext.getMatrices().translate(x + width / 2.0f + 5, y + height / 2.0f + heightfromwidget, 300);
         drawContext.getMatrices().scale(scale, scale, 1.0f);
-        drawContext.getMatrices().translate(-(x + width / 2.0f + 5), -(y + height / 2.0f + heightfromwidget), 0);
+        drawContext.getMatrices().translate(-(x + width / 2.0f + 5), -(y + height / 2.0f + heightfromwidget), 300);
 
         // Draw the background
         DrawHelper.fill(drawContext, x - 2, y + heightfromwidget - 2, x + width + 12, y + height + heightfromwidget + 2, backgroundColor);
         DrawHelper.drawOutlinedBox(drawContext, x - 2, y + heightfromwidget - 2, x + width + 12, y + height + heightfromwidget + 2, ColorHelper.ColorToInt(Color.BLACK));
-
         optionY = y + heightfromwidget + 2;
         for (ContextMenuOption option : options) {
             if (option instanceof EnumCycleContextMenuOption enumOption) {
@@ -167,6 +197,7 @@ public class ContextMenu {
             setPosition(selectedWidget.getX(), selectedWidget.getY() + textRenderer.fontHeight + 4);
 
         drawContext.getMatrices().pop();
+        updatePosition();
     }
 
     /**

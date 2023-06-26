@@ -73,6 +73,49 @@ public abstract class AbstractMoveableScreen extends Screen {
         }
         return false;
     }
+    /**
+     * Handles mouse clicks on this screen.
+     *
+     * @param mouseX - X position of mouse cursor.
+     * @param mouseY - Y position of mouse cursor.
+     * @param button - Mouse button that was clicked.
+     * @return true if mouse click was handled by this screen, false otherwise.
+     */
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (mouseHandler.mouseClicked(mouseX, mouseY, button)) {
+            return true;
+        }
+        // Check if the context menu is visible and if the mouse click occurred outside its bounds
+        // Check if the Slider is visible and if the mouse click occurred outside its bounds
+        if ((contextMenu != null && !contextMenu.contains(mouseX, mouseY) || Slider != null && !Slider.contains(mouseX, mouseY))) {
+            // Close the context menu
+            contextMenu = null;
+            Slider = null;
+            return true;
+        }
+        for (Widget widget : dynamicutil.getWidgetManager().getWidgets()) {
+            if (widget.getWidgetBox().contains(widget, mouseX, mouseY)) {
+                // Start dragging the widget
+                colorPicker = null;
+                contextMenu=null;
+                Slider=null;
+                if (button == 1) { // Right-click
+                    handleRightClickOnWidget(widget);
+                }else if(button == 0) {
+                    widget.enabled = !widget.enabled;
+                }
+                if (dragHandler.startDragging(widget, mouseX, mouseY) && button==0) {
+                    selectedWidget = widget;
+                    if (contextMenu!=null) {
+                        contextMenu.updatePosition();
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * Handles mouse release events on this screen.
@@ -93,39 +136,6 @@ public abstract class AbstractMoveableScreen extends Screen {
             return true;
         }
         return contextMenu != null;
-    }
-
-
-    /**
-     * Handles mouse clicks on this screen.
-     *
-     * @param mouseX - X position of mouse cursor.
-     * @param mouseY - Y position of mouse cursor.
-     * @param button - Mouse button that was clicked.
-     * @return true if mouse click was handled by this screen, false otherwise.
-     */
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (mouseHandler.mouseClicked(mouseX, mouseY, button)) {
-            return true;
-        }
-
-        for (Widget widget : dynamicutil.getWidgetManager().getWidgets()) {
-            if (widget.getWidgetBox().contains(widget, mouseX, mouseY)) {
-                // Start dragging the widget
-                colorPicker = null;
-                contextMenu=null;
-                Slider=null;
-                if (button == 1) { // Right-click
-                    handleRightClickOnWidget(widget);
-                } else if (dragHandler.startDragging(widget, mouseX, mouseY)) {
-                    widget.enabled = !widget.enabled;
-                    selectedWidget = widget;
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     /**
@@ -180,7 +190,8 @@ public abstract class AbstractMoveableScreen extends Screen {
 
     @Override
     public void resize(MinecraftClient client, int width, int height) {
-        if (ShouldBeAffectedByResize) super.resize(client, width, height);
+        if (ShouldBeAffectedByResize)
+            super.resize(client, width, height);
         else {
             return;
         }

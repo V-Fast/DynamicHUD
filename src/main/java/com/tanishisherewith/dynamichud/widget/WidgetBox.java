@@ -32,6 +32,9 @@ public class WidgetBox {
         }
         return x >= x1 && x <= x2 && y >= y1 && y <= y2;
     }
+    public boolean intersects(int otherX1, int otherY1, int otherX2, int otherY2) {
+        return !(otherX1 > x2 || otherX2 < x1 || otherY1 > y2 || otherY2 < y1);
+    }
 
     public int getWidth() {
         return width;

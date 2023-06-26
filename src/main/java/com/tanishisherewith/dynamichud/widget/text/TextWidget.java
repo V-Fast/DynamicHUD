@@ -233,6 +233,8 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     public void render(DrawContext drawContext) {
         int x = getX();
         int y = getY();
+        drawContext.getMatrices().push();
+        drawContext.getMatrices().translate(0,0,300);
         String CombinedText = getText() + getDataText();
         if (rainbow) {
             float hue = (System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f);
@@ -251,6 +253,7 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
             drawText(drawContext, getText(), getX() + 2, getY() - 4, Textcolour);
             drawText(drawContext, getDataText(), getX() + client.textRenderer.getWidth(getText()) + 2, getY() - 4, Datacolour);
         }
+        drawContext.getMatrices().pop();
     }
 
     @Override
