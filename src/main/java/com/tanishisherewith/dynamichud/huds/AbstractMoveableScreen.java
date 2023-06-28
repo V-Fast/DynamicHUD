@@ -28,6 +28,8 @@ public abstract class AbstractMoveableScreen extends Screen {
     protected int gridSize = 3; // The size of each grid cell in pixels
     protected boolean ShouldPause = false; // To pause if the screen is opened or not
     protected boolean ShouldBeAffectedByResize = false; // If the stuff drawn on screen to be affected by screen resize or not
+    protected int widgetX;
+    protected int widgetY;
 
 
     /**
@@ -94,6 +96,7 @@ public abstract class AbstractMoveableScreen extends Screen {
             Slider = null;
             return true;
         }
+
         for (Widget widget : dynamicutil.getWidgetManager().getWidgets()) {
             if (widget.getWidgetBox().contains(widget, mouseX, mouseY)) {
                 // Start dragging the widget
@@ -164,6 +167,11 @@ public abstract class AbstractMoveableScreen extends Screen {
         }
         if (colorPicker != null) {
             colorPicker.render(drawContext);
+        }
+        if (selectedWidget!=null)
+        {
+            widgetX=selectedWidget.getX();
+            widgetY=selectedWidget.getY();
         }
         updateMouseHandler(colorPicker, contextMenu, Slider);
     }

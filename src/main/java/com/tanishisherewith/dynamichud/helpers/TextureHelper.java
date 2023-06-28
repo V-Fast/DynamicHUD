@@ -154,9 +154,9 @@ public class TextureHelper extends DrawContext {
 
     public enum Position {
         ABOVE ("Above"),
+        RIGHT("Right"),
         BELOW("Below"),
-        LEFT("Left"),
-        RIGHT("Right");
+        LEFT("Left");
         private String name;
 
         Position(String name) {

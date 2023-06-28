@@ -14,6 +14,8 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexConsumerProvider;
 
+import java.awt.*;
+
 /**
  * This class provides utility methods for working with the DynamicHUD mod.
  */
@@ -65,7 +67,7 @@ public class DynamicUtil extends DrawContext {
             if (MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
                 int backgroundColor = widget.isEnabled() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
                 WidgetBox box = widget.getWidgetBox();
-                context.fill(box.x1, box.y1, box.x2, box.y2, backgroundColor);
+                DrawHelper.fill(context,box.x1, box.y1, box.x2, box.y2, backgroundColor);
             }
         }
     }

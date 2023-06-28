@@ -6,6 +6,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11;
 
 public class DrawHelper extends DrawContext {
     public DrawHelper(MinecraftClient client, VertexConsumerProvider.Immediate vertexConsumers) {
@@ -61,6 +62,14 @@ public class DrawHelper extends DrawContext {
                                 boolean shadow) {
         drawContext.drawText(textRenderer,text, x, y, color, shadow);
     }
+
+    public static void drawCutRectangle(DrawContext drawContext, int x1, int y1, int x2, int y2, int z, int color, int cornerRadius) {
+        // Draw the rectangles
+        drawContext.fill(  x1 + cornerRadius, y1, x2 - cornerRadius, y1 + cornerRadius, z, color);
+        drawContext.fill( x1 + cornerRadius, y2 - cornerRadius, x2 - cornerRadius, y2, z, color);
+        drawContext.fill( x1, y1 + cornerRadius, x2, y2 - cornerRadius, z, color);
+    }
+
 
     /**
      * Fills a rounded rectangle on screen with specified color.

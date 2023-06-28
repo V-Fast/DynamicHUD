@@ -100,7 +100,6 @@ public class ColorGradientPicker {
         onColorSelected.accept(gradientBox.getColor());
         return true;
     }
-
     public void mouseReleased(double mouseX, double mouseY, int button) {
         gradientSlider.onRelease(mouseX, mouseY, button);
         gradientBox.onRelease(mouseX, mouseY, button);

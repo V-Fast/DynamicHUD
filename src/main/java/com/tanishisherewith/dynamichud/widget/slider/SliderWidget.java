@@ -25,6 +25,7 @@ public class SliderWidget {
     private float progressSpeed = 0.1f;
     private float textProgress = 0.0f;
     private float textProgressSpeed = 0.05f;
+    private boolean MouseClicked=false;
 
     /**
      * Constructs a SliderWidget object.
@@ -139,9 +140,11 @@ public class SliderWidget {
         // Check if the mouse is over the slider
         if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height) {
             // Update the value based on the mouse position
+            MouseClicked=!MouseClicked;
             setValue(minValue + (float) (mouseX - x) / width * (maxValue - minValue) - 0.001f);
             return true;
         }
+        MouseClicked=false;
         return false;
     }
 
@@ -157,7 +160,7 @@ public class SliderWidget {
      */
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         // Check if the mouse is over the slider
-        if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height) {
+        if (mouseX >= x && mouseX <= x + width && MouseClicked) {
             // Update the value based on the mouse position
             setValue(minValue + (float) (mouseX - x) / width * (maxValue - minValue));
             return true;

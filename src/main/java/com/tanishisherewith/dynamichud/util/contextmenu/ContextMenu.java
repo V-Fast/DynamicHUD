@@ -1,6 +1,5 @@
 package com.tanishisherewith.dynamichud.util.contextmenu;
 
-import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.widget.Widget;
@@ -22,7 +21,7 @@ public class ContextMenu {
     private int width = 0; // The width of the context menu
     private int x; // The x position of the context menu
     private int y; // The y position of the context menu
-    private Widget selectedWidget; // The widget that this context menu is associated with
+    private final Widget selectedWidget; // The widget that this context menu is associated with
     private int backgroundColor = 0x90C0C0C0;// Semi-transparent light grey color
     private int padding = 5; // The amount of padding around the rectangle
     private int heightfromwidget = 5; // The amount of padding around the rectangle
@@ -78,6 +77,7 @@ public class ContextMenu {
     public void setBackgroundColor(int backgroundColor) {
         this.backgroundColor = backgroundColor;
     }
+
     /**
      * Returns whether the given point is within the bounds of this context menu.
      *
@@ -87,6 +87,10 @@ public class ContextMenu {
      */
     public boolean contains(double x, double y) {
         return x >= this.x - 3 && x <= this.x + width + 13 && y >= this.y + heightfromwidget - 3 && y <= this.y + height + heightfromwidget + 3;
+    }
+
+    public int getHeight() {
+        return height;
     }
 
     /**
@@ -130,6 +134,7 @@ public class ContextMenu {
         options.add(option);
     }
 
+
     public void tick() {
         // Update the scale
         float scaleSpeed = 0.1f;
@@ -138,6 +143,7 @@ public class ContextMenu {
             scale = 1.0f;
         }
     }
+
     /**
      * Updates the position of this context menu to avoid overlapping with other widgets.
      */
@@ -164,41 +170,50 @@ public class ContextMenu {
     public void render(DrawContext drawContext) {
         tick();
         TextRenderer textRenderer = client.textRenderer;
-        // Calculate the size of the context menu
-        width = 0;
-        height=0;
-        for (ContextMenuOption option : options) {
-            width = Math.max(width, textRenderer.getWidth(option.label) + padding);
-            height += textRenderer.fontHeight + 2;
-        }
+        calculateSize(textRenderer);
         // Apply the scale
         drawContext.getMatrices().push();
         drawContext.getMatrices().translate(x + width / 2.0f + 5, y + height / 2.0f + heightfromwidget, 300);
         drawContext.getMatrices().scale(scale, scale, 1.0f);
         drawContext.getMatrices().translate(-(x + width / 2.0f + 5), -(y + height / 2.0f + heightfromwidget), 300);
-
+        int x1 = x - 1;
+        int y1 = y + heightfromwidget - 2;
+        int x2 = x + width + 8;
+        int y2 = y + height + heightfromwidget + 2;
         // Draw the background
-        DrawHelper.fill(drawContext, x - 2, y + heightfromwidget - 2, x + width + 12, y + height + heightfromwidget + 2, backgroundColor);
-        DrawHelper.drawOutlinedBox(drawContext, x - 2, y + heightfromwidget - 2, x + width + 12, y + height + heightfromwidget + 2, ColorHelper.ColorToInt(Color.BLACK));
+        DrawHelper.drawCutRectangle(drawContext, x1, y1, x2, y2, 0, backgroundColor, 1);
         optionY = y + heightfromwidget + 2;
-        for (ContextMenuOption option : options) {
-            if (option instanceof EnumCycleContextMenuOption enumOption) {
-                enumOption.updateLabel();
-            }
-            int color = option.enabled ? 0xFF00FF00 : 0xFFFF0000;
-            drawContext.drawText(textRenderer, option.label, x + 5, optionY, color,false);
-            DrawHelper.drawBox(drawContext, x + 5 + width, optionY + 3, 5, 5, ColorHelper.ColorToInt(Color.BLACK));
-            if (option.enabled)
-                DrawHelper.drawBox(drawContext, x + 5 + width, optionY + 3, 2, 2, ColorHelper.ColorToInt(Color.WHITE));
-            optionY += textRenderer.fontHeight + 2;
-        }
-
+        drawOptions(drawContext, textRenderer);
         if (selectedWidget != null)
             setPosition(selectedWidget.getX(), selectedWidget.getY() + textRenderer.fontHeight + 4);
-
         drawContext.getMatrices().pop();
         updatePosition();
     }
+
+    private void calculateSize(TextRenderer textRenderer) {
+        // Calculate the size of the context menu
+        width = 0;
+        height = 0;
+        for (ContextMenuOption option : options) {
+            width = Math.max(width, textRenderer.getWidth(option.label) + padding);
+            height += textRenderer.fontHeight + 2;
+        }
+    }
+
+    private void drawOptions(DrawContext drawContext, TextRenderer textRenderer) {
+        int labelTextcolor;
+        for (ContextMenuOption option : options) {
+            if (option instanceof EnumCycleContextMenuOption enumOption) {
+                enumOption.updateLabel();
+                labelTextcolor=ColorHelper.ColorToInt(Color.WHITE);
+            } else{
+                labelTextcolor = option.enabled ? 0xFF00FF00 : 0xFFFF0000;
+            }
+            drawContext.drawText(textRenderer, option.label, x + 5, optionY, labelTextcolor, false);
+            optionY += textRenderer.fontHeight + 2;
+        }
+    }
+
 
     /**
      * Sets position of this context menu.
@@ -238,21 +253,17 @@ public class ContextMenu {
             if (mouseX >= x && mouseX <= x + textRenderer.getWidth(option.label) + 10 && mouseY >= optionY && mouseY <= optionY + textRenderer.fontHeight + 2) {
                 // Run the action of the selected option
                 option.action.run();
-
                 option.enabled = !option.enabled;
-
                 return true;
             }
             optionY += textRenderer.fontHeight + 2;
         }
-
         return false;
     }
 
 
-
     private static class ContextMenuOption {
-        private final Runnable action; // The action to perform when the option is clicked
+        final Runnable action; // The action to perform when the option is clicked
         String label; // The label of the option
         private boolean enabled = false; // Whether the option is enabled
 
@@ -281,7 +292,7 @@ public class ContextMenu {
         }
 
         public void updateLabel() {
-            label = labelPrefix  + getter.get();
+            label = labelPrefix + getter.get();
         }
     }
 

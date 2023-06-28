@@ -89,7 +89,7 @@ public abstract class Widget {
         int screenHeight = client.getWindow().getScaledHeight();
         if (y < 0) {
             y = 0;
-        } else if (y - getWidgetBox().getHeight() > screenHeight) {
+        } else if (y + getWidgetBox().getHeight() > screenHeight) {
             y = screenHeight - getWidgetBox().getHeight()+(getWidgetBox().getHeight()/2);
         }
         this.yPercent = (float) y / screenHeight;
