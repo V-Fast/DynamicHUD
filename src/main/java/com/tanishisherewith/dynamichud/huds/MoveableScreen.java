@@ -111,7 +111,7 @@ public class MoveableScreen extends AbstractMoveableScreen {
                 .setX(x)
                 .setY(y)
                 .setWidth(105)
-                .setHeight(contextMenu.getHeight()+8)
+                .setHeight(contextMenu.getHeight()+10)
                 .setLabel("Rainbow Speed")
                 .setValue(textWidget.getRainbowSpeed())
                 .setMinValue(5f)

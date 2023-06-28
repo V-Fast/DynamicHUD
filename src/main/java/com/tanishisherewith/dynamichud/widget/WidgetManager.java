@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.widget;
 
+import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.util.WidgetLoading;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.NbtCompound;
@@ -81,7 +82,7 @@ public class WidgetManager {
     public List<Widget> loadWigdets(File file) {
         List<Widget> widgets = new ArrayList<>();
         if (file.exists()) {
-            System.out.println("Widgets File exists");
+            DynamicHUD.printInfo("Widgets File exists");
             try (DataInputStream in = new DataInputStream(new FileInputStream(file))) {
                 NbtCompound rootTag = NbtIo.readCompressed(in);
                 NbtList widgetList = rootTag.getList("widgets", NbtType.COMPOUND);
@@ -89,12 +90,13 @@ public class WidgetManager {
                     NbtCompound widgetTag = widgetList.getCompound(i);
                     String className = widgetTag.getString("class");
                     widgets.add(widgetLoading.loadWidgetsFromTag(className, widgetTag));
+                    DynamicHUD.printInfo("Wigdet " + i+ ": "+widgets.get(i).toString());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else System.out.println("Widgets File does not exist");
-        System.out.println("Wigdets: " + widgets);
+        } else
+            DynamicHUD.printWarn("Widgets File does not exist");
         return widgets;
     }
 }
