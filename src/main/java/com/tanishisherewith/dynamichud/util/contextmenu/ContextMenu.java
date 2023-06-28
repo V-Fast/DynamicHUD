@@ -209,7 +209,7 @@ public class ContextMenu {
             } else{
                 labelTextcolor = option.enabled ? 0xFF00FF00 : 0xFFFF0000;
             }
-            drawContext.drawText(textRenderer, option.label, x + 5, optionY, labelTextcolor, true);
+            drawContext.drawText(textRenderer, option.label, x + 5, optionY, labelTextcolor, false);
             optionY += textRenderer.fontHeight + 2;
         }
     }
