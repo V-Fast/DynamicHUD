@@ -18,6 +18,7 @@ The library also includes basic utility features like a menu, slider and a Color
 
 
 # Demo:
+*May vary from version to version*
 https://github.com/V-Fast/DynamicHUD/assets/120117618/04de9319-69cd-4456-a555-c026c7e053a2
 
 
