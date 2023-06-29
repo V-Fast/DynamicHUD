@@ -11,6 +11,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 
 import java.awt.*;
@@ -52,8 +53,16 @@ public class ArmorWidget extends Widget {
     @Override
     public void render(DrawContext drawContext) {
         ItemRenderer itemRenderer = client.getItemRenderer();
+        ItemStack armorItem;
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        ItemStack armorItem = client.player.getEquippedStack(slot);
+        if (client.player == null)
+        {
+            armorItem = Items.DIAMOND_CHESTPLATE.getDefaultStack();
+        }
+        else
+        {
+            armorItem = client.player.getEquippedStack(slot);
+        }
         TextureHelper.drawItemTextureWithText(drawContext.getMatrices(),drawContext, itemRenderer, textRenderer, armorItem, getX(), getY(), getText(), ColorHelper.ColorToInt(getColor()), currentTextPosition[0], 0.5f,TextBackground);
     }
 
