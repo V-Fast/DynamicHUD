@@ -1,4 +1,4 @@
-package com.tanishisherewith.dynamichud.widget;
+package com.tanishisherewith.dynamichud.interfaces;
 
 import com.tanishisherewith.dynamichud.util.DynamicUtil;
 

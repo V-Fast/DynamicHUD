@@ -4,7 +4,7 @@ import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.TextureHelper;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
-import com.tanishisherewith.dynamichud.util.TextGenerator;
+import com.tanishisherewith.dynamichud.interfaces.TextGenerator;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -105,12 +105,7 @@ public class ArmorWidget extends Widget {
     @Override
     public void writeToTag(NbtCompound tag) {
         super.writeToTag(tag);
-        tag.putString("class", getClass().getName());
-        tag.putFloat("xPercent", xPercent);
-        tag.putFloat("yPercent", yPercent);
-        tag.putFloat("yPercent", yPercent);
         tag.putString("slot", slot.getName());
-        tag.putBoolean("Enabled", this.enabled);
         tag.putString("Position", String.valueOf(this.currentTextPosition[0]));
         if(this.getText()!=null) tag.putString("text",this.getText());
         tag.putInt("Color",this.getColor().getRGB());
@@ -121,9 +116,6 @@ public class ArmorWidget extends Widget {
     public void readFromTag(NbtCompound tag) {
         super.readFromTag(tag);
         slot = EquipmentSlot.byName(tag.getString("slot"));
-        xPercent = tag.getFloat("xPercent");
-        yPercent = tag.getFloat("yPercent");
-        enabled = tag.getBoolean("Enabled");
         String Position = tag.getString("Position");
         color= ()->ColorHelper.getColorFromInt(tag.getInt("Color"));
         if (TextureHelper.Position.getByUpperCaseName(Position) != null && !(tag.getString("Position") ==null) && !tag.getString("Position").isEmpty())

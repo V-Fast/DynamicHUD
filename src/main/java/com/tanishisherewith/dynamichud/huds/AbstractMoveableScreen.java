@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.huds;
 
+import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.handlers.DefaultDragHandler;
 import com.tanishisherewith.dynamichud.handlers.DefaultMouseHandler;
 import com.tanishisherewith.dynamichud.handlers.DragHandler;
@@ -56,12 +57,11 @@ public abstract class AbstractMoveableScreen extends Screen {
      */
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (mouseHandler.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
+        if (mouseHandler.mouseDragged(mouseX, mouseY, button, deltaX, deltaY) ) {
             return true;
         }
-        // Update the position of the widget while dragging
-        if (selectedWidget != null) {
-            // Update the position of the context menu
+        if (selectedWidget != null && selectedWidget.isDraggable) {
+            // Update the position of the widget while dragging
             int newX = (int) (mouseX - dragStartX);
             int newY = (int) (mouseY - dragStartY);
 
@@ -97,6 +97,7 @@ public abstract class AbstractMoveableScreen extends Screen {
             return true;
         }
 
+
         for (Widget widget : dynamicutil.getWidgetManager().getWidgets()) {
             if (widget.getWidgetBox().contains(widget, mouseX, mouseY)) {
                 // Start dragging the widget
@@ -108,7 +109,7 @@ public abstract class AbstractMoveableScreen extends Screen {
                 }else if(button == 0) {
                     widget.enabled = !widget.enabled;
                 }
-                if (dragHandler.startDragging(widget, mouseX, mouseY) && button==0) {
+                if (dragHandler.startDragging(widget, mouseX, mouseY) && button==0 && widget.isDraggable) {
                     selectedWidget = widget;
                     if (contextMenu!=null) {
                         contextMenu.updatePosition();
@@ -176,7 +177,6 @@ public abstract class AbstractMoveableScreen extends Screen {
         updateMouseHandler(colorPicker, contextMenu, Slider);
     }
 
-    // Pass null if you dont want certain stuff
     private void updateMouseHandler(ColorGradientPicker colorPicker, ContextMenu contextMenu, SliderWidget Slider) {
         this.colorPicker = colorPicker;
         this.contextMenu = contextMenu;

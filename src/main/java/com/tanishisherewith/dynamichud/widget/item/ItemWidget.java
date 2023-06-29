@@ -4,7 +4,7 @@ import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.TextureHelper;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
-import com.tanishisherewith.dynamichud.util.TextGenerator;
+import com.tanishisherewith.dynamichud.interfaces.TextGenerator;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -94,11 +94,6 @@ public class ItemWidget extends Widget {
     @Override
     public void writeToTag(NbtCompound tag) {
         super.writeToTag(tag);
-        tag.putString("class", getClass().getName());
-        tag.putFloat("xPercent", xPercent);
-        tag.putFloat("yPercent", yPercent);
-        tag.putFloat("yPercent", yPercent);
-        tag.putBoolean("Enabled", this.enabled);
         tag.putString("Position", String.valueOf(this.currentTextPosition[0]));
         tag.putInt("ItemID", Item.getRawId(getItemStack().getItem()));
         tag.putInt("ItemCount", getItemStack().getMaxCount());
@@ -109,10 +104,6 @@ public class ItemWidget extends Widget {
     @Override
     public void readFromTag(NbtCompound tag) {
         super.readFromTag(tag);
-        xPercent = tag.getFloat("xPercent");
-        yPercent = tag.getFloat("yPercent");
-        enabled = tag.getBoolean("Enabled");
-
         String Position = tag.getString("Position");
 
         int itemID = tag.getInt("ItemID");

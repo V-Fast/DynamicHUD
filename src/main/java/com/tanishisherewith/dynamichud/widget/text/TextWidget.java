@@ -5,11 +5,10 @@ import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.util.contextmenu.ContextMenuOptionsProvider;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
-import com.tanishisherewith.dynamichud.util.TextGenerator;
+import com.tanishisherewith.dynamichud.interfaces.TextGenerator;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 
 /**
@@ -259,13 +258,9 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     @Override
     public void writeToTag(NbtCompound tag) {
         super.writeToTag(tag);
-        tag.putString("class", getClass().getName());
-        tag.putFloat("xPercent", xPercent);
-        tag.putFloat("yPercent", yPercent);
         tag.putBoolean("Rainbow", hasRainbow());
         tag.putBoolean("Shadow", hasShadow());
         tag.putBoolean("VerticalRainbow", hasVerticalRainbow());
-        tag.putBoolean("Enabled", this.enabled);
         tag.putInt("TextColor", Textcolor);
         tag.putInt("DataColor", Datacolor);
         tag.putString("Text", text);
@@ -274,14 +269,11 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     @Override
     public void readFromTag(NbtCompound tag) {
         super.readFromTag(tag);
-        xPercent = tag.getFloat("xPercent");
-        yPercent = tag.getFloat("yPercent");
         shadow = tag.getBoolean("shadow");
         rainbow = tag.getBoolean("rainbow");
         verticalRainbow = tag.getBoolean("verticalRainbow");
         Textcolor = tag.getInt("TextColor");
         Datacolor = tag.getInt("DataColor");
-        enabled = tag.getBoolean("Enabled");
         text = tag.getString("Text");
     }
 

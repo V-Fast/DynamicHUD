@@ -3,9 +3,9 @@ package com.tanishisherewith.dynamichud;
 import com.tanishisherewith.dynamichud.helpers.TextureHelper;
 import com.tanishisherewith.dynamichud.huds.MoveableScreen;
 import com.tanishisherewith.dynamichud.util.DynamicUtil;
-import com.tanishisherewith.dynamichud.util.TextGenerator;
-import com.tanishisherewith.dynamichud.util.WidgetLoading;
-import com.tanishisherewith.dynamichud.widget.IWigdets;
+import com.tanishisherewith.dynamichud.interfaces.TextGenerator;
+import com.tanishisherewith.dynamichud.interfaces.WidgetLoading;
+import com.tanishisherewith.dynamichud.interfaces.IWigdets;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.armor.ArmorWidget;
 import com.tanishisherewith.dynamichud.widget.item.ItemWidget;
@@ -56,6 +56,13 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoadi
 
             widgets.add(new ItemWidget(mc, Items.DIAMOND_AXE::getDefaultStack, 0.15f, 0.15f, true, TextureHelper.Position.ABOVE, () -> "",()-> Color.RED,true));
             for (Widget wigdet : widgets) {
+                if (wigdet instanceof TextWidget textWidget)
+                {
+                    if(textWidget.getText().equalsIgnoreCase("fps: "))
+                    {
+                        textWidget.setDraggable(false);
+                    }
+                }
                 dynamicUtil.getWidgetManager().addWidget(wigdet);
             }
     }

@@ -2,7 +2,7 @@ package com.tanishisherewith.dynamichud;
 
 import com.tanishisherewith.dynamichud.huds.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.util.DynamicUtil;
-import com.tanishisherewith.dynamichud.widget.IWigdets;
+import com.tanishisherewith.dynamichud.interfaces.IWigdets;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;

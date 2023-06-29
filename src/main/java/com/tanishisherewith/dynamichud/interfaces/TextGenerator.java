@@ -1,4 +1,4 @@
-package com.tanishisherewith.dynamichud.util;
+package com.tanishisherewith.dynamichud.interfaces;
 
 @FunctionalInterface
 public interface TextGenerator {

@@ -1,7 +1,7 @@
 package com.tanishisherewith.dynamichud.widget;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
-import com.tanishisherewith.dynamichud.util.WidgetLoading;
+import com.tanishisherewith.dynamichud.interfaces.WidgetLoading;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
@@ -17,8 +17,7 @@ import java.util.List;
 public class WidgetManager {
 
     private final List<Widget> widgets = new ArrayList<>(); // The list of widgets
-    private WidgetLoading widgetLoading = new WidgetLoading() {
-    };
+    private WidgetLoading widgetLoading = new WidgetLoading() {};
 
     /**
      * Adds a widget to the list.
@@ -50,7 +49,15 @@ public class WidgetManager {
     public List<Widget> getWidgets() {
         return widgets;
     }
-
+    public List<Widget> getOtherWidgets(Widget SelectedWidget) {
+        List<Widget> otherWidgets = new ArrayList<>();
+        for (Widget widget : getWidgets()) {
+            if (widget != SelectedWidget) {
+                otherWidgets.add(widget);
+            }
+        }
+        return otherWidgets;
+    }
 
     /**
      * Saves the state of all widgets to the given file.
@@ -61,7 +68,7 @@ public class WidgetManager {
         NbtCompound rootTag = new NbtCompound();
         NbtList widgetList = new NbtList();
 
-        System.out.println("Saving widgets");
+        DynamicHUD.printInfo("Saving widgets");
 
         for (Widget widget : widgets) {
             NbtCompound widgetTag = new NbtCompound();

@@ -6,6 +6,8 @@ import net.minecraft.nbt.NbtCompound;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class represents a widget that can be displayed on the screen.
@@ -15,6 +17,9 @@ public abstract class Widget {
     public boolean enabled = true; // Whether the widget is enabled
     protected float xPercent; // The x position of the widget as a percentage of the screen width
     protected float yPercent; // The y position of the widget as a percentage of the screen height
+    public boolean isDraggable=true;
+    private int prevX;
+    private int prevY;
 
 
     /**
@@ -31,6 +36,25 @@ public abstract class Widget {
      */
     public abstract WidgetBox getWidgetBox();
 
+    public void setDraggable(boolean draggable) {
+        isDraggable = draggable;
+    }
+
+
+    public boolean isOverlapping(List<Widget> other) {
+        for (Widget widget: other) {
+            if((this.getX() < widget.getX() + widget.getWidgetBox().getWidth() && this.getX() + this.getWidgetBox().getWidth() > widget.getX() &&
+                    this.getY() < widget.getY() + widget.getWidgetBox().getHeight() && this.getY() + this.getWidgetBox().getHeight() > widget.getY()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean isOverlapping(Widget other) {
+        return this.getX() < other.getX() + other.getWidgetBox().getWidth() && this.getX() + this.getWidgetBox().getWidth() > other.getX() &&
+                this.getY() < other.getY() + other.getWidgetBox().getHeight() && this.getY() + this.getWidgetBox().getHeight() > other.getY();
+    }
 
     /**
      * Renders the widget on the screen.
@@ -45,6 +69,14 @@ public abstract class Widget {
      */
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public int getPrevX() {
+        return prevX;
+    }
+
+    public int getPrevY() {
+        return prevY;
     }
 
     /**
@@ -62,6 +94,7 @@ public abstract class Widget {
      * @param x The new x position of the widget in pixels
      */
     public void setX(int x) {
+        this.prevX = this.getX();
         int screenWidth = client.getWindow().getScaledWidth();
         if (x < 0) {
             x = 0;
@@ -86,6 +119,7 @@ public abstract class Widget {
      * @param y The new y position of the widget in pixels
      */
     public void setY(int y) {
+        this.prevY = this.getY();
         int screenHeight = client.getWindow().getScaledHeight();
         if (y < 0) {
             y = 0;
@@ -100,6 +134,10 @@ public abstract class Widget {
         return client.textRenderer.fontHeight;
     }
     public void readFromTag(NbtCompound tag) {
+        xPercent = tag.getFloat("xPercent");
+        yPercent = tag.getFloat("yPercent");
+        enabled = tag.getBoolean("Enabled");
+        isDraggable=tag.getBoolean("isDraggable");
     }
 
     /**
@@ -109,6 +147,11 @@ public abstract class Widget {
      */
     public void writeToTag(NbtCompound tag) {
         tag.putString("class", getClass().getName());
+        tag.putBoolean("isDraggable",isDraggable);
+        tag.putFloat("xPercent", xPercent);
+        tag.putFloat("yPercent", yPercent);
+        tag.putBoolean("Enabled", enabled);
+
 
         for (Field field : getClass().getDeclaredFields()) {
             if (Modifier.isStatic(field.getModifiers())) continue;

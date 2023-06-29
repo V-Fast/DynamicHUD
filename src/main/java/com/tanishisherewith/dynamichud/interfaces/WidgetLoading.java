@@ -1,4 +1,4 @@
-package com.tanishisherewith.dynamichud.util;
+package com.tanishisherewith.dynamichud.interfaces;
 
 import com.tanishisherewith.dynamichud.helpers.TextureHelper;
 import com.tanishisherewith.dynamichud.widget.armor.ArmorWidget;
