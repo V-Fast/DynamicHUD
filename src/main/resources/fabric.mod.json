@@ -23,6 +23,9 @@
       "com.tanishisherewith.dynamichud.DynamicHUDmod"
     ]
   },
+  "mixins": [
+    "dynamichud.mixins.json"
+  ],
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",

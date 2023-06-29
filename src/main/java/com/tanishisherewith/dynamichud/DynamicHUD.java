@@ -59,6 +59,9 @@ public class DynamicHUD implements ClientModInitializer {
         return dynamicutil;
     }
 
+    public static IWigdets getIWigdets() {
+        return iWigdets;
+    }
 
     @Override
     public void onInitializeClient() {

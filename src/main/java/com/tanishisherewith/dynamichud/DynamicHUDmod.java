@@ -32,12 +32,11 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoadi
     @Override
     public void onInitializeClient() {
         dynamicutil = DynamicHUD.getDynamicUtil();
-
         widgets.clear();
 
         DynamicHUD.setAbstractScreen(new MoveableScreen(Text.of("Editor Screen"),dynamicutil));
-
         DynamicHUD.setIWigdets(new DynamicHUDmod());
+
     }
 
     @Override
@@ -87,14 +86,18 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoadi
             };
             for (Widget widget : widgets) {
                 if (widget instanceof TextWidget textWidget) {
-                    TextGenerator textGenerator = TextWidgettext[textIndex++];
-                    textWidget.setDataTextGenerator(textGenerator);
-                    dynamicUtil.getWidgetManager().addWidget(textWidget);
+                    if (textIndex<6) {
+                        TextGenerator textGenerator = TextWidgettext[textIndex++];
+                        textWidget.setDataTextGenerator(textGenerator);
+                        dynamicUtil.getWidgetManager().addWidget(textWidget);
+                    }
                 }
                 if (widget instanceof ArmorWidget armorWidget) {
-                    TextGenerator textGenerator = ArmorWidgettext[armorIndex++];
-                    armorWidget.setTextGenerator(textGenerator);
-                    dynamicUtil.getWidgetManager().addWidget(armorWidget);
+                    if (armorIndex<6) {
+                        TextGenerator textGenerator = ArmorWidgettext[armorIndex++];
+                        armorWidget.setTextGenerator(textGenerator);
+                        dynamicUtil.getWidgetManager().addWidget(armorWidget);
+                    }
                 }
                 if (widget instanceof ItemWidget itemWidget) {
                     dynamicUtil.getWidgetManager().addWidget(itemWidget);
