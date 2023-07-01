@@ -26,6 +26,9 @@
       "com.tanishisherewith.dynamichud.ModMenuIntegration"
     ]
   },
+  "mixins": [
+    "dynamichud.mixins.json"
+  ],
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
@@ -36,8 +39,7 @@
   },
   "custom": {
     "modmenu": {
-      "badges": [ "library"],
-      "update_checker": true
+      "badges": [ "library"]
     }
   }
 }

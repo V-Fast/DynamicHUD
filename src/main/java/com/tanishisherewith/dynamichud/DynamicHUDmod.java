@@ -26,6 +26,7 @@ import static com.tanishisherewith.dynamichud.DynamicHUD.WIDGETS_FILE;
 public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoading {
     MinecraftClient mc = MinecraftClient.getInstance();
     protected List<Widget> widgets = new ArrayList<>();
+    protected List<Widget> MainMenuwidgets = new ArrayList<>();
     private DynamicUtil dynamicutil;
 
 
@@ -33,6 +34,7 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoadi
     public void onInitializeClient() {
         dynamicutil = DynamicHUD.getDynamicUtil();
         widgets.clear();
+        MainMenuwidgets.clear();
 
         DynamicHUD.setAbstractScreen(new MoveableScreen(Text.of("Editor Screen"),dynamicutil));
         DynamicHUD.setIWigdets(new DynamicHUDmod());
@@ -41,7 +43,8 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoadi
 
     @Override
     public void addWigdets(DynamicUtil dynamicUtil) {
-        System.out.println("Added widgets");
+        if(mc.player!=null) {
+            System.out.println("Added widgets");
             widgets.add(new TextWidget(mc, "FPS: ", () -> mc.fpsDebugString.split(" ")[0], 0.5f, 0.5f, true, true, false, -1, -1, true));
             widgets.add(new TextWidget(mc, "Dynamic", () -> "HUD", 0.7f, 0.3f, false, false, false, -1, -1, true));
             widgets.add(new TextWidget(mc, "Ping: ", () -> "", 0.08f, 0.5f, false, false, false, -1, -1, true));
@@ -49,32 +52,50 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoadi
             widgets.add(new TextWidget(mc, "Day/Night: ", () -> "", 0.83f, 0.8f, false, false, false, -1, -1, true));
 
             // Add an armor widget to the custom HUD
-            String text="Text";
-            widgets.add(new ArmorWidget(mc, EquipmentSlot.CHEST, 0.01f, 0.01f, true, TextureHelper.Position.ABOVE, () -> text, ()->Color.RED,true));
-            widgets.add(new ArmorWidget(mc, EquipmentSlot.LEGS, 0.05f, 0.01f, true, TextureHelper.Position.LEFT, () -> String.valueOf(MinecraftClient.getInstance().getCurrentFps()),()->Color.WHITE,true));
+            String text = "Text";
+            widgets.add(new ArmorWidget(mc, EquipmentSlot.CHEST, 0.01f, 0.01f, true, TextureHelper.Position.ABOVE, () -> text, () -> Color.RED, true));
+            widgets.add(new ArmorWidget(mc, EquipmentSlot.LEGS, 0.05f, 0.01f, true, TextureHelper.Position.LEFT, () -> String.valueOf(MinecraftClient.getInstance().getCurrentFps()), () -> Color.WHITE, true));
 
-            widgets.add(new ItemWidget(mc, Items.DIAMOND_AXE::getDefaultStack, 0.15f, 0.15f, true, TextureHelper.Position.ABOVE, () -> "",()-> Color.RED,true));
+            widgets.add(new ItemWidget(mc, Items.DIAMOND_AXE::getDefaultStack, 0.15f, 0.15f, true, TextureHelper.Position.ABOVE, () -> "", () -> Color.RED, true));
             for (Widget wigdet : widgets) {
-                if (wigdet instanceof TextWidget textWidget)
-                {
-                    if(textWidget.getText().equalsIgnoreCase("fps: "))
-                    {
+                if (wigdet instanceof TextWidget textWidget) {
+                    if (textWidget.getText().equalsIgnoreCase("fps: ")) {
                         textWidget.setDraggable(false);
                     }
                 }
                 dynamicUtil.getWidgetManager().addWidget(wigdet);
             }
+            dynamicUtil.WidgetAdded = true;
+        }
+    }
+
+    @Override
+    public void addMainMenuWigdets(DynamicUtil dynamicUtil) {
+        MainMenuwidgets.add(new TextWidget(mc, "Day/Night: ", () -> "", 0.83f, 0.8f, false, false, false, -1, -1, true));
+        MainMenuwidgets.add(new TextWidget(mc, "Fps: ", () -> "", 0.85f, 0.3f, false, false, false, -1, -1, true));
+        MainMenuwidgets.add(new TextWidget(mc, "EOR: ", () -> "", 0.87f, 0.5f, false, false, false, -1, -1, true));
+        for (Widget mmwigdet : MainMenuwidgets) {
+            if (mmwigdet instanceof TextWidget textWidget) {
+                if (textWidget.getText().equalsIgnoreCase("fps: ")) {
+                    textWidget.setDraggable(false);
+                }
+            }
+            dynamicUtil.getWidgetManager().addMainMenuWidget(mmwigdet);
+        }
+        dynamicUtil.MainMenuWidgetAdded=true;
     }
 
     @Override
     public void loadWigdets(DynamicUtil dynamicUtil) {
-        if (mc.player!=null) {
-            List<Widget> widgets = dynamicUtil.getWidgetManager().loadWigdets(WIDGETS_FILE);
+        List<Widget> widgets = dynamicUtil.getWidgetManager().loadWigdets(WIDGETS_FILE);
+        List<Widget> MainMenuWidget = dynamicUtil.getWidgetManager().loadMainMenuWigdets(WIDGETS_FILE);
+        System.out.println("Widgets loaded: "+widgets);
+        System.out.println("MainMenuWidgets loaded: "+MainMenuWidget);
             int textIndex = 0;
             int armorIndex = 0;
             TextGenerator[] TextWidgettext = new TextGenerator[]{
                     () -> String.valueOf(mc.getCurrentFps()),
-                    () -> " Hud",
+                    () -> "Hud",
                     () -> "",
                     () -> "",
                     () -> ""
@@ -84,26 +105,30 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoadi
                     () -> "DynamicHud",
                     () -> "True"
             };
-            for (Widget widget : widgets) {
-                if (widget instanceof TextWidget textWidget) {
-                    if (textIndex<6) {
-                        TextGenerator textGenerator = TextWidgettext[textIndex++];
-                        textWidget.setDataTextGenerator(textGenerator);
-                        dynamicUtil.getWidgetManager().addWidget(textWidget);
-                    }
+        for (Widget widget : widgets) {
+            if (widget instanceof TextWidget textWidget) {
+                if (textIndex<5) {
+                    TextGenerator textGenerator = TextWidgettext[textIndex++];
+                    textWidget.setDataTextGenerator(textGenerator);
                 }
-                if (widget instanceof ArmorWidget armorWidget) {
-                    if (armorIndex<6) {
-                        TextGenerator textGenerator = ArmorWidgettext[armorIndex++];
-                        armorWidget.setTextGenerator(textGenerator);
-                        dynamicUtil.getWidgetManager().addWidget(armorWidget);
-                    }
+                    dynamicUtil.getWidgetManager().addWidget(textWidget);
+            }
+            if (widget instanceof ArmorWidget armorWidget) {
+                if (armorIndex<3) {
+                    TextGenerator textGenerator = ArmorWidgettext[armorIndex++];
+                    armorWidget.setTextGenerator(textGenerator);
                 }
-                if (widget instanceof ItemWidget itemWidget) {
-                    dynamicUtil.getWidgetManager().addWidget(itemWidget);
-                }
+                    dynamicUtil.getWidgetManager().addWidget(armorWidget);
+            }
+            if (widget instanceof ItemWidget itemWidget) {
+                dynamicUtil.getWidgetManager().addWidget(itemWidget);
             }
         }
+        for (Widget widget: MainMenuWidget)
+        {
+           dynamicUtil.getWidgetManager().addMainMenuWidget(widget);
+        }
+        dynamicUtil.WidgetLoaded = true;
     }
 
     @Override

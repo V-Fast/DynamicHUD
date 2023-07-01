@@ -1,6 +1,7 @@
 package com.tanishisherewith.dynamichud.util;
 
 
+import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.huds.AbstractMoveableScreen;
@@ -10,6 +11,8 @@ import com.tanishisherewith.dynamichud.widget.WidgetManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.screen.GameMenuScreen;
+import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -22,6 +25,7 @@ import java.awt.*;
 public class DynamicUtil extends DrawContext {
     private final WidgetManager widgetManager; // The WidgetManager instance used by this class
     public boolean WidgetAdded = false;
+    public boolean MainMenuWidgetAdded = false;
     public boolean WidgetLoaded = false;
 
     /**
@@ -53,21 +57,31 @@ public class DynamicUtil extends DrawContext {
      * @param delta - Time elapsed since last frame in seconds.
      */
     public void render(DrawContext context, float delta) {
-        // Draw each widget
-        for (Widget widget : widgetManager.getWidgets()) {
-            if (!MinecraftClient.getInstance().options.debugEnabled || MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
-                if (MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
-                    widget.render(context);
-                } else if (widget.isEnabled()) {
-                    widget.render(context);
-                }
-            }
-
-            // Draw a red box around the widget if the HUD is disabled
-            if (MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
+        if (MinecraftClient.getInstance().currentScreen instanceof TitleScreen) {
+            // Draw each Menu widget
+            for (Widget widget : widgetManager.getMainMenuWidgets()) {
+                widget.render(context);
                 int backgroundColor = widget.isEnabled() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
                 WidgetBox box = widget.getWidgetBox();
-                DrawHelper.fill(context,box.x1, box.y1, box.x2, box.y2, backgroundColor);
+                DrawHelper.fill(context, box.x1, box.y1, box.x2, box.y2, backgroundColor);
+            }
+            return;
+        }
+
+        // Draw each widget
+        if (!MinecraftClient.getInstance().options.debugEnabled || MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
+            for (Widget widget : widgetManager.getWidgets()) {
+                    if (MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
+                        widget.render(context);
+                    } else if (widget.isEnabled()) {
+                        widget.render(context);
+                    }
+                // Draw a red box around the widget if the HUD is disabled
+                if (MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
+                    int backgroundColor = widget.isEnabled() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
+                    WidgetBox box = widget.getWidgetBox();
+                    DrawHelper.fill(context, box.x1, box.y1, box.x2, box.y2, backgroundColor);
+                }
             }
         }
     }

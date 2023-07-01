@@ -16,7 +16,9 @@ import java.util.List;
  */
 public class WidgetManager {
 
+
     private final List<Widget> widgets = new ArrayList<>(); // The list of widgets
+    private final List<Widget> MainMenuWidgets = new ArrayList<>(); // The list of MainMenu widgets
     private WidgetLoading widgetLoading = new WidgetLoading() {};
 
     /**
@@ -28,6 +30,14 @@ public class WidgetManager {
         widgets.add(widget);
     }
 
+    /**
+     * Adds a MainMenu widget to the list.
+     *
+     * @param widget The widget to add
+     */
+    public void addMainMenuWidget(Widget widget) {
+        MainMenuWidgets.add(widget);
+    }
     public void setWidgetLoading(WidgetLoading widgetLoading) {
         this.widgetLoading = widgetLoading;
     }
@@ -49,6 +59,14 @@ public class WidgetManager {
     public List<Widget> getWidgets() {
         return widgets;
     }
+    /**
+     * Returns list of all MainMenu widgets.
+     *
+     * @return list of all MainMenu widgets.
+     */
+    public List<Widget> getMainMenuWidgets() {
+        return MainMenuWidgets;
+    }
     public List<Widget> getOtherWidgets(Widget SelectedWidget) {
         List<Widget> otherWidgets = new ArrayList<>();
         for (Widget widget : getWidgets()) {
@@ -67,6 +85,7 @@ public class WidgetManager {
     public void saveWidgets(File file) {
         NbtCompound rootTag = new NbtCompound();
         NbtList widgetList = new NbtList();
+        NbtList MainMenuwidgetList = new NbtList();
 
         DynamicHUD.printInfo("Saving widgets");
 
@@ -77,7 +96,12 @@ public class WidgetManager {
         }
 
         rootTag.put("widgets", widgetList);
-
+        for (Widget mmwidget : MainMenuWidgets) {
+            NbtCompound widgetTag = new NbtCompound();
+            mmwidget.writeToTag(widgetTag);
+            MainMenuwidgetList.add(widgetTag);
+        }
+        rootTag.put("MainMenuwidgets", MainMenuwidgetList);
 
         try (DataOutputStream out = new DataOutputStream(new FileOutputStream(file))) {
             NbtIo.writeCompressed(rootTag, out);
@@ -105,5 +129,24 @@ public class WidgetManager {
         } else
             DynamicHUD.printWarn("Widgets File does not exist");
         return widgets;
+    }
+    public List<Widget> loadMainMenuWigdets(File file) {
+        List<Widget> MainMenuwidgets = new ArrayList<>();
+        if (file.exists()) {
+            try (DataInputStream in = new DataInputStream(new FileInputStream(file))) {
+                NbtCompound rootTag = NbtIo.readCompressed(in);
+                NbtList MainMenuwidgetList = rootTag.getList("MainMenuwidgets", NbtType.COMPOUND);
+                for (int i = 0; i < MainMenuwidgetList.size(); i++) {
+                    NbtCompound widgetTag = MainMenuwidgetList.getCompound(i);
+                    String className = widgetTag.getString("class");
+                    MainMenuwidgets.add(widgetLoading.loadWidgetsFromTag(className, widgetTag));
+                    DynamicHUD.printInfo("Wigdet " + i+ ": "+MainMenuwidgets.get(i).toString());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else
+            DynamicHUD.printWarn("Widgets File does not exist");
+        return MainMenuwidgets;
     }
 }

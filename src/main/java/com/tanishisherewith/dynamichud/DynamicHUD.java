@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
@@ -67,20 +68,15 @@ public class DynamicHUD implements ClientModInitializer {
     public void onInitializeClient() {
         dynamicutil = new DynamicUtil(mc);
 
-
         ClientTickEvents.START_CLIENT_TICK.register(server -> {
-            if (mc.player != null && iWigdets != null) {
-                if (!WIDGETS_FILE.exists() && !dynamicutil.WidgetAdded) {
-                    iWigdets.addWigdets(dynamicutil);
-                    dynamicutil.WidgetAdded = true;
-                    printInfo("Widgets added");
+            if (iWigdets != null) {
+                if (!WIDGETS_FILE.exists()) {
+                    if(!dynamicutil.WidgetAdded) iWigdets.addWigdets(dynamicutil);
+                    if(!dynamicutil.MainMenuWidgetAdded)iWigdets.addMainMenuWigdets(dynamicutil);
                 }
+
                 if (WIDGETS_FILE.exists() && !dynamicutil.WidgetLoaded) {
                     iWigdets.loadWigdets(dynamicutil);
-                    dynamicutil.WidgetLoaded = true;
-                    printInfo("Widgets loaded");
-                    File filedirectory=new File(fileDirectory,filename);
-                    printInfo("Load file Directory: "+filedirectory);
                 }
             }
             DynamicUtil.openDynamicScreen(EditorScreenKeyBinding, Screen);
@@ -88,10 +84,18 @@ public class DynamicHUD implements ClientModInitializer {
         ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> {
             dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE);
         });
+        printInfo("DynamicHud Initialised");
+        if (dynamicutil.WidgetAdded || dynamicutil.MainMenuWidgetAdded) printInfo("Widgets added");
+        if(dynamicutil.WidgetLoaded) {
+            printInfo("Widgets loaded");
+            File filedirectory = new File(fileDirectory, filename);
+            printInfo("Load file Directory: " + filedirectory);
+        }
         HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
-            dynamicutil.render(drawContext, tickDelta);
+            if(!(mc.currentScreen instanceof TitleScreen)) {
+                dynamicutil.render(drawContext, tickDelta);
+            }
         });
-        printInfo("Initialised");
     }
     public static void printInfo(String msg)
     {
