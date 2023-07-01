@@ -24,7 +24,7 @@ public class ContextMenu {
     private final Widget selectedWidget; // The widget that this context menu is associated with
     private int backgroundColor = 0x90C0C0C0;// Semi-transparent light grey color
     private int padding = 5; // The amount of padding around the rectangle
-    private int heightfromwidget = 5; // The amount of padding around the rectangle
+    private int HeightFromWidget = 5; // The amount of padding around the rectangle
     private float scale = 0.0f;
     private int height = 0;
 
@@ -73,6 +73,20 @@ public class ContextMenu {
         }
         options.add(option);
     }
+    public void addDataTextOption(String label, Consumer<String > action) {
+        DataInputOption option = new DataInputOption(label, action,x+client.textRenderer.getWidth(label)+25,15);
+        if (selectedWidget != null) {
+            setOptions(label, option);
+        }
+        options.add(option);
+    }
+    public void addDoubleTextOption(String label, Consumer<Double > action) {
+        DoubleInputOption option = new DoubleInputOption(label, action,x+client.textRenderer.getWidth(label)+25,15);
+        if (selectedWidget != null) {
+            setOptions(label, option);
+        }
+        options.add(option);
+    }
 
     public void setBackgroundColor(int backgroundColor) {
         this.backgroundColor = backgroundColor;
@@ -86,7 +100,7 @@ public class ContextMenu {
      * @return true if the point is within the bounds of this context menu, false otherwise.
      */
     public boolean contains(double x, double y) {
-        return x >= this.x - 3 && x <= this.x + width + 13 && y >= this.y + heightfromwidget - 3 && y <= this.y + height + heightfromwidget + 3;
+        return x >= this.x - 3 && x <= this.x + width + 13 && y >= this.y + HeightFromWidget - 3 && y <= this.y + height + HeightFromWidget + 3;
     }
 
     public int getHeight() {
@@ -154,11 +168,11 @@ public class ContextMenu {
         if (x + width + 12 > screenWidth) {
             x = screenWidth - width - 12;
         }
-        if (y + heightfromwidget - 2 < 0) {
-            y = heightfromwidget + 2;
+        if (y + HeightFromWidget - 2 < 0) {
+            y = HeightFromWidget + 2;
         }
-        if (y + height + heightfromwidget + 2 > screenHeight) {
-            y = screenHeight - height - heightfromwidget - 2;
+        if (y + height + HeightFromWidget + 2 > screenHeight) {
+            y = screenHeight - height - HeightFromWidget - 2;
         }
     }
 
@@ -173,16 +187,16 @@ public class ContextMenu {
         calculateSize(textRenderer);
         // Apply the scale
         drawContext.getMatrices().push();
-        drawContext.getMatrices().translate(x + width / 2.0f + 5, y + height / 2.0f + heightfromwidget, 300);
+        drawContext.getMatrices().translate(x + width / 2.0f + 5, y + height / 2.0f + HeightFromWidget, 300);
         drawContext.getMatrices().scale(scale, scale, 1.0f);
-        drawContext.getMatrices().translate(-(x + width / 2.0f + 5), -(y + height / 2.0f + heightfromwidget), 300);
+        drawContext.getMatrices().translate(-(x + width / 2.0f + 5), -(y + height / 2.0f + HeightFromWidget), 300);
         int x1 = x - 1;
-        int y1 = y + heightfromwidget - 2;
+        int y1 = y + HeightFromWidget - 2;
         int x2 = x + width + 8;
-        int y2 = y + height + heightfromwidget + 2;
+        int y2 = y + height + HeightFromWidget + 2;
         // Draw the background
         DrawHelper.drawCutRectangle(drawContext, x1, y1, x2, y2, 0, backgroundColor, 1);
-        optionY = y + heightfromwidget + 2;
+        optionY = y + HeightFromWidget + 2;
         drawOptions(drawContext, textRenderer);
         if (selectedWidget != null)
             setPosition(selectedWidget.getX(), selectedWidget.getY() + textRenderer.fontHeight + 4);
@@ -230,8 +244,8 @@ public class ContextMenu {
         this.padding = padding;
     }
 
-    public void setHeightfromwidget(int heightfromwidget) {
-        this.heightfromwidget = heightfromwidget;
+    public void setHeightFromWidget(int HeightFromWidget) {
+        this.HeightFromWidget = HeightFromWidget;
     }
 
     public List<ContextMenuOption> getOptions() {
@@ -248,7 +262,7 @@ public class ContextMenu {
      */
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         TextRenderer textRenderer = client.textRenderer;
-        int optionY = y + heightfromwidget + 2;
+        int optionY = y + HeightFromWidget + 2;
         for (ContextMenuOption option : options) {
             if (mouseX >= x && mouseX <= x + textRenderer.getWidth(option.label) + 10 && mouseY >= optionY && mouseY <= optionY + textRenderer.fontHeight + 2) {
                 // Run the action of the selected option
@@ -293,6 +307,22 @@ public class ContextMenu {
 
         public void updateLabel() {
             label = labelPrefix + getter.get();
+        }
+    }
+    public class DataInputOption extends ContextMenuOption {
+        public DataInputOption(String label, Consumer<String> consumer,int x,int y) {
+            super(label, () -> {
+                // Open a new screen to allow the player to input data
+                MinecraftClient.getInstance().setScreen(new DataInputScreen(consumer,x,y));
+            });
+        }
+    }
+    public class DoubleInputOption extends ContextMenuOption {
+        public DoubleInputOption(String label, Consumer<Double> consumer,int x, int y) {
+            super(label, () -> {
+                // Open a new screen to allow the player to input data
+                MinecraftClient.getInstance().setScreen(new DoubleInputScreen(consumer,x,y));
+            });
         }
     }
 

@@ -18,32 +18,27 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen {
-    protected MouseHandler mouseHandler =new DefaultMouseHandler(null,null,null);
+    protected MouseHandler mouseHandler = new DefaultMouseHandler(null, null, null);
     protected DragHandler dragHandler = new DefaultDragHandler();
     protected Widget selectedWidget;
     protected int dragStartX = 0, dragStartY = 0; // The starting position of a drag operation
     protected int gridSize = 1; // The size of each grid cell in pixels
+    DynamicUtil dynamicUtil = DynamicHUD.getDynamicUtil();
+    protected TitleScreenMixin(Text title) {
+        super(title);
+    }
 
     public void setGridSize(int gridSize) {
         this.gridSize = gridSize;
     }
 
-    DynamicUtil dynamicUtil= DynamicHUD.getDynamicUtil();
-
-
-    protected TitleScreenMixin(Text title) {
-        super(title);
-    }
-
     @Inject(at = @At("TAIL"), method = "render")
     private void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         // Draw custom text on the title screen
-        if (dynamicUtil!=null && (dynamicUtil.MainMenuWidgetAdded || dynamicUtil.WidgetLoaded))
-        {
-                dynamicUtil.render(context,delta);
+        if (dynamicUtil != null && (dynamicUtil.MainMenuWidgetAdded || dynamicUtil.WidgetLoaded)) {
+            dynamicUtil.render(context, delta);
         }
     }
-
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (mouseHandler.mouseClicked(mouseX, mouseY, button)) {
@@ -54,10 +49,10 @@ public abstract class TitleScreenMixin extends Screen {
             if (widget.getWidgetBox().contains(widget, mouseX, mouseY)) {
                 if (button == 1) { // Right-click
                     handleRightClickOnWidget(widget);
-                }else if(button == 0) {
+                } else if (button == 0) {
                     widget.enabled = !widget.enabled;
                 }
-                if (dragHandler.startDragging(widget, mouseX, mouseY) && button==0 && widget.isDraggable) {
+                if (dragHandler.startDragging(widget, mouseX, mouseY) && button == 0 && widget.isDraggable) {
                     selectedWidget = widget;
                     return true;
                 }
@@ -69,7 +64,7 @@ public abstract class TitleScreenMixin extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (mouseHandler.mouseDragged(mouseX, mouseY, button, deltaX, deltaY) ) {
+        if (mouseHandler.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
             return true;
         }
         if (selectedWidget != null && selectedWidget.isDraggable) {
@@ -100,7 +95,7 @@ public abstract class TitleScreenMixin extends Screen {
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
-    protected void handleRightClickOnWidget(Widget widget){
+    protected void handleRightClickOnWidget(Widget widget) {
 
     }
 

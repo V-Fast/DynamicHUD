@@ -38,6 +38,7 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoadi
 
         DynamicHUD.setAbstractScreen(new MoveableScreen(Text.of("Editor Screen"),dynamicutil));
         DynamicHUD.setIWigdets(new DynamicHUDmod());
+        dynamicutil.getWidgetManager().setWidgetLoading(new DynamicHUDmod());
 
     }
 
@@ -147,8 +148,8 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoadi
        * >>
        * I will add Documentation to understand this code better as it looks awful as a comment
        * This is basically using advanced dynamic ItemWidgets and ArmorWidgets
-       * The code rn is kind of complicated for first time using this library (Dont worry, its gonna improve), But this is better than writing 10 different classes from scratch. (Not an excuss for being a bad coder)
-       * As an excuse, I will write a really good documentation explaining how to use even the smallest feature. (I will also setup a template with each of the widgets with dynamic texts and colors)
+       * The code rn is kind of complicated for first time using this library (Don't worry, it's going to improve), But this is better than writing 10 different classes from scratch. (Not an excuss for being a bad coder)
+       * As an excuse, I will write a perfect documentation explaining how to use even the smallest feature. (I will also set up a template with each of the widgets with dynamic texts and colors)
        */
       private void NoDocumentationDangling(){}
   /*protected List<Widget> widgets = new ArrayList<>();

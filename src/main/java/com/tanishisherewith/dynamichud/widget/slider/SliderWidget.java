@@ -20,7 +20,6 @@ public class SliderWidget {
     private int y; // The y position of the widget
     private float value; // The current value of the slider
     private Widget selectedWidget = null;
-
     private float progress = 0.0f;
     private float progressSpeed = 0.1f;
     private float textProgress = 0.0f;

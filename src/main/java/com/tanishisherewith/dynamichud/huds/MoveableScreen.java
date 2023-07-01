@@ -67,7 +67,7 @@ public class MoveableScreen extends AbstractMoveableScreen {
 
     protected void ArmorWidgetMenu(ArmorWidget armorWidget, int x, int y) {
         Slider = null;
-        contextMenu.setHeightfromwidget(15);
+        contextMenu.setHeightFromWidget(14);
         contextMenu.setPadding(5);
         contextMenu.addEnumCycleOption("", TextureHelper.Position.values(), () -> armorWidget.currentTextPosition[0], newPosition -> {
             armorWidget.currentTextPosition[0] = newPosition;
@@ -75,7 +75,7 @@ public class MoveableScreen extends AbstractMoveableScreen {
     }
 
     protected void TextWidgetMenu(TextWidget textWidget, int x, int y) {
-        contextMenu.setHeightfromwidget(2);
+        contextMenu.setHeightFromWidget(2);
         contextMenu.setPadding(5);
         contextMenu.addOption("Shadow", () -> {
             textWidget.setShadow(!textWidget.hasShadow());
@@ -106,12 +106,18 @@ public class MoveableScreen extends AbstractMoveableScreen {
                     colorPicker=null;
             });
         }
+        contextMenu.addDataTextOption(("Enter data"), data -> {
+            System.out.println("Entered data: " + data);
+        });
+        contextMenu.addDoubleTextOption(("Enter data"), data -> {
+            System.out.println("Entered data: " + data);
+        });
 
         Slider = new SliderWidgetBuilder(client)
                 .setX(x)
                 .setY(y)
                 .setWidth(105)
-                .setHeight(contextMenu.getHeight()+10)
+                .setHeight(contextMenu.getHeight()+13)
                 .setLabel("Rainbow Speed")
                 .setValue(textWidget.getRainbowSpeed())
                 .setMinValue(5f)
