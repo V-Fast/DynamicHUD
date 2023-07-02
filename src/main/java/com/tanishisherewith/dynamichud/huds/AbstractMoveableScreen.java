@@ -1,29 +1,31 @@
 package com.tanishisherewith.dynamichud.huds;
 
-import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.handlers.DefaultDragHandler;
 import com.tanishisherewith.dynamichud.handlers.DefaultMouseHandler;
 import com.tanishisherewith.dynamichud.handlers.DragHandler;
 import com.tanishisherewith.dynamichud.handlers.MouseHandler;
-import com.tanishisherewith.dynamichud.widget.slider.SliderWidget;
+import com.tanishisherewith.dynamichud.util.DynamicUtil;
 import com.tanishisherewith.dynamichud.util.colorpicker.ColorGradientPicker;
 import com.tanishisherewith.dynamichud.util.contextmenu.ContextMenu;
-import com.tanishisherewith.dynamichud.util.DynamicUtil;
 import com.tanishisherewith.dynamichud.widget.Widget;
+import com.tanishisherewith.dynamichud.widget.slider.SliderWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class AbstractMoveableScreen extends Screen {
     protected final DynamicUtil dynamicutil; // The DynamicUtil instance used by this screen
     protected MinecraftClient mc = MinecraftClient.getInstance();
     protected Widget selectedWidget = null; // The currently selected widget
     protected int dragStartX = 0, dragStartY = 0; // The starting position of a drag operation
-    protected ContextMenu contextMenu = null; // The context menu that is currently displayed
+    protected List<ContextMenu> contextMenu = new ArrayList<>(); // The context menu that is currently displayed
     protected ColorGradientPicker colorPicker = null; // The color picker that is currently displayed
     protected Widget sliderWigdet = null; // The widget that is currently being edited by the slider
-    protected SliderWidget Slider = null; // The rainbow speed slider
+    protected List<SliderWidget> Slider = new ArrayList<>(); // The rainbow speed slider
     protected MouseHandler mouseHandler;
     protected DragHandler dragHandler;
     protected int gridSize = 3; // The size of each grid cell in pixels
@@ -41,7 +43,7 @@ public abstract class AbstractMoveableScreen extends Screen {
     public AbstractMoveableScreen(Text title, DynamicUtil dynamicutil) {
         super(title);
         this.dynamicutil = dynamicutil;
-        updateMouseHandler(this.colorPicker, this.contextMenu, this.Slider);
+        updateMouseHandler(this.colorPicker, contextMenu, Slider);
         dragHandler = new DefaultDragHandler();
     }
 
@@ -57,7 +59,7 @@ public abstract class AbstractMoveableScreen extends Screen {
      */
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (mouseHandler.mouseDragged(mouseX, mouseY, button, deltaX, deltaY) ) {
+        if (mouseHandler.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
             return true;
         }
         if (selectedWidget != null && selectedWidget.isDraggable) {
@@ -75,6 +77,7 @@ public abstract class AbstractMoveableScreen extends Screen {
         }
         return false;
     }
+
     /**
      * Handles mouse clicks on this screen.
      *
@@ -90,11 +93,25 @@ public abstract class AbstractMoveableScreen extends Screen {
         }
         // Check if the context menu is visible and if the mouse click occurred outside its bounds
         // Check if the Slider is visible and if the mouse click occurred outside its bounds
-        if ((contextMenu != null && !contextMenu.contains(mouseX, mouseY) || Slider != null && !Slider.contains(mouseX, mouseY))) {
-            // Close the context menu
-            contextMenu = null;
-            Slider = null;
-            return true;
+        if (contextMenu != null) {
+            for (ContextMenu contextmenu : contextMenu) {
+                if (!contextmenu.contains(mouseX, mouseY)) {
+                    // Close the context menu
+                    contextMenu.clear();
+                    Slider.clear();
+                    return true;
+                }
+            }
+        }
+        if (Slider != null) {
+            for (SliderWidget sliderWidget : Slider) {
+                if (!sliderWidget.contains(mouseX, mouseY)) {
+                    // Close the Slider
+                    Slider.clear();
+                    contextMenu.clear();
+                    return true;
+                }
+            }
         }
 
 
@@ -102,17 +119,24 @@ public abstract class AbstractMoveableScreen extends Screen {
             if (widget.getWidgetBox().contains(widget, mouseX, mouseY)) {
                 // Start dragging the widget
                 colorPicker = null;
-                contextMenu=null;
-                Slider=null;
+                contextMenu.clear();
+                Slider.clear();
                 if (button == 1) { // Right-click
                     handleRightClickOnWidget(widget);
-                }else if(button == 0) {
+                } else if (button == 0) {
                     widget.enabled = !widget.enabled;
                 }
-                if (dragHandler.startDragging(widget, mouseX, mouseY) && button==0 && widget.isDraggable) {
+                if (dragHandler.startDragging(widget, mouseX, mouseY) && button == 0 && widget.isDraggable) {
                     selectedWidget = widget;
-                    if (contextMenu!=null) {
-                        contextMenu.updatePosition();
+                    if (contextMenu != null) {
+                        for (ContextMenu contextmenu : contextMenu) {
+                            contextmenu.updatePosition();
+                        }
+                    }
+                    if (Slider != null) {
+                        for (SliderWidget sliderWidget : Slider) {
+                            sliderWidget.updatePosition();
+                        }
                     }
                     return true;
                 }
@@ -161,23 +185,27 @@ public abstract class AbstractMoveableScreen extends Screen {
 
         // Draw the slider and other stuff
         if (Slider != null) {
-            Slider.render(drawContext);
+            for (SliderWidget sliderWidget : Slider) {
+                sliderWidget.render(drawContext);
+            }
         }
         if (contextMenu != null) {
-            contextMenu.render(drawContext);
+            for (ContextMenu contextMenu : contextMenu) {
+                contextMenu.render(drawContext);
+            }
         }
         if (colorPicker != null) {
             colorPicker.render(drawContext);
         }
-        if (selectedWidget!=null)
-        {
-            widgetX=selectedWidget.getX();
-            widgetY=selectedWidget.getY();
+        if (selectedWidget != null) {
+            widgetX = selectedWidget.getX();
+            widgetY = selectedWidget.getY();
         }
+
         updateMouseHandler(colorPicker, contextMenu, Slider);
     }
 
-    private void updateMouseHandler(ColorGradientPicker colorPicker, ContextMenu contextMenu, SliderWidget Slider) {
+    private void updateMouseHandler(ColorGradientPicker colorPicker, List<ContextMenu> contextMenu, List<SliderWidget> Slider) {
         this.colorPicker = colorPicker;
         this.contextMenu = contextMenu;
         this.Slider = Slider;
@@ -201,7 +229,6 @@ public abstract class AbstractMoveableScreen extends Screen {
         if (ShouldBeAffectedByResize)
             super.resize(client, width, height);
         else {
-            return;
         }
     }
 

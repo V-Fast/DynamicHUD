@@ -218,8 +218,8 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         TextRenderer textRenderer = client.textRenderer;
         int x1 = getX(); //- client.textRenderer.getWidth(textWidget.getText());
         int x2 = getX() + textRenderer.getWidth(getDataText()) + textRenderer.getWidth(getText()) + textRenderer.getWidth(" ");
-        int y1 = getY() - textRenderer.fontHeight / 2 - 2;
-        int y2 = getY() + textRenderer.fontHeight / 2 + 2;
+        int y1 = getY() - textRenderer.fontHeight / 2;
+        int y2 = getY() + textRenderer.fontHeight / 2;
         return new WidgetBox(x1, y1, x2, y2);
     }
 

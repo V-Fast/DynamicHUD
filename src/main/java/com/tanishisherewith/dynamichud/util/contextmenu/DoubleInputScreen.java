@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.util.contextmenu;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
@@ -11,13 +12,21 @@ public class DoubleInputScreen extends Screen {
     private final Consumer<Double> consumer;
     private TextFieldWidget textField;
     private int x,y;
+    private final Screen parentScreen;
+    private final ContextMenu.DoubleInputOption doubleInputOption;
 
 
-    public DoubleInputScreen(Consumer<Double> consumer,int x,int y) {
+    public DoubleInputScreen(Consumer<Double> consumer, int x, int y, Screen parentScreen, ContextMenu.DoubleInputOption doubleInputOption) {
         super(Text.of("Double Input"));
         this.consumer = consumer;
         this.x=x;
         this.y=y;
+        this.parentScreen=parentScreen;
+        this.doubleInputOption=doubleInputOption;
+        if(this.x>MinecraftClient.getInstance().getWindow().getScaledWidth())this.x=MinecraftClient.getInstance().getWindow().getScaledWidth()-110;
+        if(this.y>MinecraftClient.getInstance().getWindow().getScaledWidth())this.y=MinecraftClient.getInstance().getWindow().getScaledHeight()-14;
+        if(this.x<0)this.x=MinecraftClient.getInstance().getWindow().getScaledWidth()+110;
+        if(this.y<0)this.y=MinecraftClient.getInstance().getWindow().getScaledHeight()+14;
     }
     @Override
     protected void init() {
@@ -33,7 +42,8 @@ public class DoubleInputScreen extends Screen {
             try {
                 double value = Double.parseDouble(this.textField.getText());
                 this.consumer.accept(value);
-                this.close();
+                MinecraftClient.getInstance().setScreen(parentScreen);
+                doubleInputOption.getLabelSetter().accept(value);
             } catch (NumberFormatException e) {
                 // Handle invalid input
                 this.textField.setText("Not double value");

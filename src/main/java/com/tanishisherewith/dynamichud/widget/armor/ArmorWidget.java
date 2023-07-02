@@ -69,7 +69,7 @@ public class ArmorWidget extends Widget {
 
     @Override
     public WidgetBox getWidgetBox() {
-        return new WidgetBox(this.getX() - 2, this.getY() - 2, this.getX() + this.getWidth() + 2, this.getY() + this.getHeight() + 2);
+        return new WidgetBox(this.getX(), this.getY() , this.getX() + this.getWidth(), this.getY() + this.getHeight());
     }
 
     /**

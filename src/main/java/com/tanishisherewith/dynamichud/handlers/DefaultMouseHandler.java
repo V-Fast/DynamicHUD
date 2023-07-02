@@ -5,12 +5,14 @@ import com.tanishisherewith.dynamichud.util.colorpicker.ColorGradientPicker;
 import com.tanishisherewith.dynamichud.util.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.widget.text.TextWidget;
 
+import java.util.List;
+
 public class DefaultMouseHandler implements MouseHandler {
     private final ColorGradientPicker colorPicker;
-    private final ContextMenu contextMenu;
-    private final SliderWidget sliderWidget;
+    private final List<ContextMenu> contextMenu;
+    private final List<SliderWidget> sliderWidget;
 
-    public DefaultMouseHandler(ColorGradientPicker colorPicker, ContextMenu contextMenu, SliderWidget sliderWidget) {
+    public DefaultMouseHandler(ColorGradientPicker colorPicker, List<ContextMenu> contextMenu, List<SliderWidget> sliderWidget) {
         this.colorPicker = colorPicker;
         this.contextMenu = contextMenu;
         this.sliderWidget = sliderWidget;
@@ -18,20 +20,30 @@ public class DefaultMouseHandler implements MouseHandler {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (contextMenuClicked(mouseX, mouseY, button)) {
-            return true;
-        }
-            if (colorPickerClicked(mouseX, mouseY, button)) {
-                return true;
+        if (contextMenu != null && sliderWidget != null) {
+            for (ContextMenu contextMenu : contextMenu) {
+                if (contextMenuClicked(mouseX, mouseY, button, contextMenu)) {
+                    return true;
+                }
             }
-        return sliderClicked(mouseX, mouseY, button);
+            for (SliderWidget sliderWidget : sliderWidget) {
+                if (sliderClicked(mouseX, mouseY, button, sliderWidget)) {
+                    return true;
+                }
+            }
+        }
+        return colorPickerClicked(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (sliderWidget != null && sliderWidget.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
-            TextWidget.setRainbowSpeed(sliderWidget.getValue());
-            return true;
+        if (sliderWidget != null) {
+            for (SliderWidget sliderWidget : sliderWidget) {
+                if (sliderWidget != null && sliderWidget.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
+                    TextWidget.setRainbowSpeed(sliderWidget.getValue());
+                    return true;
+                }
+            }
         }
             if (this.colorPicker!=null) {
                 colorPicker.mouseDragged(mouseX, mouseY, button);
@@ -52,7 +64,7 @@ public class DefaultMouseHandler implements MouseHandler {
 
 
     @Override
-    public boolean contextMenuClicked(double mouseX, double mouseY, int button) {
+    public boolean contextMenuClicked(double mouseX, double mouseY, int button, ContextMenu contextMenu) {
         return contextMenu != null && contextMenu.mouseClicked(mouseX, mouseY, button);
     }
 
@@ -62,7 +74,7 @@ public class DefaultMouseHandler implements MouseHandler {
     }
 
     @Override
-    public boolean sliderClicked(double mouseX, double mouseY, int button) {
+    public boolean sliderClicked(double mouseX, double mouseY, int button, SliderWidget sliderWidget) {
         return sliderWidget != null && sliderWidget.mouseClicked(mouseX, mouseY, button);
     }
 }

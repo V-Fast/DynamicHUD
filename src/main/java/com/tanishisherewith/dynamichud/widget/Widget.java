@@ -18,8 +18,6 @@ public abstract class Widget {
     protected float xPercent; // The x position of the widget as a percentage of the screen width
     protected float yPercent; // The y position of the widget as a percentage of the screen height
     public boolean isDraggable=true;
-    private int prevX;
-    private int prevY;
 
 
     /**
@@ -71,14 +69,6 @@ public abstract class Widget {
         return enabled;
     }
 
-    public int getPrevX() {
-        return prevX;
-    }
-
-    public int getPrevY() {
-        return prevY;
-    }
-
     /**
      * Returns the x position of the widget.
      *
@@ -94,12 +84,11 @@ public abstract class Widget {
      * @param x The new x position of the widget in pixels
      */
     public void setX(int x) {
-        this.prevX = this.getX();
         int screenWidth = client.getWindow().getScaledWidth();
         if (x < 0) {
             x = 0;
         } else if (x + getWidgetBox().getWidth() > screenWidth) {
-            x = screenWidth - getWidgetBox().getWidth()+(getWidgetBox().getWidth()/2);
+            x = screenWidth - getWidgetBox().getWidth();
         }
         this.xPercent = (float) x / screenWidth;
     }
@@ -119,20 +108,24 @@ public abstract class Widget {
      * @param y The new y position of the widget in pixels
      */
     public void setY(int y) {
-        this.prevY = this.getY();
-        int screenHeight = client.getWindow().getScaledHeight();
+       int screenHeight = client.getWindow().getScaledHeight();
         if (y < 0) {
             y = 0;
         } else if (y + getWidgetBox().getHeight() > screenHeight) {
-            y = screenHeight - getWidgetBox().getHeight()+(getWidgetBox().getHeight()/2);
+            y = screenHeight - getWidgetBox().getHeight();
         }
         this.yPercent = (float) y / screenHeight;
     }
 
+    /**
+     * Returns the fontheight
+     * @return fontHeight from TextRenderer
+     */
     public int getHeight()
     {
         return client.textRenderer.fontHeight;
     }
+
     public void readFromTag(NbtCompound tag) {
         xPercent = tag.getFloat("xPercent");
         yPercent = tag.getFloat("yPercent");

@@ -6,6 +6,7 @@ import com.tanishisherewith.dynamichud.widget.Widget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -18,15 +19,18 @@ public class ContextMenu {
     private static int optionY;
     private final MinecraftClient client; // The Minecraft client instance
     private final List<ContextMenuOption> options = new ArrayList<>(); // The list of options in the context menu
+    private final Widget selectedWidget; // The widget that this context menu is associated with
+    private final Screen parentScreen;
     private int width = 0; // The width of the context menu
     private int x; // The x position of the context menu
     private int y; // The y position of the context menu
-    private final Widget selectedWidget; // The widget that this context menu is associated with
     private int backgroundColor = 0x90C0C0C0;// Semi-transparent light grey color
     private int padding = 5; // The amount of padding around the rectangle
     private int HeightFromWidget = 5; // The amount of padding around the rectangle
     private float scale = 0.0f;
     private int height = 0;
+    private String dataInputValue = "";
+    private String doubleInputValue = "";
 
 
     /**
@@ -37,11 +41,12 @@ public class ContextMenu {
      * @param y              The y position of the context menu
      * @param selectedWidget The widget that this context menu is associated with
      */
-    public ContextMenu(MinecraftClient client, int x, int y, Widget selectedWidget) {
+    public ContextMenu(MinecraftClient client, int x, int y, Widget selectedWidget, Screen parentScreen) {
         this.client = client;
         this.x = x;
         this.y = y;
         this.selectedWidget = selectedWidget;
+        this.parentScreen = parentScreen;
     }
 
     public static int getOptionY() {
@@ -73,15 +78,36 @@ public class ContextMenu {
         }
         options.add(option);
     }
-    public void addDataTextOption(String label, Consumer<String > action) {
-        DataInputOption option = new DataInputOption(label, action,x+client.textRenderer.getWidth(label)+25,15);
+
+    /*public void addDataTextOption(String label, Consumer<String> action) {
+        DataInputOption option = new DataInputOption(label, action, x + client.textRenderer.getWidth(label) + 25, 15);
+        if (selectedWidget != null) {
+            setOptions(label, option);
+        }
+        options.add(option);
+    }*/
+    public void addDataTextOption(String label, Consumer<String> action,int WidgetX, int WidgetY) {
+        int OptionY = WidgetY + HeightFromWidget + 2;
+        WidgetX+=client.textRenderer.getWidth(label+dataInputValue);
+        OptionY+=options.size()*(client.textRenderer.fontHeight+2);
+        DataInputOption option = new DataInputOption(label + dataInputValue, text -> {
+            action.accept(text);
+            dataInputValue = text;
+        }, WidgetX, OptionY);
         if (selectedWidget != null) {
             setOptions(label, option);
         }
         options.add(option);
     }
-    public void addDoubleTextOption(String label, Consumer<Double > action) {
-        DoubleInputOption option = new DoubleInputOption(label, action,x+client.textRenderer.getWidth(label)+25,15);
+
+    public void addDoubleTextOption(String label, Consumer<Double> action,int WidgetX, int WidgetY) {
+        int OptionY = WidgetY + HeightFromWidget + 2;
+        WidgetX+=client.textRenderer.getWidth(label+dataInputValue);
+        OptionY+=options.size()*(client.textRenderer.fontHeight+2);
+        DoubleInputOption option = new DoubleInputOption(label + doubleInputValue, text -> {
+            action.accept(text);
+            doubleInputValue = String.valueOf(text);
+        }, WidgetX, OptionY);
         if (selectedWidget != null) {
             setOptions(label, option);
         }
@@ -103,8 +129,38 @@ public class ContextMenu {
         return x >= this.x - 3 && x <= this.x + width + 13 && y >= this.y + HeightFromWidget - 3 && y <= this.y + height + HeightFromWidget + 3;
     }
 
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public Screen getParentScreen() {
+        return parentScreen;
+    }
+
+    public Widget getSelectedWidget() {
+        return selectedWidget;
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
     public int getHeight() {
         return height;
+    }
+
+    public int getOptionY(int optionIndex) {
+        int OptionY = y + HeightFromWidget + 2;
+        OptionY+=optionIndex*(client.textRenderer.fontHeight+2);
+        return OptionY;
     }
 
     /**
@@ -159,7 +215,7 @@ public class ContextMenu {
     }
 
     /**
-     * Updates the position of this context menu to avoid overlapping with other widgets.
+     * Updates the position of this context menu to avoid getting out of the screen.
      */
     public void updatePosition() {
         // Check if the context menu is outside the bounds of the screen
@@ -219,15 +275,45 @@ public class ContextMenu {
         for (ContextMenuOption option : options) {
             if (option instanceof EnumCycleContextMenuOption enumOption) {
                 enumOption.updateLabel();
-                labelTextcolor=ColorHelper.ColorToInt(Color.WHITE);
-            } else{
+                labelTextcolor = ColorHelper.ColorToInt(Color.WHITE);
+            } else if (option instanceof DataInputOption) {
+                labelTextcolor = ColorHelper.ColorToInt(Color.YELLOW);
+
+                // Draw a black box around the value text
+                String[] splitLabel = option.label.split(":");
+                if (splitLabel.length > 1) {
+                    String valueText = splitLabel[1].trim();
+                    int valueTextWidth = textRenderer.getWidth(valueText);
+                    int labelWidth = textRenderer.getWidth(splitLabel[0].trim());
+                    int boxX = x + labelWidth + 9;
+                    int boxY = optionY - 2;
+                    int boxWidth = valueTextWidth + 2;
+                    int boxHeight = textRenderer.fontHeight + 1;
+                    DrawHelper.fill(drawContext, boxX, boxY, boxX + boxWidth, boxY + boxHeight, 0x7F000000);
+
+                }
+
+            } else if (option instanceof DoubleInputOption) {
+                labelTextcolor = ColorHelper.ColorToInt(Color.BLUE.brighter());
+                // Draw a black box around the value text
+                String[] splitLabel = option.label.split(":");
+                if (splitLabel.length > 1) {
+                    String valueText = splitLabel[1].trim();
+                    int valueTextWidth = textRenderer.getWidth(valueText);
+                    int labelWidth = textRenderer.getWidth(splitLabel[0].trim());
+                    int boxX = x + labelWidth + 9;
+                    int boxY = optionY - 2;
+                    int boxWidth = valueTextWidth + 2;
+                    int boxHeight = textRenderer.fontHeight + 1;
+                    DrawHelper.fill(drawContext, boxX, boxY, boxX + boxWidth, boxY + boxHeight, 0x7F000000);
+                }
+            } else {
                 labelTextcolor = option.enabled ? 0xFF00FF00 : 0xFFFF0000;
             }
             drawContext.drawText(textRenderer, option.label, x + 5, optionY, labelTextcolor, false);
             optionY += textRenderer.fontHeight + 2;
         }
     }
-
 
     /**
      * Sets position of this context menu.
@@ -277,7 +363,7 @@ public class ContextMenu {
 
 
     private static class ContextMenuOption {
-        final Runnable action; // The action to perform when the option is clicked
+        Runnable action; // The action to perform when the option is clicked
         String label; // The label of the option
         private boolean enabled = false; // Whether the option is enabled
 
@@ -289,6 +375,18 @@ public class ContextMenu {
          */
         public ContextMenuOption(String label, Runnable action) {
             this.label = label;
+            this.action = action;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public void setLabel(String newLabel) {
+            this.label = newLabel;
+        }
+
+        public void setAction(Runnable action) {
             this.action = action;
         }
     }
@@ -309,20 +407,47 @@ public class ContextMenu {
             label = labelPrefix + getter.get();
         }
     }
-    public class DataInputOption extends ContextMenuOption {
-        public DataInputOption(String label, Consumer<String> consumer,int x,int y) {
+
+    /*public class DataInputOption extends ContextMenuOption {
+        public DataInputOption(String label, Consumer<String> consumer, int x, int y) {
             super(label, () -> {
                 // Open a new screen to allow the player to input data
-                MinecraftClient.getInstance().setScreen(new DataInputScreen(consumer,x,y));
+                MinecraftClient.getInstance().setScreen(new DataInputScreen(consumer, x, y, parentScreen));
             });
         }
-    }
-    public class DoubleInputOption extends ContextMenuOption {
-        public DoubleInputOption(String label, Consumer<Double> consumer,int x, int y) {
-            super(label, () -> {
+
+    }*/
+    public class DataInputOption extends ContextMenuOption {
+        private final Consumer<String> labelSetter;
+
+        public DataInputOption(String label, Consumer<String> consumer, int x, int y) {
+            super(label, null);
+            setAction(() -> {
                 // Open a new screen to allow the player to input data
-                MinecraftClient.getInstance().setScreen(new DoubleInputScreen(consumer,x,y));
+                MinecraftClient.getInstance().setScreen(new DataInputScreen(consumer, x, y, parentScreen, this));
             });
+            this.labelSetter = text -> setLabel(label + ": " + text);
+        }
+
+        public Consumer<String> getLabelSetter() {
+            return labelSetter;
+        }
+    }
+
+    public class DoubleInputOption extends ContextMenuOption {
+        private final Consumer<Double> labelSetter;
+
+        public DoubleInputOption(String label, Consumer<Double> consumer, int x, int y) {
+            super(label, null);
+            setAction(() -> {
+                // Open a new screen to allow the player to input data
+                MinecraftClient.getInstance().setScreen(new DoubleInputScreen(consumer, x, y, parentScreen, this));
+            });
+            this.labelSetter = text -> setLabel(label + ": " + text);
+        }
+
+        public Consumer<Double> getLabelSetter() {
+            return labelSetter;
         }
     }
 

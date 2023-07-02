@@ -67,6 +67,23 @@ public class SliderWidget {
     }
 
     /**
+     * Updates the position of this Slider to avoid getting out of the screen.
+     */
+    public void updatePosition() {
+        // Check if the Slider is outside the bounds of the screen
+        int screenWidth = client.getWindow().getScaledWidth();
+        int screenHeight = client.getWindow().getScaledHeight();
+        if (x + width + 12 > screenWidth) {
+            x = screenWidth - width - 12;
+        }
+        if (y + 2 < 0) {
+            y += 2;
+        }
+        if (y + height + 2 > screenHeight) {
+            y = screenHeight - height - 2;
+        }
+    }
+    /**
      * Renders the widget on the screen.
      *
      * @param drawContext The matrix stack used for rendering
@@ -102,6 +119,7 @@ public class SliderWidget {
 
         if (selectedWidget != null)
             setPosition(selectedWidget.getX(), selectedWidget.getY() + textRenderer.fontHeight + 67);
+        updatePosition();
     }
     /**
      * Returns whether the given point is within the bounds of this widget.

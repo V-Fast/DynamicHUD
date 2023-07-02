@@ -63,7 +63,7 @@ public class DynamicUtil extends DrawContext {
                 widget.render(context);
                 int backgroundColor = widget.isEnabled() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
                 WidgetBox box = widget.getWidgetBox();
-                DrawHelper.fill(context, box.x1, box.y1, box.x2, box.y2, backgroundColor);
+                DrawHelper.fill(context, box.x1-2, box.y1-2, box.x2+2, box.y2+2, backgroundColor);
             }
             return;
         }
@@ -80,7 +80,7 @@ public class DynamicUtil extends DrawContext {
                 if (MinecraftClient.getInstance().currentScreen instanceof AbstractMoveableScreen) {
                     int backgroundColor = widget.isEnabled() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
                     WidgetBox box = widget.getWidgetBox();
-                    DrawHelper.fill(context, box.x1, box.y1, box.x2, box.y2, backgroundColor);
+                    DrawHelper.fill(context, box.x1-2, box.y1-2, box.x2+2, box.y2+2, backgroundColor);
                 }
             }
         }

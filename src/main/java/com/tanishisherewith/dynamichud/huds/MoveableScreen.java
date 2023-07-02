@@ -47,7 +47,8 @@ public class MoveableScreen extends AbstractMoveableScreen {
 
     @Override
     protected void menu(Widget widget, int x, int y) {
-        contextMenu = new ContextMenu(mc, x, y + widget.getHeight() + 5, selectedWidget);
+        contextMenu.clear();
+        contextMenu.add(new ContextMenu(mc, x, y + widget.getHeight() + 5, selectedWidget,this));
         if (widget instanceof ArmorWidget armorWidget) {
             ArmorWidgetMenu(armorWidget, x, y);
         }
@@ -60,34 +61,35 @@ public class MoveableScreen extends AbstractMoveableScreen {
     }
 
     protected void ItemWidgetMenu(ItemWidget itemWidget, int x, int y) {
-        Slider = null;
+        Slider.clear();
         colorPicker = null;
-        contextMenu = null;
+        contextMenu.clear();
     }
 
     protected void ArmorWidgetMenu(ArmorWidget armorWidget, int x, int y) {
-        Slider = null;
-        contextMenu.setHeightFromWidget(14);
-        contextMenu.setPadding(5);
-        contextMenu.addEnumCycleOption("", TextureHelper.Position.values(), () -> armorWidget.currentTextPosition[0], newPosition -> {
+        Slider.clear();
+        contextMenu.get(0).setHeightFromWidget(14);
+        contextMenu.get(0).setPadding(5);
+        contextMenu.get(0).addEnumCycleOption("", TextureHelper.Position.values(), () -> armorWidget.currentTextPosition[0], newPosition -> {
             armorWidget.currentTextPosition[0] = newPosition;
         });
     }
 
     protected void TextWidgetMenu(TextWidget textWidget, int x, int y) {
-        contextMenu.setHeightFromWidget(2);
-        contextMenu.setPadding(5);
-        contextMenu.addOption("Shadow", () -> {
+        contextMenu.get(0).setHeightFromWidget(2);
+        contextMenu.get(0).setPadding(5);
+
+        contextMenu.get(0).addOption("Shadow", () -> {
             textWidget.setShadow(!textWidget.hasShadow());
         });
-        contextMenu.addOption("Rainbow", () -> {
+        contextMenu.get(0).addOption("Rainbow", () -> {
             textWidget.setRainbow(!textWidget.hasRainbow());
         });
-        contextMenu.addOption("Vertical Rainbow", () -> {
+        contextMenu.get(0).addOption("Vertical Rainbow", () -> {
             textWidget.setVerticalRainbow(!textWidget.hasVerticalRainbow());
         });
         if (!textWidget.getText().isEmpty()) {
-            contextMenu.addOption("TextColor", () -> {
+            contextMenu.get(0).addOption("TextColor", () -> {
                 textWidget.toggleTextColorOption();
 
                 if (textWidget.isTextcolorOptionEnabled())
@@ -97,7 +99,7 @@ public class MoveableScreen extends AbstractMoveableScreen {
             });
         }
         if (!textWidget.getDataText().trim().isEmpty()) {
-            contextMenu.addOption("DataColor", () -> {
+            contextMenu.get(0).addOption("DataColor", () -> {
                 textWidget.toggleDataColorOption();
 
                 if (textWidget.isDatacolorOptionEnabled())
@@ -106,24 +108,32 @@ public class MoveableScreen extends AbstractMoveableScreen {
                     colorPicker=null;
             });
         }
-        contextMenu.addDataTextOption(("Enter data"), data -> {
-            System.out.println("Entered data: " + data);
+         contextMenu.get(0).addOption("SubMenu: ",()->
+        {
+            if (contextMenu.size()>1) contextMenu.remove(1);
+            contextMenu.add(new ContextMenu(mc, contextMenu.get(0).getX() + 40, contextMenu.get(0).getOptionY(6), selectedWidget,this));
+            contextMenu.get(1).addOption("Option: 1",()->System.out.println("Pressed 1 "));
+            contextMenu.get(1).addOption("Option: 2",()->System.out.println("Pressed 2 "));
+            contextMenu.get(1).addOption("Option: 3",()->System.out.println("Pressed 3 "));
         });
-        contextMenu.addDoubleTextOption(("Enter data"), data -> {
+        contextMenu.get(0).addDataTextOption(("Enter data"), data -> {
             System.out.println("Entered data: " + data);
-        });
+        },widgetX,widgetY);
+        contextMenu.get(0).addDoubleTextOption(("Enter double"), data -> {
+            System.out.println("Entered data: " + data);
+        },widgetX,widgetY);
 
-        Slider = new SliderWidgetBuilder(client)
+        Slider.add(new SliderWidgetBuilder(client)
                 .setX(x)
                 .setY(y)
                 .setWidth(105)
-                .setHeight(contextMenu.getHeight()+13)
+                .setHeight(contextMenu.get(0).getHeight()+13)
                 .setLabel("Rainbow Speed")
                 .setValue(textWidget.getRainbowSpeed())
                 .setMinValue(5f)
                 .setMaxValue(25.0f)
                 .setSelectedWidget(selectedWidget)
-                .build();
+                .build());
     }
 }
 
