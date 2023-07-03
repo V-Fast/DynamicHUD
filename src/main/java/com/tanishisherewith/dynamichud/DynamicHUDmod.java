@@ -19,7 +19,9 @@ import net.minecraft.text.Text;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.tanishisherewith.dynamichud.DynamicHUD.WIDGETS_FILE;
 
@@ -54,10 +56,10 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoadi
 
             // Add an armor widget to the custom HUD
             String text = "Text";
-            widgets.add(new ArmorWidget(mc, EquipmentSlot.CHEST, 0.01f, 0.01f, true, TextureHelper.Position.ABOVE, () -> text, () -> Color.RED, true));
-            widgets.add(new ArmorWidget(mc, EquipmentSlot.LEGS, 0.05f, 0.01f, true, TextureHelper.Position.LEFT, () -> String.valueOf(MinecraftClient.getInstance().getCurrentFps()), () -> Color.WHITE, true));
+            widgets.add(new ArmorWidget(mc, EquipmentSlot.CHEST, 0.01f, 0.01f, true, TextureHelper.Position.ABOVE, () -> text, () -> Color.RED, true,"Text"));
+            widgets.add(new ArmorWidget(mc, EquipmentSlot.LEGS, 0.05f, 0.01f, true, TextureHelper.Position.LEFT, () -> String.valueOf(MinecraftClient.getInstance().getCurrentFps()), () -> Color.WHITE, true,"FPS"));
 
-            widgets.add(new ItemWidget(mc, Items.DIAMOND_AXE::getDefaultStack, 0.15f, 0.15f, true, TextureHelper.Position.ABOVE, () -> "", () -> Color.RED, true));
+            widgets.add(new ItemWidget(mc, Items.DIAMOND_AXE::getDefaultStack, 0.15f, 0.15f, true, TextureHelper.Position.ABOVE, () -> "Label", () -> Color.RED, true,"Label"));
             for (Widget wigdet : widgets) {
                 if (wigdet instanceof TextWidget textWidget) {
                     if (textWidget.getText().equalsIgnoreCase("fps: ")) {
@@ -85,52 +87,35 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoadi
         }
         dynamicUtil.MainMenuWidgetAdded=true;
     }
-
     @Override
     public void loadWigdets(DynamicUtil dynamicUtil) {
         List<Widget> widgets = dynamicUtil.getWidgetManager().loadWigdets(WIDGETS_FILE);
         List<Widget> MainMenuWidget = dynamicUtil.getWidgetManager().loadMainMenuWigdets(WIDGETS_FILE);
-        System.out.println("Widgets loaded: "+widgets);
-        System.out.println("MainMenuWidgets loaded: "+MainMenuWidget);
-            int textIndex = 0;
-            int armorIndex = 0;
-            TextGenerator[] TextWidgettext = new TextGenerator[]{
-                    () -> String.valueOf(mc.getCurrentFps()),
-                    () -> "Hud",
-                    () -> "",
-                    () -> "",
-                    () -> ""
-            };
-            TextGenerator[] ArmorWidgettext = new TextGenerator[]{
-                    () -> String.valueOf(mc.getCurrentFps()),
-                    () -> "DynamicHud",
-                    () -> "True"
-            };
+
+        System.out.println("Widgets loaded: " + widgets);
+        System.out.println("MainMenuWidgets loaded: " + MainMenuWidget);
+
+        Widget.addTextGenerator("FPS: ", () -> String.valueOf(mc.getCurrentFps()));
+        Widget.addTextGenerator("Dynamic", () -> "HUD");
+        Widget.addTextGenerator("Ping: ", () -> "");
+        Widget.addTextGenerator("Position: ", () -> "");
+        Widget.addTextGenerator("Day/Night: ", () -> "");
+        Widget.addTextGenerator("Text", () -> "Text");
+        Widget.addTextGenerator("FPS", () -> String.valueOf(mc.getCurrentFps()));
+        Widget.addTextGenerator("Label", () -> "Label");
+
+
         for (Widget widget : widgets) {
-            if (widget instanceof TextWidget textWidget) {
-                if (textIndex<5) {
-                    TextGenerator textGenerator = TextWidgettext[textIndex++];
-                    textWidget.setDataTextGenerator(textGenerator);
-                }
-                    dynamicUtil.getWidgetManager().addWidget(textWidget);
-            }
-            if (widget instanceof ArmorWidget armorWidget) {
-                if (armorIndex<3) {
-                    TextGenerator textGenerator = ArmorWidgettext[armorIndex++];
-                    armorWidget.setTextGenerator(textGenerator);
-                }
-                    dynamicUtil.getWidgetManager().addWidget(armorWidget);
-            }
-            if (widget instanceof ItemWidget itemWidget) {
-                dynamicUtil.getWidgetManager().addWidget(itemWidget);
-            }
+            dynamicUtil.getWidgetManager().addWidget(widget);
         }
-        for (Widget widget: MainMenuWidget)
-        {
-           dynamicUtil.getWidgetManager().addMainMenuWidget(widget);
+
+        for (Widget widgetItem : MainMenuWidget) {
+            dynamicUtil.getWidgetManager().addMainMenuWidget(widgetItem);
         }
+
         dynamicUtil.WidgetLoaded = true;
     }
+
 
     @Override
     public Widget loadWidgetsFromTag(String className, NbtCompound widgetTag) {

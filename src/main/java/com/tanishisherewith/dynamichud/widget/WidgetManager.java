@@ -27,6 +27,7 @@ public class WidgetManager {
      * @param widget The widget to add
      */
     public void addWidget(Widget widget) {
+        widget.setTextGeneratorFromLabel();
         widgets.add(widget);
     }
 
@@ -36,12 +37,12 @@ public class WidgetManager {
      * @param widget The widget to add
      */
     public void addMainMenuWidget(Widget widget) {
+        widget.setTextGeneratorFromLabel();
         MainMenuWidgets.add(widget);
     }
     public void setWidgetLoading(WidgetLoading widgetLoading) {
         this.widgetLoading = widgetLoading;
     }
-
     /**
      * Removes a widget from the list.
      *
@@ -50,6 +51,15 @@ public class WidgetManager {
     public void removeWidget(Widget widget) {
         widgets.remove(widget);
     }
+    /**
+     * Removes a MainMenu widget from the list.
+     *
+     * @param widget The Main Menu widget to remove
+     */
+    public void removeMainMenuWidget(Widget widget) {
+        MainMenuWidgets.remove(widget);
+    }
+
 
     /**
      * Returns list of all widgets.

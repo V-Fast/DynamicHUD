@@ -73,8 +73,8 @@ public class SliderWidget {
         // Check if the Slider is outside the bounds of the screen
         int screenWidth = client.getWindow().getScaledWidth();
         int screenHeight = client.getWindow().getScaledHeight();
-        if (x + width + 12 > screenWidth) {
-            x = screenWidth - width - 12;
+        if (x + width > screenWidth) {
+            x = screenWidth - width + 1;
         }
         if (y + 2 < 0) {
             y += 2;
@@ -104,8 +104,7 @@ public class SliderWidget {
         int sliderX = x;
         int sliderY = y + height - sliderHeight;
 
-        int visibleSliderWidth = (int) (sliderWidth * progress);
-        DrawHelper.fillRoundedRect(drawContext, sliderX, sliderY, sliderX + visibleSliderWidth, sliderY + sliderHeight, 0xFFFFFFFF);
+        drawSlider(drawContext, sliderX, sliderY, sliderWidth, sliderHeight);
 
         // Draw the handle
         float handleWidth = 4;
@@ -121,6 +120,12 @@ public class SliderWidget {
             setPosition(selectedWidget.getX(), selectedWidget.getY() + textRenderer.fontHeight + 67);
         updatePosition();
     }
+
+    private void drawSlider(DrawContext drawContext, int sliderX, int sliderY, int sliderWidth, int sliderHeight) {
+        int visibleSliderWidth = (int) (sliderWidth * progress);
+        DrawHelper.fillRoundedRect(drawContext, sliderX, sliderY, sliderX + visibleSliderWidth, sliderY + sliderHeight, 0xFFFFFFFF);
+    }
+
     /**
      * Returns whether the given point is within the bounds of this widget.
      *

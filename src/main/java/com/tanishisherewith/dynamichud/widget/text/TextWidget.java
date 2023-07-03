@@ -176,6 +176,14 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         return Datacolor;
     }
 
+    @Override
+    public void setTextGeneratorFromLabel() {
+        TextGenerator textGenerator = textGenerators.get(getText());
+        if (textGenerator != null) {
+            setDataTextGenerator(textGenerator);
+        }
+    }
+
     /**
      * Sets the color of the text.
      *

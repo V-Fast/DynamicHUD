@@ -78,14 +78,6 @@ public class ContextMenu {
         }
         options.add(option);
     }
-
-    /*public void addDataTextOption(String label, Consumer<String> action) {
-        DataInputOption option = new DataInputOption(label, action, x + client.textRenderer.getWidth(label) + 25, 15);
-        if (selectedWidget != null) {
-            setOptions(label, option);
-        }
-        options.add(option);
-    }*/
     public void addDataTextOption(String label, Consumer<String> action,int WidgetX, int WidgetY) {
         int OptionY = WidgetY + HeightFromWidget + 2;
         WidgetX+=client.textRenderer.getWidth(label+dataInputValue);
@@ -221,8 +213,8 @@ public class ContextMenu {
         // Check if the context menu is outside the bounds of the screen
         int screenWidth = client.getWindow().getScaledWidth();
         int screenHeight = client.getWindow().getScaledHeight();
-        if (x + width + 12 > screenWidth) {
-            x = screenWidth - width - 12;
+        if (x + width + 14 > screenWidth) {
+            x = screenWidth - width - 14;
         }
         if (y + HeightFromWidget - 2 < 0) {
             y = HeightFromWidget + 2;
@@ -241,11 +233,7 @@ public class ContextMenu {
         tick();
         TextRenderer textRenderer = client.textRenderer;
         calculateSize(textRenderer);
-        // Apply the scale
-        drawContext.getMatrices().push();
-        drawContext.getMatrices().translate(x + width / 2.0f + 5, y + height / 2.0f + HeightFromWidget, 300);
-        drawContext.getMatrices().scale(scale, scale, 1.0f);
-        drawContext.getMatrices().translate(-(x + width / 2.0f + 5), -(y + height / 2.0f + HeightFromWidget), 300);
+        applyScale(drawContext);
         int x1 = x - 1;
         int y1 = y + HeightFromWidget - 2;
         int x2 = x + width + 8;
@@ -258,6 +246,14 @@ public class ContextMenu {
             setPosition(selectedWidget.getX(), selectedWidget.getY() + textRenderer.fontHeight + 4);
         drawContext.getMatrices().pop();
         updatePosition();
+    }
+
+    private void applyScale(DrawContext drawContext) {
+        // Apply the scale
+        drawContext.getMatrices().push();
+        drawContext.getMatrices().translate(x + width / 2.0f + 5, y + height / 2.0f + HeightFromWidget, 300);
+        drawContext.getMatrices().scale(scale, scale, 1.0f);
+        drawContext.getMatrices().translate(-(x + width / 2.0f + 5), -(y + height / 2.0f + HeightFromWidget), 300);
     }
 
     private void calculateSize(TextRenderer textRenderer) {
@@ -314,7 +310,6 @@ public class ContextMenu {
             optionY += textRenderer.fontHeight + 2;
         }
     }
-
     /**
      * Sets position of this context menu.
      *
@@ -407,16 +402,6 @@ public class ContextMenu {
             label = labelPrefix + getter.get();
         }
     }
-
-    /*public class DataInputOption extends ContextMenuOption {
-        public DataInputOption(String label, Consumer<String> consumer, int x, int y) {
-            super(label, () -> {
-                // Open a new screen to allow the player to input data
-                MinecraftClient.getInstance().setScreen(new DataInputScreen(consumer, x, y, parentScreen));
-            });
-        }
-
-    }*/
     public class DataInputOption extends ContextMenuOption {
         private final Consumer<String> labelSetter;
 

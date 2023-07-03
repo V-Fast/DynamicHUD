@@ -22,13 +22,15 @@ public class ItemWidget extends Widget {
     protected TextGenerator textGenerator;
     protected Supplier<ItemStack> itemStack;
     protected boolean TextBackground;
+    protected String label;
+
 
     /**
      * Constructs a Widget object.
      *
      * @param client The Minecraft client instance
      */
-    public ItemWidget(MinecraftClient client, Supplier<ItemStack> itemStack, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator, Supplier<Color> color,boolean Textbackground) {
+    public ItemWidget(MinecraftClient client, Supplier<ItemStack> itemStack, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator, Supplier<Color> color,boolean Textbackground,String label) {
         super(client);
         this.xPercent = xPercent;
         this.yPercent = yPercent;
@@ -38,6 +40,7 @@ public class ItemWidget extends Widget {
         this.textGenerator = textGenerator;
         this.color = color;
         this.TextBackground=Textbackground;
+        this.label=label;
     }
 
     @Override
@@ -90,6 +93,13 @@ public class ItemWidget extends Widget {
     public void setColor(Supplier<Color> color) {
         this.color=color;
     }
+    @Override
+    public void setTextGeneratorFromLabel() {
+        TextGenerator textGenerator = textGenerators.get(label);
+        if (textGenerator != null) {
+            setTextGenerator(textGenerator);
+        }
+    }
 
     @Override
     public void writeToTag(NbtCompound tag) {
@@ -115,6 +125,7 @@ public class ItemWidget extends Widget {
         else
             currentTextPosition[0] = TextureHelper.Position.ABOVE;
         TextBackground=tag.getBoolean("TextBackground");
+        label=tag.getString("label");
     }
 
     public ItemStack getItemStack(int itemID, int itemCount) {

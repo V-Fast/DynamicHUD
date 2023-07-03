@@ -1,24 +1,26 @@
 package com.tanishisherewith.dynamichud.widget;
 
+import com.tanishisherewith.dynamichud.interfaces.TextGenerator;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class represents a widget that can be displayed on the screen.
  */
 public abstract class Widget {
+    protected static Map<String, TextGenerator> textGenerators = new HashMap<>();
     protected final MinecraftClient client; // The Minecraft client instance
     public boolean enabled = true; // Whether the widget is enabled
+    public boolean isDraggable = true;
     protected float xPercent; // The x position of the widget as a percentage of the screen width
     protected float yPercent; // The y position of the widget as a percentage of the screen height
-    public boolean isDraggable=true;
-
 
     /**
      * Constructs a Widget object.
@@ -27,6 +29,10 @@ public abstract class Widget {
      */
     public Widget(MinecraftClient client) {
         this.client = client;
+    }
+
+    public static void addTextGenerator(String label, TextGenerator textGenerator) {
+        textGenerators.put(label, textGenerator);
     }
 
     /**
@@ -40,15 +46,15 @@ public abstract class Widget {
 
 
     public boolean isOverlapping(List<Widget> other) {
-        for (Widget widget: other) {
-            if((this.getX() < widget.getX() + widget.getWidgetBox().getWidth() && this.getX() + this.getWidgetBox().getWidth() > widget.getX() &&
-                    this.getY() < widget.getY() + widget.getWidgetBox().getHeight() && this.getY() + this.getWidgetBox().getHeight() > widget.getY()))
-            {
+        for (Widget widget : other) {
+            if ((this.getX() < widget.getX() + widget.getWidgetBox().getWidth() && this.getX() + this.getWidgetBox().getWidth() > widget.getX() &&
+                    this.getY() < widget.getY() + widget.getWidgetBox().getHeight() && this.getY() + this.getWidgetBox().getHeight() > widget.getY())) {
                 return true;
             }
         }
         return false;
     }
+
     public boolean isOverlapping(Widget other) {
         return this.getX() < other.getX() + other.getWidgetBox().getWidth() && this.getX() + this.getWidgetBox().getWidth() > other.getX() &&
                 this.getY() < other.getY() + other.getWidgetBox().getHeight() && this.getY() + this.getWidgetBox().getHeight() > other.getY();
@@ -56,7 +62,6 @@ public abstract class Widget {
 
     /**
      * Renders the widget on the screen.
-     *
      */
     public abstract void render(DrawContext drawContext);
 
@@ -108,7 +113,7 @@ public abstract class Widget {
      * @param y The new y position of the widget in pixels
      */
     public void setY(int y) {
-       int screenHeight = client.getWindow().getScaledHeight();
+        int screenHeight = client.getWindow().getScaledHeight();
         if (y < 0) {
             y = 0;
         } else if (y + getWidgetBox().getHeight() > screenHeight) {
@@ -119,10 +124,10 @@ public abstract class Widget {
 
     /**
      * Returns the fontheight
+     *
      * @return fontHeight from TextRenderer
      */
-    public int getHeight()
-    {
+    public int getHeight() {
         return client.textRenderer.fontHeight;
     }
 
@@ -130,8 +135,12 @@ public abstract class Widget {
         xPercent = tag.getFloat("xPercent");
         yPercent = tag.getFloat("yPercent");
         enabled = tag.getBoolean("Enabled");
-        isDraggable=tag.getBoolean("isDraggable");
+        isDraggable = tag.getBoolean("isDraggable");
+
+        setTextGeneratorFromLabel();
     }
+
+    public abstract void setTextGeneratorFromLabel();
 
     /**
      * Writes the state of this widget to the given tag.
@@ -140,7 +149,7 @@ public abstract class Widget {
      */
     public void writeToTag(NbtCompound tag) {
         tag.putString("class", getClass().getName());
-        tag.putBoolean("isDraggable",isDraggable);
+        tag.putBoolean("isDraggable", isDraggable);
         tag.putFloat("xPercent", xPercent);
         tag.putFloat("yPercent", yPercent);
         tag.putBoolean("Enabled", enabled);

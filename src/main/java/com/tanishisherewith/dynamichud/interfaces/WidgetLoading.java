@@ -20,12 +20,12 @@ public interface WidgetLoading {
             return widget;
         }
         if (className.equals(ArmorWidget.class.getName())) {
-            ArmorWidget widget = new ArmorWidget(MinecraftClient.getInstance(), EquipmentSlot.CHEST, 0, 0, false, TextureHelper.Position.ABOVE, () -> "", () -> Color.RED,true);
+            ArmorWidget widget = new ArmorWidget(MinecraftClient.getInstance(), EquipmentSlot.CHEST, 0, 0, false, TextureHelper.Position.ABOVE, () -> "", () -> Color.RED,true,"");
             widget.readFromTag(widgetTag);
             return widget;
         }
         if (className.equals(ItemWidget.class.getName())) {
-            ItemWidget widget = new ItemWidget(MinecraftClient.getInstance(), () -> ItemStack.EMPTY, 0, 0, true, TextureHelper.Position.ABOVE, () -> "", () -> Color.WHITE,true);
+            ItemWidget widget = new ItemWidget(MinecraftClient.getInstance(), () -> ItemStack.EMPTY, 0, 0, true, TextureHelper.Position.ABOVE, () -> "", () -> Color.WHITE,true,"");
             widget.readFromTag(widgetTag);
             return widget;
         }
