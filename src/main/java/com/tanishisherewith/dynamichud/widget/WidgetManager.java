@@ -15,11 +15,10 @@ import java.util.List;
  * This class manages a list of widgets that can be added, removed and retrieved.
  */
 public class WidgetManager {
-
-
     private final List<Widget> widgets = new ArrayList<>(); // The list of widgets
     private final List<Widget> MainMenuWidgets = new ArrayList<>(); // The list of MainMenu widgets
-    private WidgetLoading widgetLoading = new WidgetLoading() {};
+    private WidgetLoading widgetLoading = new WidgetLoading() {
+    };
 
     /**
      * Adds a widget to the list.
@@ -40,9 +39,11 @@ public class WidgetManager {
         widget.setTextGeneratorFromLabel();
         MainMenuWidgets.add(widget);
     }
+
     public void setWidgetLoading(WidgetLoading widgetLoading) {
         this.widgetLoading = widgetLoading;
     }
+
     /**
      * Removes a widget from the list.
      *
@@ -51,6 +52,7 @@ public class WidgetManager {
     public void removeWidget(Widget widget) {
         widgets.remove(widget);
     }
+
     /**
      * Removes a MainMenu widget from the list.
      *
@@ -69,6 +71,7 @@ public class WidgetManager {
     public List<Widget> getWidgets() {
         return widgets;
     }
+
     /**
      * Returns list of all MainMenu widgets.
      *
@@ -77,6 +80,7 @@ public class WidgetManager {
     public List<Widget> getMainMenuWidgets() {
         return MainMenuWidgets;
     }
+
     public List<Widget> getOtherWidgets(Widget SelectedWidget) {
         List<Widget> otherWidgets = new ArrayList<>();
         for (Widget widget : getWidgets()) {
@@ -105,13 +109,13 @@ public class WidgetManager {
             widgetList.add(widgetTag);
         }
 
-        rootTag.put("widgets", widgetList);
+        rootTag.put("Widgets", widgetList);
         for (Widget mmwidget : MainMenuWidgets) {
             NbtCompound widgetTag = new NbtCompound();
             mmwidget.writeToTag(widgetTag);
             MainMenuwidgetList.add(widgetTag);
         }
-        rootTag.put("MainMenuwidgets", MainMenuwidgetList);
+        rootTag.put("MainMenuWidgets", MainMenuwidgetList);
 
         try (DataOutputStream out = new DataOutputStream(new FileOutputStream(file))) {
             NbtIo.writeCompressed(rootTag, out);
@@ -126,12 +130,12 @@ public class WidgetManager {
             DynamicHUD.printInfo("Widgets File exists");
             try (DataInputStream in = new DataInputStream(new FileInputStream(file))) {
                 NbtCompound rootTag = NbtIo.readCompressed(in);
-                NbtList widgetList = rootTag.getList("widgets", NbtType.COMPOUND);
+                NbtList widgetList = rootTag.getList("Widgets", NbtType.COMPOUND);
                 for (int i = 0; i < widgetList.size(); i++) {
                     NbtCompound widgetTag = widgetList.getCompound(i);
                     String className = widgetTag.getString("class");
                     widgets.add(widgetLoading.loadWidgetsFromTag(className, widgetTag));
-                    DynamicHUD.printInfo("Wigdet " + i+ ": "+widgets.get(i).toString());
+                    DynamicHUD.printInfo("Wigdet " + i + ": " + widgets.get(i).toString());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -140,17 +144,18 @@ public class WidgetManager {
             DynamicHUD.printWarn("Widgets File does not exist");
         return widgets;
     }
+
     public List<Widget> loadMainMenuWigdets(File file) {
         List<Widget> MainMenuwidgets = new ArrayList<>();
         if (file.exists()) {
             try (DataInputStream in = new DataInputStream(new FileInputStream(file))) {
                 NbtCompound rootTag = NbtIo.readCompressed(in);
-                NbtList MainMenuwidgetList = rootTag.getList("MainMenuwidgets", NbtType.COMPOUND);
+                NbtList MainMenuwidgetList = rootTag.getList("MainMenuWidgets", NbtType.COMPOUND);
                 for (int i = 0; i < MainMenuwidgetList.size(); i++) {
                     NbtCompound widgetTag = MainMenuwidgetList.getCompound(i);
                     String className = widgetTag.getString("class");
                     MainMenuwidgets.add(widgetLoading.loadWidgetsFromTag(className, widgetTag));
-                    DynamicHUD.printInfo("Wigdet " + i+ ": "+MainMenuwidgets.get(i).toString());
+                    DynamicHUD.printInfo("Wigdet " + i + ": " + MainMenuwidgets.get(i).toString());
                 }
             } catch (IOException e) {
                 e.printStackTrace();

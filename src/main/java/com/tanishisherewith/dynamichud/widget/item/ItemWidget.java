@@ -22,8 +22,6 @@ public class ItemWidget extends Widget {
     protected TextGenerator textGenerator;
     protected Supplier<ItemStack> itemStack;
     protected boolean TextBackground;
-    protected String label;
-
 
     /**
      * Constructs a Widget object.

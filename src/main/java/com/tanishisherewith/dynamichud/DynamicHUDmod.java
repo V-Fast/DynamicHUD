@@ -2,10 +2,9 @@ package com.tanishisherewith.dynamichud;
 
 import com.tanishisherewith.dynamichud.helpers.TextureHelper;
 import com.tanishisherewith.dynamichud.huds.MoveableScreen;
-import com.tanishisherewith.dynamichud.util.DynamicUtil;
-import com.tanishisherewith.dynamichud.interfaces.TextGenerator;
-import com.tanishisherewith.dynamichud.interfaces.WidgetLoading;
 import com.tanishisherewith.dynamichud.interfaces.IWigdets;
+import com.tanishisherewith.dynamichud.interfaces.WidgetLoading;
+import com.tanishisherewith.dynamichud.util.DynamicUtil;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.armor.ArmorWidget;
 import com.tanishisherewith.dynamichud.widget.item.ItemWidget;
@@ -19,16 +18,15 @@ import net.minecraft.text.Text;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.tanishisherewith.dynamichud.DynamicHUD.WIDGETS_FILE;
+import static com.tanishisherewith.dynamichud.DynamicHUD.printInfo;
 
-public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoading {
-    MinecraftClient mc = MinecraftClient.getInstance();
+public class DynamicHUDmod implements ClientModInitializer, IWigdets, WidgetLoading {
     protected List<Widget> widgets = new ArrayList<>();
     protected List<Widget> MainMenuwidgets = new ArrayList<>();
+    MinecraftClient mc = MinecraftClient.getInstance();
     private DynamicUtil dynamicutil;
 
 
@@ -38,7 +36,7 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoadi
         widgets.clear();
         MainMenuwidgets.clear();
 
-        DynamicHUD.setAbstractScreen(new MoveableScreen(Text.of("Editor Screen"),dynamicutil));
+        DynamicHUD.setAbstractScreen(new MoveableScreen(Text.of("Editor Screen"), dynamicutil));
         DynamicHUD.setIWigdets(new DynamicHUDmod());
         dynamicutil.getWidgetManager().setWidgetLoading(new DynamicHUDmod());
 
@@ -46,37 +44,83 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoadi
 
     @Override
     public void addWigdets(DynamicUtil dynamicUtil) {
-        if(mc.player!=null) {
+        if (mc.player != null) {
             System.out.println("Added widgets");
-            widgets.add(new TextWidget(mc, "FPS: ", () -> mc.fpsDebugString.split(" ")[0], 0.5f, 0.5f, true, true, false, -1, -1, true));
-            widgets.add(new TextWidget(mc, "Dynamic", () -> "HUD", 0.7f, 0.3f, false, false, false, -1, -1, true));
-            widgets.add(new TextWidget(mc, "Ping: ", () -> "", 0.08f, 0.5f, false, false, false, -1, -1, true));
-            widgets.add(new TextWidget(mc, "Position: ", () -> "", 0.4f, 0.8f, false, false, false, -1, -1, true));
-            widgets.add(new TextWidget(mc, "Day/Night: ", () -> "", 0.83f, 0.8f, false, false, false, -1, -1, true));
-
-            // Add an armor widget to the custom HUD
-            String text = "Text";
-            widgets.add(new ArmorWidget(mc, EquipmentSlot.CHEST, 0.01f, 0.01f, true, TextureHelper.Position.ABOVE, () -> text, () -> Color.RED, true,"Text"));
-            widgets.add(new ArmorWidget(mc, EquipmentSlot.LEGS, 0.05f, 0.01f, true, TextureHelper.Position.LEFT, () -> String.valueOf(MinecraftClient.getInstance().getCurrentFps()), () -> Color.WHITE, true,"FPS"));
-
-            widgets.add(new ItemWidget(mc, Items.DIAMOND_AXE::getDefaultStack, 0.15f, 0.15f, true, TextureHelper.Position.ABOVE, () -> "Label", () -> Color.RED, true,"Label"));
-            for (Widget wigdet : widgets) {
-                if (wigdet instanceof TextWidget textWidget) {
-                    if (textWidget.getText().equalsIgnoreCase("fps: ")) {
-                        textWidget.setDraggable(false);
-                    }
-                }
-                dynamicUtil.getWidgetManager().addWidget(wigdet);
-            }
+            addTextWidgets(dynamicUtil);
+            addArmorWidgets(dynamicUtil);
+            addItemWidgets(dynamicUtil);
             dynamicUtil.WidgetAdded = true;
         }
     }
+
+    private void addTextWidgets(DynamicUtil dynamicUtil) {
+        widgets.add(new TextWidget(mc, "FPS: ", () -> mc.fpsDebugString.split(" ")[0], 0.5f, 0.5f, true, true, false, -1, -1, true));
+        widgets.add(new TextWidget(mc, "Dynamic", () -> "HUD", 0.7f, 0.3f, false, false, false, -1, -1, true));
+        widgets.add(new TextWidget(mc, "Ping: ", () -> "", 0.08f, 0.5f, false, false, false, -1, -1, true));
+        widgets.add(new TextWidget(mc, "Position: ", () -> "", 0.4f, 0.8f, false, false, false, -1, -1, true));
+        widgets.add(new TextWidget(mc, "Day/Night: ", () -> "", 0.83f, 0.8f, false, false, false, -1,-1,true));
+
+        for (Widget widget : widgets) {
+            if (widget instanceof TextWidget textWidget) {
+                if (textWidget.getText().equalsIgnoreCase("fps: ")) {
+                    textWidget.setDraggable(false);
+                }
+            }
+            dynamicUtil.getWidgetManager().addWidget(widget);
+        }
+    }
+
+    private void addArmorWidgets(DynamicUtil dynamicUtil) {
+        String text = "Text";
+        widgets.add(new ArmorWidget(mc, EquipmentSlot.CHEST, 0.01f, 0.01f,true,
+                TextureHelper.Position.ABOVE,
+                () -> text,
+                () -> Color.RED,
+                true,
+                "Text"));
+        widgets.add(new ArmorWidget(mc,
+                EquipmentSlot.LEGS,
+                0.05f,
+                0.01f,
+                true,
+                TextureHelper.Position.LEFT,
+                () -> String.valueOf(MinecraftClient.getInstance().getCurrentFps()),
+                () -> Color.WHITE,
+                true,
+                "FPS"));
+
+        for (Widget widget : widgets) {
+            if (widget instanceof ArmorWidget armorWidget) {
+                dynamicUtil.getWidgetManager().addWidget(armorWidget);
+            }
+        }
+    }
+
+    private void addItemWidgets(DynamicUtil dynamicUtil) {
+        widgets.add(new ItemWidget(mc,
+                Items.DIAMOND_AXE::getDefaultStack,
+                0.15f,
+                0.15f,
+                true,
+                TextureHelper.Position.ABOVE,
+                () -> "Label",
+                () -> Color.RED,
+                true,
+                "Label"));
+
+        for (Widget widgetItem : widgets) {
+            if (widgetItem instanceof ItemWidget itemWidgetItem) {
+                dynamicUtil.getWidgetManager().addWidget(itemWidgetItem);
+            }
+        }
+    }
+
 
     @Override
     public void addMainMenuWigdets(DynamicUtil dynamicUtil) {
         MainMenuwidgets.add(new TextWidget(mc, "Day/Night: ", () -> "", 0.83f, 0.8f, false, false, false, -1, -1, true));
         MainMenuwidgets.add(new TextWidget(mc, "Fps: ", () -> "", 0.85f, 0.3f, false, false, false, -1, -1, true));
-        MainMenuwidgets.add(new TextWidget(mc, "EOR: ", () -> "", 0.87f, 0.5f, false, false, false, -1, -1, true));
+        MainMenuwidgets.add(new TextWidget(mc, "Test: ", () -> "", 0.87f, 0.5f, false, false, false, -1, -1, true));
         for (Widget mmwigdet : MainMenuwidgets) {
             if (mmwigdet instanceof TextWidget textWidget) {
                 if (textWidget.getText().equalsIgnoreCase("fps: ")) {
@@ -85,15 +129,16 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoadi
             }
             dynamicUtil.getWidgetManager().addMainMenuWidget(mmwigdet);
         }
-        dynamicUtil.MainMenuWidgetAdded=true;
+        dynamicUtil.MainMenuWidgetAdded = true;
     }
+
     @Override
     public void loadWigdets(DynamicUtil dynamicUtil) {
         List<Widget> widgets = dynamicUtil.getWidgetManager().loadWigdets(WIDGETS_FILE);
         List<Widget> MainMenuWidget = dynamicUtil.getWidgetManager().loadMainMenuWigdets(WIDGETS_FILE);
 
-        System.out.println("Widgets loaded: " + widgets);
-        System.out.println("MainMenuWidgets loaded: " + MainMenuWidget);
+        printInfo("Widgets loaded: " + widgets);
+        printInfo("MainMenuWidgets loaded: " + MainMenuWidget);
 
         Widget.addTextGenerator("FPS: ", () -> String.valueOf(mc.getCurrentFps()));
         Widget.addTextGenerator("Dynamic", () -> "HUD");
@@ -127,16 +172,18 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets,WidgetLoadi
         }*/
         return WidgetLoading.super.loadWidgetsFromTag(className, widgetTag);
     }
-      /**
-       * The following code in comments (Line 100-272) code is from SMP-HACK client (not present in the latest version)
-       * This code shows how one can implement the library using just one class (or more, if you plan to add more widgets which I have done in that mod)
-       * >>
-       * I will add Documentation to understand this code better as it looks awful as a comment
-       * This is basically using advanced dynamic ItemWidgets and ArmorWidgets
-       * The code rn is kind of complicated for first time using this library (Don't worry, it's going to improve), But this is better than writing 10 different classes from scratch. (Not an excuss for being a bad coder)
-       * As an excuse, I will write a perfect documentation explaining how to use even the smallest feature. (I will also set up a template with each of the widgets with dynamic texts and colors)
-       */
-      private void NoDocumentationDangling(){}
+
+    /**
+     * The following code in comments (Line 100-272) code is from SMP-HACK client (not present in the latest version)
+     * This code shows how one can implement the library using just one class (or more, if you plan to add more widgets which I have done in that mod)
+     * >>
+     * I will add Documentation to understand this code better as it looks awful as a comment
+     * This is basically using advanced dynamic ItemWidgets and ArmorWidgets
+     * The code rn is kind of complicated for first time using this library (Don't worry, it's going to improve), But this is better than writing 10 different classes from scratch. (Not an excuss for being a bad coder)
+     * As an excuse, I will write a perfect documentation explaining how to use even the smallest feature. (I will also set up a template with each of the widgets with dynamic texts and colors)
+     */
+    private void NoDocumentationDangling() {
+    }
   /*protected List<Widget> widgets = new ArrayList<>();
     protected boolean WidgetAdded = false;
     protected boolean WidgetLoaded = false;

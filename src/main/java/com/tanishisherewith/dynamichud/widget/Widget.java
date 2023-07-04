@@ -16,11 +16,13 @@ import java.util.Map;
  */
 public abstract class Widget {
     protected static Map<String, TextGenerator> textGenerators = new HashMap<>();
+
     protected final MinecraftClient client; // The Minecraft client instance
     public boolean enabled = true; // Whether the widget is enabled
     public boolean isDraggable = true;
     protected float xPercent; // The x position of the widget as a percentage of the screen width
     protected float yPercent; // The y position of the widget as a percentage of the screen height
+    protected String label;
 
     /**
      * Constructs a Widget object.
@@ -34,9 +36,10 @@ public abstract class Widget {
     public static void addTextGenerator(String label, TextGenerator textGenerator) {
         textGenerators.put(label, textGenerator);
     }
+    public abstract void setTextGeneratorFromLabel();
 
     /**
-     * Gets the box around the widget for collison purpose
+     * Gets the box around the widget for some purpose
      */
     public abstract WidgetBox getWidgetBox();
 
@@ -136,12 +139,10 @@ public abstract class Widget {
         yPercent = tag.getFloat("yPercent");
         enabled = tag.getBoolean("Enabled");
         isDraggable = tag.getBoolean("isDraggable");
+        label = tag.getString("label");
 
         setTextGeneratorFromLabel();
     }
-
-    public abstract void setTextGeneratorFromLabel();
-
     /**
      * Writes the state of this widget to the given tag.
      *
@@ -153,7 +154,7 @@ public abstract class Widget {
         tag.putFloat("xPercent", xPercent);
         tag.putFloat("yPercent", yPercent);
         tag.putBoolean("Enabled", enabled);
-
+        tag.putString("label",label);
 
         for (Field field : getClass().getDeclaredFields()) {
             if (Modifier.isStatic(field.getModifiers())) continue;

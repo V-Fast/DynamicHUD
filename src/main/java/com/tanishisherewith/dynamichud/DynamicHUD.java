@@ -102,7 +102,7 @@ public class DynamicHUD implements ClientModInitializer {
         //RenderCallBack
         HudRenderCallback.EVENT.register((drawContext, tickDelta) -> dynamicutil.render(drawContext, tickDelta));
 
-        //Save during exiting a world, server or Minecraft itself
+        // Save during exiting a world, server or Minecraft itself
         ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE));
         Runtime.getRuntime().addShutdownHook(new Thread(() -> dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE)));
     }

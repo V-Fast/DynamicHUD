@@ -25,7 +25,6 @@ public class ArmorWidget extends Widget {
     protected EquipmentSlot slot; // The equipment slot to display the armor item from
     protected TextGenerator textGenerator;
     protected Supplier<Color> color;
-    protected String label;
     protected boolean TextBackground;
     /**
      * Constructs an ArmorWidget object.

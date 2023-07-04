@@ -47,6 +47,7 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         this.Textcolor = Textcolor;
         this.Datacolor = Datacolor;
         this.enabled = enabled;
+        this.label=text;
     }
 
     /**
