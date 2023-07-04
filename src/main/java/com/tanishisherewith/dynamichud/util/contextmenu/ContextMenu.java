@@ -92,7 +92,7 @@ public class ContextMenu {
         options.add(option);
     }
 
-    public void addDoubleTextOption(String label, Consumer<Double> action,int WidgetX, int WidgetY) {
+    public void addDoubleTextOption(String label, Consumer<Double> action, int WidgetX, int WidgetY) {
         int OptionY = WidgetY + HeightFromWidget + 2;
         WidgetX+=client.textRenderer.getWidth(label+dataInputValue);
         OptionY+=options.size()*(client.textRenderer.fontHeight+2);

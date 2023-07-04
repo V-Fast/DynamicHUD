@@ -1,11 +1,17 @@
 package com.tanishisherewith.dynamichud.util.contextmenu;
 
+import com.tanishisherewith.dynamichud.helpers.ColorHelper;
+import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
+import java.awt.*;
 import java.util.function.Consumer;
 
 public class DoubleInputScreen extends Screen {
@@ -14,7 +20,6 @@ public class DoubleInputScreen extends Screen {
     private int x,y;
     private final Screen parentScreen;
     private final ContextMenu.DoubleInputOption doubleInputOption;
-
 
     public DoubleInputScreen(Consumer<Double> consumer, int x, int y, Screen parentScreen, ContextMenu.DoubleInputOption doubleInputOption) {
         super(Text.of("Double Input"));
@@ -46,7 +51,7 @@ public class DoubleInputScreen extends Screen {
                 doubleInputOption.getLabelSetter().accept(value);
             } catch (NumberFormatException e) {
                 // Handle invalid input
-                this.textField.setText("Not double value");
+                this.textField.setText("");
             }
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
