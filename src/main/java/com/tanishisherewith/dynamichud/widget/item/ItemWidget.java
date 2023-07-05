@@ -29,7 +29,7 @@ public class ItemWidget extends Widget {
      * @param client The Minecraft client instance
      */
     public ItemWidget(MinecraftClient client, Supplier<ItemStack> itemStack, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator, Supplier<Color> color,boolean Textbackground,String label) {
-        super(client);
+        super(client,label);
         this.xPercent = xPercent;
         this.yPercent = yPercent;
         this.enabled = enabled;
@@ -38,7 +38,6 @@ public class ItemWidget extends Widget {
         this.textGenerator = textGenerator;
         this.color = color;
         this.TextBackground=Textbackground;
-        this.label=label;
     }
 
     @Override

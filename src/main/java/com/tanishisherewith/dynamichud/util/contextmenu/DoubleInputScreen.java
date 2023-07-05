@@ -11,12 +11,11 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
-import java.awt.*;
 import java.util.function.Consumer;
 
 public class DoubleInputScreen extends Screen {
     private final Consumer<Double> consumer;
-    private TextFieldWidget textField;
+    private TextWidgetButtonExt textField;
     private int x,y;
     private final Screen parentScreen;
     private final ContextMenu.DoubleInputOption doubleInputOption;
@@ -36,7 +35,7 @@ public class DoubleInputScreen extends Screen {
     @Override
     protected void init() {
         // Create a text field for the player to input data
-        this.textField = new TextFieldWidget(this.textRenderer, x, y, 100, 14, Text.of(""));
+        this.textField = new TextWidgetButtonExt(this.textRenderer, x, y, 100, 14, Text.of(""));
         this.addDrawableChild(this.textField);
     }
 

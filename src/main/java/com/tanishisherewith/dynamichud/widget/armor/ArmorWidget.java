@@ -35,7 +35,7 @@ public class ArmorWidget extends Widget {
      * @param yPercent The y position of the widget as a percentage of the screen height
      */
     public ArmorWidget(MinecraftClient client, EquipmentSlot slot, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator, Supplier<Color> color,boolean Textbackground,String label) {
-        super(client);
+        super(client,label);
         this.slot = slot;
         this.xPercent = xPercent;
         this.yPercent = yPercent;
@@ -44,7 +44,6 @@ public class ArmorWidget extends Widget {
         this.textGenerator = textGenerator;
         this.color = color;
         this.TextBackground=Textbackground;
-        this.label=label;
     }
 
     /**

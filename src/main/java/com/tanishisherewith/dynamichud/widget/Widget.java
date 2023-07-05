@@ -29,8 +29,9 @@ public abstract class Widget {
      *
      * @param client The Minecraft client instance
      */
-    public Widget(MinecraftClient client) {
+    public Widget(MinecraftClient client, String label) {
         this.client = client;
+        this.label=label;
     }
 
     public static void addTextGenerator(String label, TextGenerator textGenerator) {

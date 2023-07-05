@@ -36,7 +36,7 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
      * @param yPercent The y position of the widget as a percentage of the screen height
      */
     public TextWidget(MinecraftClient client, String text, TextGenerator dataText, float xPercent, float yPercent, boolean Shadow, boolean Rainbow, boolean VerticalRainbow, int Textcolor, int Datacolor, boolean enabled) {
-        super(client);
+        super(client,text);
         this.text = text;
         this.dataText = dataText;
         this.xPercent = xPercent;
@@ -47,7 +47,6 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         this.Textcolor = Textcolor;
         this.Datacolor = Datacolor;
         this.enabled = enabled;
-        this.label=text;
     }
 
     /**

@@ -25,7 +25,7 @@ public abstract class AbstractMoveableScreen extends Screen {
     protected List<ContextMenu> contextMenu = new ArrayList<>(); // The context menu that is currently displayed
     protected ColorGradientPicker colorPicker = null; // The color picker that is currently displayed
     protected Widget sliderWigdet = null; // The widget that is currently being edited by the slider
-    protected List<SliderWidget> Slider = new ArrayList<>(); // The rainbow speed slider
+    protected List<SliderWidget> Slider = new ArrayList<>(); // The List of sliders
     protected MouseHandler mouseHandler;
     protected DragHandler dragHandler;
     protected int gridSize = 3; // The size of each grid cell in pixels
