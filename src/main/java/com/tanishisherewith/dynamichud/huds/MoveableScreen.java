@@ -108,7 +108,7 @@ public class MoveableScreen extends AbstractMoveableScreen {
                     colorPicker=null;
             });
         }
-         contextMenu.get(0).addOption("SubMenu: ",()->
+       /*  contextMenu.get(0).addOption("SubMenu: ",()->
         {
             if (contextMenu.size()>1) contextMenu.remove(1);
             contextMenu.add(new ContextMenu(mc, contextMenu.get(0).getX() + 40, contextMenu.get(0).getOptionY(6), selectedWidget,this));
@@ -121,7 +121,7 @@ public class MoveableScreen extends AbstractMoveableScreen {
         },widgetX,widgetY);
         contextMenu.get(0).addDoubleTextOption(("Enter double"), data -> {
             System.out.println("Entered data: " + data);
-        },widgetX,widgetY);
+        },widgetX,widgetY);*/
 
         Slider.add(new SliderWidgetBuilder(client)
                 .setX(x)

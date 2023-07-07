@@ -20,7 +20,6 @@
   "entrypoints": {
     "client": [
       "com.tanishisherewith.dynamichud.DynamicHUD",
-      "com.tanishisherewith.dynamichud.DynamicHUDmod"
     ],
     "modmenu": [
       "com.tanishisherewith.dynamichud.ModMenuIntegration"
