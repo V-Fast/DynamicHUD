@@ -19,7 +19,7 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "com.tanishisherewith.dynamichud.DynamicHUD",
+      "com.tanishisherewith.dynamichud.DynamicHUD"
     ],
     "modmenu": [
       "com.tanishisherewith.dynamichud.ModMenuIntegration"
