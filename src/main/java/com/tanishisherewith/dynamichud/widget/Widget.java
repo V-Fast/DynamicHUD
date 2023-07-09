@@ -68,6 +68,11 @@ public abstract class Widget {
      * Renders the widget on the screen.
      */
     public abstract void render(DrawContext drawContext);
+    public void updatePosition()
+    {
+        int screenWidth = client.getWindow().getScaledWidth();
+        int screenHeight = client.getWindow().getScaledHeight();
+    }
 
     /**
      * Returns whether the widget is enabled.
@@ -95,9 +100,9 @@ public abstract class Widget {
     public void setX(int x) {
         int screenWidth = client.getWindow().getScaledWidth();
         if (x < 0) {
-            x = 0;
-        } else if (x + getWidgetBox().getWidth() > screenWidth) {
-            x = screenWidth - getWidgetBox().getWidth();
+            x=(0);
+        } else if (x > screenWidth) {
+           x=screenWidth;
         }
         this.xPercent = (float) x / screenWidth;
     }
@@ -119,9 +124,9 @@ public abstract class Widget {
     public void setY(int y) {
         int screenHeight = client.getWindow().getScaledHeight();
         if (y < 0) {
-            y = 0;
-        } else if (y + getWidgetBox().getHeight() > screenHeight) {
-            y = screenHeight - getWidgetBox().getHeight();
+            y=0;
+        } else if (y > screenHeight) {
+            y=(screenHeight);
         }
         this.yPercent = (float) y / screenHeight;
     }

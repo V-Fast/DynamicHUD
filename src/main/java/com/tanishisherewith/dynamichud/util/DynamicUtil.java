@@ -61,6 +61,7 @@ public class DynamicUtil extends DrawContext {
             // Draw each Menu widget
             for (Widget widget : widgetManager.getMainMenuWidgets()) {
                 widget.render(context);
+                widget.updatePosition();
                 int backgroundColor = widget.isEnabled() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
                 WidgetBox box = widget.getWidgetBox();
                 DrawHelper.fill(context, box.x1-2, box.y1-2, box.x2+2, box.y2+2, backgroundColor);
@@ -81,7 +82,9 @@ public class DynamicUtil extends DrawContext {
                     int backgroundColor = widget.isEnabled() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
                     WidgetBox box = widget.getWidgetBox();
                     DrawHelper.fill(context, box.x1-2, box.y1-2, box.x2+2, box.y2+2, backgroundColor);
+                    widget.updatePosition();
                 }
+                widget.updatePosition();
             }
         }
     }

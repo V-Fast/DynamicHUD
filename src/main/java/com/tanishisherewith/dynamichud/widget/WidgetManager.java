@@ -110,6 +110,7 @@ public class WidgetManager {
         }
 
         rootTag.put("Widgets", widgetList);
+
         for (Widget mmwidget : MainMenuWidgets) {
             NbtCompound widgetTag = new NbtCompound();
             mmwidget.writeToTag(widgetTag);
@@ -155,7 +156,7 @@ public class WidgetManager {
                     NbtCompound widgetTag = MainMenuwidgetList.getCompound(i);
                     String className = widgetTag.getString("class");
                     MainMenuwidgets.add(widgetLoading.loadWidgetsFromTag(className, widgetTag));
-                    DynamicHUD.printInfo("Wigdet " + i + ": " + MainMenuwidgets.get(i).toString());
+                    DynamicHUD.printInfo("MainMenu Wigdet " + i + ": " + MainMenuwidgets.get(i).toString());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
