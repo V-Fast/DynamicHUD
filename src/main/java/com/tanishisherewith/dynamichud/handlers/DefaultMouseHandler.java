@@ -1,8 +1,8 @@
 package com.tanishisherewith.dynamichud.handlers;
 
-import com.tanishisherewith.dynamichud.widget.slider.SliderWidget;
 import com.tanishisherewith.dynamichud.util.colorpicker.ColorGradientPicker;
 import com.tanishisherewith.dynamichud.util.contextmenu.ContextMenu;
+import com.tanishisherewith.dynamichud.widget.slider.SliderWidget;
 import com.tanishisherewith.dynamichud.widget.text.TextWidget;
 
 import java.util.List;
@@ -45,18 +45,17 @@ public class DefaultMouseHandler implements MouseHandler {
                 }
             }
         }
-            if (this.colorPicker!=null) {
-                colorPicker.mouseDragged(mouseX, mouseY, button);
-                return true;
-            }
+        if (this.colorPicker != null) {
+            colorPicker.mouseDragged(mouseX, mouseY, button);
+            return true;
+        }
         return false;
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (this.colorPicker!=null)
-        {
-            colorPicker.mouseReleased(mouseX,mouseY,button);
+        if (this.colorPicker != null) {
+            colorPicker.mouseReleased(mouseX, mouseY, button);
             return true;
         }
         return false;

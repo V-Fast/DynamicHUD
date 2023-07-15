@@ -17,15 +17,14 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.tanishisherewith.dynamichud.DynamicHUD.WIDGETS_FILE;
-import static com.tanishisherewith.dynamichud.DynamicHUD.printInfo;
 
 public class DynamicHUDmod implements ClientModInitializer, IWigdets, WidgetLoading {
-    protected List<Widget> widgets = new ArrayList<>();
-    protected List<Widget> MainMenuwidgets = new ArrayList<>();
+    protected Set<Widget> widgets = new HashSet<>();
+    protected Set<Widget> MainMenuwidgets = new HashSet<>();
     MinecraftClient mc = MinecraftClient.getInstance();
     private DynamicUtil dynamicutil;
 
@@ -58,7 +57,7 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets, WidgetLoad
         widgets.add(new TextWidget(mc, "Dynamic", () -> "HUD", 0.7f, 0.3f, false, false, false, -1, -1, true));
         widgets.add(new TextWidget(mc, "Ping: ", () -> "", 0.08f, 0.5f, false, false, false, -1, -1, true));
         widgets.add(new TextWidget(mc, "Position: ", () -> "", 0.4f, 0.8f, false, false, false, -1, -1, true));
-        widgets.add(new TextWidget(mc, "Day/Night: ", () -> "", 0.83f, 0.8f, false, false, false, -1,-1,true));
+        widgets.add(new TextWidget(mc, "Day/Night: ", () -> "", 0.83f, 0.8f, false, false, false, -1, -1, true));
 
         for (Widget widget : widgets) {
             if (widget instanceof TextWidget textWidget) {
@@ -72,7 +71,7 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets, WidgetLoad
 
     private void addArmorWidgets(DynamicUtil dynamicUtil) {
         String text = "Text";
-        widgets.add(new ArmorWidget(mc, EquipmentSlot.CHEST, 0.01f, 0.01f,true,
+        widgets.add(new ArmorWidget(mc, EquipmentSlot.CHEST, 0.01f, 0.01f, true,
                 TextureHelper.Position.ABOVE,
                 () -> text,
                 () -> Color.RED,
@@ -134,11 +133,8 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets, WidgetLoad
 
     @Override
     public void loadWigdets(DynamicUtil dynamicUtil) {
-        List<Widget> widgets = dynamicUtil.getWidgetManager().loadWigdets(WIDGETS_FILE);
-        List<Widget> MainMenuWidget = dynamicUtil.getWidgetManager().loadMainMenuWigdets(WIDGETS_FILE);
-
-        printInfo("Widgets loaded: " + widgets);
-        printInfo("MainMenuWidgets loaded: " + MainMenuWidget);
+        Set<Widget> widgets = dynamicUtil.getWidgetManager().loadWigdets(WIDGETS_FILE);
+        Set<Widget> MainMenuWidget = dynamicUtil.getWidgetManager().loadMainMenuWigdets(WIDGETS_FILE);
 
         Widget.addTextGenerator("FPS: ", () -> String.valueOf(mc.getCurrentFps()));
         Widget.addTextGenerator("Dynamic", () -> "HUD");

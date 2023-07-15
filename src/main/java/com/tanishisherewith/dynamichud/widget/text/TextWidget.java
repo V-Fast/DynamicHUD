@@ -2,10 +2,10 @@ package com.tanishisherewith.dynamichud.widget.text;
 
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
+import com.tanishisherewith.dynamichud.interfaces.TextGenerator;
 import com.tanishisherewith.dynamichud.util.contextmenu.ContextMenuOptionsProvider;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
-import com.tanishisherewith.dynamichud.interfaces.TextGenerator;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -36,7 +36,7 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
      * @param yPercent The y position of the widget as a percentage of the screen height
      */
     public TextWidget(MinecraftClient client, String text, TextGenerator dataText, float xPercent, float yPercent, boolean Shadow, boolean Rainbow, boolean VerticalRainbow, int Textcolor, int Datacolor, boolean enabled) {
-        super(client,text);
+        super(client, text);
         this.text = text;
         this.dataText = dataText;
         this.xPercent = xPercent;
@@ -234,14 +234,13 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
 
     /**
      * Renders this widget on screen.
-     *
      */
     @Override
     public void render(DrawContext drawContext) {
         int x = getX();
         int y = getY();
         drawContext.getMatrices().push();
-        drawContext.getMatrices().translate(0,0,300);
+        drawContext.getMatrices().translate(0, 0, 300);
         String CombinedText = getText() + getDataText();
         if (rainbow) {
             float hue = (System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f);
@@ -286,7 +285,7 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     }
 
     private void drawText(DrawContext drawContext, String text, int x, int y, int color) {
-            DrawHelper.drawText(drawContext,client.textRenderer, text, x, y, color,shadow);
+        DrawHelper.drawText(drawContext, client.textRenderer, text, x, y, color, shadow);
     }
 
     @Override

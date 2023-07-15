@@ -15,6 +15,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public abstract class AbstractMoveableScreen extends Screen {
@@ -93,18 +94,20 @@ public abstract class AbstractMoveableScreen extends Screen {
         }
         // Check if the context menu is visible and if the mouse click occurred outside its bounds
         // Check if the Slider is visible and if the mouse click occurred outside its bounds
-        if (contextMenu != null) {
-            for (ContextMenu contextmenu : contextMenu) {
+        Iterator<ContextMenu> contextMenuIterator = contextMenu.iterator();
+        Iterator<SliderWidget> sliderIterator = Slider.iterator();
+        while (contextMenuIterator.hasNext() || sliderIterator.hasNext()) {
+            if (contextMenuIterator.hasNext()) {
+                ContextMenu contextmenu = contextMenuIterator.next();
                 if (!contextmenu.contains(mouseX, mouseY)) {
-                    // Close the context menu
+                    // Close the context menu and slider
                     contextMenu.clear();
                     Slider.clear();
                     return true;
                 }
             }
-        }
-        if (Slider != null) {
-            for (SliderWidget sliderWidget : Slider) {
+            if (sliderIterator.hasNext()) {
+                SliderWidget sliderWidget = sliderIterator.next();
                 if (!sliderWidget.contains(mouseX, mouseY)) {
                     // Close the Slider
                     Slider.clear();
@@ -113,7 +116,6 @@ public abstract class AbstractMoveableScreen extends Screen {
                 }
             }
         }
-
 
         for (Widget widget : dynamicutil.getWidgetManager().getWidgets()) {
             if (widget.getWidgetBox().contains(widget, mouseX, mouseY)) {
@@ -128,15 +130,11 @@ public abstract class AbstractMoveableScreen extends Screen {
                 }
                 if (dragHandler.startDragging(widget, mouseX, mouseY) && button == 0 && widget.isDraggable) {
                     selectedWidget = widget;
-                    if (contextMenu != null) {
-                        for (ContextMenu contextmenu : contextMenu) {
-                            contextmenu.updatePosition();
-                        }
+                    for (ContextMenu contextmenu : contextMenu) {
+                        contextmenu.updatePosition();
                     }
-                    if (Slider != null) {
-                        for (SliderWidget sliderWidget : Slider) {
-                            sliderWidget.updatePosition();
-                        }
+                    for (SliderWidget sliderWidget : Slider) {
+                        sliderWidget.updatePosition();
                     }
                     return true;
                 }
@@ -184,19 +182,17 @@ public abstract class AbstractMoveableScreen extends Screen {
         }
 
         // Draw the slider and other stuff
-        if (Slider != null) {
-            for (SliderWidget sliderWidget : Slider) {
-                sliderWidget.render(drawContext);
-            }
+        for (SliderWidget sliderWidget : Slider) {
+            sliderWidget.render(drawContext);
         }
-        if (contextMenu != null) {
-            for (ContextMenu contextMenu : contextMenu) {
-                contextMenu.render(drawContext);
-            }
+        for (ContextMenu contextMenu : contextMenu) {
+            contextMenu.render(drawContext);
         }
+
         if (colorPicker != null) {
             colorPicker.render(drawContext);
         }
+
         if (selectedWidget != null) {
             widgetX = selectedWidget.getX();
             widgetY = selectedWidget.getY();
@@ -228,8 +224,6 @@ public abstract class AbstractMoveableScreen extends Screen {
     public void resize(MinecraftClient client, int width, int height) {
         if (ShouldBeAffectedByResize)
             super.resize(client, width, height);
-        else {
-        }
     }
 
     @Override

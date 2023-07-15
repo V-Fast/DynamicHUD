@@ -2,9 +2,9 @@ package com.tanishisherewith.dynamichud.widget.armor;
 
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.TextureHelper;
+import com.tanishisherewith.dynamichud.interfaces.TextGenerator;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
-import com.tanishisherewith.dynamichud.interfaces.TextGenerator;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -26,6 +26,7 @@ public class ArmorWidget extends Widget {
     protected TextGenerator textGenerator;
     protected Supplier<Color> color;
     protected boolean TextBackground;
+
     /**
      * Constructs an ArmorWidget object.
      *
@@ -34,8 +35,8 @@ public class ArmorWidget extends Widget {
      * @param xPercent The x position of the widget as a percentage of the screen width
      * @param yPercent The y position of the widget as a percentage of the screen height
      */
-    public ArmorWidget(MinecraftClient client, EquipmentSlot slot, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator, Supplier<Color> color,boolean Textbackground,String label) {
-        super(client,label);
+    public ArmorWidget(MinecraftClient client, EquipmentSlot slot, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator, Supplier<Color> color, boolean Textbackground, String label) {
+        super(client, label);
         this.slot = slot;
         this.xPercent = xPercent;
         this.yPercent = yPercent;
@@ -43,27 +44,23 @@ public class ArmorWidget extends Widget {
         this.currentTextPosition[0] = currentTextPosition;
         this.textGenerator = textGenerator;
         this.color = color;
-        this.TextBackground=Textbackground;
+        this.TextBackground = Textbackground;
     }
 
     /**
      * Renders the widget on the screen.
-     *
      */
     @Override
     public void render(DrawContext drawContext) {
         ItemRenderer itemRenderer = client.getItemRenderer();
         ItemStack armorItem;
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        if (client.player == null)
-        {
+        if (client.player == null) {
             armorItem = Items.DIAMOND_CHESTPLATE.getDefaultStack();
-        }
-        else
-        {
+        } else {
             armorItem = client.player.getEquippedStack(slot);
         }
-        TextureHelper.drawItemTextureWithText(drawContext.getMatrices(),drawContext, itemRenderer, textRenderer, armorItem, getX(), getY(), getText(), ColorHelper.ColorToInt(getColor()), currentTextPosition[0], 0.5f,TextBackground);
+        TextureHelper.drawItemTextureWithText(drawContext.getMatrices(), drawContext, itemRenderer, textRenderer, armorItem, getX(), getY(), getText(), ColorHelper.ColorToInt(getColor()), currentTextPosition[0], 0.5f, TextBackground);
     }
 
     @Override
@@ -73,9 +70,10 @@ public class ArmorWidget extends Widget {
             setTextGenerator(textGenerator);
         }
     }
+
     @Override
     public WidgetBox getWidgetBox() {
-        return new WidgetBox(this.getX(), this.getY() , this.getX() + this.getWidth(), this.getY() + this.getHeight());
+        return new WidgetBox(this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight());
     }
 
     /**
@@ -122,9 +120,9 @@ public class ArmorWidget extends Widget {
         super.writeToTag(tag);
         tag.putString("slot", slot.getName());
         tag.putString("Position", String.valueOf(this.currentTextPosition[0]));
-        if(this.getText()!=null) tag.putString("text",this.getText());
-        tag.putInt("Color",this.getColor().getRGB());
-        tag.putBoolean("TextBackground",this.TextBackground);
+        if (this.getText() != null) tag.putString("text", this.getText());
+        tag.putInt("Color", this.getColor().getRGB());
+        tag.putBoolean("TextBackground", this.TextBackground);
     }
 
     @Override
@@ -132,12 +130,12 @@ public class ArmorWidget extends Widget {
         super.readFromTag(tag);
         slot = EquipmentSlot.byName(tag.getString("slot"));
         String Position = tag.getString("Position");
-        color= ()->ColorHelper.getColorFromInt(tag.getInt("Color"));
-        if (TextureHelper.Position.getByUpperCaseName(Position) != null && !(tag.getString("Position") ==null) && !tag.getString("Position").isEmpty())
+        color = () -> ColorHelper.getColorFromInt(tag.getInt("Color"));
+        if (TextureHelper.Position.getByUpperCaseName(Position) != null && !(tag.getString("Position") == null) && !tag.getString("Position").isEmpty())
             currentTextPosition[0] = TextureHelper.Position.getByUpperCaseName(Position);
         else
             currentTextPosition[0] = TextureHelper.Position.ABOVE;
-        TextBackground=tag.getBoolean("TextBackground");
-        label=tag.getString("label");
+        TextBackground = tag.getBoolean("TextBackground");
+        label = tag.getString("label");
     }
 }

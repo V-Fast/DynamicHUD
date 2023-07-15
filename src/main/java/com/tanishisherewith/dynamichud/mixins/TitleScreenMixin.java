@@ -24,6 +24,7 @@ public abstract class TitleScreenMixin extends Screen {
     protected int dragStartX = 0, dragStartY = 0; // The starting position of a drag operation
     protected int gridSize = 1; // The size of each grid cell in pixels
     DynamicUtil dynamicUtil = DynamicHUD.getDynamicUtil();
+
     protected TitleScreenMixin(Text title) {
         super(title);
     }
@@ -39,6 +40,7 @@ public abstract class TitleScreenMixin extends Screen {
             dynamicUtil.render(context, delta);
         }
     }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (mouseHandler.mouseClicked(mouseX, mouseY, button)) {

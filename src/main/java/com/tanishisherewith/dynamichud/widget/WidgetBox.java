@@ -6,12 +6,21 @@ public class WidgetBox {
     public int x1 = 0, x2 = 0, y1 = 0, y2 = 0;
 
     public WidgetBox(int x1, int y1, int x2, int y2) {
-        this.width = x2 - x1;
-        this.height = y2 - y1;
+        this.width = (x2 - x1);
+        this.height = (y2 - y1);
         this.x1 = x1;
         this.x2 = x2;
         this.y1 = y1;
         this.y2 = y2;
+    }
+
+    public WidgetBox(int x1, int y1, double width, double height) {
+        this.width = (int) width;
+        this.height = (int) height;
+        this.x1 = x1;
+        this.x2 = x1 + (int) width;
+        this.y1 = y1;
+        this.y2 = y1 + (int) height;
     }
 
     public boolean contains(Widget widget, double x, double y) {
@@ -23,6 +32,7 @@ public class WidgetBox {
         }
         return x >= x1 && x <= x2 && y >= y1 && y <= y2;
     }
+
     public boolean intersects(int otherX1, int otherY1, int otherX2, int otherY2) {
         return !(otherX1 > x2 || otherX2 < x1 || otherY1 > y2 || otherY2 < y1);
     }

@@ -6,7 +6,6 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
 
 public class DrawHelper extends DrawContext {
     public DrawHelper(MinecraftClient client, VertexConsumerProvider.Immediate vertexConsumers) {
@@ -17,11 +16,11 @@ public class DrawHelper extends DrawContext {
      * Fills a box on the screen with a specified color.
      *
      * @param drawContext The matrix stack used for rendering
-     * @param x        The x position of the rectangle
-     * @param y        The y position of the rectangle
-     * @param width    The width of the rectangle
-     * @param height   The height of the rectangle
-     * @param color    The color to fill the rectangle with
+     * @param x           The x position of the rectangle
+     * @param y           The y position of the rectangle
+     * @param width       The width of the rectangle
+     * @param height      The height of the rectangle
+     * @param color       The color to fill the rectangle with
      */
     public static void drawBox(DrawContext drawContext, int x, int y, int width, int height, int color) {
         int x1 = x - width / 2 - 2;
@@ -34,11 +33,11 @@ public class DrawHelper extends DrawContext {
     /**
      * Fills a rectangle on the screen with a specified color.
      *
-     * @param x1       The x position of the top left corner of the rectangle
-     * @param y1       The y position of the top left corner of the rectangle
-     * @param x2       The x position of the bottom right corner of the rectangle
-     * @param y2       The y position of the bottom right corner of the rectangle
-     * @param color    The color to fill the rectangle with
+     * @param x1    The x position of the top left corner of the rectangle
+     * @param y1    The y position of the top left corner of the rectangle
+     * @param x2    The x position of the bottom right corner of the rectangle
+     * @param y2    The y position of the bottom right corner of the rectangle
+     * @param color The color to fill the rectangle with
      */
     public static void fill(DrawContext drawContext, int x1, int y1, int x2, int y2, int color) {
         drawContext.fill(x1, y1, x2, y2, color);
@@ -60,14 +59,14 @@ public class DrawHelper extends DrawContext {
                                 int y,
                                 int color,
                                 boolean shadow) {
-        drawContext.drawText(textRenderer,text, x, y, color, shadow);
+        drawContext.drawText(textRenderer, text, x, y, color, shadow);
     }
 
     public static void drawCutRectangle(DrawContext drawContext, int x1, int y1, int x2, int y2, int z, int color, int cornerRadius) {
         // Draw the rectangles
-        drawContext.fill(  x1 + cornerRadius, y1, x2 - cornerRadius, y1 + cornerRadius, z, color);
-        drawContext.fill( x1 + cornerRadius, y2 - cornerRadius, x2 - cornerRadius, y2, z, color);
-        drawContext.fill( x1, y1 + cornerRadius, x2, y2 - cornerRadius, z, color);
+        drawContext.fill(x1 + cornerRadius, y1, x2 - cornerRadius, y1 + cornerRadius, z, color);
+        drawContext.fill(x1 + cornerRadius, y2 - cornerRadius, x2 - cornerRadius, y2, z, color);
+        drawContext.fill(x1, y1 + cornerRadius, x2, y2 - cornerRadius, z, color);
     }
 
 
@@ -127,8 +126,8 @@ public class DrawHelper extends DrawContext {
     }
 
     public static void fillRoundedRect(DrawContext drawContext, int left, int top, int right, int bottom, int color) {
-        drawContext.fill( left + 1, top, right - 1, top + 1, color);
-        drawContext.fill( left + 1, bottom - 1, right - 1, bottom, color);
+        drawContext.fill(left + 1, top, right - 1, top + 1, color);
+        drawContext.fill(left + 1, bottom - 1, right - 1, bottom, color);
         drawContext.fill(left, top + 1, left + 1, bottom - 1, color);
         drawContext.fill(right - 1, top + 1, right, bottom - 1, color);
         drawContext.fill(left + 1, top + 1, right - 1, bottom - 1, color);
@@ -170,17 +169,17 @@ public class DrawHelper extends DrawContext {
     /**
      * Draws an outlined box on the screen.
      *
-     * @param x1       The x position of the top left corner of the box
-     * @param y1       The y position of the top left corner of the box
-     * @param x2       The x position of the bottom right corner of the box
-     * @param y2       The y position of the bottom right corner of the box
-     * @param color    The color to draw the box with
+     * @param x1    The x position of the top left corner of the box
+     * @param y1    The y position of the top left corner of the box
+     * @param x2    The x position of the bottom right corner of the box
+     * @param y2    The y position of the bottom right corner of the box
+     * @param color The color to draw the box with
      */
     public static void drawOutlinedBox(DrawContext drawContext, int x1, int y1, int x2, int y2, int color) {
-        drawContext.fill( x1, y1, x2, y1 + 1, color);
-        drawContext.fill( x1, y2 - 1, x2, y2, color);
-        drawContext.fill( x1, y1 + 1, x1 + 1, y2 - 1, color);
-        drawContext.fill( x2 - 1, y1 + 1, x2, y2 - 1, color);
+        drawContext.fill(x1, y1, x2, y1 + 1, color);
+        drawContext.fill(x1, y2 - 1, x2, y2, color);
+        drawContext.fill(x1, y1 + 1, x1 + 1, y2 - 1, color);
+        drawContext.fill(x2 - 1, y1 + 1, x2, y2 - 1, color);
     }
 
 }

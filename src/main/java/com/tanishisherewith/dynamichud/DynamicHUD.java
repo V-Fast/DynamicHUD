@@ -20,20 +20,40 @@ import java.io.File;
 
 public class DynamicHUD implements ClientModInitializer {
 
-    public static final KeyBinding EditorScreenKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-            "DynamicHud Editor Screen",
-            InputUtil.Type.KEYSYM,
-            GLFW.GLFW_KEY_RIGHT_SHIFT,
-            "DynamicHud"
-    ));
     private static final Logger logger = LoggerFactory.getLogger("DynamicHud");
     static AbstractMoveableScreen Screen;
+    private static String keybingCategory = "DynamicHud";
+    private static String TranslationKey = "DynamicHud Editor Screen";
+    private static InputUtil.Type inputType = InputUtil.Type.KEYSYM;
+    private static int key = GLFW.GLFW_KEY_RIGHT_SHIFT;
+    public static final KeyBinding EditorScreenKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+            TranslationKey,
+            inputType,
+            key,
+            keybingCategory
+    ));
     private static String filename = "widgets.nbt";
     private static File fileDirectory = FabricLoader.getInstance().getConfigDir().toFile();
     public static final File WIDGETS_FILE = new File(fileDirectory, filename);
     private static DynamicUtil dynamicutil;
     private static IWigdets iWigdets;
     MinecraftClient mc = MinecraftClient.getInstance();
+
+    public static void setInputType(InputUtil.Type inputType) {
+        DynamicHUD.inputType = inputType;
+    }
+
+    public static void setKeyBindKey(int key) {
+        DynamicHUD.key = key;
+    }
+
+    public static void setKeybingCategory(String keybingCategory) {
+        DynamicHUD.keybingCategory = keybingCategory;
+    }
+
+    public static void setTranslationKey(String translationKey) {
+        TranslationKey = translationKey;
+    }
 
     public static void setFilename(String filename) {
         DynamicHUD.filename = filename;
@@ -80,24 +100,25 @@ public class DynamicHUD implements ClientModInitializer {
         ClientTickEvents.START_CLIENT_TICK.register(server -> {
             if (iWigdets != null) {
                 if (!WIDGETS_FILE.exists()) {
-                    if (!dynamicutil.WidgetAdded) iWigdets.addWigdets(dynamicutil);
-                    if (!dynamicutil.MainMenuWidgetAdded) iWigdets.addMainMenuWigdets(dynamicutil);
+                    if (!dynamicutil.WidgetAdded) {
+                        printInfo("Widgets added");
+                        iWigdets.addWigdets(dynamicutil);
+                    }
+                    if (!dynamicutil.MainMenuWidgetAdded) {
+                        printInfo("MainMenu Widgets added");
+                        iWigdets.addMainMenuWigdets(dynamicutil);
+                    }
                 }
 
                 if (WIDGETS_FILE.exists() && !dynamicutil.WidgetLoaded) {
                     iWigdets.loadWigdets(dynamicutil);
+                    printInfo("Widgets loaded");
+                    File FileDirectory = new File(fileDirectory, filename);
+                    printInfo("Load file Directory: " + FileDirectory);
                 }
             }
             DynamicUtil.openDynamicScreen(EditorScreenKeyBinding, Screen);
         });
-        if (dynamicutil.WidgetAdded || dynamicutil.MainMenuWidgetAdded) {
-            printInfo("Widgets added");
-        }
-        if (dynamicutil.WidgetLoaded) {
-            printInfo("Widgets loaded");
-            File FileDirectory = new File(fileDirectory, filename);
-            printInfo("Load file Directory: " + FileDirectory);
-        }
 
         //RenderCallBack
         HudRenderCallback.EVENT.register((drawContext, tickDelta) -> dynamicutil.render(drawContext, tickDelta));

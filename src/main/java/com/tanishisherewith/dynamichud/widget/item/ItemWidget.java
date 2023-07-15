@@ -2,9 +2,9 @@ package com.tanishisherewith.dynamichud.widget.item;
 
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.TextureHelper;
+import com.tanishisherewith.dynamichud.interfaces.TextGenerator;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
-import com.tanishisherewith.dynamichud.interfaces.TextGenerator;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -28,8 +28,8 @@ public class ItemWidget extends Widget {
      *
      * @param client The Minecraft client instance
      */
-    public ItemWidget(MinecraftClient client, Supplier<ItemStack> itemStack, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator, Supplier<Color> color,boolean Textbackground,String label) {
-        super(client,label);
+    public ItemWidget(MinecraftClient client, Supplier<ItemStack> itemStack, float xPercent, float yPercent, boolean enabled, TextureHelper.Position currentTextPosition, TextGenerator textGenerator, Supplier<Color> color, boolean Textbackground, String label) {
+        super(client, label);
         this.xPercent = xPercent;
         this.yPercent = yPercent;
         this.enabled = enabled;
@@ -37,12 +37,12 @@ public class ItemWidget extends Widget {
         this.currentTextPosition[0] = currentTextPosition;
         this.textGenerator = textGenerator;
         this.color = color;
-        this.TextBackground=Textbackground;
+        this.TextBackground = Textbackground;
     }
 
     @Override
     public WidgetBox getWidgetBox() {
-        return new WidgetBox(this.getX(), this.getY() , this.getX() + this.getWidth(), this.getY() + this.getHeight());
+        return new WidgetBox(this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight());
     }
 
     /**
@@ -87,9 +87,11 @@ public class ItemWidget extends Widget {
     public Supplier<Color> getColor() {
         return color;
     }
+
     public void setColor(Supplier<Color> color) {
-        this.color=color;
+        this.color = color;
     }
+
     @Override
     public void setTextGeneratorFromLabel() {
         TextGenerator textGenerator = textGenerators.get(label);
@@ -105,7 +107,7 @@ public class ItemWidget extends Widget {
         tag.putInt("ItemID", Item.getRawId(getItemStack().getItem()));
         tag.putInt("ItemCount", getItemStack().getMaxCount());
         tag.putString("text", getText());
-        tag.putBoolean("TextBackground",this.TextBackground);
+        tag.putBoolean("TextBackground", this.TextBackground);
     }
 
     @Override
@@ -121,8 +123,8 @@ public class ItemWidget extends Widget {
             currentTextPosition[0] = TextureHelper.Position.getByUpperCaseName(Position);
         else
             currentTextPosition[0] = TextureHelper.Position.ABOVE;
-        TextBackground=tag.getBoolean("TextBackground");
-        label=tag.getString("label");
+        TextBackground = tag.getBoolean("TextBackground");
+        label = tag.getString("label");
     }
 
     public ItemStack getItemStack(int itemID, int itemCount) {
@@ -134,6 +136,6 @@ public class ItemWidget extends Widget {
     public void render(DrawContext drawContext) {
         ItemRenderer itemRenderer = client.getItemRenderer();
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        TextureHelper.drawItemTextureWithText(drawContext.getMatrices(),drawContext, itemRenderer, textRenderer, getItemStack(), getX(), getY(), getText(), ColorHelper.ColorToInt(color.get()), currentTextPosition[0], 0.5f,TextBackground);
+        TextureHelper.drawItemTextureWithText(drawContext.getMatrices(), drawContext, itemRenderer, textRenderer, getItemStack(), getX(), getY(), getText(), ColorHelper.ColorToInt(color.get()), currentTextPosition[0], 0.5f, TextBackground);
     }
 }

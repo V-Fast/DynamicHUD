@@ -62,7 +62,7 @@ public class GradientSlider {
             float hue = (float) i / width;
             int color = Color.HSBtoRGB(hue, 1.0f, 1.0f);
             color = (color & 0x00FFFFFF) | ((int) (alpha * 255) << 24);
-            drawContext.fill( x + i, y, x + i + 1, y + height, color);
+            drawContext.fill(x + i, y, x + i + 1, y + height, color);
         }
 
         // Draw the handle

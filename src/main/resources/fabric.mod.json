@@ -19,7 +19,8 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "com.tanishisherewith.dynamichud.DynamicHUD"
+      "com.tanishisherewith.dynamichud.DynamicHUD",
+      "com.tanishisherewith.dynamichud.DynamicHUDmod"
     ],
     "modmenu": [
       "com.tanishisherewith.dynamichud.ModMenuIntegration"
@@ -32,9 +33,6 @@
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
     "minecraft": "~${minecraft_version}"
-  },
-  "suggests": {
-    "modmenu": ">=7.1.0"
   },
   "custom": {
     "modmenu": {

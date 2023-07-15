@@ -48,7 +48,7 @@ public class MoveableScreen extends AbstractMoveableScreen {
     @Override
     protected void menu(Widget widget, int x, int y) {
         contextMenu.clear();
-        contextMenu.add(new ContextMenu(mc, x, y + widget.getHeight() + 5, selectedWidget,this));
+        contextMenu.add(new ContextMenu(mc, x, y + widget.getHeight() + 5, selectedWidget, this));
         if (widget instanceof ArmorWidget armorWidget) {
             ArmorWidgetMenu(armorWidget, x, y);
         }
@@ -105,7 +105,7 @@ public class MoveableScreen extends AbstractMoveableScreen {
                 if (textWidget.isDatacolorOptionEnabled())
                     colorPicker = new ColorGradientPicker(mc, widgetX + 110, widgetY + textWidget.getHeight() + 5, textWidget.getDatacolor(), textWidget::setDataColor, 50, 100, selectedWidget);
                 else
-                    colorPicker=null;
+                    colorPicker = null;
             });
         }
        /*  contextMenu.get(0).addOption("SubMenu: ",()->
@@ -127,7 +127,7 @@ public class MoveableScreen extends AbstractMoveableScreen {
                 .setX(x)
                 .setY(y)
                 .setWidth(105)
-                .setHeight(contextMenu.get(0).getHeight()+13)
+                .setHeight(contextMenu.get(0).getHeight() + 13)
                 .setLabel("Rainbow Speed")
                 .setValue(textWidget.getRainbowSpeed())
                 .setMinValue(5f)

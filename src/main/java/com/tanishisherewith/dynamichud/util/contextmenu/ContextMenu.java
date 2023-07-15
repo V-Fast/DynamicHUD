@@ -78,10 +78,11 @@ public class ContextMenu {
         }
         options.add(option);
     }
-    public void addDataTextOption(String label, Consumer<String> action,int WidgetX, int WidgetY) {
+
+    public void addDataTextOption(String label, Consumer<String> action, int WidgetX, int WidgetY) {
         int OptionY = WidgetY + HeightFromWidget + 2;
-        WidgetX+=client.textRenderer.getWidth(label+dataInputValue);
-        OptionY+=options.size()*(client.textRenderer.fontHeight+2);
+        WidgetX += client.textRenderer.getWidth(label + dataInputValue);
+        OptionY += options.size() * (client.textRenderer.fontHeight + 2);
         DataInputOption option = new DataInputOption(label + dataInputValue, text -> {
             action.accept(text);
             dataInputValue = text;
@@ -94,8 +95,8 @@ public class ContextMenu {
 
     public void addDoubleTextOption(String label, Consumer<Double> action, int WidgetX, int WidgetY) {
         int OptionY = WidgetY + HeightFromWidget + 2;
-        WidgetX+=client.textRenderer.getWidth(label+dataInputValue);
-        OptionY+=options.size()*(client.textRenderer.fontHeight+2);
+        WidgetX += client.textRenderer.getWidth(label + dataInputValue);
+        OptionY += options.size() * (client.textRenderer.fontHeight + 2);
         DoubleInputOption option = new DoubleInputOption(label + doubleInputValue, text -> {
             action.accept(text);
             doubleInputValue = String.valueOf(text);
@@ -151,7 +152,7 @@ public class ContextMenu {
 
     public int getOptionY(int optionIndex) {
         int OptionY = y + HeightFromWidget + 2;
-        OptionY+=optionIndex*(client.textRenderer.fontHeight+2);
+        OptionY += optionIndex * (client.textRenderer.fontHeight + 2);
         return OptionY;
     }
 
@@ -310,6 +311,7 @@ public class ContextMenu {
             optionY += textRenderer.fontHeight + 2;
         }
     }
+
     /**
      * Sets position of this context menu.
      *
@@ -402,6 +404,7 @@ public class ContextMenu {
             label = labelPrefix + getter.get();
         }
     }
+
     public class DataInputOption extends ContextMenuOption {
         private final Consumer<String> labelSetter;
 

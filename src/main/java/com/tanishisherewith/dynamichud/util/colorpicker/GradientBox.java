@@ -45,7 +45,7 @@ public class GradientBox {
                 float value = 1.0f - (float) j / size;
                 int color = Color.HSBtoRGB(hue, saturation, value);
                 color = (color & 0x00FFFFFF) | ((int) (alpha * 255) << 24);
-                drawContext.fill( x + i, y + j, x + i + 1, y + j + 1, color);
+                drawContext.fill(x + i, y + j, x + i + 1, y + j + 1, color);
             }
         }
 

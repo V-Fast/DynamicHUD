@@ -65,8 +65,8 @@ public class ColorGradientPicker {
             int green = buffer.get(1) & 0xFF;
             int blue = buffer.get(2) & 0xFF;
 
-            drawContext.fill( (int) mouseX + 10, (int) mouseY, (int) mouseX + 26, (int) mouseY + 16, -1);
-            drawContext.fill( (int) mouseX + 11, (int) mouseY + 1, (int) mouseX + 25, (int) mouseY + 15, (red << 16) | (green << 8) | blue | 0xFF000000);
+            drawContext.fill((int) mouseX + 10, (int) mouseY, (int) mouseX + 26, (int) mouseY + 16, -1);
+            drawContext.fill((int) mouseX + 11, (int) mouseY + 1, (int) mouseX + 25, (int) mouseY + 15, (red << 16) | (green << 8) | blue | 0xFF000000);
         }
     }
 
@@ -100,6 +100,7 @@ public class ColorGradientPicker {
         onColorSelected.accept(gradientBox.getColor());
         return true;
     }
+
     public void mouseReleased(double mouseX, double mouseY, int button) {
         gradientSlider.onRelease(mouseX, mouseY, button);
         gradientBox.onRelease(mouseX, mouseY, button);

@@ -8,15 +8,19 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.HashSet;
+import java.util.Set;
+
+import static com.tanishisherewith.dynamichud.DynamicHUD.printInfo;
 
 /**
  * This class manages a list of widgets that can be added, removed and retrieved.
  */
 public class WidgetManager {
-    private final List<Widget> widgets = new ArrayList<>(); // The list of widgets
-    private final List<Widget> MainMenuWidgets = new ArrayList<>(); // The list of MainMenu widgets
+    private final Set<Widget> widgets = new HashSet<>(); // The list of widgets
+    private final Set<Widget> MainMenuWidgets = new HashSet<>(); // The list of MainMenu widgets
     private WidgetLoading widgetLoading = new WidgetLoading() {
     };
 
@@ -68,21 +72,21 @@ public class WidgetManager {
      *
      * @return list of all widgets.
      */
-    public List<Widget> getWidgets() {
+    public Set<Widget> getWidgets() {
         return widgets;
     }
 
     /**
-     * Returns list of all MainMenu widgets.
+     * Returns Set of all MainMenu widgets.
      *
-     * @return list of all MainMenu widgets.
+     * @return Set of all MainMenu widgets.
      */
-    public List<Widget> getMainMenuWidgets() {
+    public Set<Widget> getMainMenuWidgets() {
         return MainMenuWidgets;
     }
 
-    public List<Widget> getOtherWidgets(Widget SelectedWidget) {
-        List<Widget> otherWidgets = new ArrayList<>();
+    public Set<Widget> getOtherWidgets(Widget SelectedWidget) {
+        Set<Widget> otherWidgets = new HashSet<>();
         for (Widget widget : getWidgets()) {
             if (widget != SelectedWidget) {
                 otherWidgets.add(widget);
@@ -101,7 +105,12 @@ public class WidgetManager {
         NbtList widgetList = new NbtList();
         NbtList MainMenuwidgetList = new NbtList();
 
-        DynamicHUD.printInfo("Saving widgets");
+        printInfo("Saving widgets");
+
+        if (widgets.size() < 1 && MainMenuWidgets.size() < 1) {
+            printInfo("Widgets are empty.. Saving interrupted to prevent empty file");
+            return;
+        }
 
         for (Widget widget : widgets) {
             NbtCompound widgetTag = new NbtCompound();
@@ -118,17 +127,29 @@ public class WidgetManager {
         }
         rootTag.put("MainMenuWidgets", MainMenuwidgetList);
 
-        try (DataOutputStream out = new DataOutputStream(new FileOutputStream(file))) {
+        // Use a temporary file to write the data
+        File tempFile = new File(file.getAbsolutePath() + ".tmp");
+        try (DataOutputStream out = new DataOutputStream(new FileOutputStream(tempFile))) {
             NbtIo.writeCompressed(rootTag, out);
+            // Check if the data has been written successfully
+            if (tempFile.length() > 0) {
+                // Check if the temporary file exists and can be renamed
+                Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } else {
+                throw new IOException("Failed to write data to temporary file OR Empty data passed");
+            }
         } catch (IOException e) {
+            // Delete the temporary file if an error occurs
+            tempFile.delete();
             e.printStackTrace();
         }
     }
 
-    public List<Widget> loadWigdets(File file) {
-        List<Widget> widgets = new ArrayList<>();
+
+    public Set<Widget> loadWigdets(File file) {
+        Set<Widget> widgets = new HashSet<>();
         if (file.exists()) {
-            DynamicHUD.printInfo("Widgets File exists");
+            printInfo("Widgets File exists");
             try (DataInputStream in = new DataInputStream(new FileInputStream(file))) {
                 NbtCompound rootTag = NbtIo.readCompressed(in);
                 NbtList widgetList = rootTag.getList("Widgets", NbtType.COMPOUND);
@@ -136,7 +157,7 @@ public class WidgetManager {
                     NbtCompound widgetTag = widgetList.getCompound(i);
                     String className = widgetTag.getString("class");
                     widgets.add(widgetLoading.loadWidgetsFromTag(className, widgetTag));
-                    DynamicHUD.printInfo("Wigdet " + i + ": " + widgets.get(i).toString());
+                    printInfo("Wigdet " + i + ": " + widgets.stream().toList().get(i).toString());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -146,8 +167,8 @@ public class WidgetManager {
         return widgets;
     }
 
-    public List<Widget> loadMainMenuWigdets(File file) {
-        List<Widget> MainMenuwidgets = new ArrayList<>();
+    public Set<Widget> loadMainMenuWigdets(File file) {
+        Set<Widget> MainMenuwidgets = new HashSet<>();
         if (file.exists()) {
             try (DataInputStream in = new DataInputStream(new FileInputStream(file))) {
                 NbtCompound rootTag = NbtIo.readCompressed(in);
@@ -156,7 +177,7 @@ public class WidgetManager {
                     NbtCompound widgetTag = MainMenuwidgetList.getCompound(i);
                     String className = widgetTag.getString("class");
                     MainMenuwidgets.add(widgetLoading.loadWidgetsFromTag(className, widgetTag));
-                    DynamicHUD.printInfo("MainMenu Wigdet " + i + ": " + MainMenuwidgets.get(i).toString());
+                    printInfo("MainMenu Wigdet " + i + ": " + MainMenuwidgets.stream().toList().get(i).toString());
                 }
             } catch (IOException e) {
                 e.printStackTrace();

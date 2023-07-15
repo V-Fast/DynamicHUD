@@ -8,8 +8,8 @@ import net.minecraft.nbt.NbtCompound;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This class represents a widget that can be displayed on the screen.
@@ -31,12 +31,13 @@ public abstract class Widget {
      */
     public Widget(MinecraftClient client, String label) {
         this.client = client;
-        this.label=label;
+        this.label = label;
     }
 
     public static void addTextGenerator(String label, TextGenerator textGenerator) {
         textGenerators.put(label, textGenerator);
     }
+
     public abstract void setTextGeneratorFromLabel();
 
     /**
@@ -49,7 +50,7 @@ public abstract class Widget {
     }
 
 
-    public boolean isOverlapping(List<Widget> other) {
+    public boolean isOverlapping(Set<Widget> other) {
         for (Widget widget : other) {
             if ((this.getX() < widget.getX() + widget.getWidgetBox().getWidth() && this.getX() + this.getWidgetBox().getWidth() > widget.getX() &&
                     this.getY() < widget.getY() + widget.getWidgetBox().getHeight() && this.getY() + this.getWidgetBox().getHeight() > widget.getY())) {
@@ -68,8 +69,8 @@ public abstract class Widget {
      * Renders the widget on the screen.
      */
     public abstract void render(DrawContext drawContext);
-    public void updatePosition()
-    {
+
+    public void updatePosition() {
         int screenWidth = client.getWindow().getScaledWidth();
         int screenHeight = client.getWindow().getScaledHeight();
     }
@@ -100,9 +101,9 @@ public abstract class Widget {
     public void setX(int x) {
         int screenWidth = client.getWindow().getScaledWidth();
         if (x < 0) {
-            x=(0);
-        } else if (x > screenWidth) {
-           x=screenWidth;
+            x = (0);
+        } else if (x + getWidgetBox().getWidth() > screenWidth) {
+            x = screenWidth - getWidgetBox().getWidth();
         }
         this.xPercent = (float) x / screenWidth;
     }
@@ -124,9 +125,9 @@ public abstract class Widget {
     public void setY(int y) {
         int screenHeight = client.getWindow().getScaledHeight();
         if (y < 0) {
-            y=0;
-        } else if (y > screenHeight) {
-            y=(screenHeight);
+            y = 0;
+        } else if (y + getWidgetBox().getHeight() > screenHeight) {
+            y = (screenHeight) - getWidgetBox().getHeight();
         }
         this.yPercent = (float) y / screenHeight;
     }
@@ -149,6 +150,7 @@ public abstract class Widget {
 
         setTextGeneratorFromLabel();
     }
+
     /**
      * Writes the state of this widget to the given tag.
      *
@@ -160,7 +162,7 @@ public abstract class Widget {
         tag.putFloat("xPercent", xPercent);
         tag.putFloat("yPercent", yPercent);
         tag.putBoolean("Enabled", enabled);
-        tag.putString("label",label);
+        tag.putString("label", label);
 
         for (Field field : getClass().getDeclaredFields()) {
             if (Modifier.isStatic(field.getModifiers())) continue;

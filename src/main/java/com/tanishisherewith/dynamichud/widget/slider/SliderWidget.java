@@ -1,7 +1,7 @@
 package com.tanishisherewith.dynamichud.widget.slider;
 
-import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
+import com.tanishisherewith.dynamichud.widget.Widget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -12,19 +12,19 @@ import net.minecraft.client.gui.DrawContext;
 public class SliderWidget {
     private final MinecraftClient client;
     private final int width; // The width of the widget
-    private int height; // The height of the widget
     private final String label; // The label displayed above the slider
     private final float minValue; // The minimum value of the slider
     private final float maxValue; // The maximum value of the slider
+    private final int height; // The height of the widget
     private int x; // The x position of the widget
     private int y; // The y position of the widget
     private float value; // The current value of the slider
     private Widget selectedWidget = null;
     private float progress = 0.0f;
-    private float progressSpeed = 0.1f;
+    private final float progressSpeed = 0.1f;
     private float textProgress = 0.0f;
-    private float textProgressSpeed = 0.05f;
-    private boolean MouseClicked=false;
+    private final float textProgressSpeed = 0.05f;
+    private boolean MouseClicked = false;
 
     /**
      * Constructs a SliderWidget object.
@@ -83,6 +83,7 @@ public class SliderWidget {
             y = screenHeight - height - 2;
         }
     }
+
     /**
      * Renders the widget on the screen.
      *
@@ -94,9 +95,9 @@ public class SliderWidget {
         TextRenderer textRenderer = client.textRenderer;
         String labelText = label + ": " + String.format("%.1f", value);
         int labelWidth = textRenderer.getWidth(labelText);
-        int labelX = (int) (x + (width - labelWidth) / 2.0f * textProgress)-1;
+        int labelX = (int) (x + (width - labelWidth) / 2.0f * textProgress) - 1;
         int labelY = y + height - textRenderer.fontHeight - 6;
-        drawContext.drawTextWithShadow(textRenderer,labelText, labelX, labelY, 0xFFFFFFFF);
+        drawContext.drawTextWithShadow(textRenderer, labelText, labelX, labelY, 0xFFFFFFFF);
 
         // Draw the slider
         int sliderWidth = width - 8;
@@ -110,7 +111,7 @@ public class SliderWidget {
         float handleWidth = 4;
         float handleHeight = 10;
         float handleX = sliderX + (value - minValue) / (maxValue - minValue) * (sliderWidth - handleWidth);
-        float handleY = sliderY + ((sliderHeight - handleHeight) / 2 );
+        float handleY = sliderY + ((sliderHeight - handleHeight) / 2);
 
         if (progress >= 1.0f) {
             DrawHelper.fillRoundedRect(drawContext, (int) handleX, (int) handleY, (int) (handleX + handleWidth), (int) (handleY + handleHeight), 0xFFFFFFFF);
@@ -134,9 +135,8 @@ public class SliderWidget {
      * @return true if the point is within the bounds of this context menu, false otherwise.
      */
     public boolean contains(double x, double y) {
-        return x >= this.x+2 && x <= this.x-2 + width && y >= this.y+2 && y <= this.y - 2 + height;
+        return x >= this.x + 2 && x <= this.x - 2 + width && y >= this.y + 2 && y <= this.y - 2 + height;
     }
-
 
 
     /**
@@ -162,11 +162,11 @@ public class SliderWidget {
         // Check if the mouse is over the slider
         if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height) {
             // Update the value based on the mouse position
-            MouseClicked=!MouseClicked;
+            MouseClicked = !MouseClicked;
             setValue(minValue + (float) (mouseX - x) / width * (maxValue - minValue) - 0.001f);
             return true;
         }
-        MouseClicked=false;
+        MouseClicked = false;
         return false;
     }
 
