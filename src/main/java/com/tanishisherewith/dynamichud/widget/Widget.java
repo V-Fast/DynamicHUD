@@ -1,10 +1,13 @@
 package com.tanishisherewith.dynamichud.widget;
 
+import com.mojang.serialization.Decoder;
 import com.tanishisherewith.dynamichud.interfaces.TextGenerator;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.option.SimpleOption;
 import net.minecraft.nbt.NbtCompound;
 
+import java.awt.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -23,6 +26,7 @@ public abstract class Widget {
     protected float xPercent; // The x position of the widget as a percentage of the screen width
     protected float yPercent; // The y position of the widget as a percentage of the screen height
     protected String label;
+    protected static float scale = 1f; // The scaling factor of the widget
 
     /**
      * Constructs a Widget object.
@@ -92,13 +96,29 @@ public abstract class Widget {
     public int getX() {
         return (int) (client.getWindow().getScaledWidth() * xPercent);
     }
+    /**
+     * Returns the scaling factor of the widget.
+     *
+     * @return The scaling factor of the widget
+     */
+    public static float getScale() {
+        return scale;
+    }
 
+    /**
+     * Sets the scaling factor of the widget.
+     *
+     * @param scale The new scaling factor of the widget
+     */
+    public static void setScale(float scale) {
+        Widget.scale = scale;
+    }
     /**
      * Sets the x position of the widget.
      *
      * @param x The new x position of the widget in pixels
      */
-    public void setX(int x) {
+    public void setX(float x) {
         int screenWidth = client.getWindow().getScaledWidth();
         if (x < 0) {
             x = (0);
@@ -122,7 +142,7 @@ public abstract class Widget {
      *
      * @param y The new y position of the widget in pixels
      */
-    public void setY(int y) {
+    public void setY(float y) {
         int screenHeight = client.getWindow().getScaledHeight();
         if (y < 0) {
             y = 0;
@@ -147,6 +167,7 @@ public abstract class Widget {
         enabled = tag.getBoolean("Enabled");
         isDraggable = tag.getBoolean("isDraggable");
         label = tag.getString("label");
+        scale = tag.getFloat("scale");
 
         setTextGeneratorFromLabel();
     }
@@ -163,6 +184,8 @@ public abstract class Widget {
         tag.putFloat("yPercent", yPercent);
         tag.putBoolean("Enabled", enabled);
         tag.putString("label", label);
+        tag.putFloat("scale", scale);
+
 
         for (Field field : getClass().getDeclaredFields()) {
             if (Modifier.isStatic(field.getModifiers())) continue;
@@ -188,7 +211,9 @@ public abstract class Widget {
                     tag.putDouble(field.getName(), (Double) value);
                 } else if (value instanceof String) {
                     tag.putString(field.getName(), (String) value);
-                } // Add more cases here for other data types
+                } else if (value instanceof Color colorvalue) {
+                    tag.putInt(field.getName(), colorvalue.getRGB());
+                }// Add more cases here for other data types
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }

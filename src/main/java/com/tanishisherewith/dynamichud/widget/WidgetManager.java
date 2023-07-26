@@ -112,18 +112,26 @@ public class WidgetManager {
             return;
         }
 
+        Set<String> widgetSet = new HashSet<>();
         for (Widget widget : widgets) {
             NbtCompound widgetTag = new NbtCompound();
             widget.writeToTag(widgetTag);
-            widgetList.add(widgetTag);
+            // Check for duplicates
+            if (widgetSet.add(widgetTag.toString())) {
+                widgetList.add(widgetTag);
+            }
         }
 
         rootTag.put("Widgets", widgetList);
 
+        Set<String> MainMenuWidgetSet = new HashSet<>();
         for (Widget mmwidget : MainMenuWidgets) {
             NbtCompound widgetTag = new NbtCompound();
             mmwidget.writeToTag(widgetTag);
-            MainMenuwidgetList.add(widgetTag);
+            // Check for duplicates
+            if (MainMenuWidgetSet.add(widgetTag.toString())) {
+                MainMenuwidgetList.add(widgetTag);
+            }
         }
         rootTag.put("MainMenuWidgets", MainMenuwidgetList);
 
@@ -140,10 +148,11 @@ public class WidgetManager {
             }
         } catch (IOException e) {
             // Delete the temporary file if an error occurs
-            tempFile.delete();
+            boolean temp = tempFile.delete();
             e.printStackTrace();
         }
     }
+
 
 
     public Set<Widget> loadWigdets(File file) {

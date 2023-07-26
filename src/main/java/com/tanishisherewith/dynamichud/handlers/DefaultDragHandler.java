@@ -8,7 +8,7 @@ public class DefaultDragHandler implements DragHandler {
 
     @Override
     public boolean startDragging(Widget widget, double mouseX, double mouseY) {
-        if (widget.getWidgetBox().contains(widget, mouseX, mouseY)) {
+        if (widget.getWidgetBox().contains(widget, mouseX, mouseY, Widget.getScale())) {
             dragStartX = (int) (mouseX - widget.getX());
             dragStartY = (int) (mouseY - widget.getY());
             return true;

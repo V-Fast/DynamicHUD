@@ -42,7 +42,7 @@ public class ItemWidget extends Widget {
 
     @Override
     public WidgetBox getWidgetBox() {
-        return new WidgetBox(this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight());
+        return new WidgetBox(this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(),scale);
     }
 
     /**
@@ -136,6 +136,6 @@ public class ItemWidget extends Widget {
     public void render(DrawContext drawContext) {
         ItemRenderer itemRenderer = client.getItemRenderer();
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        TextureHelper.drawItemTextureWithText(drawContext.getMatrices(), drawContext, itemRenderer, textRenderer, getItemStack(), getX(), getY(), getText(), ColorHelper.ColorToInt(color.get()), currentTextPosition[0], 0.5f, TextBackground);
+        TextureHelper.drawItemTextureWithTextAndScale(drawContext, scale, textRenderer, getItemStack(), getX(), getY(), getText(), ColorHelper.ColorToInt(color.get()), currentTextPosition[0], scale*0.5f, TextBackground);
     }
 }

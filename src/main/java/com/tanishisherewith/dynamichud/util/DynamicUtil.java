@@ -67,7 +67,7 @@ public class DynamicUtil extends DrawContext {
                 widget.updatePosition();
                 int backgroundColor = widget.isEnabled() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
                 WidgetBox box = widget.getWidgetBox();
-                DrawHelper.fill(context, box.x1 - 2, box.y1 - 2, box.x2 + 2, box.y2 + 2, backgroundColor);
+                DrawHelper.fill(context, (int) (box.x1 - 2), (int) (box.y1 - 2), (int) (box.x2 + 2), (int) (box.y2 + 2), backgroundColor);
             }
             return;
         }
@@ -84,7 +84,7 @@ public class DynamicUtil extends DrawContext {
                 if (client.currentScreen instanceof AbstractMoveableScreen) {
                     int backgroundColor = widget.isEnabled() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
                     WidgetBox box = widget.getWidgetBox();
-                    DrawHelper.fill(context, box.x1 - 2, box.y1 - 2, box.x2 + 2, box.y2 + 2, backgroundColor);
+                    DrawHelper.fill(context, (int) (box.x1 - 2), (int) (box.y1 - 2), (int) (box.x2 + 2), (int) (box.y2 + 2), backgroundColor);
                 }
                 widget.updatePosition();
             }

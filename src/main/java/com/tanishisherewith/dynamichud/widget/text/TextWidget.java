@@ -10,6 +10,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Text;
+
 
 /**
  * This class represents a text widget that displays a specified text on the screen.
@@ -20,11 +22,11 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     protected TextGenerator dataText;
     protected boolean shadow; // Whether to draw a shadow behind the text
     protected boolean rainbow; // Whether to apply a rainbow effect to the text
-    protected boolean verticalRainbow; // Whether to apply a vertical rainbow effect to the text
     protected int Textcolor; // The color of the text
     protected int Datacolor; // The color of the Data
     protected boolean TextcolorOptionEnabled = false;
     protected boolean DatacolorOptionEnabled = false;
+
 
 
     /**
@@ -35,7 +37,7 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
      * @param xPercent The x position of the widget as a percentage of the screen width
      * @param yPercent The y position of the widget as a percentage of the screen height
      */
-    public TextWidget(MinecraftClient client, String text, TextGenerator dataText, float xPercent, float yPercent, boolean Shadow, boolean Rainbow, boolean VerticalRainbow, int Textcolor, int Datacolor, boolean enabled) {
+    public TextWidget(MinecraftClient client, String text, TextGenerator dataText, float xPercent, float yPercent, boolean Shadow, boolean Rainbow, int Textcolor, int Datacolor, boolean enabled) {
         super(client, text);
         this.text = text;
         this.dataText = dataText;
@@ -43,7 +45,6 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         this.yPercent = yPercent;
         this.shadow = Shadow;
         this.rainbow = Rainbow;
-        this.verticalRainbow = VerticalRainbow;
         this.Textcolor = Textcolor;
         this.Datacolor = Datacolor;
         this.enabled = enabled;
@@ -100,15 +101,6 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     }
 
     /**
-     * Sets whether the vertical rainbow effect is enabled.
-     *
-     * @param verticalRainbow True if the vertical rainbow effect should be enabled, false otherwise
-     */
-    public void setVerticalRainbow(boolean verticalRainbow) {
-        this.verticalRainbow = verticalRainbow;
-    }
-
-    /**
      * Returns whether the rainbow effect is enabled.
      *
      * @return True if the rainbow effect is enabled, false otherwise
@@ -126,14 +118,6 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         return shadow;
     }
 
-    /**
-     * Returns whether the vertical rainbow effect is enabled.
-     *
-     * @return True if the vertical rainbow effect is enabled, false otherwise
-     */
-    public boolean hasVerticalRainbow() {
-        return verticalRainbow;
-    }
 
     /**
      * Returns the text displayed by this widget.
@@ -224,11 +208,12 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     @Override
     public WidgetBox getWidgetBox() {
         TextRenderer textRenderer = client.textRenderer;
-        int x1 = getX(); //- client.textRenderer.getWidth(textWidget.getText());
-        int x2 = getX() + textRenderer.getWidth(getDataText()) + textRenderer.getWidth(getText()) + textRenderer.getWidth(" ");
-        int y1 = getY() - textRenderer.fontHeight / 2;
-        int y2 = getY() + textRenderer.fontHeight / 2;
-        return new WidgetBox(x1, y1, x2, y2);
+        String cmtxt=getDataText()+getText() + ".";
+        float x1 = getX(); //- client.textRenderer.getWidth(textWidget.getText());
+        float x2 = getX() + textRenderer.getWidth(cmtxt);
+        float y1 = getY() - 1 ;
+        float y2 = getY() + textRenderer.fontHeight - 1;
+        return new WidgetBox(x1, y1, x2, y2, scale);
     }
 
 
@@ -237,37 +222,22 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
      */
     @Override
     public void render(DrawContext drawContext) {
-        int x = getX();
-        int y = getY();
         drawContext.getMatrices().push();
         drawContext.getMatrices().translate(0, 0, 300);
-        String CombinedText = getText() + getDataText();
-        if (rainbow) {
-            float hue = (System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f);
-            for (int i = 0; i < CombinedText.length(); i++) {
-                int color = ColorHelper.getColorFromHue(hue);
-                String character = String.valueOf(CombinedText.charAt(i));
-                int characterWidth = client.textRenderer.getWidth(character);
-                drawText(drawContext, character, x + 2, y - 4, color);
-                x += characterWidth;
-                hue += verticalRainbow ? 0.05f : 0.1f;
-                if (hue >= 1) hue -= 1;
-            }
-        } else {
-            int Textcolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Textcolor;
-            int Datacolour = verticalRainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Datacolor;
-            drawText(drawContext, getText(), getX() + 2, getY() - 4, Textcolour);
-            drawText(drawContext, getDataText(), getX() + client.textRenderer.getWidth(getText()) + 2, getY() - 4, Datacolour);
-        }
+        int Textcolour = rainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Textcolor;
+        int Datacolour = rainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (rainbowSpeed * 400f)) : this.Datacolor;
+        drawTwoTexts(drawContext, getText(), getDataText(), ((getX() + 1)), (getY()), Textcolour, Datacolour, scale);
         drawContext.getMatrices().pop();
     }
+
+
+
 
     @Override
     public void writeToTag(NbtCompound tag) {
         super.writeToTag(tag);
         tag.putBoolean("Rainbow", hasRainbow());
         tag.putBoolean("Shadow", hasShadow());
-        tag.putBoolean("VerticalRainbow", hasVerticalRainbow());
         tag.putInt("TextColor", Textcolor);
         tag.putInt("DataColor", Datacolor);
         tag.putString("Text", text);
@@ -276,16 +246,22 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
     @Override
     public void readFromTag(NbtCompound tag) {
         super.readFromTag(tag);
-        shadow = tag.getBoolean("shadow");
-        rainbow = tag.getBoolean("rainbow");
-        verticalRainbow = tag.getBoolean("verticalRainbow");
+        shadow = tag.getBoolean("Shadow");
+        rainbow = tag.getBoolean("Rainbow");
         Textcolor = tag.getInt("TextColor");
         Datacolor = tag.getInt("DataColor");
         text = tag.getString("Text");
     }
+    public void drawTwoTexts(DrawContext drawContext, String text1, String text2, int x, int y, int color1, int color2, float scale) {
+        drawText(drawContext, text1, x, y, color1);
+        int x2 = Math.round(x + client.textRenderer.getWidth(text1) * scale);
+        drawText(drawContext, text2, x2, y, color2);
+    }
 
     private void drawText(DrawContext drawContext, String text, int x, int y, int color) {
-        DrawHelper.drawText(drawContext, client.textRenderer, text, x, y, color, shadow);
+        DrawHelper.drawTextWithScale(drawContext, text, x, y, color, shadow, scale);
+        //client.textRenderer.draw(text, getX(), getY(), color, scale);
+
     }
 
     @Override
@@ -293,7 +269,6 @@ public class TextWidget extends Widget implements ContextMenuOptionsProvider {
         return switch (label) {
             case "Shadow" -> hasShadow();
             case "Rainbow" -> hasRainbow();
-            case "Vertical Rainbow" -> hasVerticalRainbow();
             case "TextColor" -> isTextcolorOptionEnabled();
             case "DataColor" -> isDatacolorOptionEnabled();
             default -> false;

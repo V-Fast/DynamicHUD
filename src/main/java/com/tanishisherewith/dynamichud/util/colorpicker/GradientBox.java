@@ -36,6 +36,8 @@ public class GradientBox {
     }
 
     public void render(DrawContext drawContext) {
+        drawContext.getMatrices().push();
+        drawContext.getMatrices().translate(0,0,401);
         DrawHelper.drawOutlinedBox(drawContext, x - 2, y - 2, x + size + 2, y + size + 2, -1);
 
         // Draw the gradient
@@ -57,6 +59,7 @@ public class GradientBox {
         DrawHelper.fillRoundedRect(drawContext, (int) handleX, (int) handleY, (int) (handleX + handleSize), (int) (handleY + handleSize), -1);
         if (this.selectedWidget != null)
             setPosition(selectedWidget.getX() + 30, selectedWidget.getY() + MinecraftClient.getInstance().textRenderer.fontHeight + 4);
+        drawContext.getMatrices().pop();
     }
 
     /**

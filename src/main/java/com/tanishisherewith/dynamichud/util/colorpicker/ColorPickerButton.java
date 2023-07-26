@@ -18,9 +18,12 @@ public class ColorPickerButton {
     }
 
     public void render(DrawContext drawContext) {
+        drawContext.getMatrices().push();
+        drawContext.getMatrices().translate(0,0,404);
         // Draw the button
         drawContext.fill(x, y, x + width, y + height, 0xFFAAAAAA);
         drawContext.drawCenteredTextWithShadow(MinecraftClient.getInstance().textRenderer, "Pick", x + width / 2, y + (height - 8) / 2, 0xFFFFFFFF);
+        drawContext.getMatrices().pop();
     }
 
     public boolean onClick(double mouseX, double mouseY, int button) {

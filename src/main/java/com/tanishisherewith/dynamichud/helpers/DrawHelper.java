@@ -1,6 +1,7 @@
 package com.tanishisherewith.dynamichud.helpers;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.tanishisherewith.dynamichud.util.CustomTextRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -8,6 +9,8 @@ import net.minecraft.client.render.*;
 import org.joml.Matrix4f;
 
 public class DrawHelper extends DrawContext {
+    public static CustomTextRenderer customTextRenderer;
+
     public DrawHelper(MinecraftClient client, VertexConsumerProvider.Immediate vertexConsumers) {
         super(client, vertexConsumers);
     }
@@ -61,6 +64,28 @@ public class DrawHelper extends DrawContext {
                                 boolean shadow) {
         drawContext.drawText(textRenderer, text, x, y, color, shadow);
     }
+
+
+    /**
+     * Draws text on screen.
+     *
+     * @param drawContext - drawContext used for rendering.
+     * @param text         - Text to be drawn.
+     * @param x            - X position to draw at.
+     * @param y            - Y position to draw at.
+     * @param color        - Color to draw with.
+     */
+    public static void drawTextWithScale(DrawContext drawContext,
+                                         String text,
+                                         int x,
+                                         int y,
+                                         int color,
+                                         boolean shadow,
+                                         float scale) {
+        customTextRenderer = new CustomTextRenderer(MinecraftClient.getInstance(), scale);
+        customTextRenderer.draw(drawContext, text, x, y, color, shadow);
+    }
+
 
     public static void drawCutRectangle(DrawContext drawContext, int x1, int y1, int x2, int y2, int z, int color, int cornerRadius) {
         // Draw the rectangles

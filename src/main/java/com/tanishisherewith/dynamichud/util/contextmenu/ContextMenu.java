@@ -43,10 +43,10 @@ public class ContextMenu {
      */
     public ContextMenu(MinecraftClient client, int x, int y, Widget selectedWidget, Screen parentScreen) {
         this.client = client;
-        this.x = x;
-        this.y = y;
         this.selectedWidget = selectedWidget;
         this.parentScreen = parentScreen;
+        this.x = x;
+        this.y = Math.round(y + selectedWidget.getWidgetBox().getHeight());
     }
 
     public static int getOptionY() {

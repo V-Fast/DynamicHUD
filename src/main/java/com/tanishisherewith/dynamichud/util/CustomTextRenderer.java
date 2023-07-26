@@ -1,0 +1,39 @@
+package com.tanishisherewith.dynamichud.util;
+
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+
+public class CustomTextRenderer {
+    private final TextRenderer textRenderer; // The text renderer instance
+    private final float scale; // The scaling factor of the text
+
+    /**
+     * Constructs a CustomTextRenderer object.
+     *
+     * @param client The Minecraft client instance
+     * @param scale The scaling factor of the text
+     */
+    public CustomTextRenderer(MinecraftClient client, float scale) {
+        // The Minecraft client instance
+        this.textRenderer = client.textRenderer;
+        this.scale = scale;
+    }
+
+    /**
+     * Draws a text with shadow on the screen with the given parameters.
+     *
+     * @param context The drawContext to use for rendering
+     * @param text The text to draw
+     * @param x The x position of the text in pixels
+     * @param y The y position of the text in pixels
+     * @param color The color of the text in ARGB format
+     */
+    public void draw(DrawContext context, String text, int x, int y, int color, boolean shadow) {
+        context.getMatrices().push(); // Pushes the current matrix onto the stack
+        context.getMatrices().scale(scale, scale, scale); // Scales the matrix by the scaling factor
+        context.drawText(textRenderer,text, (int) (x/scale), (int) (y/scale),color,shadow);
+        context.getMatrices().pop(); // Pops the current matrix from the stack and restores the previous one
+    }
+}
+

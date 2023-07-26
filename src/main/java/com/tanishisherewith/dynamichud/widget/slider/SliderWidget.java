@@ -6,6 +6,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
+import java.util.function.Consumer;
+
 /**
  * This class represents a slider widget that allows the user to select a value within a specified range.
  */
@@ -20,10 +22,11 @@ public class SliderWidget {
     private int y; // The y position of the widget
     private float value; // The current value of the slider
     private Widget selectedWidget = null;
+    private Consumer<Float> getValue;
     private float progress = 0.0f;
-    private final float progressSpeed = 0.1f;
+    private float progressSpeed = 0.1f;
     private float textProgress = 0.0f;
-    private final float textProgressSpeed = 0.05f;
+    private float textProgressSpeed = 0.05f;
     private boolean MouseClicked = false;
 
     /**
@@ -40,7 +43,7 @@ public class SliderWidget {
      * @param maxValue       The maximum value of the slider
      * @param selectedWidget The widget which was selected to display this slider
      */
-    public SliderWidget(MinecraftClient client, int x, int y, int width, int height, String label, float value, float minValue, float maxValue, Widget selectedWidget) {
+    public SliderWidget(MinecraftClient client, int x, int y, int width, int height, String label, float value, float minValue, float maxValue, Consumer<Float> getValue, Widget selectedWidget) {
         this.client = client;
         this.x = x;
         this.y = y;
@@ -50,6 +53,7 @@ public class SliderWidget {
         this.value = value;
         this.minValue = minValue;
         this.maxValue = maxValue;
+        this.getValue=getValue;
         this.selectedWidget = selectedWidget;
     }
 
@@ -124,7 +128,7 @@ public class SliderWidget {
 
     private void drawSlider(DrawContext drawContext, int sliderX, int sliderY, int sliderWidth, int sliderHeight) {
         int visibleSliderWidth = (int) (sliderWidth * progress);
-        DrawHelper.fillRoundedRect(drawContext, sliderX, sliderY, sliderX + visibleSliderWidth, sliderY + sliderHeight, 0xFFFFFFFF);
+        DrawHelper.fill(drawContext, sliderX, sliderY, sliderX + visibleSliderWidth, sliderY + sliderHeight, 0xFFFFFFFF);
     }
 
     /**
@@ -164,6 +168,7 @@ public class SliderWidget {
             // Update the value based on the mouse position
             MouseClicked = !MouseClicked;
             setValue(minValue + (float) (mouseX - x) / width * (maxValue - minValue) - 0.001f);
+            getValue.accept(value);
             return true;
         }
         MouseClicked = false;
@@ -185,6 +190,7 @@ public class SliderWidget {
         if (mouseX >= x && mouseX <= x + width && MouseClicked) {
             // Update the value based on the mouse position
             setValue(minValue + (float) (mouseX - x) / width * (maxValue - minValue));
+            getValue.accept(value);
             return true;
         }
         return false;

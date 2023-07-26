@@ -60,7 +60,7 @@ public class ArmorWidget extends Widget {
         } else {
             armorItem = client.player.getEquippedStack(slot);
         }
-        TextureHelper.drawItemTextureWithText(drawContext.getMatrices(), drawContext, itemRenderer, textRenderer, armorItem, getX(), getY(), getText(), ColorHelper.ColorToInt(getColor()), currentTextPosition[0], 0.5f, TextBackground);
+        TextureHelper.drawItemTextureWithTextAndScale(drawContext, scale, textRenderer, armorItem, getX(), getY(), getText(), ColorHelper.ColorToInt(getColor()), currentTextPosition[0], scale*0.5f, TextBackground);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class ArmorWidget extends Widget {
 
     @Override
     public WidgetBox getWidgetBox() {
-        return new WidgetBox(this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight());
+        return new WidgetBox(this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(),scale);
     }
 
     /**

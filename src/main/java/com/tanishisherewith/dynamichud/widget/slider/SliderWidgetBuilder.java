@@ -3,6 +3,8 @@ package com.tanishisherewith.dynamichud.widget.slider;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import net.minecraft.client.MinecraftClient;
 
+import java.util.function.Consumer;
+
 public class SliderWidgetBuilder {
     private final MinecraftClient client;
     private int x;
@@ -14,6 +16,7 @@ public class SliderWidgetBuilder {
     private float minValue;
     private float maxValue;
     private Widget selectedWidget;
+    private Consumer<Float> getValue;
 
     public SliderWidgetBuilder(MinecraftClient client) {
         this.client = client;
@@ -58,6 +61,10 @@ public class SliderWidgetBuilder {
         this.maxValue = maxValue;
         return this;
     }
+    public SliderWidgetBuilder getValue(Consumer<Float> getValue) {
+        this.getValue = getValue;
+        return this;
+    }
 
     public SliderWidgetBuilder setSelectedWidget(Widget selectedWidget) {
         this.selectedWidget = selectedWidget;
@@ -65,6 +72,6 @@ public class SliderWidgetBuilder {
     }
 
     public SliderWidget build() {
-        return new SliderWidget(client, x, y, width, height, label, value, minValue, maxValue, selectedWidget);
+        return new SliderWidget(client, x, y, width, height, label, value, minValue, maxValue,getValue, selectedWidget);
     }
 }

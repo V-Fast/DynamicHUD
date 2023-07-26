@@ -40,7 +40,6 @@ public class DefaultMouseHandler implements MouseHandler {
         if (sliderWidget != null) {
             for (SliderWidget sliderWidget : sliderWidget) {
                 if (sliderWidget != null && sliderWidget.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
-                    TextWidget.setRainbowSpeed(sliderWidget.getValue());
                     return true;
                 }
             }

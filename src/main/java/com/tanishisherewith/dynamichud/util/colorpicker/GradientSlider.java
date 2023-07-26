@@ -54,7 +54,8 @@ public class GradientSlider {
     }
 
     public void render(DrawContext drawContext) {
-
+        drawContext.getMatrices().push();
+        drawContext.getMatrices().translate(0,0,401);
         DrawHelper.drawOutlinedBox(drawContext, x - 2, y - 2, x + width + 2, y + height + 2, -1);
 
         // Draw the gradient
@@ -76,6 +77,7 @@ public class GradientSlider {
         }
         if (this.selectedWidget != null)
             setPosition(selectedWidget.getX() + 30, selectedWidget.getY() + MinecraftClient.getInstance().textRenderer.fontHeight + 4);
+        drawContext.getMatrices().pop();
     }
 
     public void onClick(double mouseX, double mouseY, int button) {

@@ -7,11 +7,14 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.resource.LifecycledResourceManager;
+import net.minecraft.server.MinecraftServer;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,11 +104,9 @@ public class DynamicHUD implements ClientModInitializer {
             if (iWigdets != null) {
                 if (!WIDGETS_FILE.exists()) {
                     if (!dynamicutil.WidgetAdded) {
-                        printInfo("Widgets added");
                         iWigdets.addWigdets(dynamicutil);
                     }
                     if (!dynamicutil.MainMenuWidgetAdded) {
-                        printInfo("MainMenu Widgets added");
                         iWigdets.addMainMenuWigdets(dynamicutil);
                     }
                 }
@@ -124,7 +125,17 @@ public class DynamicHUD implements ClientModInitializer {
         HudRenderCallback.EVENT.register((drawContext, tickDelta) -> dynamicutil.render(drawContext, tickDelta));
 
         // Save during exiting a world, server or Minecraft itself
+        ServerLifecycleEvents.SERVER_STOPPING.register(this::onServerStopping);
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register(this::onEndDataPackReload);
         ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE));
         Runtime.getRuntime().addShutdownHook(new Thread(() -> dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE)));
+    }
+
+    private void onEndDataPackReload(MinecraftServer server, LifecycledResourceManager lifecycledResourceManager, boolean b) {
+        dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE);
+    }
+
+    private void onServerStopping(MinecraftServer server) {
+        dynamicutil.getWidgetManager().saveWidgets(WIDGETS_FILE);
     }
 }

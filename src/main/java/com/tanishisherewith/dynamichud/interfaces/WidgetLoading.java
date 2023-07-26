@@ -15,7 +15,7 @@ import java.awt.*;
 public interface WidgetLoading {
     default Widget loadWidgetsFromTag(String className, NbtCompound widgetTag) {
         if (className.equals(TextWidget.class.getName())) {
-            TextWidget widget = new TextWidget(MinecraftClient.getInstance(), "", () -> "", 0, 0, false, false, false, -1, -1, true);
+            TextWidget widget = new TextWidget(MinecraftClient.getInstance(), "", () -> "", 0, 0, false, false,  -1, -1, true);
             widget.readFromTag(widgetTag);
             return widget;
         }

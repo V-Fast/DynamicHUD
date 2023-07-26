@@ -48,7 +48,7 @@ public abstract class TitleScreenMixin extends Screen {
         }
 
         for (Widget widget : dynamicUtil.getWidgetManager().getMainMenuWidgets()) {
-            if (widget.getWidgetBox().contains(widget, mouseX, mouseY)) {
+            if (widget.getWidgetBox().contains(widget, mouseX, mouseY,widget.getScale())) {
                 if (button == 1) { // Right-click
                     handleRightClickOnWidget(widget);
                 } else if (button == 0) {

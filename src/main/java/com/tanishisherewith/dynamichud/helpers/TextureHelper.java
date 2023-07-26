@@ -1,12 +1,12 @@
 package com.tanishisherewith.dynamichud.helpers;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.tanishisherewith.dynamichud.util.CustomItemRenderer;
+import com.tanishisherewith.dynamichud.util.CustomTextRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
@@ -14,6 +14,10 @@ import net.minecraft.util.Identifier;
  * This class provides helper methods for drawing textures on the screen.
  */
 public class TextureHelper extends DrawContext {
+    public static CustomTextRenderer customTextRenderer;
+    public static CustomItemRenderer customItemRenderer;
+
+
     public TextureHelper(MinecraftClient client, VertexConsumerProvider.Immediate vertexConsumers) {
         super(client, vertexConsumers);
     }
@@ -86,8 +90,6 @@ public class TextureHelper extends DrawContext {
     /**
      * Draws an item texture on the screen with text at a specified position relative to it.
      *
-     * @param matrices     The matrix stack used for rendering
-     * @param itemRenderer The item renderer instance used for rendering the item texture
      * @param textRenderer The text renderer instance used for rendering the text
      * @param itemStack    The item stack to render the texture for
      * @param x            The x position to draw the texture at
@@ -97,9 +99,7 @@ public class TextureHelper extends DrawContext {
      * @param position     The position of the text relative to the texture (ABOVE, BELOW, LEFT, or RIGHT)
      * @param scale        The scale factor to apply to the text (1.0 is normal size)
      */
-    public static void drawItemTextureWithText(MatrixStack matrices,
-                                               DrawContext drawContext,
-                                               ItemRenderer itemRenderer,
+    public static void drawItemTextureWithText(DrawContext drawContext,
                                                TextRenderer textRenderer,
                                                ItemStack itemStack,
                                                int x,
@@ -140,19 +140,74 @@ public class TextureHelper extends DrawContext {
                 int backgroundColor = 0x40000000; // ARGB format: 50% opaque black
                 drawContext.fill(textX - 1, textY - 1, textX + textWidth + 1, textY + textHeight + 1, backgroundColor);
             }
-
             // Draw the scaled text at the calculated position
-            matrices.push();
-            matrices.scale(scale, scale, 1.0f);
+            drawContext.getMatrices().push();
+            drawContext.getMatrices().scale(scale, scale, 1.0f);
             float scaledX = textX / scale;
             float scaledY = textY / scale;
             drawContext.drawText(textRenderer, text, (int) scaledX, (int) scaledY, color, false);
-            matrices.pop();
+            drawContext.getMatrices().pop();
         }
         // Draw the item texture
         drawContext.drawItem(itemStack, x, y);
     }
 
+    /**
+     * Draws an item texture on the screen with text at a specified position relative to it.
+     *
+     * @param itemScale    The scale for the item to be rendered at
+     * @param textRenderer The text renderer instance used for rendering the text
+     * @param itemStack    The item stack to render the texture for
+     * @param x            The x position to draw the texture at
+     * @param y            The y position to draw the texture at
+     * @param text         The text to draw relative to the texture
+     * @param color        The color to draw the text with
+     * @param position     The position of the text relative to the texture (ABOVE, BELOW, LEFT, or RIGHT)
+     * @param textScale    The scale factor to apply to the text (1.0 is normal size)
+     */
+    public static void drawItemTextureWithTextAndScale(DrawContext drawContext,
+                                                       float itemScale,
+                                                       TextRenderer textRenderer,
+                                                       ItemStack itemStack,
+                                                       int x,
+                                                       int y,
+                                                       String text,
+                                                       int color,
+                                                       Position position,
+                                                       float textScale,
+                                                       boolean textBackground) {
+        if (text != null && !text.trim().isEmpty()) {
+            // Calculate the position of the text based on its size and the specified position
+            int textWidth = (int) (textRenderer.getWidth(text) * textScale);
+            int textHeight = (int) (textRenderer.fontHeight * textScale);
+            int textX = switch (position) {
+                case ABOVE, BELOW -> x + (int) ((16 * itemScale - textWidth) / 2);
+                case LEFT -> x - textWidth - 2;
+                case RIGHT -> x + (int) (16 * itemScale + 2);
+            };
+            int textY = switch (position) {
+                case ABOVE -> y - textHeight - 2;
+                case BELOW -> y + (int) (16 * itemScale + 2);
+                case LEFT, RIGHT -> y + (int) ((16 * itemScale - textHeight) / 2);
+            };
+
+            // Draw semi-opaque black rectangle
+            if (textBackground) {
+                int backgroundColor = 0x40000000; // ARGB format: 50% opaque black
+                drawContext.fill(textX - 1, textY - 1, textX + textWidth + 1, textY + textHeight + 1, backgroundColor);
+            }
+
+            // Draw the scaled text at the calculated position
+            drawContext.getMatrices().push();
+            drawContext.getMatrices().scale(textScale, textScale, 11.0f);
+            float scaledX = textX / textScale;
+            float scaledY = textY / textScale;
+            drawContext.drawText(textRenderer, text, (int) scaledX + 1, (int) scaledY +1, color, false);
+            drawContext.getMatrices().pop();
+        }
+        customItemRenderer = new CustomItemRenderer(itemStack, itemScale);
+        customItemRenderer.draw(drawContext, x, y, color);
+    }
 
     public enum Position {
         ABOVE("Above"),
