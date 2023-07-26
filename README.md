@@ -16,6 +16,7 @@ The library also includes basic utility features like a menu, slider and a Color
 
 # [Modrinth](https://modrinth.com/mod/dynamichud)
 
+## A LIBRARY SIMILAR TO THIS WHICH SUPPORTS OLDER MINECRAFT VERSIONS: https://github.com/LaconicLizard/HudElements
 
 # Demo:
 ### *May vary from version to version*
