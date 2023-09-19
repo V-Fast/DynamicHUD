@@ -20,7 +20,11 @@ The library also includes basic utility features like a menu, slider and a Color
 
 # Demo:
 ### *May vary from version to version*
+## New Version 1.2.0
+https://github.com/V-Fast/DynamicHUD/assets/120117618/2abfcdf5-d786-4e58-acae-aefe51b77b4a
 
+
+## Old Version
 https://github.com/V-Fast/DynamicHUD/assets/120117618/04de9319-69cd-4456-a555-c026c7e053a2
 
 
