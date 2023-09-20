@@ -9,10 +9,10 @@ import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.armor.ArmorWidget;
 import com.tanishisherewith.dynamichud.widget.item.ItemWidget;
 import com.tanishisherewith.dynamichud.widget.text.TextWidget;
-import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.Items;
+import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 
@@ -54,15 +54,15 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets, WidgetLoad
     }
 
     private void addTextWidgets(DynamicUtil dynamicUtil) {
-        widgets.add(new TextWidget(mc, "FPS: ", () -> mc.fpsDebugString.split(" ")[0], 0.5f, 0.5f, true, true,  -1, -1, true));
+        widgets.add(new TextWidget(mc, "Non Draggable FPS: ", () -> mc.fpsDebugString.split(" ")[0], 0.5f, 0.5f, true, true,  -1, -1, true));
         widgets.add(new TextWidget(mc, "Dynamic", () -> "HUD", 0.7f, 0.3f, false, false,  -1, -1, true));
-        widgets.add(new TextWidget(mc, "Ping: ", () -> "", 0.08f, 0.5f, false, false, -1, -1, true));
-        widgets.add(new TextWidget(mc, "Position: ", () -> "", 0.4f, 0.8f, false, false,  -1, -1, true));
-        widgets.add(new TextWidget(mc, "Day/Night: ", () -> "", 0.83f, 0.8f, false, false,  -1, -1, true));
+        widgets.add(new TextWidget(mc, "Test", () -> "", 0.08f, 0.5f, false, false, -1, -1, true));
+        widgets.add(new TextWidget(mc, "", () -> "Data Test", 0.4f, 0.8f, false, false,  -1, -1, true));
+        widgets.add(new TextWidget(mc, "HUD Test ", () -> "", 0.83f, 0.8f, false, false,  -1, -1, true));
 
         for (Widget widget : widgets) {
             if (widget instanceof TextWidget textWidget) {
-                if (textWidget.getText().equalsIgnoreCase("fps: ")) {
+                if (textWidget.getText().equalsIgnoreCase("Non Draggable FPS: ")) {
                     textWidget.setDraggable(false);
                 }
             }
@@ -120,12 +120,12 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets, WidgetLoad
     public void addMainMenuWigdets(DynamicUtil dynamicUtil) {
         printInfo("MainMenu Widgets added");
 
-        MainMenuwidgets.add(new TextWidget(mc, "Day/NightS: ", () -> "", 0.83f, 0.8f, false, false,  -1, -1, true));
-        MainMenuwidgets.add(new TextWidget(mc, "FpsE: ", () -> "", 0.85f, 0.3f, false, false,  -1, -1, true));
-        MainMenuwidgets.add(new TextWidget(mc, "Test: ", () -> "", 0.87f, 0.5f, false, false,  -1, -1, true));
+        MainMenuwidgets.add(new TextWidget(mc, "Test ", () -> "", 0.83f, 0.8f, false, false,  -1, -1, true));
+        MainMenuwidgets.add(new TextWidget(mc, "E Test ", () -> "", 0.85f, 0.3f, false, false,  -1, -1, true));
+        MainMenuwidgets.add(new TextWidget(mc, "Non Draggable FPS: ", () -> String.valueOf(mc.getCurrentFps()), 0.67f, 0.5f, false, false,  -1, -1, true));
         for (Widget mmwigdet : MainMenuwidgets) {
             if (mmwigdet instanceof TextWidget textWidget) {
-                if (textWidget.getText().equalsIgnoreCase("fps: ")) {
+                if (textWidget.getText().equalsIgnoreCase("Non Draggable FPS: ")) {
                     textWidget.setDraggable(false);
                 }
             }
@@ -139,14 +139,14 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets, WidgetLoad
         Set<Widget> widgets = dynamicUtil.getWidgetManager().loadWigdets(WIDGETS_FILE);
         Set<Widget> MainMenuWidget = dynamicUtil.getWidgetManager().loadMainMenuWigdets(WIDGETS_FILE);
 
-        Widget.addTextGenerator("FPS: ", () -> String.valueOf(mc.getCurrentFps()));
+        Widget.addTextGenerator("Non Draggable FPS: ", () -> String.valueOf(mc.getCurrentFps()));
         Widget.addTextGenerator("Dynamic", () -> "HUD");
-        Widget.addTextGenerator("Ping: ", () -> "");
-        Widget.addTextGenerator("Position: ", () -> "");
-        Widget.addTextGenerator("Day/Night: ", () -> "");
+        Widget.addTextGenerator("Test", () -> "");
+        Widget.addTextGenerator("", () -> "Data Test");
+        Widget.addTextGenerator("HUD Test ", () -> "");
         Widget.addTextGenerator("Text", () -> "Text");
-        Widget.addTextGenerator("FPS", () -> String.valueOf(mc.getCurrentFps()));
-        Widget.addTextGenerator("FpsE:", () -> String.valueOf(mc.getCurrentFps()));
+        Widget.addTextGenerator("Test ", () -> String.valueOf(mc.getCurrentFps()));
+        Widget.addTextGenerator("Non Draggable FPS: ", () -> String.valueOf(mc.getCurrentFps()));
         Widget.addTextGenerator("Label", () -> "Label");
 
         for (Widget widget : widgets) {

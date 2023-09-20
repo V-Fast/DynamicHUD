@@ -3,7 +3,7 @@ package com.tanishisherewith.dynamichud;
 import com.tanishisherewith.dynamichud.huds.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.interfaces.IWigdets;
 import com.tanishisherewith.dynamichud.util.DynamicUtil;
-import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
-public class DynamicHUD implements ClientModInitializer {
+public class DynamicHUD implements ModInitializer {
 
     private static final Logger logger = LoggerFactory.getLogger("DynamicHud");
     static AbstractMoveableScreen Screen;
@@ -95,7 +95,7 @@ public class DynamicHUD implements ClientModInitializer {
     }
 
     @Override
-    public void onInitializeClient() {
+    public void onInitialize() {
         dynamicutil = new DynamicUtil(mc);
         printInfo("DynamicHud Initialised");
 

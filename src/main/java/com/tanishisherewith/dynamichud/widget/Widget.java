@@ -1,18 +1,14 @@
 package com.tanishisherewith.dynamichud.widget;
 
-import com.mojang.serialization.Decoder;
 import com.tanishisherewith.dynamichud.interfaces.TextGenerator;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.option.SimpleOption;
 import net.minecraft.nbt.NbtCompound;
 
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class represents a widget that can be displayed on the screen.

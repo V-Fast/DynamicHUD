@@ -3,6 +3,7 @@ package com.tanishisherewith.dynamichud.widget;
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.interfaces.WidgetLoading;
 import net.fabricmc.fabric.api.util.NbtType;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
