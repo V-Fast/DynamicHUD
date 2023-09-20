@@ -91,6 +91,7 @@ public class GradientSlider {
                 this.isDragging = true;
             } else if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height) {
                 hue = (float) (mouseX - x) / width;
+                this.isDragging = true;
             }
         }
     }

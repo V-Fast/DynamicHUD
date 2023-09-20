@@ -23,7 +23,7 @@ import java.util.Set;
 import static com.tanishisherewith.dynamichud.DynamicHUD.WIDGETS_FILE;
 import static com.tanishisherewith.dynamichud.DynamicHUD.printInfo;
 
-public class DynamicHUDmod implements ClientModInitializer, IWigdets, WidgetLoading {
+public class DynamicHUDtest implements ClientModInitializer, IWigdets, WidgetLoading {
     protected Set<Widget> widgets = new HashSet<>();
     protected Set<Widget> MainMenuwidgets = new HashSet<>();
     MinecraftClient mc = MinecraftClient.getInstance();
@@ -37,9 +37,8 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets, WidgetLoad
         MainMenuwidgets.clear();
 
         DynamicHUD.setAbstractScreen(new MoveableScreen(Text.of("Editor Screen"), dynamicutil));
-        DynamicHUD.setIWigdets(new DynamicHUDmod());
-        dynamicutil.getWidgetManager().setWidgetLoading(new DynamicHUDmod());
-
+        DynamicHUD.setIWigdets(new DynamicHUDtest());
+        dynamicutil.getWidgetManager().setWidgetLoading(new DynamicHUDtest());
     }
 
     @Override
@@ -169,6 +168,7 @@ public class DynamicHUDmod implements ClientModInitializer, IWigdets, WidgetLoad
             widget.readFromTag(widgetTag);
             return widget;
         }*/
+        System.out.println("widget tag loaded");
         return WidgetLoading.super.loadWidgetsFromTag(className, widgetTag);
     }
 }

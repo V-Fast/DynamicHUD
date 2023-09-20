@@ -42,6 +42,26 @@ public class DynamicHUD implements ModInitializer {
     private static IWigdets iWigdets;
     MinecraftClient mc = MinecraftClient.getInstance();
 
+    public static File getFileDirectory() {
+        return fileDirectory;
+    }
+
+    public static String getFilename() {
+        return filename;
+    }
+
+    public static String getTranslationKey() {
+        return TranslationKey;
+    }
+
+    public static String getKeybingCategory() {
+        return keybingCategory;
+    }
+
+    public static InputUtil.Type getInputType() {
+        return inputType;
+    }
+
     public static void setInputType(InputUtil.Type inputType) {
         DynamicHUD.inputType = inputType;
     }

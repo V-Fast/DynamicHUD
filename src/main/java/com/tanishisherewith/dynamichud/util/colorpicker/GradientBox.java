@@ -84,6 +84,7 @@ public class GradientBox {
             } else if (mouseX >= x && mouseX <= x + size && mouseY >= y && mouseY <= y + size) {
                 saturation = (float) (mouseX - x) / size;
                 value = 1.0f - (float) (mouseY - y) / size;
+                this.isDragging = true;
             }
         }
     }

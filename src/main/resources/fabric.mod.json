@@ -18,7 +18,7 @@
   "license": "All-Rights-Reserved",
   "environment": "client",
   "entrypoints": {
-    "mod": [
+    "main": [
       "com.tanishisherewith.dynamichud.DynamicHUD"
     ],
     "modmenu": [
