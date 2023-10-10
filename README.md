@@ -1,6 +1,5 @@
 # DynamicHUD
 A library to create HUD elements and display them on the screen. **Fabric only**\
-_Current version: 1.1.0_
 
 ## Short introduction
 Dynamic HUD is a library used to create and display "widgets" on the screen.
