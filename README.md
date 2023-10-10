@@ -11,7 +11,7 @@ The library also includes basic utility features like a menu, slider and a Color
 ## Note: This is a library meaning it does not do / display anything on its own, It is mainly to help other developers and ease of adding or displaying stuff on the screen
 
 # Examples
-- [_DynamicHUDmod.java_](src/main/java/com/tanishisherewith/dynamichud/DynamicHUDmod.java)
+- [_DynamicHUDtest.java_](src/main/java/com/tanishisherewith/dynamichud/DynamicHUDtest.java)
 
 # [Modrinth](https://modrinth.com/mod/dynamichud)
 
