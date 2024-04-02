@@ -1,11 +1,13 @@
 package com.tanishisherewith.dynamichud.helpers;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.tanishisherewith.dynamichud.newTrial.DynamicHUD;
 import com.tanishisherewith.dynamichud.util.CustomTextRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
+import net.minecraft.client.util.math.MatrixStack;
 import org.joml.Matrix4f;
 
 public class DrawHelper extends DrawContext {
@@ -205,6 +207,26 @@ public class DrawHelper extends DrawContext {
         drawContext.fill(x1, y2 - 1, x2, y2, color);
         drawContext.fill(x1, y1 + 1, x1 + 1, y2 - 1, color);
         drawContext.fill(x2 - 1, y1 + 1, x2, y2 - 1, color);
+    }
+
+    /**
+     * This method assumes that the element is widget in the top-left corner (i.e. all drawing happens with respect to the top-left corner).
+     * @param matrices
+     * @param x X position of top-left corner of widget
+     * @param y Y position of top-left corner of widget
+     * @param scale Scale the matrices
+     */
+    public static void scaleAndPosition(MatrixStack matrices, float x, float y,float z, float scale) {
+        matrices.push(); // Save the current transformation state
+
+        // Translate to the desired position
+        matrices.translate(x, y, z);
+
+        // Scale the matrix
+        matrices.scale(scale, scale, 1.0F);
+    }
+    public static void stopScaling(MatrixStack matrices){
+        matrices.pop(); // Restore the previous transformation state
     }
 
 }

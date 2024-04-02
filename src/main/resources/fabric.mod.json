@@ -18,8 +18,11 @@
   "license": "All-Rights-Reserved",
   "environment": "client",
   "entrypoints": {
-    "main": [
-      "com.tanishisherewith.dynamichud.DynamicHUD"
+    "client": [
+      "com.tanishisherewith.dynamichud.newTrial.DynamicHUD"
+    ],
+    "dynamicHud": [
+      "com.tanishisherewith.dynamichud.newTrial.DynamicHudTest"
     ],
     "modmenu": [
       "com.tanishisherewith.dynamichud.ModMenuIntegration"

@@ -2,7 +2,9 @@ package com.tanishisherewith.dynamichud;
 
 import com.tanishisherewith.dynamichud.huds.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.interfaces.IWigdets;
+import com.tanishisherewith.dynamichud.newTrial.utils.UID;
 import com.tanishisherewith.dynamichud.util.DynamicUtil;
+import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -21,7 +23,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
-public class DynamicHUD implements ModInitializer {
+public class DynamicHUD implements ClientModInitializer {
+
+    public static MinecraftClient MC = MinecraftClient.getInstance();
 
     private static final Logger logger = LoggerFactory.getLogger("DynamicHud");
     static AbstractMoveableScreen Screen;
@@ -29,12 +33,12 @@ public class DynamicHUD implements ModInitializer {
     private static String TranslationKey = "DynamicHud Editor Screen";
     private static InputUtil.Type inputType = InputUtil.Type.KEYSYM;
     private static int key = GLFW.GLFW_KEY_RIGHT_SHIFT;
-    public static final KeyBinding EditorScreenKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-            TranslationKey,
-            inputType,
-            key,
-            keybingCategory
-    ));
+ //   public static final KeyBinding EditorScreenKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+//            TranslationKey,
+//            inputType,
+//            key,
+//            keybingCategory
+//    ));
     private static String filename = "widgets.nbt";
     private static File fileDirectory = FabricLoader.getInstance().getConfigDir().toFile();
     public static final File WIDGETS_FILE = new File(fileDirectory, filename);
@@ -115,7 +119,7 @@ public class DynamicHUD implements ModInitializer {
     }
 
     @Override
-    public void onInitialize() {
+    public void onInitializeClient() {
         dynamicutil = new DynamicUtil(mc);
         printInfo("DynamicHud Initialised");
 
@@ -138,7 +142,7 @@ public class DynamicHUD implements ModInitializer {
                     printInfo("Load file Directory: " + FileDirectory);
                 }
             }
-            DynamicUtil.openDynamicScreen(EditorScreenKeyBinding, Screen);
+           // DynamicUtil.openDynamicScreen(EditorScreenKeyBinding, Screen);
         });
 
         //RenderCallBack

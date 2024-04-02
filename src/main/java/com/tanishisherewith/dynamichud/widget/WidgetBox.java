@@ -44,4 +44,16 @@ public class WidgetBox {
     public float getHeight() {
         return height;
     }
+    public void setSize(float x,float y, float width, float height){
+        this.x1 = x;
+        this.x2 = x + width;
+        this.y1 = y;
+        this.y2 = y + height;
+    }
+    public void setPosition(float x,float y, float x2, float y2){
+        this.x1 = x;
+        this.x2 = x2;
+        this.y1 = y;
+        this.y2 = y2;
+    }
 }

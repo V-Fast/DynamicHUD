@@ -107,7 +107,7 @@ public class WidgetManager {
 
         printInfo("Saving widgets");
 
-        if (widgets.size() < 1 && MainMenuWidgets.size() < 1) {
+        if (widgets.isEmpty() && MainMenuWidgets.isEmpty()) {
             printInfo("Widgets are empty.. Saving interrupted to prevent empty file");
             return;
         }
@@ -160,7 +160,8 @@ public class WidgetManager {
         if (file.exists()) {
             printInfo("Widgets File exists");
             try (DataInputStream in = new DataInputStream(new FileInputStream(file))) {
-                NbtCompound rootTag = NbtIo.readCompressed(in);
+                DataInput input = new DataInputStream(in);
+                NbtCompound rootTag = NbtIo.readCompound(input);
                 NbtList widgetList = rootTag.getList("Widgets", NbtType.COMPOUND);
                 for (int i = 0; i < widgetList.size(); i++) {
                     NbtCompound widgetTag = widgetList.getCompound(i);
@@ -180,7 +181,8 @@ public class WidgetManager {
         Set<Widget> MainMenuwidgets = new HashSet<>();
         if (file.exists()) {
             try (DataInputStream in = new DataInputStream(new FileInputStream(file))) {
-                NbtCompound rootTag = NbtIo.readCompressed(in);
+                DataInput input = new DataInputStream(in);
+                NbtCompound rootTag = NbtIo.readCompound(input);
                 NbtList MainMenuwidgetList = rootTag.getList("MainMenuWidgets", NbtType.COMPOUND);
                 for (int i = 0; i < MainMenuwidgetList.size(); i++) {
                     NbtCompound widgetTag = MainMenuwidgetList.getCompound(i);

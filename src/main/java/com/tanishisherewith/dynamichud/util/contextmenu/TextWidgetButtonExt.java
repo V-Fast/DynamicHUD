@@ -10,8 +10,4 @@ public class TextWidgetButtonExt extends TextFieldWidget {
         super(textRenderer, x, y, width, height, text);
     }
 
-    @Override
-    public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.renderButton(context, mouseX, mouseY, delta);
-    }
 }

@@ -39,7 +39,7 @@ public class DynamicUtil extends DrawContext {
     }
 
     /**
-     * Opens the MoveScreen when the specified key is pressed.
+     * Opens the MovableScreen when the specified key is pressed.
      *
      * @param key    The key to listen for
      * @param screen The AbstractMoveableScreen instance to use to set the screen
@@ -73,7 +73,7 @@ public class DynamicUtil extends DrawContext {
         }
 
         // Draw each widget
-        if (!client.options.debugEnabled || client.currentScreen instanceof AbstractMoveableScreen) {
+        if (client.currentScreen instanceof AbstractMoveableScreen) {
             for (Widget widget : widgets) {
                 if (client.currentScreen instanceof AbstractMoveableScreen) {
                     widget.render(context);

@@ -10,6 +10,6 @@
   },
   "client": [
     "OptionsScreenMixin",
-    "TitleScreenMixin"
+    "ScreenMixin"
   ]
 }
