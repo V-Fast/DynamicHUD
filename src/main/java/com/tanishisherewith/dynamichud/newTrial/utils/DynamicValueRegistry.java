@@ -3,10 +3,13 @@ package com.tanishisherewith.dynamichud.newTrial.utils;
 import java.util.*;
 import java.util.function.Supplier;
 
-public class DynamicValueRegistry {
+public class DynamicValueRegistry extends System {
     private static final Map<String, Supplier<?>> globalRegistry = new HashMap<>();
     private final Map<String, Supplier<?>> localRegistry = new HashMap<>();
-
+    public DynamicValueRegistry(String modId) {
+        super(modId);
+        instances.computeIfAbsent(modId, k -> new ArrayList<>()).add(this);
+    }
     public static void registerGlobal(String key, Supplier<?> supplier) {
         globalRegistry.put(key, supplier);
     }
@@ -29,4 +32,8 @@ public class DynamicValueRegistry {
 
         return supplier;
     }
+     public void setLocalRegistry(Map<String, Supplier<?>> map){
+        localRegistry.putAll(map);
+     }
+
 }

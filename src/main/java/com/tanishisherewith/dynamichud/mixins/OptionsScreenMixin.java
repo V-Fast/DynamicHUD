@@ -20,8 +20,6 @@ import java.text.DecimalFormat;
 @Mixin(OptionsScreen.class)
 public class OptionsScreenMixin extends Screen {
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##");
-    private final GameOptions settings = MinecraftClient.getInstance().options;
-
 
     protected OptionsScreenMixin(Text title) {
         super(title);

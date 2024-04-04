@@ -211,20 +211,20 @@ public class DrawHelper extends DrawContext {
 
     /**
      * This method assumes that the element is widget in the top-left corner (i.e. all drawing happens with respect to the top-left corner).
-     * @param matrices
      * @param x X position of top-left corner of widget
      * @param y Y position of top-left corner of widget
      * @param scale Scale the matrices
      */
-    public static void scaleAndPosition(MatrixStack matrices, float x, float y,float z, float scale) {
+    public static void scaleAndPosition(MatrixStack matrices, float x, float y, float scale) {
         matrices.push(); // Save the current transformation state
 
-        // Translate to the desired position
-        matrices.translate(x, y, z);
+        // Translate the origin back to the desired position
+        matrices.translate(x, y, 0);
 
         // Scale the matrix
         matrices.scale(scale, scale, 1.0F);
     }
+
     public static void stopScaling(MatrixStack matrices){
         matrices.pop(); // Restore the previous transformation state
     }

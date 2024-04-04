@@ -27,7 +27,7 @@ public class DynamicHUD implements ClientModInitializer {
 
     public static MinecraftClient MC = MinecraftClient.getInstance();
 
-    private static final Logger logger = LoggerFactory.getLogger("DynamicHud");
+    public static final Logger logger = LoggerFactory.getLogger("DynamicHud");
     static AbstractMoveableScreen Screen;
     private static String keybingCategory = "DynamicHud";
     private static String TranslationKey = "DynamicHud Editor Screen";

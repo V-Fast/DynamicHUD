@@ -1,8 +1,7 @@
 package com.tanishisherewith.dynamichud.newTrial.widgets;
 
-import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
-import com.tanishisherewith.dynamichud.helpers.DrawHelper;
+import com.tanishisherewith.dynamichud.newTrial.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.newTrial.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.newTrial.widget.Widget;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetData;
@@ -16,11 +15,12 @@ public class TextWidget extends Widget {
     public static WidgetData<TextWidget> DATA = new WidgetData<>("TextWidget","Display Text on screen",TextWidget::new);
     Supplier<String> textSupplier;
     String dynamicRegistryKey;
+    DynamicValueRegistry dynamicValueRegistry;
     protected boolean shadow; // Whether to draw a shadow behind the text
     protected boolean rainbow; // Whether to apply a rainbow effect to the text
 
     public TextWidget() {
-       this(null,false,false);
+       this(null,false,false,"unknown");
     }
 
     /**
@@ -30,8 +30,8 @@ public class TextWidget extends Widget {
      * @param shadow
      * @param rainbow
      */
-    public TextWidget(String dynamicRegistryKey, boolean shadow, boolean rainbow) {
-        super(DATA);
+    public TextWidget(String dynamicRegistryKey, boolean shadow, boolean rainbow,String modID) {
+        super(DATA,modID);
         this.dynamicRegistryKey = dynamicRegistryKey;
         textSupplier = (Supplier<String>) DynamicValueRegistry.getGlobal(dynamicRegistryKey);
         this.shadow = shadow;
@@ -45,9 +45,10 @@ public class TextWidget extends Widget {
      * @param shadow
      * @param rainbow
      */
-    public TextWidget(DynamicValueRegistry dynamicValueRegistry,String dynamicRegistryKey, boolean shadow, boolean rainbow) {
-        super(DATA);
+    public TextWidget(DynamicValueRegistry dynamicValueRegistry,String dynamicRegistryKey, boolean shadow, boolean rainbow,String modID) {
+        super(DATA,modID);
         this.dynamicRegistryKey = dynamicRegistryKey;
+        this.dynamicValueRegistry = dynamicValueRegistry;
         textSupplier = (Supplier<String>) dynamicValueRegistry.get(dynamicRegistryKey);
         this.shadow = shadow;
         this.rainbow = rainbow;
@@ -55,15 +56,12 @@ public class TextWidget extends Widget {
 
     @Override
     public void renderWidget(DrawContext drawContext) {
-        drawContext.getMatrices().push();
-        drawContext.getMatrices().translate(0, 0, 420);
-        int color = rainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / (1 * 400f)) : Color.WHITE.getRGB();
+        int color = rainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / 10000f) : Color.WHITE.getRGB();
         if(textSupplier != null) {
             String text = textSupplier.get();
-            drawContext.drawText(mc.textRenderer, text, (int) getX(), (int) getY(), color, shadow);
-            widgetBox.setSize(getX(),getY(),mc.textRenderer.getWidth(text),mc.textRenderer.fontHeight);
+            drawContext.drawText(mc.textRenderer, text, (int) getX(), (int)getY(), color, shadow);
+            widgetBox.setSize(getX() - 2,getY() - 2,mc.textRenderer.getWidth(text) + 2,mc.textRenderer.fontHeight + 2);
         }
-        drawContext.getMatrices().pop();
     }
 
     @Override
@@ -80,9 +78,13 @@ public class TextWidget extends Widget {
         shadow = tag.getBoolean("shadow");
         rainbow = tag.getBoolean("rainbow");
         dynamicRegistryKey = tag.getString("DRKey");
+
+        for(DynamicValueRegistry dvr: DynamicValueRegistry.getInstances(modId)){
+            textSupplier = (Supplier<String>) dvr.get(dynamicRegistryKey);
+            break;
+        }
     }
     public static class Builder extends WidgetBuilder<Builder,TextWidget> {
-
         protected boolean shadow = false;
         protected boolean rainbow = false;
         protected String dynamicRegistryKey = "";
@@ -97,11 +99,11 @@ public class TextWidget extends Widget {
             this.rainbow = rainbow;
             return self();
         }
-        public Builder setDHKey(String dynamicRegistryKey) {
+        public Builder setDRKey(String dynamicRegistryKey) {
             this.dynamicRegistryKey = dynamicRegistryKey;
             return self();
         }
-        public Builder setDH(DynamicValueRegistry dynamicValueRegistry) {
+        public Builder setDVR(DynamicValueRegistry dynamicValueRegistry) {
             this.dynamicValueRegistry = dynamicValueRegistry;
             return self();
         }
@@ -115,12 +117,11 @@ public class TextWidget extends Widget {
         public TextWidget build() {
             TextWidget widget;
             if(dynamicValueRegistry == null) {
-                widget = new TextWidget(dynamicRegistryKey, shadow, rainbow);
+                widget = new TextWidget(dynamicRegistryKey, shadow, rainbow,modID);
             }else{
-                widget = new TextWidget(dynamicValueRegistry,dynamicRegistryKey, shadow, rainbow);
+                widget = new TextWidget(dynamicValueRegistry,dynamicRegistryKey, shadow, rainbow,modID);
             }
-            widget.setxPercent(xPercent);
-            widget.setyPercent(yPercent);
+            widget.setPosition(x,y);
             widget.setDraggable(isDraggable);
             widget.setShouldScale(shouldScale);
             return widget;

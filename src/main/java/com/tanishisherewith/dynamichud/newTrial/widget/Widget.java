@@ -1,13 +1,14 @@
 package com.tanishisherewith.dynamichud.newTrial.widget;
 
-import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
+import com.tanishisherewith.dynamichud.newTrial.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.newTrial.utils.UID;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.Set;
 
@@ -17,20 +18,44 @@ public abstract class Widget {
 
     //This is the UID of the widget used to identify during loading and saving
     public UID uid = UID.generate();
-    public boolean display = true; // Whether the widget is enabled
+    public boolean isInEditor = false;
+    // Whether the widget is enabled and should be displayed.
+    public boolean display = true;
     public boolean isDraggable = true;
-    protected float xPercent; // The x position of the widget as a percentage of the screen width
-    protected float yPercent; // The y position of the widget as a percentage of the screen height
-    public boolean shouldScale = false;
+
+    //Boolean to check if the widget is being dragged
+    public boolean dragging;
+
+    //To enable/disable snapping
+    public boolean shiftDown = false;
+
+    // Used for dragging and snapping
+    int startX, startY, snapSize = 120;
+
+    // Absolute position of the widget on screen in pixels.
+    public int x,y;
+
+    // The x position of the widget as a percentage of the screen width, i.e. the relative x position of the widget for resizing and scaling
+    protected float xPercent;
+    // The y position of the widget as a percentage of the screen height, i.e. the relative y position of the widget for resizing and scaling
+    protected float yPercent;
+    public boolean shouldScale = true;
+    public String modId = "unknown";
+
+    //Dimensions of the widget
     protected WidgetBox widgetBox;
     public static WidgetData<?> DATA;
 
-    public Widget(WidgetData<?> DATA){
+    public Widget(WidgetData<?> DATA, String modId){
         Widget.DATA = DATA;
-        widgetBox = new WidgetBox(0,0,0,0,0);
+        widgetBox = new WidgetBox(0,0,0,0,1);
+        this.modId = modId;
         init();
     }
 
+    /**
+     * This method is called at the end of the {@link Widget#Widget(WidgetData)} constructor.
+     */
     public void init(){
 
     }
@@ -39,8 +64,8 @@ public abstract class Widget {
      *
      * @return The x position of the widget in pixels
      */
-    public float getX() {
-        return DynamicHUD.MC.getWindow().getScaledWidth() * xPercent;
+    public int getX() {
+        return x;
     }
 
     /**
@@ -48,8 +73,20 @@ public abstract class Widget {
      *
      * @return The y position of the widget in pixels
      */
-    public float getY() {
-        return DynamicHUD.MC.getWindow().getScaledHeight() * yPercent;
+    public int getY() {
+        return y;
+    }
+
+    public float getWidth(){
+        return widgetBox.getWidth();
+    }
+    public float getHeight(){
+        return widgetBox.getHeight();
+    }
+
+    public void setPosition(int x, int y){
+        this.x = x;
+        this.y = y;
     }
 
     public void setDraggable(boolean draggable) {
@@ -74,13 +111,16 @@ public abstract class Widget {
      * Renders the widget on the screen.
      */
     public void render(DrawContext drawContext){
-        if(shouldScale) {
-            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(),0, 1.0f);
-        }
+        if(!shouldDisplay())return;
 
+        if(shouldScale) {
+            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().scale);
+            scale(GlobalConfig.get().scale);
+        }
         renderWidget(drawContext);
 
         if(shouldScale){
+            reverseScale(GlobalConfig.get().scale);
             DrawHelper.stopScaling(drawContext.getMatrices());
         }
     }
@@ -89,12 +129,14 @@ public abstract class Widget {
      */
     public void renderInEditor(DrawContext drawContext){
         if(shouldScale) {
-            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(),0, 1.0f);
+            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().scale);
+            scale(GlobalConfig.get().scale);
         }
 
         renderWidgetInEditor(drawContext);
 
         if(shouldScale){
+            reverseScale(GlobalConfig.get().scale);
             DrawHelper.stopScaling(drawContext.getMatrices());
         }
     }
@@ -115,10 +157,49 @@ public abstract class Widget {
      *
      * @param context
      */
-    public void renderWidgetInEditor(DrawContext context){
+    private void renderWidgetInEditor(DrawContext context){
         displayBg(context);
 
         renderWidget(context);
+    }
+
+    public void mouseClicked(double mouseX, double mouseY, int button){
+        if(button == GLFW.GLFW_MOUSE_BUTTON_LEFT){
+            toggle();
+        }
+    }
+    public void mouseDragged(double mouseX, double mouseY, int button){
+        if(this.isDraggable && button == GLFW.GLFW_MOUSE_BUTTON_LEFT){
+            //Start dragging
+            startX = (int) (mouseX - x);
+            startY = (int) (mouseY - y);
+            dragging = true;
+            this.x = startX;
+            this.y = startY;
+
+            // Divides the screen into several "grid boxes" which the elements snap to. Higher the snapSize, more the grid boxes
+            if (this.shiftDown) {
+                // Calculate the size of each snap box
+                int snapBoxWidth = (int) (widgetBox.getWidth() / this.snapSize);
+                int snapBoxHeight = (int) (widgetBox.getHeight() / this.snapSize);
+
+                // Calculate the index of the snap box that the mouse is currently in
+                int snapBoxX = (int) (mouseX / snapBoxWidth);
+                int snapBoxY = (int) (mouseY / snapBoxHeight);
+
+                // Snap the element to the top-left corner of the snap box
+                this.x = snapBoxX * snapBoxWidth;
+                this.y = snapBoxY * snapBoxHeight;
+            }
+        }
+    }
+    public void mouseReleased(double mouseX, double mouseY, int button) {
+        dragging = false;
+    }
+
+
+    public boolean toggle(){
+       return this.display = !this.display;
     }
 
     /**
@@ -135,11 +216,13 @@ public abstract class Widget {
 
 
     public void readFromTag(NbtCompound tag) {
+        modId = tag.getString("modId");
         uid = new UID(tag.getString("UID"));
-        xPercent = tag.getFloat("xPercent");
-        yPercent = tag.getFloat("yPercent");
+        x = tag.getInt("x");
+        y = tag.getInt("y");
         display = tag.getBoolean("Display");
         isDraggable = tag.getBoolean("isDraggable");
+        shouldScale = tag.getBoolean("shouldScale");
     }
 
     /**
@@ -148,10 +231,13 @@ public abstract class Widget {
      * @param tag The tag to write to
      */
     public void writeToTag(NbtCompound tag) {
+        tag.putString("name", DATA.name());
+        tag.putString("modId",modId);
         tag.putString("UID", uid.getUniqueID());
         tag.putBoolean("isDraggable", isDraggable);
-        tag.putFloat("xPercent", xPercent);
-        tag.putFloat("yPercent", yPercent);
+        tag.putBoolean("shouldScale", shouldScale);
+        tag.putInt("x", x);
+        tag.putInt("y", y);
         tag.putBoolean("Display", display);
     }
 
@@ -179,6 +265,18 @@ public abstract class Widget {
         this.shouldScale = shouldScale;
     }
 
+    public String getModId() {
+        return modId;
+    }
+    public void scale(float scale) {
+        this.xPercent *= scale;
+        this.yPercent *= scale;
+    }
+    public void reverseScale(float scale) {
+        this.xPercent /= scale;
+        this.yPercent /= scale;
+    }
+
     @Override
     public String toString() {
         return "Widget{" +
@@ -188,23 +286,24 @@ public abstract class Widget {
                 ", display=" + display +
                 '}';
     }
-
     public abstract static class WidgetBuilder<T,S> {
-        protected float xPercent;
-        protected float yPercent;
+        protected int x;
+        protected int y;
         protected boolean display = true;
         protected boolean isDraggable = true;
         protected boolean shouldScale = true;
+        protected String modID = "unknown";
+
 
         /**
          * X Position of the widget relative to the screen.
          * Should be between 0f - 1f
          *
-         * @param xPercent
-         * @return
+         * @param x
+         * @return Builder
          */
-        public T setX(float xPercent) {
-            this.xPercent = xPercent;
+        public T setX(int x) {
+            this.x = x;
             return self();
         }
 
@@ -212,11 +311,11 @@ public abstract class Widget {
          * Y Position of the widget relative to the screen.
          * Should be between 0f - 1f
          *
-         * @param yPercent
+         * @param y
          * @return
          */
-        public T setY(float yPercent) {
-            this.yPercent = yPercent;
+        public T setY(int y) {
+            this.y = y;
             return self();
         }
 
@@ -234,11 +333,19 @@ public abstract class Widget {
             this.shouldScale = shouldScale;
             return self();
         }
+        public T setModID(String modID) {
+            this.modID = modID;
+            return self();
+        }
 
-        // Method to be overridden in subclasses to return "this" correctly
+        /**
+         * Method to be overridden in subclasses to return "this" correctly
+        */
         protected abstract T self();
 
-        // Method to construct a Widget object
+        /**
+         * Method to construct a Widget object
+         */
         public abstract S build();
     }
 }

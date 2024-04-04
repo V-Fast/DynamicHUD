@@ -6,8 +6,8 @@ public class WidgetBox {
     public float x1 = 0, x2 = 0, y1 = 0, y2 = 0;
 
     public WidgetBox(float x1, float y1, float x2, float y2, float scale) {
-        this.width = (float) ((x2 - x1) * scale);
-        this.height = (float) ((y2 - y1) * scale);
+        this.width = (x2 - x1) * scale;
+        this.height = (y2 - y1) * scale;
         this.x1 = x1;
         this.x2 = x1 + width;
         this.y1 = y1;

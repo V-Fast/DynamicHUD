@@ -5,11 +5,12 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
+import com.tanishisherewith.dynamichud.DynamicHUD;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.*;
+import net.minecraft.util.math.MathHelper;
 
-import static com.tanishisherewith.dynamichud.DynamicHUD.printInfo;
-import static com.tanishisherewith.dynamichud.DynamicHUD.printWarn;
+import static com.tanishisherewith.dynamichud.DynamicHUD.*;
 
 /**
  * Manages a collection of widgets, providing methods to add, remove, save, and load widgets.
@@ -71,6 +72,77 @@ public class WidgetManager {
     public static void removeWidget(Widget widget) {
         widgets.remove(widget);
     }
+ /*   public static void onScreenResized(int newWidth, int newHeight) {
+        float scaleX = (float) newWidth / MC.getWindow().getScaledWidth();
+        float scaleY = (float) newHeight / MC.getWindow().getScaledHeight();
+        System.out.println("newWidth: " + newWidth);
+        System.out.println("newHeight: " + newHeight);
+
+        System.out.println("scaleX: " + scaleX);
+
+        for (Widget widget : widgets) {
+            float newX = widget.getX() * scaleX;
+            float newY = widget.getY() * scaleY;
+            System.out.println("newX: " + newX);
+
+            // Ensure the widget is within the screen bounds
+            newX = MathHelper.clamp(newX,0,newWidth - widget.getWidth());
+            newY = MathHelper.clamp(newY,0,newHeight - widget.getHeight());
+            System.out.println("newX2: " + newX);
+
+            widget.setPosition(newX, newY);
+        }
+    }
+
+  */
+
+    /**
+     * Attempts to restore the widgets back to their place on screen resize.
+     * <p>
+     * It works by storing the position of widgets as relative to the screen size before the resize
+     * and then using that percentage to restore the widget to their appropriate place.
+     * <p>
+     * Widgets will move around on smaller GUI scales.
+     * Larger the GUI scale, more accurate is the position.
+     * </p>
+     * <p>
+     *     Called in {@link com.tanishisherewith.dynamichud.mixins.ScreenMixin}
+     * </p>
+     * </p>
+     *
+     * @param newWidth Screen width after resize
+     * @param newHeight Screen height after resize
+     * @param previousWidth Screen width before resize
+     * @param previousHeight Screen height before resize
+     */
+ public static void onScreenResized(int newWidth, int newHeight, int previousWidth, int previousHeight) {
+     for (Widget widget : widgets) {
+
+         // To ensure that infinite coords is not returned
+         if(widget.xPercent <= 0f){
+             widget.xPercent = (float) widget.getX()/previousWidth;
+         }
+         if(widget.yPercent <= 0f){
+             widget.yPercent = (float) widget.getY()/previousHeight;
+         }
+
+         // Use the stored percentages to calculate the new position
+         int newX = (int) (widget.xPercent * newWidth);
+         int newY = (int) (widget.yPercent * newHeight);
+
+         // Ensure the widget is within the screen bounds
+         newX = (int) MathHelper.clamp(newX, 0, newWidth - widget.getWidth());
+         newY = (int) MathHelper.clamp(newY, 0, newHeight - widget.getHeight());
+
+         // Update the widget's position
+         widget.setPosition(newX, newY);
+
+         // Update the stored percentages with the new screen size (after resize).
+         widget.xPercent = (float) widget.getX() / newWidth;
+         widget.yPercent =  (float) widget.getY() / newHeight;
+     }
+ }
+
 
     /**
      * Saves the state of all widgets to the given file.
@@ -100,17 +172,11 @@ public class WidgetManager {
 
         rootTag.put("widgets", widgetList);
 
-        // Use a temporary file to write the data
-        File tempFile = new File(file.getAbsolutePath() + ".tmp");
-        try (DataOutputStream out = new DataOutputStream(new FileOutputStream(tempFile))) {
+        //Write the data to the file
+        try (DataOutputStream out = new DataOutputStream(new FileOutputStream(file))) {
             NbtIo.write(rootTag, out);
-            // Check if the data has been written successfully
-            if (tempFile.length() > 0) {
-                // Check if the temporary file exists and can be renamed
-                Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            } else {
-                throw new IOException("Failed to write data to temporary file OR Empty data passed");
-            }
+        }catch (IOException e){
+            DynamicHUD.logger.warn("Error while saving",e);
         }
     }
 
@@ -145,5 +211,15 @@ public class WidgetManager {
      */
     public static List<Widget> getWidgets() {
         return widgets;
+    }
+    /**
+     * Returns the list of managed widgets with the same modID.
+     *
+     * @return The list of managed widgets with the same modID.
+     */
+    public static List<Widget> getWidgetsForMod(String modID) {
+        return getWidgets().stream()
+                .filter(widget -> modID.equalsIgnoreCase(widget.getModId()))
+                .toList();
     }
 }

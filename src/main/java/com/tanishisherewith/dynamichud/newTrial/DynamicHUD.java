@@ -2,8 +2,10 @@ package com.tanishisherewith.dynamichud.newTrial;
 
 import com.tanishisherewith.dynamichud.DynamicHudIntegration;
 import com.tanishisherewith.dynamichud.huds.AbstractMoveableScreen;
+import com.tanishisherewith.dynamichud.newTrial.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetManager;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetRenderer;
+import com.tanishisherewith.dynamichud.newTrial.widgets.TextWidget;
 import com.tanishisherewith.dynamichud.util.DynamicUtil;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -12,6 +14,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +27,7 @@ import java.util.List;
 public class DynamicHUD implements ClientModInitializer {
 
     public static MinecraftClient MC = MinecraftClient.getInstance();
+    public static String MOD_ID = "dynamichud";
     private static final Logger logger = LoggerFactory.getLogger("DynamicHud");
     private static final List<WidgetRenderer> widgetRenderers = new ArrayList<>();
 
@@ -45,31 +49,16 @@ public class DynamicHUD implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        printInfo("DynamicHud Initialised");
+        printInfo("Initialising DynamicHud");
 
-        //Save and Load
-       /* ClientTickEvents.START_CLIENT_TICK.register(server -> {
-            if (iWigdets != null) {
-                if (!WIDGETS_FILE.exists()) {
-                    if (!dynamicutil.WidgetAdded) {
-                        iWigdets.addWigdets(dynamicutil);
-                    }
-                    if (!dynamicutil.MainMenuWidgetAdded) {
-                        iWigdets.addMainMenuWigdets(dynamicutil);
-                    }
-                }
+        // Add WidgetData of included widgets
+        WidgetManager.addWidgetDatas(
+                TextWidget.DATA
+        );
+        //YACL load
+        GlobalConfig.HANDLER.load();
 
-                if (WIDGETS_FILE.exists() && !dynamicutil.WidgetLoaded) {
-                    iWigdets.loadWigdets(dynamicutil);
-                    printInfo("Widgets loaded");
-                    File FileDirectory = new File(fileDirectory, filename);
-                    printInfo("Load file Directory: " + FileDirectory);
-                }
-            }
-            DynamicUtil.openDynamicScreen(EditorScreenKeyBinding, Screen);
-        });
-
-        */
+        printInfo("Integrating mods...");
         FabricLoader.getInstance().getEntrypointContainers("dynamicHud", DynamicHudIntegration.class).forEach(entrypoint -> {
             ModMetadata metadata = entrypoint.getProvider().getMetadata();
             String modId = metadata.getId();
@@ -88,11 +77,14 @@ public class DynamicHUD implements ClientModInitializer {
 
                 screen = DHIntegration.getMovableScreen();
                 KeyBinding binding =DHIntegration.EDITOR_SCREEN_KEY_BINDING;
+
                 WidgetRenderer widgetRenderer = DHIntegration.getWidgetRenderer();
                 addWidgetRenderer(widgetRenderer);
 
                 //Register events for rendering, saving, loading, and opening the hudEditor
-                ClientTickEvents.START_CLIENT_TICK.register((client)->{
+                ClientTickEvents.START_CLIENT_TICK.register((client)-> {
+                    System.out.println("TICK FOR : " + modId);
+                    System.out.println(binding);
                     DynamicUtil.openDynamicScreen(binding, screen);
                 });
 
@@ -101,6 +93,9 @@ public class DynamicHUD implements ClientModInitializer {
                 ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, s) -> saveWidgetsSafely(widgetsFile));
                 ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> saveWidgetsSafely(widgetsFile));
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> saveWidgetsSafely(widgetsFile)));
+
+
+                printInfo(String.format("Integration of mod %s was successful",modId));
             } catch (Throwable e) {
                 if(e instanceof IOException){
                     logger.warn("An error has occured while loading widgets of mod {}", modId,e);
@@ -109,6 +104,11 @@ public class DynamicHUD implements ClientModInitializer {
                 }
             }
            });
+
+        ServerLifecycleEvents.SERVER_STOPPING.register(server -> GlobalConfig.HANDLER.save());
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, s) -> GlobalConfig.HANDLER.save());
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> GlobalConfig.HANDLER.save());
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> GlobalConfig.HANDLER.save()));
     }
     private void saveWidgetsSafely(File widgetsFile) {
         try {
