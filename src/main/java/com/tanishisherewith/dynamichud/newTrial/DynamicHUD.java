@@ -1,14 +1,15 @@
 package com.tanishisherewith.dynamichud.newTrial;
 
 import com.tanishisherewith.dynamichud.DynamicHudIntegration;
-import com.tanishisherewith.dynamichud.huds.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.newTrial.config.GlobalConfig;
+import com.tanishisherewith.dynamichud.newTrial.screens.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetManager;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetRenderer;
 import com.tanishisherewith.dynamichud.newTrial.widgets.TextWidget;
 import com.tanishisherewith.dynamichud.util.DynamicUtil;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -74,18 +75,20 @@ public class DynamicHUD implements ClientModInitializer {
                 }else{
                     DHIntegration.addWidgets();
                 }
+                DHIntegration.initAfter();
 
                 screen = DHIntegration.getMovableScreen();
+
                 KeyBinding binding =DHIntegration.EDITOR_SCREEN_KEY_BINDING;
+
+                DHIntegration.registerCustomWidgets();
 
                 WidgetRenderer widgetRenderer = DHIntegration.getWidgetRenderer();
                 addWidgetRenderer(widgetRenderer);
 
                 //Register events for rendering, saving, loading, and opening the hudEditor
                 ClientTickEvents.START_CLIENT_TICK.register((client)-> {
-                    System.out.println("TICK FOR : " + modId);
-                    System.out.println(binding);
-                    DynamicUtil.openDynamicScreen(binding, screen);
+                    openDynamicScreen(binding, screen);
                 });
 
                 // Save during exiting a world, server or Minecraft itself
@@ -109,6 +112,8 @@ public class DynamicHUD implements ClientModInitializer {
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, s) -> GlobalConfig.HANDLER.save());
         ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> GlobalConfig.HANDLER.save());
         Runtime.getRuntime().addShutdownHook(new Thread(() -> GlobalConfig.HANDLER.save()));
+
+        HudRenderCallback.EVENT.register(new HudRender());
     }
     private void saveWidgetsSafely(File widgetsFile) {
         try {
@@ -116,6 +121,17 @@ public class DynamicHUD implements ClientModInitializer {
         } catch (IOException e) {
             logger.error("Failed to save widgets");
             throw new RuntimeException(e);
+        }
+    }
+    /**
+     * Opens the MovableScreen when the specified key is pressed.
+     *
+     * @param key    The key to listen for
+     * @param screen The AbstractMoveableScreen instance to use to set the screen
+     */
+    public static void openDynamicScreen(KeyBinding key, AbstractMoveableScreen screen) {
+        if (key.wasPressed()) {
+            MC.setScreen(screen);
         }
     }
 

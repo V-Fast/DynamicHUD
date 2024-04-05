@@ -1,7 +1,6 @@
 package com.tanishisherewith.dynamichud.newTrial.widgets;
 
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
-import com.tanishisherewith.dynamichud.newTrial.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.newTrial.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.newTrial.widget.Widget;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetData;
@@ -14,8 +13,8 @@ import java.util.function.Supplier;
 public class TextWidget extends Widget {
     public static WidgetData<TextWidget> DATA = new WidgetData<>("TextWidget","Display Text on screen",TextWidget::new);
     Supplier<String> textSupplier;
-    String dynamicRegistryKey;
-    DynamicValueRegistry dynamicValueRegistry;
+    String dynamicRegistryKey = "";
+    DynamicValueRegistry dynamicValueRegistry = null;
     protected boolean shadow; // Whether to draw a shadow behind the text
     protected boolean rainbow; // Whether to apply a rainbow effect to the text
 
@@ -60,7 +59,7 @@ public class TextWidget extends Widget {
         if(textSupplier != null) {
             String text = textSupplier.get();
             drawContext.drawText(mc.textRenderer, text, (int) getX(), (int)getY(), color, shadow);
-            widgetBox.setSize(getX() - 2,getY() - 2,mc.textRenderer.getWidth(text) + 2,mc.textRenderer.fontHeight + 2);
+            widgetBox.setSizeAndPosition(getX() - 2,getY() - 2,mc.textRenderer.getWidth(text) + 2,mc.textRenderer.fontHeight + 2);
         }
     }
 
@@ -70,6 +69,9 @@ public class TextWidget extends Widget {
         tag.putString("DRKey",dynamicRegistryKey);
         tag.putBoolean("shadow",shadow);
         tag.putBoolean("rainbow",rainbow);
+
+        // If true then it means that we should use local registry and if false (i.e. null) then use global registry
+        tag.putBoolean("DVRObj", dynamicValueRegistry != null);
     }
 
     @Override
@@ -79,9 +81,19 @@ public class TextWidget extends Widget {
         rainbow = tag.getBoolean("rainbow");
         dynamicRegistryKey = tag.getString("DRKey");
 
+        // If true then it means that we should use local registry and if false (i.e. null) then use global registry
+        boolean dvrObj = tag.getBoolean("DVRObj");
+
+        if(!dvrObj && dynamicRegistryKey != null){
+            textSupplier = (Supplier<String>) DynamicValueRegistry.getGlobal(dynamicRegistryKey);
+            return;
+        }
+
         for(DynamicValueRegistry dvr: DynamicValueRegistry.getInstances(modId)){
+            //Unfortunately, this method takes the value from the first local registry with the key.
+            //It returns to prevent overriding with other registries
             textSupplier = (Supplier<String>) dvr.get(dynamicRegistryKey);
-            break;
+            return;
         }
     }
     public static class Builder extends WidgetBuilder<Builder,TextWidget> {

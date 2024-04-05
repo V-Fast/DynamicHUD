@@ -1,8 +1,8 @@
 package com.tanishisherewith.dynamichud.widget;
 
 public class WidgetBox {
-    private final float width;
-    private final float height;
+    private float width;
+    private float height;
     public float x1 = 0, x2 = 0, y1 = 0, y2 = 0;
 
     public WidgetBox(float x1, float y1, float x2, float y2, float scale) {
@@ -33,8 +33,11 @@ public class WidgetBox {
         return x >= x1 && x <= x2 && y >= y1 && y <= y2;
     }
 
-    public boolean intersects(float otherX1, float otherY1, float otherX2, float otherY2, float scale) {
+    public boolean intersects(float otherX1, float otherY1, float otherX2, float otherY2) {
         return !(otherX1 > x2 || otherX2 < x1 || otherY1 > y2 || otherY2 < y1);
+    }
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        return mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2;
     }
 
     public float getWidth() {
@@ -44,11 +47,13 @@ public class WidgetBox {
     public float getHeight() {
         return height;
     }
-    public void setSize(float x,float y, float width, float height){
+    public void setSizeAndPosition(float x, float y, float width, float height){
         this.x1 = x;
         this.x2 = x + width;
         this.y1 = y;
         this.y2 = y + height;
+        this.height = height;
+        this.width = width;
     }
     public void setPosition(float x,float y, float x2, float y2){
         this.x1 = x;

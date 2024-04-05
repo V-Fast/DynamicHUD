@@ -1,10 +1,7 @@
 package com.tanishisherewith.dynamichud.newTrial.widget;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
-import com.tanishisherewith.dynamichud.helpers.ColorHelper;
-import com.tanishisherewith.dynamichud.helpers.DrawHelper;
-import com.tanishisherewith.dynamichud.huds.AbstractMoveableScreen;
-import com.tanishisherewith.dynamichud.widget.WidgetBox;
+import com.tanishisherewith.dynamichud.newTrial.screens.AbstractMoveableScreen;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import org.lwjgl.glfw.GLFW;
@@ -17,6 +14,7 @@ public class WidgetRenderer {
     private boolean renderInGameHud = true;
     public boolean isInEditor = false;
     List<Widget> widgets;
+    public Widget selectedWidget = null;
     public WidgetRenderer(List<Widget> widgets){
         this.widgets = widgets;
     }
@@ -32,7 +30,7 @@ public class WidgetRenderer {
         this.renderInGameHud = renderInGameHud;
     }
 
-    public void renderWidgets(DrawContext context) {
+    public void renderWidgets(DrawContext context, int mouseX, int mouseY) {
         if(WidgetManager.getWidgets().isEmpty()) return;
 
         Screen currentScreen = DynamicHUD.MC.currentScreen;
@@ -47,7 +45,7 @@ public class WidgetRenderer {
         if(currentScreen instanceof AbstractMoveableScreen){
             for (Widget widget : widgets) {
                 widget.isInEditor = true;
-                widget.renderInEditor(context);
+                widget.renderInEditor(context,mouseX,mouseY);
             }
             return;
         }
@@ -65,18 +63,35 @@ public class WidgetRenderer {
         }
         if(currentScreen instanceof AbstractMoveableScreen){
             for (Widget widget : widgets) {
-                widget.mouseClicked(mouseX,mouseY,button);
+                if(widget.mouseClicked(mouseX,mouseY,button)){
+                    selectedWidget = widget;
+                    return;
+                }
             }
         }
     }
-    public void mouseDragged(double mouseX, double mouseY, int button){
+    public void mouseDragged(double mouseX, double mouseY, int button, int snapSize){
         Screen currentScreen = DynamicHUD.MC.currentScreen;
         if(currentScreen == null) {
             return;
         }
         if(currentScreen instanceof AbstractMoveableScreen){
             for (Widget widget : widgets) {
-                widget.mouseDragged(mouseX,mouseY,button);
+                if(widget.mouseDragged(mouseX,mouseY,button,snapSize)){
+                    selectedWidget = widget;
+                    return;
+                }
+            }
+        }
+    }
+    public void mouseScrolled(double mouseX, double mouseY, double vAmount,double hAmount){
+        Screen currentScreen = DynamicHUD.MC.currentScreen;
+        if(currentScreen == null) {
+            return;
+        }
+        if(currentScreen instanceof AbstractMoveableScreen){
+            for (Widget widget : widgets) {
+               widget.mouseScrolled(mouseX,mouseY,vAmount,hAmount);
             }
         }
     }

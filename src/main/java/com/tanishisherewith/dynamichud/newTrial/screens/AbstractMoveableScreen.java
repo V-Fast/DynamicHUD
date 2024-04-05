@@ -1,7 +1,6 @@
 package com.tanishisherewith.dynamichud.newTrial.screens;
 
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetRenderer;
-import com.tanishisherewith.dynamichud.widget.Widget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -9,7 +8,7 @@ import net.minecraft.text.Text;
 public abstract class AbstractMoveableScreen extends Screen {
     protected boolean ShouldPause = false; // To pause if the screen is opened or not
     public final WidgetRenderer widgetRenderer;
-
+    public int snapSize = 120;
 
     /**
      * Constructs a AbstractMoveableScreen object.
@@ -22,7 +21,7 @@ public abstract class AbstractMoveableScreen extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        widgetRenderer.mouseDragged(mouseX,mouseY,button);
+        widgetRenderer.mouseDragged(mouseX,mouseY,button, snapSize);
         return false;
     }
 
@@ -36,6 +35,24 @@ public abstract class AbstractMoveableScreen extends Screen {
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         widgetRenderer.mouseReleased(mouseX,mouseY,button);
         return false;
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        widgetRenderer.keyPressed(keyCode);
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+        widgetRenderer.keyReleased(keyCode);
+        return super.keyReleased(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        widgetRenderer.mouseScrolled(mouseX,mouseY,verticalAmount,horizontalAmount);
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     /**
@@ -52,7 +69,7 @@ public abstract class AbstractMoveableScreen extends Screen {
 
         // Draw each widget
         widgetRenderer.isInEditor = true;
-        widgetRenderer.renderWidgets(drawContext);
+        widgetRenderer.renderWidgets(drawContext,mouseX,mouseY);
     }
 
     @Override

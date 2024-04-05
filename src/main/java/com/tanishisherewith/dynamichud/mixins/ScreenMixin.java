@@ -23,7 +23,7 @@ public abstract class ScreenMixin {
     @Inject(at = @At("TAIL"), method = "render")
     private void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         for(WidgetRenderer widgetRenderer: DynamicHUD.getWidgetRenderers()){
-            widgetRenderer.renderWidgets(context);
+            widgetRenderer.renderWidgets(context,mouseX,mouseY);
         }
     }
     @Inject(at = @At("HEAD"), method = "resize")
