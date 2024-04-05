@@ -22,7 +22,7 @@
 > In progress
 ---
 
-### Mid stage (1.2.0)
+### Mid stage (2.0.0)
 <details>
   <summary>View Demo video</summary>
   
