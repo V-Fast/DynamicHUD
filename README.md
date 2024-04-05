@@ -2,7 +2,7 @@
 
 **A library to display stuff on the screen. Fabric only**
 
-**Version:** `1.3.0`
+**Version:** `2.0.0`
 
 > ⚠ **IN PROGRESS** ⚠
 >
@@ -22,7 +22,7 @@
 > In progress
 ---
 
-### Mid stage (2.0.0)
+### Mid stage (1.2.0)
 <details>
   <summary>View Demo video</summary>
   
