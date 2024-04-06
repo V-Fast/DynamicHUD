@@ -1,6 +1,8 @@
 package com.tanishisherewith.dynamichud.newTrial.widget;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
@@ -164,18 +166,32 @@ public class WidgetManager {
             widget.writeToTag(widgetTag);
             // Check for duplicates
             if (widgetSet.add(widgetTag.toString())) {
+                printInfo("Saving Widget: " + widget);
                 widgetList.add(widgetTag);
             }
         }
 
         rootTag.put("widgets", widgetList);
 
-        //Write the data to the file
-        try (DataOutputStream out = new DataOutputStream(new FileOutputStream(file))) {
-            NbtIo.write(rootTag, out);
-        }catch (IOException e){
-            DynamicHUD.logger.warn("Error while saving",e);
+        // Backup the old file
+        File backupFile = new File(file.getAbsolutePath() + ".bak");
+        if (file.exists()) {
+            Files.copy(file.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
+
+        // Write the data to a temporary file
+        File tempFile = new File(file.getAbsolutePath() + ".tmp");
+        try (DataOutputStream out = new DataOutputStream(new FileOutputStream(tempFile))) {
+            NbtIo.write(rootTag, out);
+        } catch (IOException e) {
+            DynamicHUD.logger.warn("Error while saving", e);
+            // If save operation failed, restore the backup
+            Files.move(backupFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            throw e;  // rethrow the exception
+        }
+
+        // If save operation was successful, replace the old file with the new one
+        Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
     /**
@@ -195,6 +211,7 @@ public class WidgetManager {
                     WidgetData<?> widgetData = widgetDataMap.get(widgetTag.getString("name"));
                     Widget widget = widgetData.createWidget();
                     widget.readFromTag(widgetTag);
+                    printInfo("Loading Widget: " + widget);
                     widgets.add(widget);
                 }
         }else{

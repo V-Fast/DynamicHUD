@@ -116,14 +116,13 @@ public abstract class Widget {
     /**
      * Renders the widget on the screen.
      */
-    public void render(DrawContext drawContext) {
+    public void render(DrawContext drawContext, int mouseX, int mouseY) {
         if (!shouldDisplay()) return;
 
         if (shouldScale) {
             DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().scale);
         }
-        renderWidget(drawContext);
-        updateWidgetBox();
+        renderWidget(drawContext,mouseX,mouseY);
 
         if (shouldScale) {
             DrawHelper.stopScaling(drawContext.getMatrices());
@@ -137,8 +136,7 @@ public abstract class Widget {
         if (shouldScale) {
             DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().scale);
         }
-        renderWidgetInEditor(drawContext);
-        updateWidgetBox();
+        renderWidgetInEditor(drawContext,mouseX,mouseY);
 
         if (shouldScale) {
             DrawHelper.stopScaling(drawContext.getMatrices());
@@ -151,10 +149,15 @@ public abstract class Widget {
 
     /**
      * Renders the widget on the screen
+     * <p>
+     * The mouse position values are only passed when in a {@link com.tanishisherewith.dynamichud.newTrial.screens.AbstractMoveableScreen} screen.
+     * </p>
      *
      * @param context
+     * @param mouseX X position of mouse.
+     * @param mouseY Y position of mouse
      */
-    public abstract void renderWidget(DrawContext context);
+    public abstract void renderWidget(DrawContext context,int mouseX, int mouseY);
 
 
     /**
@@ -164,10 +167,10 @@ public abstract class Widget {
      *
      * @param context
      */
-    private void renderWidgetInEditor(DrawContext context) {
+    private void renderWidgetInEditor(DrawContext context,int mouseX, int mouseY) {
         displayBg(context);
 
-        renderWidget(context);
+        renderWidget(context,mouseX,mouseY);
     }
 
     public boolean mouseClicked(double mouseX, double mouseY, int button) {

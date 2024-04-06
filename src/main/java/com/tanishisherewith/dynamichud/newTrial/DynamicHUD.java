@@ -24,9 +24,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class DynamicHUD implements ClientModInitializer {
-
     public static MinecraftClient MC = MinecraftClient.getInstance();
     public static String MOD_ID = "dynamichud";
     private static final Logger logger = LoggerFactory.getLogger("DynamicHud");
@@ -60,7 +60,9 @@ public class DynamicHUD implements ClientModInitializer {
         GlobalConfig.HANDLER.load();
 
         printInfo("Integrating mods...");
-        FabricLoader.getInstance().getEntrypointContainers("dynamicHud", DynamicHudIntegration.class).forEach(entrypoint -> {
+        FabricLoader.getInstance()
+                .getEntrypointContainers("dynamicHud", DynamicHudIntegration.class)
+                .forEach(entrypoint -> {
             ModMetadata metadata = entrypoint.getProvider().getMetadata();
             String modId = metadata.getId();
             AbstractMoveableScreen screen;
@@ -92,18 +94,18 @@ public class DynamicHUD implements ClientModInitializer {
                 });
 
                 // Save during exiting a world, server or Minecraft itself
+                // Also saved when a resource pack is reloaded.
                 ServerLifecycleEvents.SERVER_STOPPING.register(server -> saveWidgetsSafely(widgetsFile));
                 ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, s) -> saveWidgetsSafely(widgetsFile));
                 ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> saveWidgetsSafely(widgetsFile));
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> saveWidgetsSafely(widgetsFile)));
 
-
                 printInfo(String.format("Integration of mod %s was successful",modId));
             } catch (Throwable e) {
                 if(e instanceof IOException){
-                    logger.warn("An error has occured while loading widgets of mod {}", modId,e);
+                    logger.warn("An error has occurred while loading widgets of mod {}", modId,e);
                 }else {
-                    logger.warn("Mod {} has incorrect implementation of dynamicHud", modId, e);
+                    logger.warn("Mod {} has incorrect implementation of DynamicHUD", modId, e);
                 }
             }
            });

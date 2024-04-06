@@ -54,7 +54,7 @@ public class TextWidget extends Widget {
     }
 
     @Override
-    public void renderWidget(DrawContext drawContext) {
+    public void renderWidget(DrawContext drawContext,int mouseX, int mouseY) {
         int color = rainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / 10000f) : Color.WHITE.getRGB();
         if(textSupplier != null) {
             String text = textSupplier.get();
@@ -66,12 +66,12 @@ public class TextWidget extends Widget {
     @Override
     public void writeToTag(NbtCompound tag) {
         super.writeToTag(tag);
-        tag.putString("DRKey",dynamicRegistryKey);
+        tag.putString("DynamicRegistryKey",dynamicRegistryKey);
         tag.putBoolean("shadow",shadow);
         tag.putBoolean("rainbow",rainbow);
 
         // If true then it means that we should use local registry and if false (i.e. null) then use global registry
-        tag.putBoolean("DVRObj", dynamicValueRegistry != null);
+        tag.putBoolean("DynamicValueRegistry", dynamicValueRegistry != null);
     }
 
     @Override
@@ -79,10 +79,10 @@ public class TextWidget extends Widget {
         super.readFromTag(tag);
         shadow = tag.getBoolean("shadow");
         rainbow = tag.getBoolean("rainbow");
-        dynamicRegistryKey = tag.getString("DRKey");
+        dynamicRegistryKey = tag.getString("DynamicRegistryKey");
 
         // If true then it means that we should use local registry and if false (i.e. null) then use global registry
-        boolean dvrObj = tag.getBoolean("DVRObj");
+        boolean dvrObj = tag.getBoolean("DynamicValueRegistry");
 
         if(!dvrObj && dynamicRegistryKey != null){
             textSupplier = (Supplier<String>) DynamicValueRegistry.getGlobal(dynamicRegistryKey);

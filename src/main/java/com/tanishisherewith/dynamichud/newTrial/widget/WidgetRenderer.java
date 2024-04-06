@@ -38,7 +38,7 @@ public class WidgetRenderer {
         if(currentScreen == null && renderInGameHud){
             for (Widget widget : widgets) {
                 widget.isInEditor = false;
-                widget.render(context);
+                widget.render(context,0,0);
             }
             return;
         }
@@ -52,7 +52,7 @@ public class WidgetRenderer {
         if (currentScreen != null && allowedScreens.contains(DynamicHUD.MC.currentScreen.getClass()) && !this.isInEditor) {
             for (Widget widget : widgets) {
                 widget.isInEditor = false;
-                widget.render(context);
+                widget.render(context,0,0);
             }
         }
     }
