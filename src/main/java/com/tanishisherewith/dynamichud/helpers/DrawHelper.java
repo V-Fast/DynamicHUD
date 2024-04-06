@@ -210,9 +210,9 @@ public class DrawHelper extends DrawContext {
     }
 
     /**
-     * This method assumes that the element is widget in the top-left corner (i.e. all drawing happens with respect to the top-left corner).
-     * @param x X position of top-left corner of widget
-     * @param y Y position of top-left corner of widget
+     * This method assumes that the x, y coords are the origin of a widget.
+     * @param x X position of widget
+     * @param y Y position of widget
      * @param scale Scale the matrices
      */
     public static void scaleAndPosition(MatrixStack matrices, float x, float y, float scale) {
@@ -223,6 +223,27 @@ public class DrawHelper extends DrawContext {
 
         // Scale the matrix
         matrices.scale(scale, scale, 1.0F);
+
+        matrices.translate(-x,-y,0);
+    }
+    /**
+     * This method scales the matrices by the centre of the widget
+     * @param x X position of widget
+     * @param y Y position of widget
+     * @param height height of widget
+     * @param width width of widget
+     * @param scale Scale the matrices
+     */
+    public static void scaleAndPosition(MatrixStack matrices, float x, float y,float width, float height, float scale) {
+        matrices.push(); // Save the current transformation state
+
+        // Translate the origin back to the desired position
+        matrices.translate(x + width / 2.0f, y + height / 2.0f, 0);
+
+        // Scale the matrix
+        matrices.scale(scale, scale, 1.0F);
+
+        matrices.translate(-(x + width / 2.0f), -(y + height / 2.0f), 0);
     }
 
     public static void stopScaling(MatrixStack matrices){

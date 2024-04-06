@@ -287,7 +287,6 @@ public class ContextMenu {
                     int boxWidth = valueTextWidth + 2;
                     int boxHeight = textRenderer.fontHeight + 1;
                     DrawHelper.fill(drawContext, boxX, boxY, boxX + boxWidth, boxY + boxHeight, 0x7F000000);
-
                 }
 
             } else if (option instanceof DoubleInputOption) {

@@ -115,7 +115,7 @@ public class WidgetRenderer {
     public void onCloseScreen(){
         if(DynamicHUD.MC.currentScreen instanceof AbstractMoveableScreen){
             for (Widget widget : widgets) {
-                widget.shiftDown = false;
+                widget.onClose();
             }
         }
     }

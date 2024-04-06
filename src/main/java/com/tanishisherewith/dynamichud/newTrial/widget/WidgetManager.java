@@ -117,7 +117,6 @@ public class WidgetManager {
      */
  public static void onScreenResized(int newWidth, int newHeight, int previousWidth, int previousHeight) {
      for (Widget widget : widgets) {
-
          // To ensure that infinite coords is not returned
          if(widget.xPercent <= 0f){
              widget.xPercent = (float) widget.getX()/previousWidth;
@@ -136,7 +135,6 @@ public class WidgetManager {
 
          // Update the widget's position
          widget.setPosition(newX, newY);
-
          // Update the stored percentages with the new screen size (after resize).
          widget.xPercent = (float) widget.getX() / newWidth;
          widget.yPercent =  (float) widget.getY() / newHeight;
@@ -174,7 +172,7 @@ public class WidgetManager {
         rootTag.put("widgets", widgetList);
 
         // Backup the old file
-        File backupFile = new File(file.getAbsolutePath() + ".bak");
+        File backupFile = new File(file.getAbsolutePath() + ".backup");
         if (file.exists()) {
             Files.copy(file.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }

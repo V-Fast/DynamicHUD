@@ -43,7 +43,7 @@ public class DynamicHudTest implements DynamicHudIntegration {
                 .setDRKey("FPS")
                 .setDVR(registry)
                 .setModID(DynamicHUD.MOD_ID)
-                .shouldScale(false)
+                .shouldScale(true)
                 .build();
     }
 

@@ -8,7 +8,7 @@ import net.minecraft.text.Text;
 public abstract class AbstractMoveableScreen extends Screen {
     protected boolean ShouldPause = false; // To pause if the screen is opened or not
     public final WidgetRenderer widgetRenderer;
-    public int snapSize = 120;
+    public int snapSize = 100;
 
     /**
      * Constructs a AbstractMoveableScreen object.
@@ -65,8 +65,9 @@ public abstract class AbstractMoveableScreen extends Screen {
      */
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        super.render(drawContext, mouseX, mouseY, delta);
-
+        if(this.client.world == null) {
+            this.renderBackgroundTexture(drawContext);
+        }
         // Draw each widget
         widgetRenderer.isInEditor = true;
         widgetRenderer.renderWidgets(drawContext,mouseX,mouseY);
@@ -76,6 +77,7 @@ public abstract class AbstractMoveableScreen extends Screen {
     public void close() {
         super.close();
         widgetRenderer.isInEditor = false;
+        widgetRenderer.onCloseScreen();
     }
 
     public void setShouldPause(boolean shouldPause) {

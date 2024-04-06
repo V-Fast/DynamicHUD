@@ -2,10 +2,13 @@ package com.tanishisherewith.dynamichud.newTrial.widgets;
 
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.newTrial.utils.DynamicValueRegistry;
+import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.ContextMenu;
+import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.BooleanOption;
 import com.tanishisherewith.dynamichud.newTrial.widget.Widget;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetData;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.util.function.Supplier;
@@ -17,6 +20,7 @@ public class TextWidget extends Widget {
     DynamicValueRegistry dynamicValueRegistry = null;
     protected boolean shadow; // Whether to draw a shadow behind the text
     protected boolean rainbow; // Whether to apply a rainbow effect to the text
+    private ContextMenu menu;
 
     public TextWidget() {
        this(null,false,false,"unknown");
@@ -35,6 +39,9 @@ public class TextWidget extends Widget {
         textSupplier = (Supplier<String>) DynamicValueRegistry.getGlobal(dynamicRegistryKey);
         this.shadow = shadow;
         this.rainbow = rainbow;
+        menu = new ContextMenu(getX(),getY(),20,20,null);
+        menu.addOption(new BooleanOption("Shadow",()->this.shadow,value-> this.shadow = value));
+        menu.addOption(new BooleanOption("Rainbow",()->this.rainbow,value-> this.rainbow = value));
     }
 
     /**
@@ -51,16 +58,47 @@ public class TextWidget extends Widget {
         textSupplier = (Supplier<String>) dynamicValueRegistry.get(dynamicRegistryKey);
         this.shadow = shadow;
         this.rainbow = rainbow;
+        menu = new ContextMenu(getX(),getY(),20,20,null);
+        menu.addOption(new BooleanOption("Shadow",()->this.shadow,value-> this.shadow = value));
+        menu.addOption(new BooleanOption("Rainbow",()->this.rainbow,value-> this.rainbow = value));
     }
 
     @Override
     public void renderWidget(DrawContext drawContext,int mouseX, int mouseY) {
+        menu.render(drawContext, getX() - 2,getY(), (int) Math.ceil(getHeight()));
         int color = rainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / 10000f) : Color.WHITE.getRGB();
         if(textSupplier != null) {
             String text = textSupplier.get();
             drawContext.drawText(mc.textRenderer, text, (int) getX(), (int)getY(), color, shadow);
             widgetBox.setSizeAndPosition(getX() - 2,getY() - 2,mc.textRenderer.getWidth(text) + 2,mc.textRenderer.fontHeight + 2);
         }
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if(button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && widgetBox.isMouseOver(mouseX,mouseY)){
+            menu.toggleDisplay();
+        }
+        menu.mouseClicked(mouseX,mouseY,button);
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public void mouseReleased(double mouseX, double mouseY, int button) {
+        menu.mouseReleased(mouseX,mouseY,button);
+        super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, int snapSize) {
+        menu.mouseDragged(mouseX,mouseY,button);
+        return super.mouseDragged(mouseX, mouseY, button, snapSize);
+    }
+
+    @Override
+    public void onClose() {
+        super.onClose();
+        menu.close();
     }
 
     @Override
@@ -93,8 +131,13 @@ public class TextWidget extends Widget {
             //Unfortunately, this method takes the value from the first local registry with the key.
             //It returns to prevent overriding with other registries
             textSupplier = (Supplier<String>) dvr.get(dynamicRegistryKey);
+            System.out.println(dvr);
+            System.out.println(DynamicValueRegistry.getInstances(modId));
             return;
         }
+        menu = new ContextMenu(getX(),getY(),20,20,null);
+        menu.addOption(new BooleanOption("Shadow",()->this.shadow,value-> this.shadow = value));
+        menu.addOption(new BooleanOption("Rainbow",()->this.rainbow,value-> this.rainbow = value));
     }
     public static class Builder extends WidgetBuilder<Builder,TextWidget> {
         protected boolean shadow = false;

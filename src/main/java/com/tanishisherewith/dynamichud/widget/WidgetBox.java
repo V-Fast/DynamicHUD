@@ -55,6 +55,12 @@ public class WidgetBox {
         this.height = height;
         this.width = width;
     }
+    public void setSize(double width, double height) {
+        if (width >= 0)
+            this.width = (int) Math.ceil(width);
+        if (height >= 0)
+            this.height = (int) Math.ceil(height);
+    }
     public void setPosition(float x,float y, float x2, float y2){
         this.x1 = x;
         this.x2 = x2;

@@ -9,8 +9,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.MathHelper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Set;
@@ -120,7 +118,7 @@ public abstract class Widget {
         if (!shouldDisplay()) return;
 
         if (shouldScale) {
-            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().scale);
+            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(),GlobalConfig.get().scale);
         }
         renderWidget(drawContext,mouseX,mouseY);
 
@@ -134,7 +132,7 @@ public abstract class Widget {
      */
     public void renderInEditor(DrawContext drawContext, int mouseX, int mouseY) {
         if (shouldScale) {
-            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().scale);
+            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(),GlobalConfig.get().scale);
         }
         renderWidgetInEditor(drawContext,mouseX,mouseY);
 
@@ -205,8 +203,12 @@ public abstract class Widget {
                 newY = snapBoxY * snapBoxHeight;
             }
 
-            this.x = (int) MathHelper.clamp(newX, 0, mc.getWindow().getWidth() - getWidth());
-            this.y = (int) MathHelper.clamp(newY, 0, mc.getWindow().getHeight() - getHeight());
+            this.x = (int) MathHelper.clamp(newX, 0, mc.getWindow().getScaledWidth() - getWidth());
+            this.y = (int) MathHelper.clamp(newY, 0, mc.getWindow().getScaledHeight() - getHeight());
+
+
+            this.xPercent = (float) this.getX() / mc.getWindow().getScaledWidth();
+            this.yPercent =  (float) this.getY() / mc.getWindow().getScaledHeight();
 
             return true;
         }
@@ -229,6 +231,9 @@ public abstract class Widget {
 
     public boolean toggle() {
         return this.display = !this.display;
+    }
+    public void onClose(){
+        this.shiftDown = false;
     }
 
     /**
