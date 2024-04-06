@@ -5,13 +5,17 @@ import com.tanishisherewith.dynamichud.newTrial.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.BooleanOption;
 import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.DoubleOption;
+import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.EnumOption;
+import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.ListOption;
 import com.tanishisherewith.dynamichud.newTrial.widget.Widget;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetData;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
 import org.lwjgl.glfw.GLFW;
 
-import java.awt.*;
+import java.awt.Color;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public class TextWidget extends Widget {
@@ -48,6 +52,16 @@ public class TextWidget extends Widget {
         menu.addOption(new BooleanOption("Shadow",()->this.shadow,value-> this.shadow = value));
         menu.addOption(new BooleanOption("Rainbow",()->this.rainbow,value-> this.rainbow = value));
         menu.addOption(new DoubleOption("RainbowSpeed",1,4,1.0f, ()->(double)this.rainbowSpeed, value-> this.rainbowSpeed = value.intValue()));
+        AtomicReference<test> testss = new AtomicReference<>(test.TEST);
+        List<String> options = Arrays.asList("TEST","TEST2","TEST23");
+        AtomicReference<String> option = new AtomicReference<>("TEST");
+        menu.addOption(new EnumOption<test>("Test", testss::get, testss::set,test.values()));
+        menu.addOption(new ListOption<String>("New", option::get, option::set,options ));
+    }
+    public enum test{
+        TEST,
+        TEST_2,
+        TEST_3
     }
 
     /**
@@ -109,8 +123,9 @@ public class TextWidget extends Widget {
     public void writeToTag(NbtCompound tag) {
         super.writeToTag(tag);
         tag.putString("DynamicRegistryKey",dynamicRegistryKey);
-        tag.putBoolean("shadow",shadow);
-        tag.putBoolean("rainbow",rainbow);
+        tag.putBoolean("Shadow",shadow);
+        tag.putBoolean("Rainbow",rainbow);
+        tag.putInt("RainbowSpeed",rainbowSpeed);
 
         // If true then it means that we should use local registry and if false (i.e. null) then use global registry
         tag.putBoolean("DynamicValueRegistry", dynamicValueRegistry != null);
@@ -119,8 +134,10 @@ public class TextWidget extends Widget {
     @Override
     public void readFromTag(NbtCompound tag) {
         super.readFromTag(tag);
-        shadow = tag.getBoolean("shadow");
-        rainbow = tag.getBoolean("rainbow");
+        shadow = tag.getBoolean("Shadow");
+        rainbow = tag.getBoolean("Rainbow");
+        rainbowSpeed = tag.getInt("RainbowSpeed");
+
         dynamicRegistryKey = tag.getString("DynamicRegistryKey");
 
         // If true then it means that we should use local registry and if false (i.e. null) then use global registry
