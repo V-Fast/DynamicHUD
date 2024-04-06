@@ -4,6 +4,7 @@ import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.newTrial.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.BooleanOption;
+import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.DoubleOption;
 import com.tanishisherewith.dynamichud.newTrial.widget.Widget;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetData;
 import net.minecraft.client.gui.DrawContext;
@@ -20,6 +21,7 @@ public class TextWidget extends Widget {
     DynamicValueRegistry dynamicValueRegistry = null;
     protected boolean shadow; // Whether to draw a shadow behind the text
     protected boolean rainbow; // Whether to apply a rainbow effect to the text
+    protected int rainbowSpeed = 2; //Speed of the rainbow effect
     private ContextMenu menu;
 
     public TextWidget() {
@@ -39,9 +41,13 @@ public class TextWidget extends Widget {
         textSupplier = (Supplier<String>) DynamicValueRegistry.getGlobal(dynamicRegistryKey);
         this.shadow = shadow;
         this.rainbow = rainbow;
-        menu = new ContextMenu(getX(),getY(),20,20,null);
+        createMenu();
+    }
+    public void createMenu(){
+        menu = new ContextMenu(getX(),getY());
         menu.addOption(new BooleanOption("Shadow",()->this.shadow,value-> this.shadow = value));
         menu.addOption(new BooleanOption("Rainbow",()->this.rainbow,value-> this.rainbow = value));
+        menu.addOption(new DoubleOption("RainbowSpeed",1,4,1.0f, ()->(double)this.rainbowSpeed, value-> this.rainbowSpeed = value.intValue()));
     }
 
     /**
@@ -58,19 +64,17 @@ public class TextWidget extends Widget {
         textSupplier = (Supplier<String>) dynamicValueRegistry.get(dynamicRegistryKey);
         this.shadow = shadow;
         this.rainbow = rainbow;
-        menu = new ContextMenu(getX(),getY(),20,20,null);
-        menu.addOption(new BooleanOption("Shadow",()->this.shadow,value-> this.shadow = value));
-        menu.addOption(new BooleanOption("Rainbow",()->this.rainbow,value-> this.rainbow = value));
+        createMenu();
     }
 
     @Override
     public void renderWidget(DrawContext drawContext,int mouseX, int mouseY) {
-        menu.render(drawContext, getX() - 2,getY(), (int) Math.ceil(getHeight()));
-        int color = rainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % 10000) / 10000f) : Color.WHITE.getRGB();
-        if(textSupplier != null) {
+        menu.render(drawContext, getX() - 2, getY(), (int) Math.ceil(getHeight()));
+        int color = rainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % (5000 * rainbowSpeed) / (float) (5000f * rainbowSpeed))) : Color.WHITE.getRGB();
+        if (textSupplier != null) {
             String text = textSupplier.get();
-            drawContext.drawText(mc.textRenderer, text, (int) getX(), (int)getY(), color, shadow);
-            widgetBox.setSizeAndPosition(getX() - 2,getY() - 2,mc.textRenderer.getWidth(text) + 2,mc.textRenderer.fontHeight + 2);
+            drawContext.drawText(mc.textRenderer, text, (int) getX(), (int) getY(), color, shadow);
+            widgetBox.setSizeAndPosition(getX() - 2, getY() - 2, mc.textRenderer.getWidth(text) + 2, mc.textRenderer.fontHeight + 2);
         }
     }
 
@@ -135,10 +139,8 @@ public class TextWidget extends Widget {
             System.out.println(DynamicValueRegistry.getInstances(modId));
             return;
         }
-        menu = new ContextMenu(getX(),getY(),20,20,null);
-        menu.addOption(new BooleanOption("Shadow",()->this.shadow,value-> this.shadow = value));
-        menu.addOption(new BooleanOption("Rainbow",()->this.rainbow,value-> this.rainbow = value));
-    }
+        createMenu();
+     }
     public static class Builder extends WidgetBuilder<Builder,TextWidget> {
         protected boolean shadow = false;
         protected boolean rainbow = false;

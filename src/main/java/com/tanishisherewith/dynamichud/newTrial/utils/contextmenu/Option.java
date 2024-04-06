@@ -30,6 +30,7 @@ public abstract class Option<T> {
         return getter.get();
     }
     protected void set(T value){
+        this.value = value;
         setter.accept(value);
     }
 

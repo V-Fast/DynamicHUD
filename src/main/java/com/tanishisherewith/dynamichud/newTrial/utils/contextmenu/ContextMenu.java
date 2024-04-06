@@ -21,11 +21,9 @@ public class ContextMenu {
     public int heightOffset = 4; // Height offset from the widget
     public boolean shouldDisplay = false;
 
-    public ContextMenu(int x,int y, int width, int height, Widget selectedWidget){
+    public ContextMenu(int x,int y){
         this.x = x;
         this.y = y + heightOffset;
-        this.width = width;
-        this.height = height;
         this.selectedWidget = selectedWidget;
     }
 

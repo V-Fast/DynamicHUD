@@ -17,7 +17,12 @@ public abstract class Widget {
 
     protected MinecraftClient mc = MinecraftClient.getInstance();
 
-    //This is the UID of the widget used to identify during loading and saving
+    /**
+     * This is the UID of the widget used to identify during loading and saving.
+     * <p>
+     * It's different from modID because this is unique to each widget.
+     * @see #modId
+     */
     public UID uid = UID.generate();
     public boolean isInEditor = false;
     // Whether the widget is enabled and should be displayed.
@@ -41,6 +46,14 @@ public abstract class Widget {
     // The y position of the widget as a percentage of the screen height, i.e. the relative y position of the widget for resizing and scaling
     protected float yPercent;
     public boolean shouldScale = true;
+
+    /**
+     *  An identifier for widgets to group them under one ID.
+     * <p>
+     *  Doesn't necessarily have to be the mod ID of mod, but it's preferred to use mod ID if you are only grouping widgets under one ID.
+     *  Can be any string if wanted.
+     * @see #uid
+     */
     public String modId = "unknown";
 
     //Dimensions of the widget

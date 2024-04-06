@@ -208,8 +208,8 @@ public class WidgetManager {
                     NbtCompound widgetTag = widgetList.getCompound(i);
                     WidgetData<?> widgetData = widgetDataMap.get(widgetTag.getString("name"));
                     Widget widget = widgetData.createWidget();
-                    widget.readFromTag(widgetTag);
                     printInfo("Loading Widget: " + widget);
+                    widget.readFromTag(widgetTag);
                     widgets.add(widget);
                 }
         }else{

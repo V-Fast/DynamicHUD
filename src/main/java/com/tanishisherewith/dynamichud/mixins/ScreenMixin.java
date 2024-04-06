@@ -30,8 +30,8 @@ public abstract class ScreenMixin {
     private void onScreenResize(MinecraftClient client,int width, int height, CallbackInfo ci) {
         WidgetManager.onScreenResized(width,height,this.width,this.height);
     }
-    @Inject(at = @At("TAIL"), method = "close")
-    private void render(CallbackInfo ci) {
+    @Inject(at = @At("HEAD"), method = "close")
+    private void onClose(CallbackInfo ci) {
         for(WidgetRenderer widgetRenderer: DynamicHUD.getWidgetRenderers()){
             widgetRenderer.onCloseScreen();
         }

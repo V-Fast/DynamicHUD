@@ -18,11 +18,15 @@ import java.util.List;
 public class DynamicHudTest implements DynamicHudIntegration {
     TextWidget textWidget;
     TextWidget Example2Widget;
-    DynamicValueRegistry registry = new DynamicValueRegistry(DynamicHUD.MOD_ID);
+    DynamicValueRegistry registry;
     WidgetRenderer renderer;
     @Override
     public void init() {
+        //Global registry
         DynamicValueRegistry.registerGlobal("FPS",() -> "FPS: "+ DynamicHUD.MC.getCurrentFps());
+
+        //Local registry
+        registry = new DynamicValueRegistry(DynamicHUD.MOD_ID);
         registry.registerLocal("FPS",()-> "FPS C-DVR: "+ DynamicHUD.MC.getCurrentFps());
 
         textWidget  = new TextWidget.Builder()

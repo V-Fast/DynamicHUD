@@ -3,6 +3,7 @@ package com.tanishisherewith.dynamichud.newTrial.widget;
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.newTrial.screens.AbstractMoveableScreen;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import org.lwjgl.glfw.GLFW;
 
@@ -15,8 +16,17 @@ public class WidgetRenderer {
     public boolean isInEditor = false;
     List<Widget> widgets;
     public Widget selectedWidget = null;
+
+    /**
+     * Add the list of widgets the widgetRenderer should render
+     * <p>
+     * By default, it adds the {@link GameMenuScreen} to allow rendering of the widgets in the pause/main menu screen.
+     *
+     * @param widgets List of widgets to render
+     */
     public WidgetRenderer(List<Widget> widgets){
         this.widgets = widgets;
+        addScreen(GameMenuScreen.class);
     }
     public void addWidget(Widget widget){
         widgets.add(widget);
@@ -63,6 +73,8 @@ public class WidgetRenderer {
         }
         if(currentScreen instanceof AbstractMoveableScreen){
             for (Widget widget : widgets) {
+                // This essentially acts as a Z - layer where the widget first in the list is moved and dragged
+                // if they are overlapped on each other.
                 if(widget.mouseClicked(mouseX,mouseY,button)){
                     selectedWidget = widget;
                     return;
@@ -77,6 +89,8 @@ public class WidgetRenderer {
         }
         if(currentScreen instanceof AbstractMoveableScreen){
             for (Widget widget : widgets) {
+                // This essentially acts as a Z - layer where the widget first in the list is moved and dragged
+                // if they are overlapped on each other.
                 if(widget.mouseDragged(mouseX,mouseY,button,snapSize)){
                     selectedWidget = widget;
                     return;

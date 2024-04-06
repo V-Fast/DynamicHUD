@@ -75,9 +75,9 @@ public abstract class AbstractMoveableScreen extends Screen {
 
     @Override
     public void close() {
-        super.close();
         widgetRenderer.isInEditor = false;
         widgetRenderer.onCloseScreen();
+        super.close();
     }
 
     public void setShouldPause(boolean shouldPause) {
