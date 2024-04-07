@@ -30,10 +30,10 @@ public class RunnableOption extends Option<Boolean> {
         super.render(drawContext, x, y);
 
         value = get();
+        this.height = mc.textRenderer.fontHeight;
+        this.width = mc.textRenderer.getWidth("Run: " + name) + 1;
         int color = value ? Color.BLUE.getRGB() : Color.GRAY.getRGB();
         drawContext.drawText(mc.textRenderer,Text.of(name),x,y, color,false);
-        this.height = mc.textRenderer.fontHeight;
-        this.width = mc.textRenderer.getWidth(name) + 1;
     }
 
     @Override
