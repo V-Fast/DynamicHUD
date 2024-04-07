@@ -29,7 +29,7 @@ public class TextWidget extends Widget {
     private ContextMenu menu;
 
     public TextWidget() {
-       this(null,false,false,"unknown");
+       this(null,null,false,false,"unknown");
     }
 
     /**
@@ -75,7 +75,9 @@ public class TextWidget extends Widget {
         super(DATA,modID);
         this.dynamicRegistryKey = dynamicRegistryKey;
         this.dynamicValueRegistry = dynamicValueRegistry;
-        textSupplier = (Supplier<String>) dynamicValueRegistry.get(dynamicRegistryKey);
+        if(dynamicValueRegistry != null) {
+            textSupplier = (Supplier<String>) dynamicValueRegistry.get(dynamicRegistryKey);
+        }
         this.shadow = shadow;
         this.rainbow = rainbow;
         createMenu();
@@ -88,7 +90,7 @@ public class TextWidget extends Widget {
         if (textSupplier != null) {
             String text = textSupplier.get();
             drawContext.drawText(mc.textRenderer, text, (int) getX(), (int) getY(), color, shadow);
-            widgetBox.setSizeAndPosition(getX() - 2, getY() - 2, mc.textRenderer.getWidth(text) + 2, mc.textRenderer.fontHeight + 2);
+            widgetBox.setSizeAndPosition(getX() - 2, getY() - 2, mc.textRenderer.getWidth(text) + 3, mc.textRenderer.fontHeight + 2);
         }
     }
 
@@ -143,7 +145,7 @@ public class TextWidget extends Widget {
         // If true then it means that we should use local registry and if false (i.e. null) then use global registry
         boolean dvrObj = tag.getBoolean("DynamicValueRegistry");
 
-        if(!dvrObj && dynamicRegistryKey != null){
+        if(!dvrObj){
             textSupplier = (Supplier<String>) DynamicValueRegistry.getGlobal(dynamicRegistryKey);
             return;
         }
@@ -152,8 +154,6 @@ public class TextWidget extends Widget {
             //Unfortunately, this method takes the value from the first local registry with the key.
             //It returns to prevent overriding with other registries
             textSupplier = (Supplier<String>) dvr.get(dynamicRegistryKey);
-            System.out.println(dvr);
-            System.out.println(DynamicValueRegistry.getInstances(modId));
             return;
         }
         createMenu();

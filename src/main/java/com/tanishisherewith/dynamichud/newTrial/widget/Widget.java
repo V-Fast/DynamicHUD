@@ -258,7 +258,7 @@ public abstract class Widget {
     protected void displayBg(DrawContext context) {
         int backgroundColor = this.shouldDisplay() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
         WidgetBox box = this.getWidgetBox();
-        DrawHelper.fill(context, (int) (box.x1 - 2), (int) (box.y1 - 2), (int) (box.x2 + 2), (int) (box.y2 + 2), backgroundColor);
+        DrawHelper.fill(context, (int) box.x1, (int) box.y1, (int) box.x2, (int) box.y2, backgroundColor);
     }
 
 

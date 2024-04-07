@@ -7,6 +7,7 @@ import net.minecraft.client.gui.DrawContext;
 import org.apache.commons.lang3.Validate;
 
 import javax.xml.validation.Validator;
+import java.awt.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -43,20 +44,22 @@ public class DoubleOption extends Option<Double> {
         drawContext.drawTextWithShadow(textRenderer, labelText, x, y + 1, 0xFFFFFFFF);
         DrawHelper.stopScaling(drawContext.getMatrices());
 
-        // Draw the slider
-        drawSlider(drawContext, x, y + textRenderer.fontHeight + 1, width);
-
-        // Draw the handle
         float handleWidth = 3;
         float handleHeight = 8;
         double handleX = x + (value - minValue) / (maxValue - minValue) * (width - handleWidth);
         double handleY = y + textRenderer.fontHeight + 1 + ((2 - handleHeight) / 2);
 
+        // Draw the slider
+        drawSlider(drawContext, x, y + textRenderer.fontHeight + 1, width, handleX);
+
+        // Draw the handle
+
         DrawHelper.fillRoundedRect(drawContext, (int) handleX, (int) handleY, (int) (handleX + handleWidth), (int) (handleY + handleHeight), 0xFFFFFFFF);
     }
 
-    private void drawSlider(DrawContext drawContext, int sliderX, int sliderY, int sliderWidth) {
+    private void drawSlider(DrawContext drawContext, int sliderX, int sliderY, int sliderWidth, double handleX) {
         DrawHelper.fill(drawContext, sliderX, sliderY, sliderX + sliderWidth, sliderY + 2, 0xFFFFFFFF);
+        DrawHelper.fill(drawContext, sliderX, sliderY, (int) Math.round(handleX), sliderY + 2, Color.ORANGE.getRGB());
     }
 
     @Override

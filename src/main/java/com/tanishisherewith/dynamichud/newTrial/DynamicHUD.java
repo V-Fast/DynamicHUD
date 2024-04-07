@@ -114,6 +114,7 @@ public class DynamicHUD implements ClientModInitializer {
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, s) -> GlobalConfig.HANDLER.save());
         ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> GlobalConfig.HANDLER.save());
         Runtime.getRuntime().addShutdownHook(new Thread(() -> GlobalConfig.HANDLER.save()));
+        GlobalConfig.HANDLER.save();
 
         HudRenderCallback.EVENT.register(new HudRender());
     }

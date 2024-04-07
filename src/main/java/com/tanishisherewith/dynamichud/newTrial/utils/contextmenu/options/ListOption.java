@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options;
 
+import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.Option;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
@@ -36,8 +37,9 @@ public class ListOption<T> extends Option<T> {
         this.height = mc.textRenderer.fontHeight;
         this.width = mc.textRenderer.getWidth(name + ": " + value.toString()) + 1;
 
-        int color = Color.WHITE.getRGB();
-        drawContext.drawText(mc.textRenderer, Text.of(name + ": " + value.toString()), x, y, color, false);
+        drawContext.drawText(mc.textRenderer, Text.of(name + ": "), x, y, Color.WHITE.getRGB(), false);
+        drawContext.drawText(mc.textRenderer, Text.of(value.toString()), x + mc.textRenderer.getWidth(name + ": ") + 1, y, Color.CYAN.getRGB(), false);
+
     }
 
     @Override

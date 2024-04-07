@@ -28,11 +28,7 @@ public class DrawHelper extends DrawContext {
      * @param color       The color to fill the rectangle with
      */
     public static void drawBox(DrawContext drawContext, int x, int y, int width, int height, int color) {
-        int x1 = x - width / 2 - 2;
-        int y1 = y - height / 2 - 2;
-        int x2 = x + width / 2 + 2;
-        int y2 = y + height / 2 + 2;
-        drawContext.fill(x1, y1, x2, y2, color);
+        drawContext.fill(x, y, x + width, y + height, color);
     }
 
     /**

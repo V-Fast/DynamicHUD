@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options;
 
+import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.Option;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
@@ -34,8 +35,8 @@ public class EnumOption<E extends Enum<E>> extends Option<E> {
         this.height = mc.textRenderer.fontHeight + 1;
         this.width = mc.textRenderer.getWidth(name + ": " + value.name()) + 1;
 
-        int color = Color.WHITE.getRGB();
-        drawContext.drawText(mc.textRenderer, Text.of(name + ": " + value.name()), x, y, color, false);
+        drawContext.drawText(mc.textRenderer, Text.of(name + ": "), x, y, Color.WHITE.getRGB(), false);
+        drawContext.drawText(mc.textRenderer, Text.of(value.name()), x + mc.textRenderer.getWidth(name + ": ") + 1, y, Color.CYAN.getRGB(), false);
     }
 
     @Override
