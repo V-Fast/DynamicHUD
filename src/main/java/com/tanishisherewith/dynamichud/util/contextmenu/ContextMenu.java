@@ -272,9 +272,9 @@ public class ContextMenu {
         for (ContextMenuOption option : options) {
             if (option instanceof EnumCycleContextMenuOption enumOption) {
                 enumOption.updateLabel();
-                labelTextcolor = ColorHelper.ColorToInt(Color.WHITE);
+                labelTextcolor = Color.WHITE.getRGB();
             } else if (option instanceof DataInputOption) {
-                labelTextcolor = ColorHelper.ColorToInt(Color.YELLOW);
+                labelTextcolor = Color.YELLOW.getRGB();
 
                 // Draw a black box around the value text
                 String[] splitLabel = option.label.split(":");

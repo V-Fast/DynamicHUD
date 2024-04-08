@@ -94,6 +94,32 @@ public class ColorHelper {
         rainbow[2] = 0.5F + 0.5F * MathHelper.sin((x + 8F / 3F) * pi);
         return rainbow;
     }
+
+    /**
+     * Rainbow color with custom speed.
+     *
+     * @param speed
+     * @return Current rainbow color.
+     */
+    public static Color getRainbowColor(int speed) {
+        float hue = (System.currentTimeMillis() % (speed * 100)) / (speed * 100.0f);
+        return Color.getHSBColor(hue, 1.0f, 1.0f);
+    }
+
+
+    /**
+     * Changes alpha on color.
+     *
+     * @param color Target color.
+     * @param alpha Target alpha.
+     * @return Color with changed alpha.
+     */
+    public static Color changeAlpha(Color color, int alpha) {
+        if (color != null)
+            return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
+        else
+            return new Color(0);
+    }
     public static int fromRGBA(int r, int g, int b, int a) {
         return (r << 16) + (g << 8) + (b) + (a << 24);
     }

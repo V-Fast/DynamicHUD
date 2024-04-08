@@ -94,5 +94,8 @@ public abstract class AbstractMoveableScreen extends Screen {
     public boolean shouldPause() {
         return ShouldPause;
     }
+    public void setSnapSize(int size){
+        this.snapSize = size;
+    }
 }
 

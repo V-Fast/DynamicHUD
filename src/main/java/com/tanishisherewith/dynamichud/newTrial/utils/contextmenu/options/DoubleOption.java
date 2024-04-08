@@ -1,12 +1,11 @@
 package com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options;
 
-import com.tanishisherewith.dynamichud.helpers.DrawHelper;
+import com.tanishisherewith.dynamichud.newTrial.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.Option;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import org.apache.commons.lang3.Validate;
 
-import javax.xml.validation.Validator;
 import java.awt.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -30,7 +29,6 @@ public class DoubleOption extends Option<Double> {
     @Override
     public void render(DrawContext drawContext, int x, int y) {
         super.render(drawContext, x, y);
-
         value = get();
 
         this.width = 30;
@@ -54,12 +52,23 @@ public class DoubleOption extends Option<Double> {
 
         // Draw the handle
 
-        DrawHelper.fillRoundedRect(drawContext, (int) handleX, (int) handleY, (int) (handleX + handleWidth), (int) (handleY + handleHeight), 0xFFFFFFFF);
+        DrawHelper.drawRoundedRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(),
+                (float)handleX,
+                (float)handleY,
+                 handleWidth,
+                 handleHeight,
+                1,
+                0xFFFFFFFF,
+                90,
+                0.6f,
+                0.6f);
     }
 
     private void drawSlider(DrawContext drawContext, int sliderX, int sliderY, int sliderWidth, double handleX) {
-        DrawHelper.fill(drawContext, sliderX, sliderY, sliderX + sliderWidth, sliderY + 2, 0xFFFFFFFF);
-        DrawHelper.fill(drawContext, sliderX, sliderY, (int) Math.round(handleX), sliderY + 2, Color.ORANGE.getRGB());
+        DrawHelper.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), sliderX, sliderY, sliderWidth,  2, 0xFFFFFFFF);
+        if(handleX-sliderX > 0) {
+            DrawHelper.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), (float) sliderX, (float) sliderY, (float) ((value - minValue) / (maxValue - minValue) * (width - 3)), 2, Color.ORANGE.getRGB());
+        }
     }
 
     @Override

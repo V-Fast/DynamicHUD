@@ -106,7 +106,7 @@ public class MoveableScreen extends AbstractMoveableScreen {
                 textWidget.toggleTextColorOption();
 
                 if (textWidget.isTextcolorOptionEnabled())
-                    colorPicker = new ColorGradientPicker(mc, widgetX + 110, widgetY + textWidget.getHeight() + 5, textWidget.getTextcolor(), textWidget::setTextColor, 50, 100, selectedWidget);
+                    colorPicker = new ColorGradientPicker(mc, widgetX +110, widgetY + textWidget.getHeight() + 5, textWidget.getTextcolor(), textWidget::setTextColor, 50, 100, selectedWidget);
                 else
                     colorPicker = null;
             });
