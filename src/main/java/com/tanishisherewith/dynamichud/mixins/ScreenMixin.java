@@ -1,8 +1,6 @@
 package com.tanishisherewith.dynamichud.mixins;
 
-import com.tanishisherewith.dynamichud.DynamicHudIntegration;
 import com.tanishisherewith.dynamichud.newTrial.DynamicHUD;
-import com.tanishisherewith.dynamichud.newTrial.DynamicHudTest;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetManager;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetRenderer;
 import net.minecraft.client.MinecraftClient;

@@ -2,69 +2,74 @@ package com.tanishisherewith.dynamichud.newTrial;
 
 import com.tanishisherewith.dynamichud.newTrial.screens.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.newTrial.utils.DynamicValueRegistry;
+import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.Option;
 import com.tanishisherewith.dynamichud.newTrial.widget.Widget;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetManager;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetRenderer;
 import com.tanishisherewith.dynamichud.newTrial.widgets.TextWidget;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
+import net.minecraft.client.gui.screen.option.OptionsScreen;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL;
 
+import java.io.File;
 import java.util.List;
 
-public class DynamicHudTest implements DynamicHudIntegration {
+public class DynamicHudTestTWO implements DynamicHudIntegration {
     TextWidget textWidget;
-    TextWidget Example2Widget;
-    DynamicValueRegistry registry;
     WidgetRenderer renderer;
     @Override
     public void init() {
         //Global registry
-        DynamicValueRegistry.registerGlobal("FPS",() -> "FPS: "+ DynamicHUD.MC.getCurrentFps());
+        DynamicValueRegistry.registerGlobal("CPS",() -> "NOT FPS");
 
-        //Local registry
-        registry = new DynamicValueRegistry(DynamicHUD.MOD_ID);
-        registry.registerLocal("FPS",()-> "FPS C-DVR: "+ DynamicHUD.MC.getCurrentFps());
 
         textWidget  = new TextWidget.Builder()
-                .setX(300)
+                .setX(150)
                 .setY(100)
                 .setDraggable(true)
-                .rainbow(false)
-                .setDRKey("FPS")
-                .setModID(DynamicHUD.MOD_ID)
-                .shouldScale(false)
-                .build();
-
-        Example2Widget  = new TextWidget.Builder()
-                .setX(200)
-                .setY(100)
-                .setDraggable(true)
-                .rainbow(false)
-                .setDRKey("FPS")
-                .setDVR(registry)
-                .setModID(DynamicHUD.MOD_ID)
+                .rainbow(true)
+                .setDRKey("CPS")
+                .setModID("CustomMod")
                 .shouldScale(true)
                 .build();
     }
 
     @Override
+    public KeyBinding getKeyBind() {
+        return KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "DynamicHUD editor screenn",
+                INPUT_TYPE,
+                GLFW.GLFW_KEY_RIGHT_CONTROL,
+                "CATEGORY 2"
+        ));
+    }
+
+    @Override
+    public File getWidgetsFile() {
+        return new File(FILE_DIRECTORY,"widgets_new.nbt");
+    }
+
+    @Override
     public void addWidgets() {
         WidgetManager.addWidget(textWidget);
-        WidgetManager.addWidget(Example2Widget);
     }
     public void initAfter(){
-        List<Widget> widgets = WidgetManager.getWidgetsForMod(DynamicHUD.MOD_ID);
+        List<Widget> widgets = WidgetManager.getWidgetsForMod("CustomMod");
 
         renderer = new WidgetRenderer(widgets);
         renderer.shouldRenderInGameHud(true);
+        renderer.addScreen(OptionsScreen.class);
         renderer.addScreen(TitleScreen.class);
-        renderer.addScreen(MultiplayerScreen.class);
     }
 
     @Override
     public AbstractMoveableScreen getMovableScreen() {
-        return new AbstractMoveableScreen(Text.literal("Editor"), renderer) {};
+        return new AbstractMoveableScreen(Text.literal("Editor 2"), renderer) {};
     }
 
     @Override

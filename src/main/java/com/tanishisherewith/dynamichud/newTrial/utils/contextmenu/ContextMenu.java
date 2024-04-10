@@ -1,8 +1,6 @@
 package com.tanishisherewith.dynamichud.newTrial.utils.contextmenu;
 
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
-import com.tanishisherewith.dynamichud.widget.Widget;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
@@ -13,7 +11,6 @@ public class ContextMenu {
     public int x,y;
     protected float scale = 0.0f;
     private final List<Option<?>> options = new ArrayList<>(); // The list of options in the context menu
-    private Widget selectedWidget; // The widget that this context menu is associated with
     public int width = 0;
     public int height = 0;
     public int backgroundColor = new Color(107, 112, 126, 124).getRGB();// Semi-transparent light grey color
@@ -24,7 +21,6 @@ public class ContextMenu {
     public ContextMenu(int x,int y){
         this.x = x;
         this.y = y + heightOffset;
-        this.selectedWidget = selectedWidget;
     }
 
     public void addOption(Option<?> option){

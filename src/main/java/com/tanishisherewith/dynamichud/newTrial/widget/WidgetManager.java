@@ -147,7 +147,7 @@ public class WidgetManager {
      *
      * @param file The file to save to
      */
-    public static void saveWidgets(File file) throws IOException {
+    public static void saveWidgets(File file,List<Widget> widgets) throws IOException {
         NbtCompound rootTag = new NbtCompound();
         NbtList widgetList = new NbtList();
 

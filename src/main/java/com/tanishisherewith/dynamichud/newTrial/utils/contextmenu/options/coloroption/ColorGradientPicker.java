@@ -14,20 +14,20 @@ import java.util.function.Consumer;
 
 public class ColorGradientPicker {
     MinecraftClient client = MinecraftClient.getInstance();
-    private final Consumer<Integer> onColorSelected; // The callback to call when a color is selected
+    private final Consumer<Color> onColorSelected; // The callback to call when a color is selected
     private final GradientSlider gradientSlider;
     private final GradientBox gradientBox;
     private final ColorPickerButton colorPickerButton;
+    private final AlphaSlider alphaSlider;
     private int x,y;
     private final int boxSize;
     private boolean display = false;
 
-    public ColorGradientPicker(int x, int y, Color initialColor, Consumer<Integer> onColorSelected, int boxSize, int colors) {
+    public ColorGradientPicker(int x, int y, Color initialColor, Consumer<Color> onColorSelected, int boxSize, int colors) {
         this.x = x;
         this.y = y;
         this.onColorSelected = onColorSelected;
-        float[] hsv = new float[3];
-        Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
+        float[] hsv = Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), null);
         this.boxSize = boxSize;
         this.gradientSlider = new GradientSlider(x, y, colors, 10);
         this.gradientSlider.setHue(hsv[0]);
@@ -36,6 +36,8 @@ public class ColorGradientPicker {
         this.gradientBox.setHue(hsv[0]);
         this.gradientBox.setSaturation(hsv[1]);
         this.gradientBox.setValue(hsv[2]);
+
+        this.alphaSlider = new AlphaSlider(x,y,10,boxSize,initialColor);
         this.colorPickerButton = new ColorPickerButton(x + boxSize + 8, y + 20, 35, 20);
     }
     public void setPos(int x, int y){
@@ -66,7 +68,8 @@ public class ColorGradientPicker {
         tick();
         gradientSlider.render(drawContext,x + 30, y +client.textRenderer.fontHeight + 4);
         gradientBox.render(drawContext,x + 30, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
-        colorPickerButton.render(drawContext,x+ 40 + boxSize,y + client.textRenderer.fontHeight  + gradientSlider.getHeight() + 7);
+        colorPickerButton.render(drawContext,x+ 55 + boxSize,y + client.textRenderer.fontHeight  + gradientSlider.getHeight() + 8);
+        alphaSlider.render(drawContext,x + 40 + boxSize,y + client.textRenderer.fontHeight +gradientSlider.getHeight() + 10);
 
         if (colorPickerButton.isPicking()) {
             // Draw the cursor
@@ -118,13 +121,16 @@ public class ColorGradientPicker {
 
             colorPickerButton.setPicking(false);
         }
-        onColorSelected.accept(gradientBox.getColor());
+        alphaSlider.setColor(new Color(gradientBox.getColor()));
+        alphaSlider.onClick(mouseX, mouseY, button);
+        onColorSelected.accept(alphaSlider.getColor());
         return true;
     }
 
     public void mouseReleased(double mouseX, double mouseY, int button) {
         gradientSlider.onRelease(mouseX, mouseY, button);
         gradientBox.onRelease(mouseX, mouseY, button);
+        alphaSlider.onRelease(mouseX, mouseY, button);
     }
 
     public void mouseDragged(double mouseX, double mouseY, int button) {
@@ -134,7 +140,9 @@ public class ColorGradientPicker {
         gradientSlider.onDrag(mouseX, mouseY, button);
         gradientBox.setHue(gradientSlider.getHue());
         gradientBox.onDrag(mouseX, mouseY, button);
-        onColorSelected.accept(gradientBox.getColor());
+        alphaSlider.setColor(new Color(gradientBox.getColor()));
+        alphaSlider.onDrag(mouseX, mouseY, button);
+        onColorSelected.accept(alphaSlider.getColor());
     }
 
 }

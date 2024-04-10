@@ -1,4 +1,4 @@
-package com.tanishisherewith.dynamichud;
+package com.tanishisherewith.dynamichud.newTrial;
 
 import com.tanishisherewith.dynamichud.newTrial.screens.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetManager;
@@ -93,6 +93,14 @@ public interface DynamicHudIntegration {
      */
     default File getWidgetsFile() {
         return WIDGETS_FILE;
+    }
+    /**
+     * Returns the keybind to open the {@link AbstractMoveableScreen} instance.
+     *
+     * @return The keybind.
+     */
+    default KeyBinding getKeyBind() {
+        return EDITOR_SCREEN_KEY_BINDING;
     }
 
     /**

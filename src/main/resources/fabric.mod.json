@@ -22,7 +22,8 @@
       "com.tanishisherewith.dynamichud.newTrial.DynamicHUD"
     ],
     "dynamicHud": [
-      "com.tanishisherewith.dynamichud.newTrial.DynamicHudTest"
+      "com.tanishisherewith.dynamichud.newTrial.DynamicHudTest",
+      "com.tanishisherewith.dynamichud.newTrial.DynamicHudTestTWO"
     ],
     "modmenu": [
       "com.tanishisherewith.dynamichud.ModMenuIntegration"

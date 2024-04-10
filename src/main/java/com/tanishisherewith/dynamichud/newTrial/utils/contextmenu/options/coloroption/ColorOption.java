@@ -19,13 +19,13 @@ public class ColorOption extends Option<Color> {
         super(getter, setter);
         this.name = name;
         this.parentMenu = parentMenu;
-        colorPicker = new ColorGradientPicker(x + parentMenu.width + 2,y,value,color-> set(new Color(color)),50,100 );
+        colorPicker = new ColorGradientPicker(x + this.parentMenu.width + 10,y - 10,value, this::set,50,100 );
     }
 
     @Override
     public void render(DrawContext drawContext, int x, int y) {
         super.render(drawContext, x, y);
-        value = get();
+        System.out.println(value.getAlpha());
 
         int color = isVisible ? Color.GREEN.getRGB() : Color.RED.getRGB();
         this.height = mc.textRenderer.fontHeight;
@@ -42,7 +42,7 @@ public class ColorOption extends Option<Color> {
                 1,
                 1 );
 
-        colorPicker.render(drawContext,x + parentMenu.width + 2,y);
+        colorPicker.render(drawContext,this.x + parentMenu.width + 10,y - 10);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class ColorOption extends Option<Color> {
             isVisible = !isVisible;
             if(isVisible)
             {
-                colorPicker.setPos(x + parentMenu.width + 2,y);
+                colorPicker.setPos(x + parentMenu.width + 10,y - 10);
                 colorPicker.display();
             }else{
                 colorPicker.close();

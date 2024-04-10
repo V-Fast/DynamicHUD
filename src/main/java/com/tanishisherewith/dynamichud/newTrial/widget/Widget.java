@@ -34,7 +34,8 @@ public abstract class Widget {
 
     //To enable/disable snapping
     public boolean shiftDown = false;
-
+    public int snapBoxWidth,snapBoxHeight;
+    public static int snapSize = 1;
     // Used for dragging and snapping
     int startX, startY;
 
@@ -144,6 +145,7 @@ public abstract class Widget {
         if (shouldScale) {
             DrawHelper.stopScaling(drawContext.getMatrices());
         }
+
     }
 
     /**
@@ -153,6 +155,10 @@ public abstract class Widget {
         if (shouldScale) {
             DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(),GlobalConfig.get().scale);
         }
+        // Calculate the size of each snap box
+        snapBoxWidth = mc.getWindow().getScaledWidth() / snapSize;
+        snapBoxHeight = mc.getWindow().getScaledHeight() / snapSize;
+
         renderWidgetInEditor(drawContext,mouseX,mouseY);
 
         if (shouldScale) {
@@ -202,6 +208,7 @@ public abstract class Widget {
     }
 
     public boolean mouseDragged(double mouseX, double mouseY, int button, int snapSize) {
+        Widget.snapSize = snapSize;
         if (dragging && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             int newX = (int) (mouseX - startX);
             int newY = (int) (mouseY - startY);
@@ -209,10 +216,6 @@ public abstract class Widget {
             // Divides the screen into several "grid boxes" which the elements snap to.
             // Higher the snapSize, more the grid boxes
             if (this.shiftDown) {
-                // Calculate the size of each snap box
-                int snapBoxWidth = mc.getWindow().getScaledWidth() / snapSize;
-                int snapBoxHeight = mc.getWindow().getScaledHeight() / snapSize;
-
                 // Calculate the index of the snap box that the new position would be in
                 int snapBoxX = newX / snapBoxWidth;
                 int snapBoxY = newY / snapBoxHeight;

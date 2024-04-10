@@ -68,7 +68,6 @@ public class TextWidget extends Widget {
         createMenu();
     }
     public void createMenu(){
-        System.out.println("TextColor: " + this.textColor);
         menu = new ContextMenu(getX(),getY());
         menu.addOption(new BooleanOption("Shadow",()->this.shadow,value-> this.shadow = value));
         menu.addOption(new BooleanOption("Rainbow",()->this.rainbow,value-> this.rainbow = value));
