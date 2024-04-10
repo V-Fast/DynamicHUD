@@ -48,6 +48,12 @@ public abstract class Widget {
     public boolean shouldScale = true;
 
     /**
+     * Scale of the current widget.
+     * @see GlobalConfig#scale
+     */
+    protected float scale = 1.0f;
+
+    /**
      *  An identifier for widgets to group them under one ID.
      * <p>
      *  Doesn't necessarily have to be the mod ID of mod, but it's preferred to use mod ID if you are only grouping widgets under one ID.

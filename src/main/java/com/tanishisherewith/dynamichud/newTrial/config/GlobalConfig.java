@@ -20,6 +20,9 @@ public class GlobalConfig {
                     .build())
             .build();
 
+    /**
+     * Common scale for all widgets. Set by the user using YACL.
+     */
     @SerialEntry
     public float scale = 1.0f;
 

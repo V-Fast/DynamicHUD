@@ -1,8 +1,8 @@
-package com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options;
+package com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.coloroption;
 
 import com.tanishisherewith.dynamichud.newTrial.helpers.DrawHelper;
+import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.Option;
-import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.coloroption.ColorGradientPicker;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
@@ -14,10 +14,12 @@ public class ColorOption extends Option<Color> {
     public String name  = "Empty";
     public boolean isVisible =  false;
     private ColorGradientPicker colorPicker = null;
-    public ColorOption(String name, Supplier<Color> getter, Consumer<Color> setter) {
+    public ContextMenu parentMenu = null;
+    public ColorOption(String name,ContextMenu parentMenu, Supplier<Color> getter, Consumer<Color> setter) {
         super(getter, setter);
         this.name = name;
-        colorPicker = new ColorGradientPicker(x + this.width + 50,y,value,color-> set(new Color(color)),50,100 );
+        this.parentMenu = parentMenu;
+        colorPicker = new ColorGradientPicker(x + parentMenu.width + 2,y,value,color-> set(new Color(color)),50,100 );
     }
 
     @Override
@@ -40,7 +42,7 @@ public class ColorOption extends Option<Color> {
                 1,
                 1 );
 
-        colorPicker.render(drawContext,x + this.width + 50,y);
+        colorPicker.render(drawContext,x + parentMenu.width + 2,y);
     }
 
     @Override
@@ -49,7 +51,7 @@ public class ColorOption extends Option<Color> {
             isVisible = !isVisible;
             if(isVisible)
             {
-                colorPicker.setPos(x + this.width + 50,y);
+                colorPicker.setPos(x + parentMenu.width + 2,y);
                 colorPicker.display();
             }else{
                 colorPicker.close();

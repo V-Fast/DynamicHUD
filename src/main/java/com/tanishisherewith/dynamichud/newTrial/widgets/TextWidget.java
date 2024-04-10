@@ -4,6 +4,7 @@ import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.newTrial.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.*;
+import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.coloroption.ColorOption;
 import com.tanishisherewith.dynamichud.newTrial.widget.Widget;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetData;
 import net.minecraft.client.gui.DrawContext;
@@ -71,7 +72,7 @@ public class TextWidget extends Widget {
         menu = new ContextMenu(getX(),getY());
         menu.addOption(new BooleanOption("Shadow",()->this.shadow,value-> this.shadow = value));
         menu.addOption(new BooleanOption("Rainbow",()->this.rainbow,value-> this.rainbow = value));
-        menu.addOption(new ColorOption("TextColor",()-> textColor, value -> textColor = value));
+        menu.addOption(new ColorOption("TextColor",menu,()-> textColor, value -> textColor = value));
         menu.addOption(new DoubleOption("RainbowSpeed",1,4,1.0f, ()->(double)this.rainbowSpeed, value-> this.rainbowSpeed = value.intValue()));
         AtomicReference<test> testss = new AtomicReference<>(test.TEST);
         List<String> options = Arrays.asList("TEST","TEST2","TEST23");
