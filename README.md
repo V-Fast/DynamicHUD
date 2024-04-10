@@ -13,6 +13,7 @@ DynamicHUD is a special tool for Minecraft mod creators who use Fabric. It works
 - **Utility Classes**: Utilize `DrawHelper`, `ColorHelper`, and `TextureHelper` for efficient and streamlined development.
 - **ContextMenu**: A versatile context menu featuring boolean, slider, runnable, color options, and list/enum selections for comprehensive widget customization.
 - **Screen Border Control**: Widgets are confined within the screen boundaries to prevent off-screen drift.
+- **Snapping**: Widgets automatically snap to a grid corner in a imaginary grid pattern on the screen when the shift key is pressed.
 - **Multi-Mod Support**: Designed for compatibility and easy integration across various mods.
 - **Easy Integration**: Simple setup for quick implementation into your projects.
 - **Comprehensive Wiki**: A detailed guide and reference for all features of DynamicHUD, available at https://tanishisherewith.gitbook.io/dynamic-hud.
