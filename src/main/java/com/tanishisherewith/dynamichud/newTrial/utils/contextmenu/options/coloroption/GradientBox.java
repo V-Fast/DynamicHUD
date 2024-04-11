@@ -1,8 +1,6 @@
 package com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.coloroption;
 
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
-import com.tanishisherewith.dynamichud.widget.Widget;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
@@ -22,14 +20,15 @@ public class GradientBox {
         this.y = y;
         this.size = size;
     }
+
     public void render(DrawContext drawContext, int x, int y) {
-        setPosition(x,y);
+        setPosition(x, y);
         drawContext.getMatrices().push();
-        drawContext.getMatrices().translate(0,0,406);
+        drawContext.getMatrices().translate(0, 0, 406);
         DrawHelper.drawOutlinedBox(drawContext, x - 2, y - 2, x + size + 2, y + size + 2, -1);
 
         // Draw the gradient
-        com.tanishisherewith.dynamichud.newTrial.helpers.DrawHelper.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), Color.BLACK, Color.BLACK, Color.getHSBColor(hue, 1.0f, 1.0f), Color.WHITE, x, y, size, size,2);
+        com.tanishisherewith.dynamichud.newTrial.helpers.DrawHelper.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), Color.BLACK, Color.BLACK, Color.getHSBColor(hue, 1.0f, 1.0f), Color.WHITE, x, y, size, size, 2);
 
         // Draw the handle
         float handleSize = 3;

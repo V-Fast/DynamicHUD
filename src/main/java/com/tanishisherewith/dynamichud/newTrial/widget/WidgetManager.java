@@ -1,16 +1,22 @@
 package com.tanishisherewith.dynamichud.newTrial.widget;
 
-import java.io.*;
+import com.tanishisherewith.dynamichud.DynamicHUD;
+import net.fabricmc.fabric.api.util.NbtType;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.util.math.MathHelper;
+
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
-import com.tanishisherewith.dynamichud.DynamicHUD;
-import net.fabricmc.fabric.api.util.NbtType;
-import net.minecraft.nbt.*;
-import net.minecraft.util.math.MathHelper;
-
-import static com.tanishisherewith.dynamichud.DynamicHUD.*;
+import static com.tanishisherewith.dynamichud.DynamicHUD.printInfo;
+import static com.tanishisherewith.dynamichud.DynamicHUD.printWarn;
 
 /**
  * Manages a collection of widgets, providing methods to add, remove, save, and load widgets.
@@ -31,8 +37,8 @@ public class WidgetManager {
      *
      * @param data The WidgetData object to add.
      */
-    public static void addWidgetData(WidgetData<?> data){
-        widgetDataMap.put(data.name(),data);
+    public static void addWidgetData(WidgetData<?> data) {
+        widgetDataMap.put(data.name(), data);
     }
 
     /**
@@ -40,8 +46,8 @@ public class WidgetManager {
      *
      * @param widgetDatas The WidgetData objects to add.
      */
-    public static void addWidgetDatas(WidgetData<?>... widgetDatas){
-        for(WidgetData<?> data: widgetDatas) {
+    public static void addWidgetDatas(WidgetData<?>... widgetDatas) {
+        for (WidgetData<?> data : widgetDatas) {
             widgetDataMap.put(data.name(), data);
         }
     }
@@ -106,41 +112,41 @@ public class WidgetManager {
      * Larger the GUI scale, more accurate is the position.
      * </p>
      * <p>
-     *     Called in {@link com.tanishisherewith.dynamichud.mixins.ScreenMixin}
+     * Called in {@link com.tanishisherewith.dynamichud.mixins.ScreenMixin}
      * </p>
      * </p>
      *
-     * @param newWidth Screen width after resize
-     * @param newHeight Screen height after resize
-     * @param previousWidth Screen width before resize
+     * @param newWidth       Screen width after resize
+     * @param newHeight      Screen height after resize
+     * @param previousWidth  Screen width before resize
      * @param previousHeight Screen height before resize
      */
- public static void onScreenResized(int newWidth, int newHeight, int previousWidth, int previousHeight) {
-     for (Widget widget : widgets) {
-         // To ensure that infinite coords is not returned
-         if(widget.xPercent <= 0.0f){
-             widget.xPercent = (float) widget.getX()/previousWidth;
-         }
-         if(widget.yPercent <= 0.0f){
-             widget.yPercent = (float) widget.getY()/previousHeight;
-         }
+    public static void onScreenResized(int newWidth, int newHeight, int previousWidth, int previousHeight) {
+        for (Widget widget : widgets) {
+            // To ensure that infinite coords is not returned
+            if (widget.xPercent <= 0.0f) {
+                widget.xPercent = (float) widget.getX() / previousWidth;
+            }
+            if (widget.yPercent <= 0.0f) {
+                widget.yPercent = (float) widget.getY() / previousHeight;
+            }
 
-         // Use the stored percentages to calculate the new position
-         float newX = widget.xPercent * newWidth;
-         float newY = widget.yPercent * newHeight;
+            // Use the stored percentages to calculate the new position
+            float newX = widget.xPercent * newWidth;
+            float newY = widget.yPercent * newHeight;
 
-         // Ensure the widget is within the screen bounds
-         newX = MathHelper.clamp(newX, 0, newWidth - widget.getWidth());
-         newY = MathHelper.clamp(newY, 0, newHeight - widget.getHeight());
+            // Ensure the widget is within the screen bounds
+            newX = MathHelper.clamp(newX, 0, newWidth - widget.getWidth());
+            newY = MathHelper.clamp(newY, 0, newHeight - widget.getHeight());
 
-         // Update the widget's position
-         widget.setPosition((int) newX, (int) newY);
+            // Update the widget's position
+            widget.setPosition((int) newX, (int) newY);
 
-         // Update the stored percentages with the new screen size (after resize).
-         widget.xPercent = (float) widget.getX() / newWidth;
-         widget.yPercent =  (float) widget.getY() / newHeight;
-     }
- }
+            // Update the stored percentages with the new screen size (after resize).
+            widget.xPercent = (float) widget.getX() / newWidth;
+            widget.yPercent = (float) widget.getY() / newHeight;
+        }
+    }
 
 
     /**
@@ -148,7 +154,7 @@ public class WidgetManager {
      *
      * @param file The file to save to
      */
-    public static void saveWidgets(File file,List<Widget> widgets) throws IOException {
+    public static void saveWidgets(File file, List<Widget> widgets) throws IOException {
         NbtCompound rootTag = new NbtCompound();
         NbtList widgetList = new NbtList();
 
@@ -202,18 +208,18 @@ public class WidgetManager {
         widgets.clear();
 
         if (file.exists()) {
-                NbtCompound rootTag = NbtIo.read(file.toPath());
-                NbtList widgetList = rootTag.getList("widgets", NbtType.COMPOUND);
+            NbtCompound rootTag = NbtIo.read(file.toPath());
+            NbtList widgetList = rootTag.getList("widgets", NbtType.COMPOUND);
 
-                for (int i = 0; i < widgetList.size(); i++) {
-                    NbtCompound widgetTag = widgetList.getCompound(i);
-                    WidgetData<?> widgetData = widgetDataMap.get(widgetTag.getString("name"));
-                    Widget widget = widgetData.createWidget();
-                    printInfo("Loading Widget: " + widget);
-                    widget.readFromTag(widgetTag);
-                    widgets.add(widget);
-                }
-        }else{
+            for (int i = 0; i < widgetList.size(); i++) {
+                NbtCompound widgetTag = widgetList.getCompound(i);
+                WidgetData<?> widgetData = widgetDataMap.get(widgetTag.getString("name"));
+                Widget widget = widgetData.createWidget();
+                printInfo("Loading Widget: " + widget);
+                widget.readFromTag(widgetTag);
+                widgets.add(widget);
+            }
+        } else {
             printWarn("Widget File does not exist. Try saving one first");
         }
     }
@@ -226,6 +232,7 @@ public class WidgetManager {
     public static List<Widget> getWidgets() {
         return widgets;
     }
+
     /**
      * Returns the list of managed widgets with the same modID.
      *

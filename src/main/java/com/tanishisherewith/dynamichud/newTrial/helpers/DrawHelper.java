@@ -281,6 +281,7 @@ public class DrawHelper {
 
 
     /* ====  Drawing filled and outline circles  ==== */
+
     /**
      * Draws an outline of a circle
      *
@@ -783,10 +784,6 @@ public class DrawHelper {
         drawRectangle(matrix4f, x1, y, width, thickness, color);
     }
 
-    public enum Direction {
-        /* LEFT_RIGHT means from left to right. Same for others */
-        LEFT_RIGHT, TOP_BOTTOM, RIGHT_LEFT, BOTTOM_TOP
-    }
     /**
      * Draws an outlined box on the screen.
      *
@@ -805,8 +802,9 @@ public class DrawHelper {
 
     /**
      * This method assumes that the x, y coords are the origin of a widget.
-     * @param x X position of widget
-     * @param y Y position of widget
+     *
+     * @param x     X position of widget
+     * @param y     Y position of widget
      * @param scale Scale the matrices
      */
     public static void scaleAndPosition(MatrixStack matrices, float x, float y, float scale) {
@@ -818,17 +816,19 @@ public class DrawHelper {
         // Scale the matrix
         matrices.scale(scale, scale, 1.0F);
 
-        matrices.translate(-x,-y,0);
+        matrices.translate(-x, -y, 0);
     }
+
     /**
      * This method scales the matrices by the centre of the widget
-     * @param x X position of widget
-     * @param y Y position of widget
+     *
+     * @param x      X position of widget
+     * @param y      Y position of widget
      * @param height height of widget
-     * @param width width of widget
-     * @param scale Scale the matrices
+     * @param width  width of widget
+     * @param scale  Scale the matrices
      */
-    public static void scaleAndPosition(MatrixStack matrices, float x, float y,float width, float height, float scale) {
+    public static void scaleAndPosition(MatrixStack matrices, float x, float y, float width, float height, float scale) {
         matrices.push(); // Save the current transformation state
 
         // Translate the origin back to the desired position
@@ -840,8 +840,13 @@ public class DrawHelper {
         matrices.translate(-(x + width / 2.0f), -(y + height / 2.0f), 0);
     }
 
-    public static void stopScaling(MatrixStack matrices){
+    public static void stopScaling(MatrixStack matrices) {
         matrices.pop(); // Restore the previous transformation state
+    }
+
+    public enum Direction {
+        /* LEFT_RIGHT means from left to right. Same for others */
+        LEFT_RIGHT, TOP_BOTTOM, RIGHT_LEFT, BOTTOM_TOP
     }
 
 }

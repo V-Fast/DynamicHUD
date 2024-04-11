@@ -1,6 +1,5 @@
 package com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.coloroption;
 
-import com.tanishisherewith.dynamichud.widget.Widget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.DrawContext;
@@ -9,18 +8,17 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.function.Consumer;
 
 public class ColorGradientPicker {
-    MinecraftClient client = MinecraftClient.getInstance();
     private final Consumer<Color> onColorSelected; // The callback to call when a color is selected
     private final GradientSlider gradientSlider;
     private final GradientBox gradientBox;
     private final ColorPickerButton colorPickerButton;
     private final AlphaSlider alphaSlider;
-    private int x,y;
     private final int boxSize;
+    MinecraftClient client = MinecraftClient.getInstance();
+    private int x, y;
     private boolean display = false;
 
     public ColorGradientPicker(int x, int y, Color initialColor, Consumer<Color> onColorSelected, int boxSize, int colors) {
@@ -37,29 +35,32 @@ public class ColorGradientPicker {
         this.gradientBox.setSaturation(hsv[1]);
         this.gradientBox.setValue(hsv[2]);
 
-        this.alphaSlider = new AlphaSlider(x,y,10,boxSize,initialColor);
+        this.alphaSlider = new AlphaSlider(x, y, 10, boxSize, initialColor);
         this.colorPickerButton = new ColorPickerButton(x + boxSize + 8, y + 20, 30, 18);
     }
-    public void setPos(int x, int y){
+
+    public void setPos(int x, int y) {
         this.x = x;
         this.y = y;
     }
+
     public void display() {
         display = true;
     }
+
     public void close() {
         display = false;
     }
 
     public void render(DrawContext drawContext, int x1, int y1) {
-        setPos(x1,y1);
-        if(!display){
+        setPos(x1, y1);
+        if (!display) {
             return;
         }
-        gradientSlider.render(drawContext,x + 30, y +client.textRenderer.fontHeight + 4);
-        gradientBox.render(drawContext,x + 30, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
-        colorPickerButton.render(drawContext,x+ 55 + boxSize,y + client.textRenderer.fontHeight  + gradientSlider.getHeight() + 8);
-        alphaSlider.render(drawContext,x + 40 + boxSize,y + client.textRenderer.fontHeight +gradientSlider.getHeight() + 10);
+        gradientSlider.render(drawContext, x + 30, y + client.textRenderer.fontHeight + 4);
+        gradientBox.render(drawContext, x + 30, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
+        colorPickerButton.render(drawContext, x + 55 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 8);
+        alphaSlider.render(drawContext, x + 40 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
 
         if (colorPickerButton.isPicking()) {
             // Draw the cursor
@@ -82,7 +83,7 @@ public class ColorGradientPicker {
     }
 
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if(!display){
+        if (!display) {
             return false;
         }
         if (colorPickerButton.onClick(mouseX, mouseY, button)) {
@@ -124,7 +125,7 @@ public class ColorGradientPicker {
     }
 
     public void mouseDragged(double mouseX, double mouseY, int button) {
-        if(!display){
+        if (!display) {
             return;
         }
         gradientSlider.onDrag(mouseX, mouseY, button);

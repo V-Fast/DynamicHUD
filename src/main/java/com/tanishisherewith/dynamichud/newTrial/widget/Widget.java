@@ -14,12 +14,12 @@ import java.util.Set;
 
 public abstract class Widget {
 
-    protected MinecraftClient mc = MinecraftClient.getInstance();
-
+    public static WidgetData<?> DATA;
     /**
      * This is the UID of the widget used to identify during loading and saving.
      * <p>
      * It's different from modID because this is unique to each widget.
+     *
      * @see #modId
      */
     public UID uid = UID.generate();
@@ -33,35 +33,32 @@ public abstract class Widget {
 
     //To enable/disable snapping
     public boolean shiftDown = false;
-    int startX, startY;
-
     // Absolute position of the widget on screen in pixels.
     public int x, y;
-
+    public boolean shouldScale = true;
+    /**
+     * An identifier for widgets to group them under one ID.
+     * <p>
+     * Doesn't necessarily have to be the mod ID of mod, but it's preferred to use mod ID if you are only grouping widgets under one ID.
+     * Can be any string if wanted.
+     *
+     * @see #uid
+     */
+    public String modId = "unknown";
+    protected MinecraftClient mc = MinecraftClient.getInstance();
     // The x position of the widget as a percentage of the screen width, i.e. the relative x position of the widget for resizing and scaling
     protected float xPercent;
     // The y position of the widget as a percentage of the screen height, i.e. the relative y position of the widget for resizing and scaling
     protected float yPercent;
-    public boolean shouldScale = true;
-
     /**
      * Scale of the current widget.
+     *
      * @see GlobalConfig#scale
      */
     protected float scale = 1.0f;
-
-    /**
-     *  An identifier for widgets to group them under one ID.
-     * <p>
-     *  Doesn't necessarily have to be the mod ID of mod, but it's preferred to use mod ID if you are only grouping widgets under one ID.
-     *  Can be any string if wanted.
-     * @see #uid
-     */
-    public String modId = "unknown";
-
     //Dimensions of the widget
     protected WidgetBox widgetBox;
-    public static WidgetData<?> DATA;
+    int startX, startY;
 
     public Widget(WidgetData<?> DATA, String modId) {
         Widget.DATA = DATA;
@@ -104,8 +101,8 @@ public abstract class Widget {
     }
 
     public void setPosition(int x, int y) {
-            this.x = x;
-            this.y = y;
+        this.x = x;
+        this.y = y;
     }
 
     public void setDraggable(boolean draggable) {
@@ -134,9 +131,9 @@ public abstract class Widget {
         if (!shouldDisplay()) return;
 
         if (shouldScale) {
-            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(),GlobalConfig.get().scale);
+            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().scale);
         }
-        renderWidget(drawContext,mouseX,mouseY);
+        renderWidget(drawContext, mouseX, mouseY);
 
         if (shouldScale) {
             DrawHelper.stopScaling(drawContext.getMatrices());
@@ -151,9 +148,9 @@ public abstract class Widget {
         displayBg(drawContext);
 
         if (shouldScale) {
-            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(),GlobalConfig.get().scale);
+            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().scale);
         }
-        renderWidgetInEditor(drawContext,mouseX,mouseY);
+        renderWidgetInEditor(drawContext, mouseX, mouseY);
 
         if (shouldScale) {
             DrawHelper.stopScaling(drawContext.getMatrices());
@@ -168,10 +165,10 @@ public abstract class Widget {
      * </p>
      *
      * @param context
-     * @param mouseX X position of mouse.
-     * @param mouseY Y position of mouse
+     * @param mouseX  X position of mouse.
+     * @param mouseY  Y position of mouse
      */
-    public abstract void renderWidget(DrawContext context,int mouseX, int mouseY);
+    public abstract void renderWidget(DrawContext context, int mouseX, int mouseY);
 
 
     /**
@@ -181,10 +178,10 @@ public abstract class Widget {
      *
      * @param context
      */
-    private void renderWidgetInEditor(DrawContext context,int mouseX, int mouseY) {
+    private void renderWidgetInEditor(DrawContext context, int mouseX, int mouseY) {
         //displayBg(context);
 
-        renderWidget(context,mouseX,mouseY);
+        renderWidget(context, mouseX, mouseY);
     }
 
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
@@ -220,7 +217,7 @@ public abstract class Widget {
             this.y = (int) MathHelper.clamp(newY, 0, mc.getWindow().getScaledHeight() - getHeight());
 
             this.xPercent = (float) this.x / mc.getWindow().getScaledWidth();
-            this.yPercent =  (float) this.y / mc.getWindow().getScaledHeight();
+            this.yPercent = (float) this.y / mc.getWindow().getScaledHeight();
 
             return true;
         }
@@ -237,14 +234,15 @@ public abstract class Widget {
      * @param vAmount vertical amount of scrolling
      * @param hAmount horizontal amount of scrolling
      */
-    public void mouseScrolled(double mouseX, double mouseY, double vAmount,double hAmount) {
+    public void mouseScrolled(double mouseX, double mouseY, double vAmount, double hAmount) {
     }
 
 
     public boolean toggle() {
         return this.display = !this.display;
     }
-    public void onClose(){
+
+    public void onClose() {
         this.shiftDown = false;
     }
 
@@ -257,7 +255,7 @@ public abstract class Widget {
     protected void displayBg(DrawContext context) {
         int backgroundColor = this.shouldDisplay() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
         WidgetBox box = this.getWidgetBox();
-       DrawHelper.drawRectangle(context.getMatrices().peek().getPositionMatrix(),
+        DrawHelper.drawRectangle(context.getMatrices().peek().getPositionMatrix(),
                 box.x,
                 box.y,
                 box.getWidth(),

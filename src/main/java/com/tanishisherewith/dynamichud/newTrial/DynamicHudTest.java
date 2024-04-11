@@ -17,16 +17,17 @@ public class DynamicHudTest implements DynamicHudIntegration {
     TextWidget Example2Widget;
     DynamicValueRegistry registry;
     WidgetRenderer renderer;
+
     @Override
     public void init() {
         //Global registry
-        DynamicValueRegistry.registerGlobal("FPS",() -> "FPS: "+ DynamicHUD.MC.getCurrentFps());
+        DynamicValueRegistry.registerGlobal("FPS", () -> "FPS: " + DynamicHUD.MC.getCurrentFps());
 
         //Local registry
         registry = new DynamicValueRegistry(DynamicHUD.MOD_ID);
-        registry.registerLocal("FPS",()-> "FPS C-DVR: "+ DynamicHUD.MC.getCurrentFps());
+        registry.registerLocal("FPS", () -> "FPS C-DVR: " + DynamicHUD.MC.getCurrentFps());
 
-        textWidget  = new TextWidget.Builder()
+        textWidget = new TextWidget.Builder()
                 .setX(300)
                 .setY(100)
                 .setDraggable(true)
@@ -36,7 +37,7 @@ public class DynamicHudTest implements DynamicHudIntegration {
                 .shouldScale(false)
                 .build();
 
-        Example2Widget  = new TextWidget.Builder()
+        Example2Widget = new TextWidget.Builder()
                 .setX(200)
                 .setY(100)
                 .setDraggable(true)
@@ -53,7 +54,8 @@ public class DynamicHudTest implements DynamicHudIntegration {
         WidgetManager.addWidget(textWidget);
         WidgetManager.addWidget(Example2Widget);
     }
-    public void initAfter(){
+
+    public void initAfter() {
         List<Widget> widgets = WidgetManager.getWidgetsForMod(DynamicHUD.MOD_ID);
 
         renderer = new WidgetRenderer(widgets);
@@ -64,7 +66,8 @@ public class DynamicHudTest implements DynamicHudIntegration {
 
     @Override
     public AbstractMoveableScreen getMovableScreen() {
-        return new AbstractMoveableScreen(Text.literal("Editor"), renderer) {};
+        return new AbstractMoveableScreen(Text.literal("Editor"), renderer) {
+        };
     }
 
     @Override

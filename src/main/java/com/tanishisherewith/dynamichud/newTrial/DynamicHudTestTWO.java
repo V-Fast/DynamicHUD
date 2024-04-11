@@ -2,19 +2,16 @@ package com.tanishisherewith.dynamichud.newTrial;
 
 import com.tanishisherewith.dynamichud.newTrial.screens.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.newTrial.utils.DynamicValueRegistry;
-import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.Option;
 import com.tanishisherewith.dynamichud.newTrial.widget.Widget;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetManager;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetRenderer;
 import com.tanishisherewith.dynamichud.newTrial.widgets.TextWidget;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.option.OptionsScreen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL;
 
 import java.io.File;
 import java.util.List;
@@ -22,10 +19,11 @@ import java.util.List;
 public class DynamicHudTestTWO implements DynamicHudIntegration {
     TextWidget exampleWidget;
     WidgetRenderer renderer;
+
     @Override
     public void init() {
         //Global registry
-        DynamicValueRegistry.registerGlobal("CPS",() -> "NOT FPS");
+        DynamicValueRegistry.registerGlobal("CPS", () -> "NOT FPS");
 
 
         exampleWidget = new TextWidget.Builder()
@@ -51,14 +49,15 @@ public class DynamicHudTestTWO implements DynamicHudIntegration {
 
     @Override
     public File getWidgetsFile() {
-        return new File(FILE_DIRECTORY,"widgets_new.nbt");
+        return new File(FILE_DIRECTORY, "widgets_new.nbt");
     }
 
     @Override
     public void addWidgets() {
         WidgetManager.addWidget(exampleWidget);
     }
-    public void initAfter(){
+
+    public void initAfter() {
         List<Widget> widgets = WidgetManager.getWidgetsForMod("CustomMod");
 
         renderer = new WidgetRenderer(widgets);
@@ -69,7 +68,8 @@ public class DynamicHudTestTWO implements DynamicHudIntegration {
 
     @Override
     public AbstractMoveableScreen getMovableScreen() {
-        return new AbstractMoveableScreen(Text.literal("Editor 2"), renderer) {};
+        return new AbstractMoveableScreen(Text.literal("Editor 2"), renderer) {
+        };
     }
 
     @Override

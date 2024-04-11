@@ -22,7 +22,7 @@ public class BooleanOption extends Option<Boolean> {
 
         value = get();
         int color = value ? Color.GREEN.getRGB() : Color.RED.getRGB();
-        drawContext.drawText(mc.textRenderer,Text.of(name),x,y, color,false);
+        drawContext.drawText(mc.textRenderer, Text.of(name), x, y, color, false);
         this.height = mc.textRenderer.fontHeight;
         this.width = mc.textRenderer.getWidth(name) + 1;
     }
@@ -30,7 +30,7 @@ public class BooleanOption extends Option<Boolean> {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         super.mouseClicked(mouseX, mouseY, button);
-        if(isMouseOver(mouseX, mouseY)) {
+        if (isMouseOver(mouseX, mouseY)) {
             value = !value;
             set(value);
         }

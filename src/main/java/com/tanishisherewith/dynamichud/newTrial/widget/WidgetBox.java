@@ -1,9 +1,9 @@
 package com.tanishisherewith.dynamichud.newTrial.widget;
 
 public class WidgetBox {
+    public float x = 0, y = 0;
     private float width;
     private float height;
-    public float x = 0, y = 0;
 
     public WidgetBox(int x, int y, int width, int height) {
         this.x = x;
@@ -45,22 +45,24 @@ public class WidgetBox {
         return !(this.y + this.height < other.y);
     }
 
-    public void setSizeAndPosition(float x, float y, float width, float height){
+    public void setSizeAndPosition(float x, float y, float width, float height) {
         this.x = x;
         this.y = y;
         this.height = height;
         this.width = width;
     }
-    public void setSizeAndPosition(float x, float y, float width, float height,boolean shouldScale, float scale){
+
+    public void setSizeAndPosition(float x, float y, float width, float height, boolean shouldScale, float scale) {
         this.x = x;
         this.y = y;
-        this.height = height * (shouldScale? scale : 1.0f);
-        this.width = width  * (shouldScale? scale : 1.0f);
+        this.height = height * (shouldScale ? scale : 1.0f);
+        this.width = width * (shouldScale ? scale : 1.0f);
     }
-    public void setSize(double width, double height,boolean shouldScale, float scale) {
+
+    public void setSize(double width, double height, boolean shouldScale, float scale) {
         if (width >= 0)
-            this.width = (int) Math.ceil(width  * (shouldScale? scale : 1.0f));
+            this.width = (int) Math.ceil(width * (shouldScale ? scale : 1.0f));
         if (height >= 0)
-            this.height = (int) Math.ceil(height * (shouldScale? scale : 1.0f));
+            this.height = (int) Math.ceil(height * (shouldScale ? scale : 1.0f));
     }
 }

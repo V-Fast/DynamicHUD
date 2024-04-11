@@ -202,7 +202,7 @@ public class TextureHelper extends DrawContext {
             drawContext.getMatrices().scale(textScale, textScale, 11.0f);
             float scaledX = textX / textScale;
             float scaledY = textY / textScale;
-            drawContext.drawText(textRenderer, text, (int) scaledX + 1, (int) scaledY +1, color, false);
+            drawContext.drawText(textRenderer, text, (int) scaledX + 1, (int) scaledY + 1, color, false);
             drawContext.getMatrices().pop();
         }
         customItemRenderer = new CustomItemRenderer(itemStack, itemScale);

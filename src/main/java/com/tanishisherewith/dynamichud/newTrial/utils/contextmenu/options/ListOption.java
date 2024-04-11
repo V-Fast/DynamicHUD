@@ -1,20 +1,18 @@
 package com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options;
 
-import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.Option;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ListOption<T> extends Option<T> {
     private final List<T> values;
-    private int currentIndex = 0;
     public String name = "Empty";
+    private int currentIndex = 0;
 
     public ListOption(String name, Supplier<T> getter, Consumer<T> setter, List<T> values) {
         super(getter, setter);
@@ -46,15 +44,15 @@ public class ListOption<T> extends Option<T> {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         super.mouseClicked(mouseX, mouseY, button);
         if (isMouseOver(mouseX, mouseY)) {
-            if(button == 0) {
+            if (button == 0) {
                 currentIndex = (currentIndex + 1) % values.size();
-                if(currentIndex > values.size() - 1){
+                if (currentIndex > values.size() - 1) {
                     currentIndex = 0;
                 }
                 value = values.get(currentIndex);
-            }else if(button == 1){
+            } else if (button == 1) {
                 currentIndex = (currentIndex - 1) % values.size();
-                if(currentIndex < 0){
+                if (currentIndex < 0) {
                     currentIndex = values.size() - 1;
                 }
                 value = values.get(currentIndex);

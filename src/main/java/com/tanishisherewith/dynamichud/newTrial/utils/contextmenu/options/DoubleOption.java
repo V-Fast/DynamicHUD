@@ -12,10 +12,11 @@ import java.util.function.Supplier;
 
 public class DoubleOption extends Option<Double> {
     public String name = "Empty";
-    private boolean isDragging = false;
-    private double minValue = 0.0,maxValue = 0.0;
     float step = 0.1f;
-    public DoubleOption(String name,double minValue,double maxValue,float step,Supplier<Double> getter, Consumer<Double> setter) {
+    private boolean isDragging = false;
+    private double minValue = 0.0, maxValue = 0.0;
+
+    public DoubleOption(String name, double minValue, double maxValue, float step, Supplier<Double> getter, Consumer<Double> setter) {
         super(getter, setter);
         this.name = name;
         this.value = get();
@@ -24,8 +25,9 @@ public class DoubleOption extends Option<Double> {
         this.width = 30;
         this.height = 16;
         this.step = step;
-        Validate.isTrue(this.step>0.0f,"Step cannot be less than or equal to 0 (zero)");
+        Validate.isTrue(this.step > 0.0f, "Step cannot be less than or equal to 0 (zero)");
     }
+
     @Override
     public void render(DrawContext drawContext, int x, int y) {
         super.render(drawContext, x, y);
@@ -35,10 +37,10 @@ public class DoubleOption extends Option<Double> {
         this.height = 16;
         // Draw the label
         TextRenderer textRenderer = mc.textRenderer;
-        DrawHelper.scaleAndPosition(drawContext.getMatrices(),x,y,0.7f);
+        DrawHelper.scaleAndPosition(drawContext.getMatrices(), x, y, 0.7f);
         String labelText = name + ": " + String.format("%.1f", value);
         int labelWidth = textRenderer.getWidth(labelText);
-        this.width = Math.max(this.width,labelWidth);
+        this.width = Math.max(this.width, labelWidth);
         drawContext.drawTextWithShadow(textRenderer, labelText, x, y + 1, 0xFFFFFFFF);
         DrawHelper.stopScaling(drawContext.getMatrices());
 
@@ -53,10 +55,10 @@ public class DoubleOption extends Option<Double> {
         // Draw the handle
 
         DrawHelper.drawRoundedRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(),
-                (float)handleX,
-                (float)handleY,
-                 handleWidth,
-                 handleHeight,
+                (float) handleX,
+                (float) handleY,
+                handleWidth,
+                handleHeight,
                 1,
                 0xFFFFFFFF,
                 90,
@@ -65,8 +67,8 @@ public class DoubleOption extends Option<Double> {
     }
 
     private void drawSlider(DrawContext drawContext, int sliderX, int sliderY, int sliderWidth, double handleX) {
-        DrawHelper.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), sliderX, sliderY, sliderWidth,  2, 0xFFFFFFFF);
-        if(handleX-sliderX > 0) {
+        DrawHelper.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), sliderX, sliderY, sliderWidth, 2, 0xFFFFFFFF);
+        if (handleX - sliderX > 0) {
             DrawHelper.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), (float) sliderX, (float) sliderY, (float) ((value - minValue) / (maxValue - minValue) * (width - 3)), 2, Color.ORANGE.getRGB());
         }
     }
@@ -74,7 +76,7 @@ public class DoubleOption extends Option<Double> {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         super.mouseClicked(mouseX, mouseY, button);
-        if(isMouseOver(mouseX, mouseY)) {
+        if (isMouseOver(mouseX, mouseY)) {
             step(mouseX);
             isDragging = true;
         }
@@ -86,7 +88,8 @@ public class DoubleOption extends Option<Double> {
         isDragging = false;
         return super.mouseReleased(mouseX, mouseY, button);
     }
-    private void step(double mouseX){
+
+    private void step(double mouseX) {
         double newValue = minValue + (float) (mouseX - x) / width * (maxValue - minValue);
         // Round the new value to the nearest step
         newValue = Math.round(newValue / step) * step;
@@ -95,7 +98,7 @@ public class DoubleOption extends Option<Double> {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button) {
-        if(isMouseOver(mouseX, mouseY) && isDragging) {
+        if (isMouseOver(mouseX, mouseY) && isDragging) {
             step(mouseX);
         }
         return super.mouseDragged(mouseX, mouseY, button);

@@ -1,8 +1,6 @@
 package com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.coloroption;
 
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
-import com.tanishisherewith.dynamichud.widget.Widget;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
@@ -35,9 +33,9 @@ public class GradientSlider {
     }
 
     public void render(DrawContext drawContext, int x, int y) {
-        setPosition(x,y);
+        setPosition(x, y);
         drawContext.getMatrices().push();
-        drawContext.getMatrices().translate(0,0,401);
+        drawContext.getMatrices().translate(0, 0, 401);
         DrawHelper.drawOutlinedBox(drawContext, x - 2, y - 2, x + width + 2, y + height + 2, -1);
 
         // Draw the gradient
@@ -51,12 +49,12 @@ public class GradientSlider {
 
 
         // Draw the handle
-            float handleWidth = 3;
-            float handleHeight = height + 4;
-            float handleX = x + hue * width - handleWidth / 2.0f;
-            float handleY = y - (handleHeight - height) / 2.0f;
+        float handleWidth = 3;
+        float handleHeight = height + 4;
+        float handleX = x + hue * width - handleWidth / 2.0f;
+        float handleY = y - (handleHeight - height) / 2.0f;
 
-            DrawHelper.fillRoundedRect(drawContext, (int) handleX, (int) handleY, (int) (handleX + handleWidth), (int) (handleY + handleHeight), -1);
+        DrawHelper.fillRoundedRect(drawContext, (int) handleX, (int) handleY, (int) (handleX + handleWidth), (int) (handleY + handleHeight), -1);
         drawContext.getMatrices().pop();
     }
 

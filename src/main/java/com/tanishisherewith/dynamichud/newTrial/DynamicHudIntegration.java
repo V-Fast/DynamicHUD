@@ -63,7 +63,7 @@ public interface DynamicHudIntegration {
     /**
      * Initializes the DynamicHud integration.
      * <p>
-     *   Suggested to be used to initialize {@link com.tanishisherewith.dynamichud.newTrial.utils.DynamicValueRegistry} and widgets with their respective values
+     * Suggested to be used to initialize {@link com.tanishisherewith.dynamichud.newTrial.utils.DynamicValueRegistry} and widgets with their respective values
      * </p>
      */
     void init();
@@ -76,15 +76,17 @@ public interface DynamicHudIntegration {
     /**
      * To register custom widgets. This method can be overridden by implementations.
      */
-    default void registerCustomWidgets(){}
+    default void registerCustomWidgets() {
+    }
 
     /**
      * Performs any necessary initialization after the widgets have been added. This method can be overridden by implementations.
      * <p>
-     *     Suggested to be used to initialize a {@link WidgetRenderer} object with the added widgets.
+     * Suggested to be used to initialize a {@link WidgetRenderer} object with the added widgets.
      * </p>
      */
-    default void initAfter(){}
+    default void initAfter() {
+    }
 
     /**
      * Returns the file where widgets are to be saved and loaded from.
@@ -94,6 +96,7 @@ public interface DynamicHudIntegration {
     default File getWidgetsFile() {
         return WIDGETS_FILE;
     }
+
     /**
      * Returns the keybind to open the {@link AbstractMoveableScreen} instance.
      *
@@ -116,7 +119,7 @@ public interface DynamicHudIntegration {
      *
      * @return The widget renderer.
      */
-    default WidgetRenderer getWidgetRenderer(){
+    default WidgetRenderer getWidgetRenderer() {
         return new WidgetRenderer(WidgetManager.getWidgets());
     }
 }

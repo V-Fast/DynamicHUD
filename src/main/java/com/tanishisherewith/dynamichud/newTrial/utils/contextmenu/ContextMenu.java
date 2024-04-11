@@ -8,32 +8,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ContextMenu {
-    public int x,y;
-    protected float scale = 0.0f;
     private final List<Option<?>> options = new ArrayList<>(); // The list of options in the context menu
+    public int x, y;
     public int width = 0;
     public int height = 0;
     public int backgroundColor = new Color(107, 112, 126, 124).getRGB();// Semi-transparent light grey color
     public int padding = 5; // The amount of padding around the rectangle
     public int heightOffset = 4; // Height offset from the widget
     public boolean shouldDisplay = false;
+    protected float scale = 0.0f;
 
-    public ContextMenu(int x,int y){
+    public ContextMenu(int x, int y) {
         this.x = x;
         this.y = y + heightOffset;
     }
 
-    public void addOption(Option<?> option){
+    public void addOption(Option<?> option) {
         options.add(option);
     }
 
-    public void render(DrawContext drawContext, int x, int y, int height){
+    public void render(DrawContext drawContext, int x, int y, int height) {
         this.x = x;
         this.y = y + heightOffset + height;
-        if(!shouldDisplay) return;
+        if (!shouldDisplay) return;
 
         update();
-        DrawHelper.scaleAndPosition(drawContext.getMatrices(),x,y,scale);
+        DrawHelper.scaleAndPosition(drawContext.getMatrices(), x, y, scale);
 
         int x1 = this.x - 1;
         int y1 = this.y;
@@ -45,8 +45,8 @@ public class ContextMenu {
 
         int yOffset = y1 + 3;
         this.width = 10;
-        for(Option<?> option: options){
-            option.render(drawContext,x + 2,yOffset);
+        for (Option<?> option : options) {
+            option.render(drawContext, x + 2, yOffset);
             this.width = Math.max(this.width, option.width + padding);
             yOffset += option.height + 1;
         }
@@ -55,6 +55,7 @@ public class ContextMenu {
 
         DrawHelper.stopScaling(drawContext.getMatrices());
     }
+
     public void update() {
         // Update the scale
         float scaleSpeed = 0.1f;
@@ -64,49 +65,55 @@ public class ContextMenu {
         }
     }
 
-    public void close(){
+    public void close() {
         shouldDisplay = false;
         scale = 0.0f;
     }
-    public void open(){
+
+    public void open() {
         shouldDisplay = true;
         update();
     }
-    public void toggleDisplay(){
-        if(shouldDisplay){
+
+    public void toggleDisplay() {
+        if (shouldDisplay) {
             close();
-        }else{
+        } else {
             open();
         }
     }
 
-    public void mouseClicked(double mouseX, double mouseY, int button){
-        if(!shouldDisplay) return;
-        for(Option<?> option: options){
+    public void mouseClicked(double mouseX, double mouseY, int button) {
+        if (!shouldDisplay) return;
+        for (Option<?> option : options) {
             option.mouseClicked(mouseX, mouseY, button);
         }
     }
-    public void mouseReleased(double mouseX, double mouseY, int button){
-        if(!shouldDisplay) return;
-        for(Option<?> option: options){
+
+    public void mouseReleased(double mouseX, double mouseY, int button) {
+        if (!shouldDisplay) return;
+        for (Option<?> option : options) {
             option.mouseReleased(mouseX, mouseY, button);
         }
     }
-    public void mouseDragged(double mouseX, double mouseY, int button){
-        if(!shouldDisplay) return;
-        for(Option<?> option: options){
+
+    public void mouseDragged(double mouseX, double mouseY, int button) {
+        if (!shouldDisplay) return;
+        for (Option<?> option : options) {
             option.mouseDragged(mouseX, mouseY, button);
         }
     }
-    public void keyPressed(int key){
-        if(!shouldDisplay) return;
-        for(Option<?> option: options){
+
+    public void keyPressed(int key) {
+        if (!shouldDisplay) return;
+        for (Option<?> option : options) {
             option.keyPressed(key);
         }
     }
-    public void keyReleased(int key){
-        if(!shouldDisplay) return;
-        for(Option<?> option: options){
+
+    public void keyReleased(int key) {
+        if (!shouldDisplay) return;
+        for (Option<?> option : options) {
             option.keyReleased(key);
         }
     }

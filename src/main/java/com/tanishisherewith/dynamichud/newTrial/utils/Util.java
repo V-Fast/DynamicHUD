@@ -3,10 +3,6 @@ package com.tanishisherewith.dynamichud.newTrial.utils;
 import com.tanishisherewith.dynamichud.newTrial.DynamicHUD;
 
 public class Util {
-    public enum Quadrant {
-        UPPER_LEFT, UPPER_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT
-    }
-
     public static Quadrant getQuadrant(int x, int y) {
         int screenWidth = DynamicHUD.MC.getWindow().getScaledWidth();
         int screenHeight = DynamicHUD.MC.getWindow().getScaledHeight();
@@ -24,6 +20,10 @@ public class Util {
                 return Quadrant.BOTTOM_RIGHT;
             }
         }
+    }
+
+    public enum Quadrant {
+        UPPER_LEFT, UPPER_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT
     }
 
 }

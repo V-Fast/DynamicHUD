@@ -7,8 +7,8 @@ import net.minecraft.client.gui.DrawContext;
 public class HudRender implements HudRenderCallback {
     @Override
     public void onHudRender(DrawContext drawContext, float tickDelta) {
-        for(WidgetRenderer widgetRenderer: DynamicHUD.getWidgetRenderers()){
-            widgetRenderer.renderWidgets(drawContext,-120,-120);
+        for (WidgetRenderer widgetRenderer : DynamicHUD.getWidgetRenderers()) {
+            widgetRenderer.renderWidgets(drawContext, -120, -120);
         }
     }
 }

@@ -9,28 +9,18 @@ import java.awt.*;
  */
 public class ColorHelper {
     public static int r, g, b, a;
+
     public ColorHelper(int r, int g, int b) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.a = 255;
+        ColorHelper.r = r;
+        ColorHelper.g = g;
+        ColorHelper.b = b;
+        a = 255;
         validate();
     }
+
     public ColorHelper() {
     }
-    public void validate() {
-        if (r < 0) r = 0;
-        else if (r > 255) r = 255;
 
-        if (g < 0) g = 0;
-        else if (g > 255) g = 255;
-
-        if (b < 0) b = 0;
-        else if (b > 255) b = 255;
-
-        if (a < 0) a = 0;
-        else if (a > 255) a = 255;
-    }
     /**
      * Returns a color as an integer value given its red, green and blue components.
      *
@@ -82,10 +72,10 @@ public class ColorHelper {
     public static int ColorToInt(Color color) {
         return color.getRGB();
     }
-    public static float[] getRainbowColor()
-    {
+
+    public static float[] getRainbowColor() {
         float x = System.currentTimeMillis() % 2000 / 1000F;
-        float pi = (float)Math.PI;
+        float pi = (float) Math.PI;
 
         float[] rainbow = new float[3];
         rainbow[0] = 0.5F + 0.5F * MathHelper.sin(x * pi);
@@ -105,7 +95,6 @@ public class ColorHelper {
         return Color.getHSBColor(hue, 1.0f, 1.0f);
     }
 
-
     /**
      * Changes alpha on color.
      *
@@ -119,6 +108,7 @@ public class ColorHelper {
         else
             return new Color(0);
     }
+
     public static int fromRGBA(int r, int g, int b, int a) {
         return (r << 16) + (g << 8) + (b) + (a << 24);
     }
@@ -138,8 +128,22 @@ public class ColorHelper {
     public static int toRGBAA(int color) {
         return (color >> 24) & 0x000000FF;
     }
-    public int toInt()
-    {
-     return new Color(r,b,g,a).getRGB();
+
+    public void validate() {
+        if (r < 0) r = 0;
+        else if (r > 255) r = 255;
+
+        if (g < 0) g = 0;
+        else if (g > 255) g = 255;
+
+        if (b < 0) b = 0;
+        else if (b > 255) b = 255;
+
+        if (a < 0) a = 0;
+        else if (a > 255) a = 255;
+    }
+
+    public int toInt() {
+        return new Color(r, b, g, a).getRGB();
     }
 }

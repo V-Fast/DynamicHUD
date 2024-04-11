@@ -11,7 +11,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class GlobalConfig {
-    private static GlobalConfig INSTANCE = new GlobalConfig();
     public static ConfigClassHandler<GlobalConfig> HANDLER = ConfigClassHandler.createBuilder(GlobalConfig.class)
             .id(new Identifier("dynamichud", "dynamichud_config"))
             .serializer(config -> GsonConfigSerializerBuilder.create(config)
@@ -19,15 +18,19 @@ public class GlobalConfig {
                     .setJson5(true)
                     .build())
             .build();
-
+    private static final GlobalConfig INSTANCE = new GlobalConfig();
     /**
      * Common scale for all widgets. Set by the user using YACL.
      */
     @SerialEntry
     public float scale = 1.0f;
 
+    public static GlobalConfig get() {
+        return INSTANCE;
+    }
+
     public Screen createYACLGUI() {
-      return  YetAnotherConfigLib.createBuilder()
+        return YetAnotherConfigLib.createBuilder()
                 .title(Text.literal("DynamicHUD config screen."))
                 .category(ConfigCategory.createBuilder()
                         .name(Text.literal("General"))
@@ -39,14 +42,11 @@ public class GlobalConfig {
                                         .name(Text.literal("Scale"))
                                         .description(OptionDescription.of(Text.literal("Set scale for all widgets.")))
                                         .binding(1.0f, () -> this.scale, newVal -> this.scale = newVal)
-                                        .controller(floatOption -> FloatSliderControllerBuilder.create(floatOption).range(0.1f,2.5f).step(0.1f))
+                                        .controller(floatOption -> FloatSliderControllerBuilder.create(floatOption).range(0.1f, 2.5f).step(0.1f))
                                         .build())
                                 .build())
                         .build())
                 .build()
                 .generateScreen(null);
-    }
-    public static GlobalConfig get(){
-        return INSTANCE;
     }
 }

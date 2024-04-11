@@ -1,6 +1,8 @@
 package com.tanishisherewith.dynamichud.newTrial.utils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -20,12 +22,14 @@ import java.util.function.Supplier;
 public class DynamicValueRegistry extends System {
     /**
      * A map that holds the global registry of suppliers.
+     *
      * @see #localRegistry
      */
     private static final Map<String, Supplier<?>> globalRegistry = new HashMap<>();
 
     /**
      * A map that holds the local registry of suppliers.
+     *
      * @see #globalRegistry
      */
     private final Map<String, Supplier<?>> localRegistry = new HashMap<>();
@@ -43,21 +47,11 @@ public class DynamicValueRegistry extends System {
     /**
      * Registers a supplier in the global registry.
      *
-     * @param key The key under which the supplier is to be registered.
+     * @param key      The key under which the supplier is to be registered.
      * @param supplier The supplier to be registered.
      */
     public static void registerGlobal(String key, Supplier<?> supplier) {
         globalRegistry.put(key, supplier);
-    }
-
-    /**
-     * Registers a supplier in the local registry.
-     *
-     * @param key The key under which the supplier is to be registered.
-     * @param supplier The supplier to be registered.
-     */
-    public void registerLocal(String key, Supplier<?> supplier) {
-        localRegistry.put(key, supplier);
     }
 
     /**
@@ -68,6 +62,16 @@ public class DynamicValueRegistry extends System {
      */
     public static Supplier<?> getGlobal(String key) {
         return globalRegistry.get(key);
+    }
+
+    /**
+     * Registers a supplier in the local registry.
+     *
+     * @param key      The key under which the supplier is to be registered.
+     * @param supplier The supplier to be registered.
+     */
+    public void registerLocal(String key, Supplier<?> supplier) {
+        localRegistry.put(key, supplier);
     }
 
     /**
@@ -93,7 +97,7 @@ public class DynamicValueRegistry extends System {
      *
      * @param map The map to be set as the local registry.
      */
-    public void setLocalRegistry(Map<String, Supplier<?>> map){
+    public void setLocalRegistry(Map<String, Supplier<?>> map) {
         localRegistry.putAll(map);
     }
 }

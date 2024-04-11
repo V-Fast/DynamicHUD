@@ -4,33 +4,34 @@ import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.newTrial.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.newTrial.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.ContextMenu;
-import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.*;
+import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.BooleanOption;
+import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.DoubleOption;
+import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.EnumOption;
+import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.ListOption;
 import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.coloroption.ColorOption;
 import com.tanishisherewith.dynamichud.newTrial.widget.Widget;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetData;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import org.lwjgl.glfw.GLFW;
 
-import java.awt.Color;
-import java.util.*;
+import java.awt.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public class TextWidget extends Widget {
-    public static WidgetData<TextWidget> DATA = new WidgetData<>("TextWidget","Display Text on screen",TextWidget::new);
-    Supplier<String> textSupplier;
-    String dynamicRegistryKey = "";
-    DynamicValueRegistry dynamicValueRegistry = null;
+    public Color textColor;    public static WidgetData<TextWidget> DATA = new WidgetData<>("TextWidget", "Display Text on screen", TextWidget::new);
     protected boolean shadow; // Whether to draw a shadow behind the text
     protected boolean rainbow; // Whether to apply a rainbow effect to the text
     protected int rainbowSpeed = 2; //Speed of the rainbow effect
+    Supplier<String> textSupplier;
+    String dynamicRegistryKey = "";
+    DynamicValueRegistry dynamicValueRegistry = null;
     private ContextMenu menu;
-    public Color textColor;
-
     public TextWidget() {
-       this(null,null,false,false,Color.WHITE,"unknown");
+        this(null, null, false, false, Color.WHITE, "unknown");
     }
 
     /**
@@ -40,8 +41,8 @@ public class TextWidget extends Widget {
      * @param shadow
      * @param rainbow
      */
-    public TextWidget(String dynamicRegistryKey, boolean shadow, boolean rainbow,Color color,String modID) {
-        super(DATA,modID);
+    public TextWidget(String dynamicRegistryKey, boolean shadow, boolean rainbow, Color color, String modID) {
+        super(DATA, modID);
         this.dynamicRegistryKey = dynamicRegistryKey;
         textSupplier = (Supplier<String>) DynamicValueRegistry.getGlobal(dynamicRegistryKey);
         this.shadow = shadow;
@@ -57,11 +58,11 @@ public class TextWidget extends Widget {
      * @param shadow
      * @param rainbow
      */
-    public TextWidget(DynamicValueRegistry dynamicValueRegistry,String dynamicRegistryKey, boolean shadow, boolean rainbow,Color color,String modID) {
-        super(DATA,modID);
+    public TextWidget(DynamicValueRegistry dynamicValueRegistry, String dynamicRegistryKey, boolean shadow, boolean rainbow, Color color, String modID) {
+        super(DATA, modID);
         this.dynamicRegistryKey = dynamicRegistryKey;
         this.dynamicValueRegistry = dynamicValueRegistry;
-        if(dynamicValueRegistry != null) {
+        if (dynamicValueRegistry != null) {
             textSupplier = (Supplier<String>) dynamicValueRegistry.get(dynamicRegistryKey);
         }
         this.textColor = color;
@@ -69,49 +70,46 @@ public class TextWidget extends Widget {
         this.rainbow = rainbow;
         createMenu();
     }
-    public void createMenu(){
-        menu = new ContextMenu(getX(),getY());
-        menu.addOption(new BooleanOption("Shadow",()->this.shadow,value-> this.shadow = value));
-        menu.addOption(new BooleanOption("Rainbow",()->this.rainbow,value-> this.rainbow = value));
-        menu.addOption(new ColorOption("TextColor",menu,()-> textColor, value -> textColor = value));
-        menu.addOption(new DoubleOption("RainbowSpeed",1,4,1.0f, ()->(double)this.rainbowSpeed, value-> this.rainbowSpeed = value.intValue()));
+
+    public void createMenu() {
+        menu = new ContextMenu(getX(), getY());
+        menu.addOption(new BooleanOption("Shadow", () -> this.shadow, value -> this.shadow = value));
+        menu.addOption(new BooleanOption("Rainbow", () -> this.rainbow, value -> this.rainbow = value));
+        menu.addOption(new ColorOption("TextColor", menu, () -> textColor, value -> textColor = value));
+        menu.addOption(new DoubleOption("RainbowSpeed", 1, 4, 1.0f, () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue()));
 
         /* TEST */
         AtomicReference<Enum> enums = new AtomicReference<>(Enum.Enum1);
         AtomicReference<String> option = new AtomicReference<>("Enum1");
         menu.addOption(new EnumOption<>("Enum", enums::get, enums::set, Enum.values()));
 
-        List<String> options = Arrays.asList("List1","List2","List3");
+        List<String> options = Arrays.asList("List1", "List2", "List3");
         menu.addOption(new ListOption<>("List", option::get, option::set, options));
     }
-    public enum Enum{
-        Enum1,
-        Enum2,
-        Enum3
-    }
+
     @Override
-    public void renderWidget(DrawContext drawContext,int mouseX, int mouseY) {
+    public void renderWidget(DrawContext drawContext, int mouseX, int mouseY) {
         int color = rainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % (5000 * rainbowSpeed) / (5000f * rainbowSpeed))) : textColor.getRGB();
         if (textSupplier != null) {
             String text = textSupplier.get();
-            drawContext.drawText(mc.textRenderer, text,getX() + 2, getY() + 2, color, shadow);
-            widgetBox.setSizeAndPosition(getX(), getY(), mc.textRenderer.getWidth(text) + 3, mc.textRenderer.fontHeight + 2,this.shouldScale,GlobalConfig.get().scale);
+            drawContext.drawText(mc.textRenderer, text, getX() + 2, getY() + 2, color, shadow);
+            widgetBox.setSizeAndPosition(getX(), getY(), mc.textRenderer.getWidth(text) + 3, mc.textRenderer.fontHeight + 2, this.shouldScale, GlobalConfig.get().scale);
         }
         menu.render(drawContext, getX() - 2, getY(), (int) Math.ceil(getHeight()));
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if(button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && widgetBox.isMouseOver(mouseX,mouseY)){
+        if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && widgetBox.isMouseOver(mouseX, mouseY)) {
             menu.toggleDisplay();
         }
-        menu.mouseClicked(mouseX,mouseY,button);
+        menu.mouseClicked(mouseX, mouseY, button);
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public void mouseReleased(double mouseX, double mouseY, int button) {
-        menu.mouseReleased(mouseX,mouseY,button);
+        menu.mouseReleased(mouseX, mouseY, button);
         super.mouseReleased(mouseX, mouseY, button);
     }
 
@@ -130,11 +128,11 @@ public class TextWidget extends Widget {
     @Override
     public void writeToTag(NbtCompound tag) {
         super.writeToTag(tag);
-        tag.putString("DynamicRegistryKey",dynamicRegistryKey);
-        tag.putBoolean("Shadow",shadow);
-        tag.putBoolean("Rainbow",rainbow);
-        tag.putInt("TextColor",textColor.getRGB());
-        tag.putInt("RainbowSpeed",rainbowSpeed);
+        tag.putString("DynamicRegistryKey", dynamicRegistryKey);
+        tag.putBoolean("Shadow", shadow);
+        tag.putBoolean("Rainbow", rainbow);
+        tag.putInt("TextColor", textColor.getRGB());
+        tag.putInt("RainbowSpeed", rainbowSpeed);
 
         // If true then it means that we should use local registry and if false (i.e. null) then use global registry
         tag.putBoolean("DynamicValueRegistry", dynamicValueRegistry != null);
@@ -152,20 +150,27 @@ public class TextWidget extends Widget {
         // If true then it means that we should use local registry and if false (i.e. null) then use global registry
         boolean dvrObj = tag.getBoolean("DynamicValueRegistry");
 
-        if(!dvrObj){
+        if (!dvrObj) {
             this.textSupplier = (Supplier<String>) DynamicValueRegistry.getGlobal(dynamicRegistryKey);
             return;
         }
 
-        for(DynamicValueRegistry dvr: DynamicValueRegistry.getInstances(modId)){
+        for (DynamicValueRegistry dvr : DynamicValueRegistry.getInstances(modId)) {
             //Unfortunately, this method takes the value from the first local registry with the key.
             //It returns to prevent overriding with other registries
             this.textSupplier = (Supplier<String>) dvr.get(dynamicRegistryKey);
             return;
         }
         createMenu();
-     }
-    public static class Builder extends WidgetBuilder<Builder,TextWidget> {
+    }
+
+    public enum Enum {
+        Enum1,
+        Enum2,
+        Enum3
+    }
+
+    public static class Builder extends WidgetBuilder<Builder, TextWidget> {
         protected boolean shadow = false;
         protected boolean rainbow = false;
         protected String dynamicRegistryKey = "";
@@ -181,14 +186,17 @@ public class TextWidget extends Widget {
             this.rainbow = rainbow;
             return self();
         }
+
         public Builder setDRKey(String dynamicRegistryKey) {
             this.dynamicRegistryKey = dynamicRegistryKey;
             return self();
         }
+
         public Builder setDVR(DynamicValueRegistry dynamicValueRegistry) {
             this.dynamicValueRegistry = dynamicValueRegistry;
             return self();
         }
+
         public Builder setTextColor(Color textColor) {
             this.textColor = textColor;
             return self();
@@ -202,15 +210,17 @@ public class TextWidget extends Widget {
         @Override
         public TextWidget build() {
             TextWidget widget;
-            if(dynamicValueRegistry == null) {
-                widget = new TextWidget(dynamicRegistryKey, shadow, rainbow,textColor,modID);
-            }else{
-                widget = new TextWidget(dynamicValueRegistry,dynamicRegistryKey, shadow, rainbow,textColor,modID);
+            if (dynamicValueRegistry == null) {
+                widget = new TextWidget(dynamicRegistryKey, shadow, rainbow, textColor, modID);
+            } else {
+                widget = new TextWidget(dynamicValueRegistry, dynamicRegistryKey, shadow, rainbow, textColor, modID);
             }
-            widget.setPosition(x,y);
+            widget.setPosition(x, y);
             widget.setDraggable(isDraggable);
             widget.setShouldScale(shouldScale);
             return widget;
         }
     }
+
+
 }

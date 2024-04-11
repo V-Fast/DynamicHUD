@@ -6,13 +6,12 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
 public abstract class AbstractMoveableScreen extends Screen {
-    protected boolean shouldPause = false; // To pause if the screen is opened or not
     public final WidgetRenderer widgetRenderer;
     public int snapSize = 100;
+    protected boolean shouldPause = false; // To pause if the screen is opened or not
 
     /**
      * Constructs a AbstractMoveableScreen object.
-     *
      */
     public AbstractMoveableScreen(Text title, WidgetRenderer renderer) {
         super(title);
@@ -21,19 +20,19 @@ public abstract class AbstractMoveableScreen extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        widgetRenderer.mouseDragged(mouseX,mouseY,button, snapSize);
+        widgetRenderer.mouseDragged(mouseX, mouseY, button, snapSize);
         return false;
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        widgetRenderer.mouseClicked(mouseX,mouseY,button);
+        widgetRenderer.mouseClicked(mouseX, mouseY, button);
         return false;
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        widgetRenderer.mouseReleased(mouseX,mouseY,button);
+        widgetRenderer.mouseReleased(mouseX, mouseY, button);
         return false;
     }
 
@@ -51,7 +50,7 @@ public abstract class AbstractMoveableScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        widgetRenderer.mouseScrolled(mouseX,mouseY,verticalAmount,horizontalAmount);
+        widgetRenderer.mouseScrolled(mouseX, mouseY, verticalAmount, horizontalAmount);
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
@@ -65,12 +64,12 @@ public abstract class AbstractMoveableScreen extends Screen {
      */
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        if(this.client.world == null) {
+        if (this.client.world == null) {
             this.renderBackgroundTexture(drawContext);
         }
         // Draw each widget
         widgetRenderer.isInEditor = true;
-        widgetRenderer.renderWidgets(drawContext,mouseX,mouseY);
+        widgetRenderer.renderWidgets(drawContext, mouseX, mouseY);
     }
 
     @Override
@@ -88,7 +87,8 @@ public abstract class AbstractMoveableScreen extends Screen {
     public boolean shouldPause() {
         return shouldPause;
     }
-    public void setSnapSize(int size){
+
+    public void setSnapSize(int size) {
         this.snapSize = size;
     }
 }
