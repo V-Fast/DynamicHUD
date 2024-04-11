@@ -25,7 +25,6 @@ public class ColorOption extends Option<Color> {
     @Override
     public void render(DrawContext drawContext, int x, int y) {
         super.render(drawContext, x, y);
-        System.out.println(value.getAlpha());
 
         int color = isVisible ? Color.GREEN.getRGB() : Color.RED.getRGB();
         this.height = mc.textRenderer.fontHeight;
@@ -42,7 +41,7 @@ public class ColorOption extends Option<Color> {
                 1,
                 1 );
 
-        colorPicker.render(drawContext,this.x + parentMenu.width + 10,y - 10);
+        colorPicker.render(drawContext,this.x + width/3 + parentMenu.width + 10,y - 10);
     }
 
     @Override

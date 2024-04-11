@@ -9,14 +9,12 @@ import java.awt.*;
 
 public class GradientBox {
     private final int size;
-    private final float alphaSpeed = 0.05f;
     private int x;
     private int y;
     private float hue = 0.0f;
     private float saturation = 1.0f;
     private float value = 1.0f;
     private boolean isDragging = false;
-    private float alpha = 0.0f;
 
 
     public GradientBox(int x, int y, int size) {
@@ -24,15 +22,6 @@ public class GradientBox {
         this.y = y;
         this.size = size;
     }
-
-    public void tick() {
-        // Update the alpha
-        alpha += alphaSpeed;
-        if (alpha > 1.0f) {
-            alpha = 1.0f;
-        }
-    }
-
     public void render(DrawContext drawContext, int x, int y) {
         setPosition(x,y);
         drawContext.getMatrices().push();
@@ -41,16 +30,6 @@ public class GradientBox {
 
         // Draw the gradient
         com.tanishisherewith.dynamichud.newTrial.helpers.DrawHelper.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), Color.BLACK, Color.BLACK, Color.getHSBColor(hue, 1.0f, 1.0f), Color.WHITE, x, y, size, size,2);
-        /* for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                float saturation = (float) i / size;
-                float value = 1.0f - (float) j / size;
-                int color = Color.HSBtoRGB(hue, saturation, value);
-                color = (color & 0x00FFFFFF) | ((int) (alpha * 255) << 24);
-                drawContext.fill(x + i, y + j, x + i + 1, y + j + 1, color);
-            }
-        }
-         */
 
         // Draw the handle
         float handleSize = 3;
@@ -59,9 +38,6 @@ public class GradientBox {
 
         DrawHelper.fillRoundedRect(drawContext, (int) handleX, (int) handleY, (int) (handleX + handleSize), (int) (handleY + handleSize), -1);
         drawContext.getMatrices().pop();
-    }
-    public void defaultValues(){
-        alpha = 0.0f;
     }
 
 

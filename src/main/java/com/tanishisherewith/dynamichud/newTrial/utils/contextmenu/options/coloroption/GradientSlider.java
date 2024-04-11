@@ -10,14 +10,10 @@ import java.awt.*;
 public class GradientSlider {
     private final int width;
     private final int height;
-    private final float progressSpeed = 0.1f;
-    private final float alphaSpeed = 0.05f;
     private int x;
     private int y;
     private float hue = 0.0f;
-    private float progress = 0.0f;
     private boolean isDragging = false;
-    private float alpha = 0.0f;
 
     public GradientSlider(int x, int y, int width, int height) {
         this.x = x;
@@ -26,23 +22,6 @@ public class GradientSlider {
         this.height = height;
     }
 
-    public void tick() {
-        // Update the progress
-        progress += progressSpeed;
-        if (progress > 1.0f) {
-            progress = 1.0f;
-        }
-
-        // Update the alpha
-        alpha += alphaSpeed;
-        if (alpha > 1.0f) {
-            alpha = 1.0f;
-        }
-    }
-    public void defaultValues(){
-        progress = 0.0f;
-        alpha = 0.0f;
-    }
 
     /**
      * Sets position.
@@ -66,20 +45,18 @@ public class GradientSlider {
         for (int i = 0; i < width; i++) {
             float hue = (float) i / width;
             int color = Color.HSBtoRGB(hue, 1.0f, 1.0f);
-            color = (color & 0x00FFFFFF) | ((int) (alpha * 255) << 24);
+            color = (color & 0x00FFFFFF) | (255 << 24);
             drawContext.fill(x + i, y, x + i + 1, y + height, color);
         }
 
 
         // Draw the handle
-        if (progress >= 1.0f) {
             float handleWidth = 3;
             float handleHeight = height + 4;
             float handleX = x + hue * width - handleWidth / 2.0f;
             float handleY = y - (handleHeight - height) / 2.0f;
 
             DrawHelper.fillRoundedRect(drawContext, (int) handleX, (int) handleY, (int) (handleX + handleWidth), (int) (handleY + handleHeight), -1);
-        }
         drawContext.getMatrices().pop();
     }
 

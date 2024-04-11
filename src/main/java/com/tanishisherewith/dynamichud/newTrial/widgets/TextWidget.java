@@ -1,6 +1,7 @@
 package com.tanishisherewith.dynamichud.newTrial.widgets;
 
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
+import com.tanishisherewith.dynamichud.newTrial.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.newTrial.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.*;
@@ -8,6 +9,7 @@ import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.coloro
 import com.tanishisherewith.dynamichud.newTrial.widget.Widget;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetData;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import org.lwjgl.glfw.GLFW;
 
@@ -73,28 +75,29 @@ public class TextWidget extends Widget {
         menu.addOption(new BooleanOption("Rainbow",()->this.rainbow,value-> this.rainbow = value));
         menu.addOption(new ColorOption("TextColor",menu,()-> textColor, value -> textColor = value));
         menu.addOption(new DoubleOption("RainbowSpeed",1,4,1.0f, ()->(double)this.rainbowSpeed, value-> this.rainbowSpeed = value.intValue()));
-        AtomicReference<test> testss = new AtomicReference<>(test.TEST);
-        List<String> options = Arrays.asList("TEST","TEST2","TEST23");
-        AtomicReference<String> option = new AtomicReference<>("TEST");
-        AtomicReference<Color> testColor = new AtomicReference<>(new Color(102));
-        menu.addOption(new EnumOption<test>("Test", testss::get, testss::set,test.values()));
-        menu.addOption(new ListOption<String>("New", option::get, option::set,options ));
 
+        /* TEST */
+        AtomicReference<Enum> enums = new AtomicReference<>(Enum.Enum1);
+        AtomicReference<String> option = new AtomicReference<>("Enum1");
+        menu.addOption(new EnumOption<>("Enum", enums::get, enums::set, Enum.values()));
+
+        List<String> options = Arrays.asList("List1","List2","List3");
+        menu.addOption(new ListOption<>("List", option::get, option::set, options));
     }
-    public enum test{
-        TEST,
-        TEST_2,
-        TEST_3
+    public enum Enum{
+        Enum1,
+        Enum2,
+        Enum3
     }
     @Override
     public void renderWidget(DrawContext drawContext,int mouseX, int mouseY) {
-        menu.render(drawContext, getX() - 2, getY(), (int) Math.ceil(getHeight()));
         int color = rainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % (5000 * rainbowSpeed) / (5000f * rainbowSpeed))) : textColor.getRGB();
         if (textSupplier != null) {
             String text = textSupplier.get();
-            drawContext.drawText(mc.textRenderer, text,getX(), getY(), color, shadow);
-            widgetBox.setSizeAndPosition(getX() - 2, getY() - 2, mc.textRenderer.getWidth(text) + 3, mc.textRenderer.fontHeight + 2);
+            drawContext.drawText(mc.textRenderer, text,getX() + 2, getY() + 2, color, shadow);
+            widgetBox.setSizeAndPosition(getX(), getY(), mc.textRenderer.getWidth(text) + 3, mc.textRenderer.fontHeight + 2,this.shouldScale,GlobalConfig.get().scale);
         }
+        menu.render(drawContext, getX() - 2, getY(), (int) Math.ceil(getHeight()));
     }
 
     @Override
@@ -114,7 +117,7 @@ public class TextWidget extends Widget {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, int snapSize) {
-        menu.mouseDragged(mouseX,mouseY,button);
+        menu.mouseDragged(mouseX, mouseY, button);
         return super.mouseDragged(mouseX, mouseY, button, snapSize);
     }
 

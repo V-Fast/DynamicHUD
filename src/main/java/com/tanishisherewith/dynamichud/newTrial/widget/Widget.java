@@ -1,10 +1,9 @@
 package com.tanishisherewith.dynamichud.newTrial.widget;
 
-import com.tanishisherewith.dynamichud.helpers.ColorHelper;
-import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.newTrial.config.GlobalConfig;
+import com.tanishisherewith.dynamichud.newTrial.helpers.ColorHelper;
+import com.tanishisherewith.dynamichud.newTrial.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.newTrial.utils.UID;
-import com.tanishisherewith.dynamichud.widget.WidgetBox;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
@@ -34,9 +33,6 @@ public abstract class Widget {
 
     //To enable/disable snapping
     public boolean shiftDown = false;
-    public int snapBoxWidth,snapBoxHeight;
-    public static int snapSize = 1;
-    // Used for dragging and snapping
     int startX, startY;
 
     // Absolute position of the widget on screen in pixels.
@@ -69,7 +65,7 @@ public abstract class Widget {
 
     public Widget(WidgetData<?> DATA, String modId) {
         Widget.DATA = DATA;
-        widgetBox = new WidgetBox(0, 0, 0, 0, 1);
+        widgetBox = new WidgetBox(0, 0, 0, 0);
         this.modId = modId;
         init();
     }
@@ -108,8 +104,8 @@ public abstract class Widget {
     }
 
     public void setPosition(int x, int y) {
-        this.x = x;
-        this.y = y;
+            this.x = x;
+            this.y = y;
     }
 
     public void setDraggable(boolean draggable) {
@@ -152,21 +148,16 @@ public abstract class Widget {
      * Renders the widget on the editor screen.
      */
     public void renderInEditor(DrawContext drawContext, int mouseX, int mouseY) {
+        displayBg(drawContext);
+
         if (shouldScale) {
             DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(),GlobalConfig.get().scale);
         }
-        // Calculate the size of each snap box
-        snapBoxWidth = mc.getWindow().getScaledWidth() / snapSize;
-        snapBoxHeight = mc.getWindow().getScaledHeight() / snapSize;
-
         renderWidgetInEditor(drawContext,mouseX,mouseY);
 
         if (shouldScale) {
             DrawHelper.stopScaling(drawContext.getMatrices());
         }
-    }
-    protected void updateWidgetBox(){
-        widgetBox.setSizeAndPosition(x,y,getWidth(),getHeight());
     }
 
 
@@ -191,7 +182,7 @@ public abstract class Widget {
      * @param context
      */
     private void renderWidgetInEditor(DrawContext context,int mouseX, int mouseY) {
-        displayBg(context);
+        //displayBg(context);
 
         renderWidget(context,mouseX,mouseY);
     }
@@ -208,7 +199,6 @@ public abstract class Widget {
     }
 
     public boolean mouseDragged(double mouseX, double mouseY, int button, int snapSize) {
-        Widget.snapSize = snapSize;
         if (dragging && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             int newX = (int) (mouseX - startX);
             int newY = (int) (mouseY - startY);
@@ -216,21 +206,21 @@ public abstract class Widget {
             // Divides the screen into several "grid boxes" which the elements snap to.
             // Higher the snapSize, more the grid boxes
             if (this.shiftDown) {
-                // Calculate the index of the snap box that the new position would be in
-                int snapBoxX = newX / snapBoxWidth;
-                int snapBoxY = newY / snapBoxHeight;
+                // Calculate the size of each snap box
+                int snapBoxWidth = mc.getWindow().getScaledWidth() / snapSize;
+                int snapBoxHeight = mc.getWindow().getScaledHeight() / snapSize;
 
-                // Snap the new position to the top-left corner of the snap box
-                newX = snapBoxX * snapBoxWidth;
-                newY = snapBoxY * snapBoxHeight;
+                // Calculate the index of the snap box that the new position would be in and
+                // snap the new position to the top-left corner of the snap box
+                newX = (newX / snapBoxWidth) * snapBoxWidth;
+                newY = (newY / snapBoxHeight) * snapBoxHeight;
             }
 
             this.x = (int) MathHelper.clamp(newX, 0, mc.getWindow().getScaledWidth() - getWidth());
             this.y = (int) MathHelper.clamp(newY, 0, mc.getWindow().getScaledHeight() - getHeight());
 
-
-            this.xPercent = (float) this.getX() / mc.getWindow().getScaledWidth();
-            this.yPercent =  (float) this.getY() / mc.getWindow().getScaledHeight();
+            this.xPercent = (float) this.x / mc.getWindow().getScaledWidth();
+            this.yPercent =  (float) this.y / mc.getWindow().getScaledHeight();
 
             return true;
         }
@@ -267,7 +257,12 @@ public abstract class Widget {
     protected void displayBg(DrawContext context) {
         int backgroundColor = this.shouldDisplay() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
         WidgetBox box = this.getWidgetBox();
-        DrawHelper.fill(context, (int) box.x1, (int) box.y1, (int) box.x2, (int) box.y2, backgroundColor);
+       DrawHelper.drawRectangle(context.getMatrices().peek().getPositionMatrix(),
+                box.x,
+                box.y,
+                box.getWidth(),
+                box.getHeight(),
+                backgroundColor);
     }
 
 

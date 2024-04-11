@@ -37,7 +37,7 @@ public class WidgetBox {
         return !(otherX1 > x2 || otherX2 < x1 || otherY1 > y2 || otherY2 < y1);
     }
     public boolean isMouseOver(double mouseX, double mouseY) {
-        return mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2;
+        return mouseX >= x1 && mouseX <= x1 + width && mouseY >= y1 && mouseY <= y2 + height;
     }
 
     public float getWidth() {
@@ -47,13 +47,18 @@ public class WidgetBox {
     public float getHeight() {
         return height;
     }
+
     public void setSizeAndPosition(float x, float y, float width, float height){
         this.x1 = x;
-        this.x2 = x + width;
         this.y1 = y;
-        this.y2 = y + height;
         this.height = height;
         this.width = width;
+    }
+    public void setSizeAndPosition(float x, float y, float width, float height,boolean shouldScale, float scale){
+        this.x1 = x;
+        this.y1 = y;
+        this.height = height * (shouldScale? scale : 1.0f);
+        this.width = width  * (shouldScale? scale : 1.0f);
     }
     public void setSize(double width, double height) {
         if (width >= 0)

@@ -20,7 +20,7 @@ import java.io.File;
 import java.util.List;
 
 public class DynamicHudTestTWO implements DynamicHudIntegration {
-    TextWidget textWidget;
+    TextWidget exampleWidget;
     WidgetRenderer renderer;
     @Override
     public void init() {
@@ -28,7 +28,7 @@ public class DynamicHudTestTWO implements DynamicHudIntegration {
         DynamicValueRegistry.registerGlobal("CPS",() -> "NOT FPS");
 
 
-        textWidget  = new TextWidget.Builder()
+        exampleWidget = new TextWidget.Builder()
                 .setX(150)
                 .setY(100)
                 .setDraggable(true)
@@ -56,7 +56,7 @@ public class DynamicHudTestTWO implements DynamicHudIntegration {
 
     @Override
     public void addWidgets() {
-        WidgetManager.addWidget(textWidget);
+        WidgetManager.addWidget(exampleWidget);
     }
     public void initAfter(){
         List<Widget> widgets = WidgetManager.getWidgetsForMod("CustomMod");

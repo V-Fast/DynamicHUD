@@ -117,7 +117,7 @@ public abstract class Widget {
     public void setX(float x) {
         int screenWidth = client.getWindow().getScaledWidth();
         if (x < 0) {
-            x = (0);
+            x = 0;
         } else if (x + getWidgetBox().getWidth() > screenWidth) {
             x = screenWidth - getWidgetBox().getWidth();
         }

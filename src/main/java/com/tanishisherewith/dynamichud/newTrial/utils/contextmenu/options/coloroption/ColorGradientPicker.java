@@ -38,7 +38,7 @@ public class ColorGradientPicker {
         this.gradientBox.setValue(hsv[2]);
 
         this.alphaSlider = new AlphaSlider(x,y,10,boxSize,initialColor);
-        this.colorPickerButton = new ColorPickerButton(x + boxSize + 8, y + 20, 35, 20);
+        this.colorPickerButton = new ColorPickerButton(x + boxSize + 8, y + 20, 30, 18);
     }
     public void setPos(int x, int y){
         this.x = x;
@@ -50,22 +50,12 @@ public class ColorGradientPicker {
     public void close() {
         display = false;
     }
-    public void tick() {
-        gradientSlider.tick();
-        gradientBox.tick();
-    }
-    public void defaultValues(){
-        gradientSlider.defaultValues();
-        gradientBox.defaultValues();
-    }
 
     public void render(DrawContext drawContext, int x1, int y1) {
         setPos(x1,y1);
         if(!display){
-            defaultValues();
             return;
         }
-        tick();
         gradientSlider.render(drawContext,x + 30, y +client.textRenderer.fontHeight + 4);
         gradientBox.render(drawContext,x + 30, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
         colorPickerButton.render(drawContext,x+ 55 + boxSize,y + client.textRenderer.fontHeight  + gradientSlider.getHeight() + 8);

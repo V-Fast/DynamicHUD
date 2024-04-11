@@ -118,23 +118,24 @@ public class WidgetManager {
  public static void onScreenResized(int newWidth, int newHeight, int previousWidth, int previousHeight) {
      for (Widget widget : widgets) {
          // To ensure that infinite coords is not returned
-         if(widget.xPercent <= 0f){
+         if(widget.xPercent <= 0.0f){
              widget.xPercent = (float) widget.getX()/previousWidth;
          }
-         if(widget.yPercent <= 0f){
+         if(widget.yPercent <= 0.0f){
              widget.yPercent = (float) widget.getY()/previousHeight;
          }
 
          // Use the stored percentages to calculate the new position
-         int newX = (int) (widget.xPercent * newWidth);
-         int newY = (int) (widget.yPercent * newHeight);
+         float newX = widget.xPercent * newWidth;
+         float newY = widget.yPercent * newHeight;
 
          // Ensure the widget is within the screen bounds
-         newX = (int) MathHelper.clamp(newX, 0, newWidth - widget.getWidth());
-         newY = (int) MathHelper.clamp(newY, 0, newHeight - widget.getHeight());
+         newX = MathHelper.clamp(newX, 0, newWidth - widget.getWidth());
+         newY = MathHelper.clamp(newY, 0, newHeight - widget.getHeight());
 
          // Update the widget's position
-         widget.setPosition(newX, newY);
+         widget.setPosition((int) newX, (int) newY);
+
          // Update the stored percentages with the new screen size (after resize).
          widget.xPercent = (float) widget.getX() / newWidth;
          widget.yPercent =  (float) widget.getY() / newHeight;

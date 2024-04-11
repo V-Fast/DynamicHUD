@@ -1,12 +1,12 @@
 package com.tanishisherewith.dynamichud.newTrial.screens;
 
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetRenderer;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+
 public abstract class AbstractMoveableScreen extends Screen {
-    protected boolean ShouldPause = false; // To pause if the screen is opened or not
+    protected boolean shouldPause = false; // To pause if the screen is opened or not
     public final WidgetRenderer widgetRenderer;
     public int snapSize = 100;
 
@@ -81,18 +81,12 @@ public abstract class AbstractMoveableScreen extends Screen {
     }
 
     public void setShouldPause(boolean shouldPause) {
-        this.ShouldPause = shouldPause;
-    }
-
-
-    @Override
-    public void resize(MinecraftClient client, int width, int height) {
-            super.resize(client, width, height);
+        this.shouldPause = shouldPause;
     }
 
     @Override
     public boolean shouldPause() {
-        return ShouldPause;
+        return shouldPause;
     }
     public void setSnapSize(int size){
         this.snapSize = size;
