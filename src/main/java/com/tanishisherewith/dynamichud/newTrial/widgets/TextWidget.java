@@ -22,7 +22,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public class TextWidget extends Widget {
-    public Color textColor;    public static WidgetData<TextWidget> DATA = new WidgetData<>("TextWidget", "Display Text on screen", TextWidget::new);
+    public Color textColor;
+    public static WidgetData<TextWidget> DATA = new WidgetData<>("TextWidget", "Display Text on screen", TextWidget::new);
     protected boolean shadow; // Whether to draw a shadow behind the text
     protected boolean rainbow; // Whether to apply a rainbow effect to the text
     protected int rainbowSpeed = 2; //Speed of the rainbow effect
@@ -95,7 +96,7 @@ public class TextWidget extends Widget {
             drawContext.drawText(mc.textRenderer, text, getX() + 2, getY() + 2, color, shadow);
             widgetBox.setSizeAndPosition(getX(), getY(), mc.textRenderer.getWidth(text) + 3, mc.textRenderer.fontHeight + 2, this.shouldScale, GlobalConfig.get().scale);
         }
-        menu.render(drawContext, getX() - 2, getY(), (int) Math.ceil(getHeight()));
+        menu.render(drawContext, getX(), getY(), (int) Math.ceil(getHeight()));
     }
 
     @Override
@@ -149,9 +150,10 @@ public class TextWidget extends Widget {
 
         // If true then it means that we should use local registry and if false (i.e. null) then use global registry
         boolean dvrObj = tag.getBoolean("DynamicValueRegistry");
-
+        System.out.println(dvrObj);
         if (!dvrObj) {
             this.textSupplier = (Supplier<String>) DynamicValueRegistry.getGlobal(dynamicRegistryKey);
+            System.out.println(textSupplier);
             return;
         }
 

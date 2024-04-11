@@ -55,6 +55,11 @@ public class DynamicHudTest implements DynamicHudIntegration {
         WidgetManager.addWidget(Example2Widget);
     }
 
+    @Override
+    public void registerCustomWidgets() {
+        //WidgetManager.addWidgetData(MyWidget.DATA);
+    }
+
     public void initAfter() {
         List<Widget> widgets = WidgetManager.getWidgetsForMod(DynamicHUD.MOD_ID);
 

@@ -59,11 +59,13 @@ public class ColorGradientPicker {
         }
         gradientSlider.render(drawContext, x + 30, y + client.textRenderer.fontHeight + 4);
         gradientBox.render(drawContext, x + 30, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
-        colorPickerButton.render(drawContext, x + 55 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 8);
+        colorPickerButton.render(drawContext, x + 54 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 8);
         alphaSlider.render(drawContext, x + 40 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
 
         if (colorPickerButton.isPicking()) {
-            // Draw the cursor
+            // Draw the preview box near cursor
+
+            //Translate cursor screen position to minecraft's scaled window
             double mouseX = client.mouse.getX() * client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
             double mouseY = client.mouse.getY() * client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
 
@@ -71,14 +73,18 @@ public class ColorGradientPicker {
             int x = (int) (mouseX * framebuffer.textureWidth / client.getWindow().getScaledWidth());
             int y = (int) ((client.getWindow().getScaledHeight() - mouseY) * framebuffer.textureHeight / client.getWindow().getScaledHeight());
 
+            //Read the pixel color at x,y pos to buffer
             ByteBuffer buffer = GlAllocationUtils.allocateByteBuffer(4);
             GL11.glReadPixels(x, y, 1, 1, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
             int red = buffer.get(0) & 0xFF;
             int green = buffer.get(1) & 0xFF;
             int blue = buffer.get(2) & 0xFF;
 
+            drawContext.getMatrices().push();
+            drawContext.getMatrices().translate(0,0,500);
             drawContext.fill((int) mouseX + 10, (int) mouseY, (int) mouseX + 26, (int) mouseY + 16, -1);
             drawContext.fill((int) mouseX + 11, (int) mouseY + 1, (int) mouseX + 25, (int) mouseY + 15, (red << 16) | (green << 8) | blue | 0xFF000000);
+            drawContext.getMatrices().pop();
         }
     }
 

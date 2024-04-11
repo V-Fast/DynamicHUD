@@ -16,7 +16,7 @@ import org.lwjgl.glfw.GLFW;
 import java.io.File;
 import java.util.List;
 
-public class DynamicHudTestTWO implements DynamicHudIntegration {
+public class DynamicHudTestTwo implements DynamicHudIntegration {
     TextWidget exampleWidget;
     WidgetRenderer renderer;
 

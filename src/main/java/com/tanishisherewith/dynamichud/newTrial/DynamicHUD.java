@@ -69,9 +69,10 @@ public class DynamicHUD implements ClientModInitializer {
         printInfo("Initialising DynamicHud");
 
         // Add WidgetData of included widgets
-        WidgetManager.addWidgetDatas(
+        WidgetManager.registerCustomWidgets(
                 TextWidget.DATA
         );
+
         //YACL load
         GlobalConfig.HANDLER.load();
 
@@ -81,12 +82,16 @@ public class DynamicHUD implements ClientModInitializer {
                 .forEach(entrypoint -> {
                     ModMetadata metadata = entrypoint.getProvider().getMetadata();
                     String modId = metadata.getId();
+                    printInfo(String.format("Supported mod with id %s was found!", modId));
                     AbstractMoveableScreen screen;
+                    KeyBinding binding;
+                    WidgetRenderer widgetRenderer;
+                    File widgetsFile;
                     try {
                         DynamicHudIntegration DHIntegration = entrypoint.getEntrypoint();
                         DHIntegration.init();
 
-                        File widgetsFile = DHIntegration.getWidgetsFile();
+                        widgetsFile = DHIntegration.getWidgetsFile();
 
                         if (widgetsFile.exists()) {
                             WidgetManager.loadWidgets(widgetsFile);
@@ -97,11 +102,11 @@ public class DynamicHUD implements ClientModInitializer {
 
                         screen = DHIntegration.getMovableScreen();
 
-                        KeyBinding binding = DHIntegration.getKeyBind();
+                        binding = DHIntegration.getKeyBind();
 
                         DHIntegration.registerCustomWidgets();
 
-                        WidgetRenderer widgetRenderer = DHIntegration.getWidgetRenderer();
+                        widgetRenderer = DHIntegration.getWidgetRenderer();
                         addWidgetRenderer(widgetRenderer);
 
                         List<Widget> widgets = fileMap.get(widgetsFile.getName());
@@ -139,7 +144,6 @@ public class DynamicHUD implements ClientModInitializer {
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, s) -> GlobalConfig.HANDLER.save());
         ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> GlobalConfig.HANDLER.save());
         Runtime.getRuntime().addShutdownHook(new Thread(() -> GlobalConfig.HANDLER.save()));
-        GlobalConfig.HANDLER.save();
 
         HudRenderCallback.EVENT.register(new HudRender());
     }

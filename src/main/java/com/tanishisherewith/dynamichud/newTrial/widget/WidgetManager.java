@@ -37,7 +37,7 @@ public class WidgetManager {
      *
      * @param data The WidgetData object to add.
      */
-    public static void addWidgetData(WidgetData<?> data) {
+    public static void registerCustomWidget(WidgetData<?> data) {
         widgetDataMap.put(data.name(), data);
     }
 
@@ -46,7 +46,7 @@ public class WidgetManager {
      *
      * @param widgetDatas The WidgetData objects to add.
      */
-    public static void addWidgetDatas(WidgetData<?>... widgetDatas) {
+    public static void registerCustomWidgets(WidgetData<?>... widgetDatas) {
         for (WidgetData<?> data : widgetDatas) {
             widgetDataMap.put(data.name(), data);
         }
