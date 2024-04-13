@@ -1,8 +1,9 @@
-package com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption;
+package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
+import com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption.ColorGradientPicker;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 

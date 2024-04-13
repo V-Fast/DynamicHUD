@@ -8,7 +8,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.options.BooleanOption;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.DoubleOption;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.EnumOption;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.ListOption;
-import com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption.ColorOption;
+import com.tanishisherewith.dynamichud.utils.contextmenu.options.ColorOption;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
 import net.minecraft.client.gui.DrawContext;

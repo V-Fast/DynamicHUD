@@ -32,8 +32,8 @@ public class GradientBox {
 
         // Draw the handle
         float handleSize = 3;
-        float handleX = x + saturation * size - handleSize / 2.0f;
-        float handleY = y + (1.0f - value) * size - handleSize / 2.0f;
+        float handleX = x + 2 + saturation * size - handleSize / 2.0f;
+        float handleY = y + 2 + (1.0f - value) * size - handleSize / 2.0f;
 
         DrawHelper.drawFilledCircle(drawContext.getMatrices().peek().getPositionMatrix(), handleX, handleY, 1, -1);
         drawContext.getMatrices().pop();
