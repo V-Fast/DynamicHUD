@@ -23,7 +23,8 @@ import java.util.function.Supplier;
 
 public class TextWidget extends Widget {
     public Color textColor;
-    protected boolean shadow; // Whether to draw a shadow behind the text    public static WidgetData<TextWidget> DATA = new WidgetData<>("TextWidget", "Display Text on screen", TextWidget::new);
+    protected boolean shadow; // Whether to draw a shadow behind the text
+    public static WidgetData<TextWidget> DATA = new WidgetData<>("TextWidget", "Display Text on screen", TextWidget::new);
     protected boolean rainbow; // Whether to apply a rainbow effect to the text
     protected int rainbowSpeed = 2; //Speed of the rainbow effect
     Supplier<String> textSupplier;
