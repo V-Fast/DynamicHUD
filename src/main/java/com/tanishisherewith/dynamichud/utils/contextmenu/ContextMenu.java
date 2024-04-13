@@ -10,12 +10,13 @@ import java.util.List;
 public class ContextMenu {
     private final List<Option<?>> options = new ArrayList<>(); // The list of options in the context menu
     public int x, y;
-    public int width = 0;
+    public int width = 0, finalWidth = 0;
     public int height = 0;
-    public int backgroundColor = new Color(107, 112, 126, 124).getRGB();// Semi-transparent light greyish - blue color
+    public Color backgroundColor = new Color(107, 112, 126, 124);// Semi-transparent light greyish - blue color
     public int padding = 5; // The amount of padding around the rectangle
     public int heightOffset = 4; // Height offset from the widget
     public boolean shouldDisplay = false;
+    public static boolean drawBorder = true;
     protected float scale = 0.0f;
 
     public ContextMenu(int x, int y) {
@@ -27,7 +28,7 @@ public class ContextMenu {
         options.add(option);
     }
 
-    public void render(DrawContext drawContext, int x, int y, int height) {
+    public void render(DrawContext drawContext, int x, int y, int height, int mouseX, int mouseY) {
         this.x = x;
         this.y = y + heightOffset + height;
         if (!shouldDisplay) return;
@@ -35,26 +36,31 @@ public class ContextMenu {
         update();
         DrawHelper.scaleAndPosition(drawContext.getMatrices(), x, y, scale);
 
-        int x1 = this.x - 1;
-        int y1 = this.y;
-        int x2 = this.x + width;
-        int y2 = this.y + this.height;
-
         // Draw the background
-        DrawHelper.drawCutRectangle(drawContext, x1, y1, x2, y2, 0, backgroundColor, 1);
+        DrawHelper.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(),  this.x - 1, this.y, this.width, this.height, 2,backgroundColor.getRGB());
+        if(drawBorder){
+            DrawHelper.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), this.x - 1,this.y,width + 1,this.height,2,0.7f,backgroundColor.darker().darker().darker().darker().darker().getRGB());
+        }
 
-        int yOffset = y1 + 3;
+        int yOffset = this.y + 3;
         this.width = 10;
         for (Option<?> option : options) {
             if (!option.shouldRender()) continue;
-            option.render(drawContext, x + 2, yOffset);
+            if(isMouseOver(mouseX,mouseY, this.x +1,yOffset-1,this.finalWidth - 2,option.height)){
+            DrawHelper.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), this.x,yOffset - 1.24f,this.finalWidth - 2,option.height + 0.48f,2,backgroundColor.darker().darker().getRGB());
+            }
+            option.render(drawContext, x + 2, yOffset,mouseX,mouseY);
             this.width = Math.max(this.width, option.width + padding);
             yOffset += option.height + 1;
         }
         this.width = this.width + 3;
-        this.height = (yOffset - y1);
+        this.finalWidth = this.width;
+        this.height = (yOffset - this.y);
 
         DrawHelper.stopScaling(drawContext.getMatrices());
+    }
+    public boolean isMouseOver(int mouseX, int mouseY, int x, int y, int width, int height){
+        return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
 
     public void update() {

@@ -74,7 +74,7 @@ public class AlphaSlider {
     }
 
     public void onDrag(double mouseX, double mouseY, int button) {
-        if (isDragging && isMouseOver(mouseX, mouseY)) {
+        if (isDragging) {
             alphaHandleY = (int) mouseY - y;
             alpha = 1.0f - (alphaHandleY / (float) height);
             if (alpha < 0.0f) {

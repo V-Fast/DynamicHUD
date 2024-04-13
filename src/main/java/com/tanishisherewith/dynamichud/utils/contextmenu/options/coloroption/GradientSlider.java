@@ -54,7 +54,7 @@ public class GradientSlider {
         float handleX = x + hue * width - handleWidth / 2.0f;
         float handleY = y - (handleHeight - height) / 2.0f;
 
-        DrawHelper.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), handleX, handleY, handleWidth, handleHeight, 2, -1);
+        DrawHelper.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), handleX, handleY, handleWidth, handleHeight, -1);
         drawContext.getMatrices().pop();
     }
 

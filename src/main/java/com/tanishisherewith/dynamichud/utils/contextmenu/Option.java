@@ -48,6 +48,9 @@ public abstract class Option<T> {
         this.x = x;
         this.y = y;
     }
+    public void render(DrawContext drawContext, int x, int y,int mouseX, int mouseY) {
+        this.render(drawContext, x, y);
+    }
 
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         return isMouseOver(mouseX, mouseY);

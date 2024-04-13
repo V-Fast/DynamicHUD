@@ -35,13 +35,14 @@ public class SubMenuOption extends Option<Boolean> {
     }
 
     @Override
-    public void render(DrawContext drawContext, int x, int y) {
-        super.render(drawContext, x, y);
+    public void render(DrawContext drawContext, int x, int y,int mouseX,int mouseY) {
+        this.x = x;
+        this.y = y;
 
         int color = value ? Color.GREEN.getRGB() : Color.RED.getRGB();
         drawContext.drawText(mc.textRenderer, Text.of(name), x, y, color, false);
 
-        subMenu.render(drawContext, this.x + parentMenu.width, this.y, 0);
+        subMenu.render(drawContext, this.x + parentMenu.width, this.y, 0,mouseX, mouseY);
     }
 
     @Override

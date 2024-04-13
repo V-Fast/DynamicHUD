@@ -96,7 +96,7 @@ public class TextWidget extends Widget {
             drawContext.drawText(mc.textRenderer, text, getX() + 2, getY() + 2, color, shadow);
             widgetBox.setSizeAndPosition(getX(), getY(), mc.textRenderer.getWidth(text) + 3, mc.textRenderer.fontHeight + 2, this.shouldScale, GlobalConfig.get().scale);
         }
-        menu.render(drawContext, getX(), getY(), (int) Math.ceil(getHeight()));
+        menu.render(drawContext, getX(), getY(), (int) Math.ceil(getHeight()),mouseX,mouseY);
     }
 
     @Override

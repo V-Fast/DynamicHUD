@@ -32,6 +32,8 @@ public class ColorOption extends Option<Color> {
         this.height = mc.textRenderer.fontHeight;
         this.width = mc.textRenderer.getWidth(name) + 12;
         drawContext.drawText(mc.textRenderer, Text.of(name), x, y, color, false);
+
+        int shadowOpacity = Math.min(value.getAlpha(),90);
         DrawHelper.drawRoundedRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(),
                 x + width - 8,
                 y,
@@ -39,7 +41,7 @@ public class ColorOption extends Option<Color> {
                 8,
                 2,
                 value.getRGB(),
-                90,
+                shadowOpacity,
                 1,
                 1);
 
