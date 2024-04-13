@@ -163,6 +163,7 @@ public class DynamicHUD implements ClientModInitializer {
         ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> GlobalConfig.HANDLER.save());
         ClientLifecycleEvents.CLIENT_STOPPING.register((minecraftClient)->GlobalConfig.HANDLER.save());
 
+
         HudRenderCallback.EVENT.register(new HudRender());
     }
 

@@ -13,7 +13,7 @@ import java.util.function.Supplier;
  * <pre>
  *     {@code
  *     DynamicValueRegistry dvr = new DynamicValueRegistry("mod_id");
- *     dvr.registerGlobal("ABC",//YourSupplier);
+ *     dvr.registerLocal("ABC",//YourSupplier);
  *     Supplier<?> result = dvr.get("ABC");
  *     }
  * </pre>

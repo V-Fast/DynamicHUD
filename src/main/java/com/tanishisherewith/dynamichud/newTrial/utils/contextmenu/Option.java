@@ -18,10 +18,18 @@ public abstract class Option<T> {
     protected T defaultValue = null;
     protected MinecraftClient mc = MinecraftClient.getInstance();
     private Widget selectedWidget; // The widget that this context menu is associated with
+    public Supplier<Boolean> shouldRender = ()->true;
 
     public Option(Supplier<T> getter, Consumer<T> setter) {
         this.getter = getter;
         this.setter = setter;
+        value = get();
+        defaultValue = get();
+    }
+    public Option(Supplier<T> getter, Consumer<T> setter,Supplier<Boolean> shouldRender) {
+        this.getter = getter;
+        this.setter = setter;
+        this.shouldRender = shouldRender;
         value = get();
         defaultValue = get();
     }
@@ -62,5 +70,14 @@ public abstract class Option<T> {
 
     public boolean isMouseOver(double mouseX, double mouseY) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
+    }
+
+    public Option<T> setShouldRender(Supplier<Boolean> shouldRender) {
+        this.shouldRender = shouldRender;
+        return this;
+    }
+
+    public boolean shouldRender(){
+        return shouldRender.get();
     }
 }

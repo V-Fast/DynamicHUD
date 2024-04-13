@@ -46,6 +46,7 @@ public class ContextMenu {
         int yOffset = y1 + 3;
         this.width = 10;
         for (Option<?> option : options) {
+            if(!option.shouldRender())continue;
             option.render(drawContext, x + 2, yOffset);
             this.width = Math.max(this.width, option.width + padding);
             yOffset += option.height + 1;

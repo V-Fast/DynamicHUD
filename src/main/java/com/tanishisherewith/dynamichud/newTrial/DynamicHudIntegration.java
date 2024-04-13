@@ -40,10 +40,10 @@ public interface DynamicHudIntegration {
      * The key binding for opening the editor screen.
      */
     KeyBinding EDITOR_SCREEN_KEY_BINDING = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-            TRANSLATION_KEY,
-            INPUT_TYPE,
-            KEY,
-            KEYBIND_CATEGORY
+            "DynamicHud Editor Screen",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_RIGHT_SHIFT,
+            "DynamicHud"
     ));
 
     /**
