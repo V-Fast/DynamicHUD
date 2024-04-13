@@ -7,6 +7,7 @@ import com.tanishisherewith.dynamichud.newTrial.widget.WidgetManager;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetRenderer;
 import com.tanishisherewith.dynamichud.newTrial.widgets.TextWidget;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -30,7 +31,7 @@ public class DynamicHUD implements ClientModInitializer {
      * <p>
      * Allows saving widgets across different mods with same save file name.
      */
-    public static final HashMap<String, List<Widget>> fileMap = new HashMap<>();
+    public static final HashMap<String, List<Widget>> FILE_MAP = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger("DynamicHud");
     private static final List<WidgetRenderer> widgetRenderers = new ArrayList<>();
     public static MinecraftClient MC = MinecraftClient.getInstance();
@@ -89,33 +90,43 @@ public class DynamicHUD implements ClientModInitializer {
                     File widgetsFile;
                     try {
                         DynamicHudIntegration DHIntegration = entrypoint.getEntrypoint();
+
+                        //Calls the init method
                         DHIntegration.init();
 
+                        //Gets the widget file to save and load the widgets from
                         widgetsFile = DHIntegration.getWidgetsFile();
 
+                        // Adds / loads widgets from file
                         if (widgetsFile.exists()) {
                             WidgetManager.loadWidgets(widgetsFile);
                         } else {
                             DHIntegration.addWidgets();
                         }
+
+                        //Calls the second init method
                         DHIntegration.initAfter();
 
+                        // Get the instance of AbstractMoveableScreen
                         screen = DHIntegration.getMovableScreen();
 
+                        // Get the keybind to open the screen instance
                         binding = DHIntegration.getKeyBind();
 
+                        //Register custom widget datas by WidgetManager.registerCustomWidgets();
                         DHIntegration.registerCustomWidgets();
 
+                        //WidgetRenderer with widgets instance
                         widgetRenderer = DHIntegration.getWidgetRenderer();
                         addWidgetRenderer(widgetRenderer);
 
-                        List<Widget> widgets = fileMap.get(widgetsFile.getName());
+                        List<Widget> widgets = FILE_MAP.get(widgetsFile.getName());
 
-                        if (widgets == null) {
-                            fileMap.put(widgetsFile.getName(), widgetRenderer.getWidgets());
+                        if (widgets == null || widgets.isEmpty()) {
+                            FILE_MAP.put(widgetsFile.getName(), widgetRenderer.getWidgets());
                         } else {
-                            widgetRenderer.getWidgets().addAll(widgets);
-                            fileMap.put(widgetsFile.getName(), widgetRenderer.getWidgets());
+                            widgets.addAll(widgetRenderer.getWidgets());
+                            FILE_MAP.put(widgetsFile.getName(), widgets);
                         }
 
                         //Register events for rendering, saving, loading, and opening the hudEditor
@@ -123,12 +134,19 @@ public class DynamicHUD implements ClientModInitializer {
                             openDynamicScreen(binding, screen);
                         });
 
-                        // Save during exiting a world, server or Minecraft itself
-                        // Also saved when a resource pack is reloaded.
-                        ServerLifecycleEvents.SERVER_STOPPING.register(server -> saveWidgetsSafely(widgetsFile, fileMap.get(widgetsFile.getName())));
-                        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, s) -> saveWidgetsSafely(widgetsFile, fileMap.get(widgetsFile.getName())));
-                        ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> saveWidgetsSafely(widgetsFile, fileMap.get(widgetsFile.getName())));
-                        Runtime.getRuntime().addShutdownHook(new Thread(() -> saveWidgetsSafely(widgetsFile, fileMap.get(widgetsFile.getName()))));
+                        /* === Saving === */
+
+                        //When a player exits a world (SinglePlayer worlds) or a server stops
+                        ServerLifecycleEvents.SERVER_STOPPING.register(server -> saveWidgetsSafely(widgetsFile, FILE_MAP.get(widgetsFile.getName())));
+
+                        // When a resource pack is reloaded.
+                        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, s) -> saveWidgetsSafely(widgetsFile, FILE_MAP.get(widgetsFile.getName())));
+
+                        //When player disconnects
+                        ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> saveWidgetsSafely(widgetsFile, FILE_MAP.get(widgetsFile.getName())));
+
+                        //When minecraft closes
+                        ClientLifecycleEvents.CLIENT_STOPPING.register((minecraftClient)->saveWidgetsSafely(widgetsFile,FILE_MAP.get(widgetsFile.getName())));
 
                         printInfo(String.format("Integration of mod %s was successful", modId));
                     } catch (Throwable e) {
@@ -143,7 +161,7 @@ public class DynamicHUD implements ClientModInitializer {
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> GlobalConfig.HANDLER.save());
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, s) -> GlobalConfig.HANDLER.save());
         ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> GlobalConfig.HANDLER.save());
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> GlobalConfig.HANDLER.save()));
+        ClientLifecycleEvents.CLIENT_STOPPING.register((minecraftClient)->GlobalConfig.HANDLER.save());
 
         HudRenderCallback.EVENT.register(new HudRender());
     }

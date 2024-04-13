@@ -183,6 +183,7 @@ public abstract class Widget {
 
         renderWidget(context, mouseX, mouseY);
     }
+    /* Input related methods. Override with super call to add your own input-based code like contextMenu */
 
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (widgetBox.isMouseOver(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {

@@ -1,6 +1,7 @@
 package com.tanishisherewith.dynamichud.newTrial;
 
 import com.tanishisherewith.dynamichud.newTrial.screens.AbstractMoveableScreen;
+import com.tanishisherewith.dynamichud.newTrial.widget.WidgetData;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetManager;
 import com.tanishisherewith.dynamichud.newTrial.widget.WidgetRenderer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -75,6 +76,14 @@ public interface DynamicHudIntegration {
 
     /**
      * To register custom widgets. This method can be overridden by implementations.
+     * <p>
+     * Use {@link WidgetManager#registerCustomWidget(WidgetData)} to register custom widgets.
+     * <pre>
+     * Example:
+     *     {@code
+     *     WidgetManager.registerCustomWidget(TextWidget.DATA);
+     *     }
+     * </pre>
      */
     default void registerCustomWidgets() {
     }

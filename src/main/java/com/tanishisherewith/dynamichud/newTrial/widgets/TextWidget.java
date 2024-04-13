@@ -134,7 +134,6 @@ public class TextWidget extends Widget {
         tag.putBoolean("Rainbow", rainbow);
         tag.putInt("TextColor", textColor.getRGB());
         tag.putInt("RainbowSpeed", rainbowSpeed);
-
         // If true then it means that we should use local registry and if false (i.e. null) then use global registry
         tag.putBoolean("DynamicValueRegistry", dynamicValueRegistry != null);
     }
@@ -150,10 +149,8 @@ public class TextWidget extends Widget {
 
         // If true then it means that we should use local registry and if false (i.e. null) then use global registry
         boolean dvrObj = tag.getBoolean("DynamicValueRegistry");
-        System.out.println(dvrObj);
         if (!dvrObj) {
             this.textSupplier = (Supplier<String>) DynamicValueRegistry.getGlobal(dynamicRegistryKey);
-            System.out.println(textSupplier);
             return;
         }
 
@@ -161,6 +158,7 @@ public class TextWidget extends Widget {
             //Unfortunately, this method takes the value from the first local registry with the key.
             //It returns to prevent overriding with other registries
             this.textSupplier = (Supplier<String>) dvr.get(dynamicRegistryKey);
+            dynamicValueRegistry = dvr;
             return;
         }
         createMenu();

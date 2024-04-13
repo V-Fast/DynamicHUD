@@ -19,6 +19,12 @@ public abstract class AbstractMoveableScreen extends Screen {
     }
 
     @Override
+    public void onDisplayed() {
+        super.onDisplayed();
+        widgetRenderer.isInEditor = true;
+    }
+
+    @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         widgetRenderer.mouseDragged(mouseX, mouseY, button, snapSize);
         return false;
@@ -68,7 +74,6 @@ public abstract class AbstractMoveableScreen extends Screen {
             this.renderBackgroundTexture(drawContext);
         }
         // Draw each widget
-        widgetRenderer.isInEditor = true;
         widgetRenderer.renderWidgets(drawContext, mouseX, mouseY);
     }
 

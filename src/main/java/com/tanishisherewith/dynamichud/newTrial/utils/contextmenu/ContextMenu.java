@@ -12,7 +12,7 @@ public class ContextMenu {
     public int x, y;
     public int width = 0;
     public int height = 0;
-    public int backgroundColor = new Color(107, 112, 126, 124).getRGB();// Semi-transparent light grey color
+    public int backgroundColor = new Color(107, 112, 126, 124).getRGB();// Semi-transparent light greyish - blue color
     public int padding = 5; // The amount of padding around the rectangle
     public int heightOffset = 4; // Height offset from the widget
     public boolean shouldDisplay = false;
