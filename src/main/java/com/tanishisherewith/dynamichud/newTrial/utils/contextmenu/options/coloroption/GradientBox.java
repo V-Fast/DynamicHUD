@@ -1,6 +1,6 @@
 package com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.coloroption;
 
-import com.tanishisherewith.dynamichud.helpers.DrawHelper;
+import com.tanishisherewith.dynamichud.newTrial.helpers.DrawHelper;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
@@ -35,7 +35,7 @@ public class GradientBox {
         float handleX = x + saturation * size - handleSize / 2.0f;
         float handleY = y + (1.0f - value) * size - handleSize / 2.0f;
 
-        DrawHelper.fillRoundedRect(drawContext, (int) handleX, (int) handleY, (int) (handleX + handleSize), (int) (handleY + handleSize), -1);
+        DrawHelper.drawFilledCircle(drawContext.getMatrices().peek().getPositionMatrix(), handleX, handleY, 1,-1);
         drawContext.getMatrices().pop();
     }
 

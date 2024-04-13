@@ -70,6 +70,7 @@ public abstract class AbstractMoveableScreen extends Screen {
      */
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+        assert this.client != null;
         if (this.client.world == null) {
             this.renderBackgroundTexture(drawContext);
         }

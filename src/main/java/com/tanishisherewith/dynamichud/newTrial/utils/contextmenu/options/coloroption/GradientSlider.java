@@ -1,6 +1,6 @@
 package com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.coloroption;
 
-import com.tanishisherewith.dynamichud.helpers.DrawHelper;
+import com.tanishisherewith.dynamichud.newTrial.helpers.DrawHelper;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
@@ -54,7 +54,7 @@ public class GradientSlider {
         float handleX = x + hue * width - handleWidth / 2.0f;
         float handleY = y - (handleHeight - height) / 2.0f;
 
-        DrawHelper.fillRoundedRect(drawContext, (int) handleX, (int) handleY, (int) (handleX + handleWidth), (int) (handleY + handleHeight), -1);
+        DrawHelper.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), handleX, handleY, handleWidth, handleHeight, 2,-1);
         drawContext.getMatrices().pop();
     }
 

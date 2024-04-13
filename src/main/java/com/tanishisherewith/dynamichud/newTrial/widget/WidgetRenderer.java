@@ -1,6 +1,6 @@
 package com.tanishisherewith.dynamichud.newTrial.widget;
 
-import com.tanishisherewith.dynamichud.DynamicHUD;
+import com.tanishisherewith.dynamichud.newTrial.DynamicHUD;
 import com.tanishisherewith.dynamichud.newTrial.screens.AbstractMoveableScreen;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.GameMenuScreen;

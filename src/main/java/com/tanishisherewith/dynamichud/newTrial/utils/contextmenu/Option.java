@@ -1,6 +1,6 @@
 package com.tanishisherewith.dynamichud.newTrial.utils.contextmenu;
 
-import com.tanishisherewith.dynamichud.widget.Widget;
+import com.tanishisherewith.dynamichud.newTrial.widget.Widget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 

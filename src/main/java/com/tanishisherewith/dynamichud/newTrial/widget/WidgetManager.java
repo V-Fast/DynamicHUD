@@ -1,6 +1,6 @@
 package com.tanishisherewith.dynamichud.newTrial.widget;
 
-import com.tanishisherewith.dynamichud.DynamicHUD;
+import com.tanishisherewith.dynamichud.newTrial.DynamicHUD;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
@@ -15,8 +15,8 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
-import static com.tanishisherewith.dynamichud.DynamicHUD.printInfo;
-import static com.tanishisherewith.dynamichud.DynamicHUD.printWarn;
+import static com.tanishisherewith.dynamichud.newTrial.DynamicHUD.printInfo;
+import static com.tanishisherewith.dynamichud.newTrial.DynamicHUD.printWarn;
 
 /**
  * Manages a collection of widgets, providing methods to add, remove, save, and load widgets.
@@ -78,29 +78,6 @@ public class WidgetManager {
     public static void removeWidget(Widget widget) {
         widgets.remove(widget);
     }
- /*   public static void onScreenResized(int newWidth, int newHeight) {
-        float scaleX = (float) newWidth / MC.getWindow().getScaledWidth();
-        float scaleY = (float) newHeight / MC.getWindow().getScaledHeight();
-        System.out.println("newWidth: " + newWidth);
-        System.out.println("newHeight: " + newHeight);
-
-        System.out.println("scaleX: " + scaleX);
-
-        for (Widget widget : widgets) {
-            float newX = widget.getX() * scaleX;
-            float newY = widget.getY() * scaleY;
-            System.out.println("newX: " + newX);
-
-            // Ensure the widget is within the screen bounds
-            newX = MathHelper.clamp(newX,0,newWidth - widget.getWidth());
-            newY = MathHelper.clamp(newY,0,newHeight - widget.getHeight());
-            System.out.println("newX2: " + newX);
-
-            widget.setPosition(newX, newY);
-        }
-    }
-
-  */
 
     /**
      * Attempts to restore the widgets back to their place on screen resize.
@@ -210,7 +187,10 @@ public class WidgetManager {
         if (file.exists()) {
             NbtCompound rootTag = NbtIo.read(file.toPath());
             NbtList widgetList = rootTag.getList("widgets", NbtType.COMPOUND);
-
+            if(widgetList == null){
+                printWarn("RootTag is null. File is either empty or corrupted," + file);
+                return;
+            }
             for (int i = 0; i < widgetList.size(); i++) {
                 NbtCompound widgetTag = widgetList.getCompound(i);
                 WidgetData<?> widgetData = widgetDataMap.get(widgetTag.getString("name"));

@@ -1,7 +1,7 @@
 package com.tanishisherewith.dynamichud.newTrial.widgets;
 
-import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.newTrial.config.GlobalConfig;
+import com.tanishisherewith.dynamichud.newTrial.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.newTrial.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.newTrial.utils.contextmenu.options.BooleanOption;
@@ -28,7 +28,7 @@ public class TextWidget extends Widget {
     protected boolean rainbow; // Whether to apply a rainbow effect to the text
     protected int rainbowSpeed = 2; //Speed of the rainbow effect
     Supplier<String> textSupplier;
-    String dynamicRegistryKey = "";
+    String dynamicRegistryKey;
     DynamicValueRegistry dynamicValueRegistry = null;
     private ContextMenu menu;
     public TextWidget() {
@@ -161,7 +161,6 @@ public class TextWidget extends Widget {
             dynamicValueRegistry = dvr;
             return;
         }
-        createMenu();
     }
 
     public enum Enum {

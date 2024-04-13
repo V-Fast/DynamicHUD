@@ -1,6 +1,6 @@
 package com.tanishisherewith.dynamichud.newTrial.utils.contextmenu;
 
-import com.tanishisherewith.dynamichud.helpers.DrawHelper;
+import com.tanishisherewith.dynamichud.newTrial.helpers.DrawHelper;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;

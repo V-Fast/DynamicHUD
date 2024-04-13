@@ -2,7 +2,6 @@ package com.tanishisherewith.dynamichud.newTrial.helpers;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.newTrial.DynamicHUD;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
@@ -659,7 +658,7 @@ public class DrawHelper {
     }
 
     /**
-     * Draws a outline rounded gradient rectangle
+     * Draws an outline rounded gradient rectangle
      *
      * @param matrix4f Matrix4f object to draw the rounded gradient rectangle
      * @param color1   is applied to the bottom-left vertex (x, y + height).

@@ -32,7 +32,7 @@ public class DynamicHUD implements ClientModInitializer {
      * Allows saving widgets across different mods with same save file name.
      */
     public static final HashMap<String, List<Widget>> FILE_MAP = new HashMap<>();
-    private static final Logger logger = LoggerFactory.getLogger("DynamicHud");
+    public static final Logger logger = LoggerFactory.getLogger("DynamicHud");
     private static final List<WidgetRenderer> widgetRenderers = new ArrayList<>();
     public static MinecraftClient MC = MinecraftClient.getInstance();
     public static String MOD_ID = "dynamichud";
@@ -130,9 +130,7 @@ public class DynamicHUD implements ClientModInitializer {
                         }
 
                         //Register events for rendering, saving, loading, and opening the hudEditor
-                        ClientTickEvents.START_CLIENT_TICK.register((client) -> {
-                            openDynamicScreen(binding, screen);
-                        });
+                        ClientTickEvents.START_CLIENT_TICK.register((client) -> openDynamicScreen(binding, screen));
 
                         /* === Saving === */
 

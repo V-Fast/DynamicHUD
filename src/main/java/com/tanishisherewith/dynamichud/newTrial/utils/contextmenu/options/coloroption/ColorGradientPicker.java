@@ -17,7 +17,7 @@ public class ColorGradientPicker {
     private final ColorPickerButton colorPickerButton;
     private final AlphaSlider alphaSlider;
     private final int boxSize;
-    MinecraftClient client = MinecraftClient.getInstance();
+    final MinecraftClient client = MinecraftClient.getInstance();
     private int x, y;
     private boolean display = false;
 
