@@ -23,13 +23,13 @@ public class GlobalConfig {
      * Common scale for all widgets. Set by the user using YACL.
      */
     @SerialEntry
-    public float scale = 1.0f;
+    private float scale = 1.0f;
 
     public static GlobalConfig get() {
         return INSTANCE;
     }
 
-    public Screen createYACLGUI() {
+    public final Screen createYACLGUI() {
         return YetAnotherConfigLib.createBuilder()
                 .title(Text.literal("DynamicHUD config screen."))
                 .category(ConfigCategory.createBuilder()
@@ -48,5 +48,8 @@ public class GlobalConfig {
                         .build())
                 .build()
                 .generateScreen(null);
+    }
+    public float getScale(){
+        return scale;
     }
 }

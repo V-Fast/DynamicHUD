@@ -4,11 +4,7 @@ import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
-import com.tanishisherewith.dynamichud.utils.contextmenu.options.BooleanOption;
-import com.tanishisherewith.dynamichud.utils.contextmenu.options.DoubleOption;
-import com.tanishisherewith.dynamichud.utils.contextmenu.options.EnumOption;
-import com.tanishisherewith.dynamichud.utils.contextmenu.options.ListOption;
-import com.tanishisherewith.dynamichud.utils.contextmenu.options.ColorOption;
+import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
 import net.minecraft.client.gui.DrawContext;
@@ -18,6 +14,7 @@ import org.lwjgl.glfw.GLFW;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
@@ -76,16 +73,26 @@ public class TextWidget extends Widget {
         menu = new ContextMenu(getX(), getY());
         menu.addOption(new BooleanOption("Shadow", () -> this.shadow, value -> this.shadow = value));
         menu.addOption(new BooleanOption("Rainbow", () -> this.rainbow, value -> this.rainbow = value));
-        menu.addOption(new ColorOption("TextColor", menu, () -> textColor, value -> textColor = value));
-        menu.addOption(new DoubleOption("RainbowSpeed", 1, 4, 1.0f, () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue()));
+        menu.addOption(new ColorOption("TextColor", menu, () -> this.textColor, value -> this.textColor = value));
+        menu.addOption(new DoubleOption("RainbowSpeed", 1, 4, 1.0f, () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue(),menu));
 
         /* TEST */
         AtomicReference<Enum> enums = new AtomicReference<>(Enum.Enum1);
         AtomicReference<String> option = new AtomicReference<>("Enum1");
-        menu.addOption(new EnumOption<>("Enum", enums::get, enums::set, Enum.values()));
-
         List<String> options = Arrays.asList("List1", "List2", "List3");
+        AtomicBoolean running = new AtomicBoolean(false);
+        AtomicBoolean subMenu = new AtomicBoolean(false);
+        menu.addOption(new EnumOption<>("Enum", enums::get, enums::set, Enum.values()));
         menu.addOption(new ListOption<>("List", option::get, option::set, options));
+        menu.addOption(new RunnableOption("Runnable Test",running::get,running::set, this::printStuff));
+        SubMenuOption subMenuOption = new SubMenuOption("SubMenu",menu,subMenu::get,subMenu::set);
+        subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows2", () -> this.shadow, value -> this.shadow = value));
+        subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows3", () -> this.shadow, value -> this.shadow = value));
+        subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows4", () -> this.shadow, value -> this.shadow = value));
+        menu.addOption(subMenuOption);
+    }
+    public void printStuff(){
+        System.out.println("Runnable works");
     }
 
     @Override
@@ -94,7 +101,7 @@ public class TextWidget extends Widget {
         if (textSupplier != null) {
             String text = textSupplier.get();
             drawContext.drawText(mc.textRenderer, text, getX() + 2, getY() + 2, color, shadow);
-            widgetBox.setSizeAndPosition(getX(), getY(), mc.textRenderer.getWidth(text) + 3, mc.textRenderer.fontHeight + 2, this.shouldScale, GlobalConfig.get().scale);
+            widgetBox.setSizeAndPosition(getX(), getY(), mc.textRenderer.getWidth(text) + 3, mc.textRenderer.fontHeight + 2, this.shouldScale, GlobalConfig.get().getScale());
         }
         menu.render(drawContext, getX(), getY(), (int) Math.ceil(getHeight()),mouseX,mouseY);
     }
@@ -161,6 +168,7 @@ public class TextWidget extends Widget {
             dynamicValueRegistry = dvr;
             return;
         }
+         createMenu();
     }
 
     public enum Enum {

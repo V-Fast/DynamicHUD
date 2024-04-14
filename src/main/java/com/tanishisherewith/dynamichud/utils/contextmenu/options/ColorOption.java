@@ -21,7 +21,8 @@ public class ColorOption extends Option<Color> {
         super(getter, setter);
         this.name = name;
         this.parentMenu = parentMenu;
-        colorPicker = new ColorGradientPicker(x + this.parentMenu.width + 10, y - 10, value, this::set, 50, 100);
+        System.out.println(get());
+        colorPicker = new ColorGradientPicker(x + this.parentMenu.finalWidth, y - 10, get(), this::set, 50, 100);
     }
 
     @Override
@@ -30,13 +31,13 @@ public class ColorOption extends Option<Color> {
 
         int color = isVisible ? Color.GREEN.getRGB() : Color.RED.getRGB();
         this.height = mc.textRenderer.fontHeight;
-        this.width = mc.textRenderer.getWidth(name) + 12;
+        this.width = mc.textRenderer.getWidth(name) + 8;
         drawContext.drawText(mc.textRenderer, Text.of(name), x, y, color, false);
 
         int shadowOpacity = Math.min(value.getAlpha(),90);
         DrawHelper.drawRoundedRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(),
-                x + width - 8,
-                y,
+                x + width - 4,
+                y - 1,
                 8,
                 8,
                 2,
@@ -45,7 +46,7 @@ public class ColorOption extends Option<Color> {
                 1,
                 1);
 
-        colorPicker.render(drawContext, this.x + width / 3 + parentMenu.width + 10, y - 10);
+        colorPicker.render(drawContext, this.x + parentMenu.finalWidth + 7, y - 10);
     }
 
     @Override

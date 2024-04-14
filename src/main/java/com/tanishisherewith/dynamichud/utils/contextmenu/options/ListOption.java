@@ -32,7 +32,7 @@ public class ListOption<T> extends Option<T> {
         super.render(drawContext, x, y);
 
         value = get();
-        this.height = mc.textRenderer.fontHeight;
+        this.height = mc.textRenderer.fontHeight + 1;
         this.width = mc.textRenderer.getWidth(name + ": " + value.toString()) + 1;
 
         drawContext.drawText(mc.textRenderer, Text.of(name + ": "), x, y, Color.WHITE.getRGB(), false);

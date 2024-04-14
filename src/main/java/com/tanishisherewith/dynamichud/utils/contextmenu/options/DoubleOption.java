@@ -1,6 +1,7 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
+import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -15,8 +16,9 @@ public class DoubleOption extends Option<Double> {
     float step = 0.1f;
     private boolean isDragging = false;
     private double minValue = 0.0, maxValue = 0.0;
+    ContextMenu parentMenu;
 
-    public DoubleOption(String name, double minValue, double maxValue, float step, Supplier<Double> getter, Consumer<Double> setter) {
+    public DoubleOption(String name, double minValue, double maxValue, float step, Supplier<Double> getter, Consumer<Double> setter, ContextMenu parentMenu) {
         super(getter, setter);
         this.name = name;
         this.value = get();
@@ -25,6 +27,7 @@ public class DoubleOption extends Option<Double> {
         this.width = 30;
         this.height = 16;
         this.step = step;
+        this.parentMenu = parentMenu;
         Validate.isTrue(this.step > 0.0f, "Step cannot be less than or equal to 0 (zero)");
     }
 
@@ -33,8 +36,9 @@ public class DoubleOption extends Option<Double> {
         super.render(drawContext, x, y);
         value = get();
 
-        this.width = 30;
+        this.width = 35;
         this.height = 16;
+
         // Draw the label
         TextRenderer textRenderer = mc.textRenderer;
         DrawHelper.scaleAndPosition(drawContext.getMatrices(), x, y, 0.7f);

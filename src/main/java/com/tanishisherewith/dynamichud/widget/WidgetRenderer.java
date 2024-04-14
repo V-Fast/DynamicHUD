@@ -42,7 +42,7 @@ public class WidgetRenderer {
     }
 
     public void renderWidgets(DrawContext context, int mouseX, int mouseY) {
-        if (WidgetManager.getWidgets().isEmpty()) return;
+        if (WidgetManager.getWidgets().isEmpty() || DynamicHUD.MC.getDebugHud().shouldShowDebugHud()) return;
 
         Screen currentScreen = DynamicHUD.MC.currentScreen;
 

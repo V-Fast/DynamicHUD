@@ -18,7 +18,6 @@ public abstract class Option<T> {
     protected Consumer<T> setter;
     protected T defaultValue = null;
     protected MinecraftClient mc = MinecraftClient.getInstance();
-    private Widget selectedWidget; // The widget that this context menu is associated with
 
     public Option(Supplier<T> getter, Consumer<T> setter) {
         this.getter = getter;

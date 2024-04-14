@@ -29,7 +29,7 @@ public class SubMenuOption extends Option<Boolean> {
         Objects.requireNonNull(parentMenu, "Parent Menu cannot be null");
         this.name = name;
         this.parentMenu = parentMenu;
-        this.subMenu = new ContextMenu(parentMenu.x + parentMenu.width, this.y);
+        this.subMenu = new ContextMenu(parentMenu.x + parentMenu.finalWidth, this.y);
         this.subMenu.heightOffset = 0;
         this.subMenu.shouldDisplay = get();
     }
@@ -40,9 +40,11 @@ public class SubMenuOption extends Option<Boolean> {
         this.y = y;
 
         int color = value ? Color.GREEN.getRGB() : Color.RED.getRGB();
-        drawContext.drawText(mc.textRenderer, Text.of(name), x, y, color, false);
+        drawContext.drawText(mc.textRenderer, Text.of(name), x, y + 1, color, false);
+        this.height = mc.textRenderer.fontHeight + 2;
+        this.width = mc.textRenderer.getWidth(name) + 1;
 
-        subMenu.render(drawContext, this.x + parentMenu.width, this.y, 0,mouseX, mouseY);
+        subMenu.render(drawContext, this.x + parentMenu.finalWidth, this.y, 0,mouseX, mouseY);
     }
 
     @Override

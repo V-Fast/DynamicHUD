@@ -25,6 +25,9 @@ public class RunnableOption extends Option<Boolean> {
         this.name = "Run: " + name; // prepend the "run" symbol to the name
         this.task = task;
     }
+    Color DARK_RED = new Color(116, 0, 0);
+    Color DARK_GREEN = new Color(24, 132, 0, 226);
+
 
     @Override
     public void render(DrawContext drawContext, int x, int y) {
@@ -32,8 +35,8 @@ public class RunnableOption extends Option<Boolean> {
 
         value = get();
         this.height = mc.textRenderer.fontHeight;
-        this.width = mc.textRenderer.getWidth("Run: " + name) + 1;
-        int color = value ? Color.BLUE.getRGB() : Color.GRAY.getRGB();
+        this.width = mc.textRenderer.getWidth("Run: " + name);
+        int color = value ? DARK_GREEN.getRGB() : DARK_RED.getRGB();
         drawContext.drawText(mc.textRenderer, Text.of(name), x, y, color, false);
     }
 

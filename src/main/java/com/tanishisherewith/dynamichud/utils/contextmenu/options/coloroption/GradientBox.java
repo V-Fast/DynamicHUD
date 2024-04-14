@@ -28,7 +28,7 @@ public class GradientBox {
         DrawHelper.drawOutlinedBox(drawContext, x - 2, y - 2, x + size + 2, y + size + 2, -1);
 
         // Draw the gradient
-        com.tanishisherewith.dynamichud.helpers.DrawHelper.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), Color.BLACK, Color.BLACK, Color.getHSBColor(hue, 1.0f, 1.0f), Color.WHITE, x, y, size, size, 2);
+        DrawHelper.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), Color.BLACK, Color.BLACK, Color.getHSBColor(hue, 1.0f, 1.0f), Color.WHITE, x, y, size, size, 2);
 
         // Draw the handle
         float handleSize = 3;

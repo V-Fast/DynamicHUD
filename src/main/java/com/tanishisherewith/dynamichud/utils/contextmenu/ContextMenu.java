@@ -12,7 +12,9 @@ public class ContextMenu {
     public int x, y;
     public int width = 0, finalWidth = 0;
     public int height = 0;
-    public Color backgroundColor = new Color(107, 112, 126, 124);// Semi-transparent light greyish - blue color
+    public Color backgroundColor = new Color(107, 112, 126, 124);
+    private Color darkerBorderColor = backgroundColor.darker().darker().darker().darker().darker().darker();
+    //Todo: Add padding around the rectangle instead of just one side.
     public int padding = 5; // The amount of padding around the rectangle
     public int heightOffset = 4; // Height offset from the widget
     public boolean shouldDisplay = false;
@@ -39,7 +41,7 @@ public class ContextMenu {
         // Draw the background
         DrawHelper.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(),  this.x - 1, this.y, this.width, this.height, 2,backgroundColor.getRGB());
         if(drawBorder){
-            DrawHelper.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), this.x - 1,this.y,width + 1,this.height,2,0.7f,backgroundColor.darker().darker().darker().darker().darker().getRGB());
+            DrawHelper.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), this.x - 1,this.y,width + 1,this.height,2,0.7f,darkerBorderColor.getRGB());
         }
 
         int yOffset = this.y + 3;
@@ -47,13 +49,13 @@ public class ContextMenu {
         for (Option<?> option : options) {
             if (!option.shouldRender()) continue;
             if(isMouseOver(mouseX,mouseY, this.x +1,yOffset-1,this.finalWidth - 2,option.height)){
-            DrawHelper.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), this.x,yOffset - 1.24f,this.finalWidth - 2,option.height + 0.48f,2,backgroundColor.darker().darker().getRGB());
+               DrawHelper.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), this.x,yOffset - 1.24f,this.finalWidth - 2,option.height + 0.48f,2,backgroundColor.darker().darker().getRGB());
             }
             option.render(drawContext, x + 2, yOffset,mouseX,mouseY);
-            this.width = Math.max(this.width, option.width + padding);
+            this.width = Math.max(this.width, option.width);
             yOffset += option.height + 1;
         }
-        this.width = this.width + 3;
+        this.width = this.width + padding;
         this.finalWidth = this.width;
         this.height = (yOffset - this.y);
 

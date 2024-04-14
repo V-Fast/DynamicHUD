@@ -20,22 +20,26 @@ public class ColorGradientPicker {
     private final int boxSize;
     private int x, y;
     private boolean display = false;
+    private final Color initialColor;
 
     public ColorGradientPicker(int x, int y, Color initialColor, Consumer<Color> onColorSelected, int boxSize, int colors) {
         this.x = x;
         this.y = y;
+        this.initialColor = initialColor;
         this.onColorSelected = onColorSelected;
-        float[] hsv = Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), null);
-        this.boxSize = boxSize;
         this.gradientSlider = new GradientSlider(x, y, colors, 10);
-        this.gradientSlider.setHue(hsv[0]);
-
         this.gradientBox = new GradientBox(x, y + 20, boxSize);
+        this.alphaSlider = new AlphaSlider(x, y, 10, boxSize, initialColor);
+
+        float[] hsv = new float[3];
+        Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
+
+        this.boxSize = boxSize;
+        this.gradientSlider.setHue(hsv[0]);
         this.gradientBox.setHue(hsv[0]);
         this.gradientBox.setSaturation(hsv[1]);
         this.gradientBox.setValue(hsv[2]);
 
-        this.alphaSlider = new AlphaSlider(x, y, 10, boxSize, initialColor);
         this.colorPickerButton = new ColorPickerButton(x + boxSize + 8, y + 20, 30, 18);
     }
 
@@ -57,10 +61,10 @@ public class ColorGradientPicker {
         if (!display) {
             return;
         }
-        gradientSlider.render(drawContext, x + 30, y + client.textRenderer.fontHeight + 4);
-        gradientBox.render(drawContext, x + 30, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
-        colorPickerButton.render(drawContext, x + 54 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 8);
-        alphaSlider.render(drawContext, x + 40 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
+        gradientSlider.render(drawContext, x, y + client.textRenderer.fontHeight + 4);
+        gradientBox.render(drawContext, x, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
+        colorPickerButton.render(drawContext, x + 24 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 8);
+        alphaSlider.render(drawContext, x + 10 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
 
         if (colorPickerButton.isPicking()) {
             // Draw the preview box near cursor
@@ -92,6 +96,15 @@ public class ColorGradientPicker {
         if (!display) {
             return false;
         }
+
+        float[] hsv1 = new float[3];
+        Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv1);
+
+        this.gradientSlider.setHue(hsv1[0]);
+        this.gradientBox.setHue(hsv1[0]);
+        this.gradientBox.setSaturation(hsv1[1]);
+        this.gradientBox.setValue(hsv1[2]);
+
         if (colorPickerButton.onClick(mouseX, mouseY, button)) {
             return true;
         } else if (gradientSlider.isMouseOver(mouseX, mouseY)) {

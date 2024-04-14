@@ -53,7 +53,7 @@ public abstract class Widget {
     /**
      * Scale of the current widget.
      *
-     * @see GlobalConfig#scale
+     * @see GlobalConfig#getScale()
      */
     protected float scale = 1.0f;
     //Dimensions of the widget
@@ -68,7 +68,7 @@ public abstract class Widget {
     }
 
     /**
-     * This method is called at the end of the {@link Widget#Widget(WidgetData)} constructor.
+     * This method is called at the end of the {@link Widget#Widget(WidgetData, String)} constructor.
      */
     public void init() {
 
@@ -127,11 +127,11 @@ public abstract class Widget {
     /**
      * Renders the widget on the screen.
      */
-    public void render(DrawContext drawContext, int mouseX, int mouseY) {
+    public final void render(DrawContext drawContext, int mouseX, int mouseY) {
         if (!shouldDisplay()) return;
 
         if (shouldScale) {
-            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().scale);
+            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().getScale());
         }
         renderWidget(drawContext, mouseX, mouseY);
 
@@ -144,11 +144,11 @@ public abstract class Widget {
     /**
      * Renders the widget on the editor screen.
      */
-    public void renderInEditor(DrawContext drawContext, int mouseX, int mouseY) {
+    public final void renderInEditor(DrawContext drawContext, int mouseX, int mouseY) {
         displayBg(drawContext);
 
         if (shouldScale) {
-            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().scale);
+            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().getScale());
         }
         renderWidgetInEditor(drawContext, mouseX, mouseY);
 
@@ -183,6 +183,7 @@ public abstract class Widget {
 
         renderWidget(context, mouseX, mouseY);
     }
+
     /* Input related methods. Override with super call to add your own input-based code like contextMenu */
 
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
