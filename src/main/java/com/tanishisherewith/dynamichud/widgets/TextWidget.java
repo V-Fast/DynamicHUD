@@ -76,7 +76,7 @@ public class TextWidget extends Widget {
         menu.addOption(new ColorOption("TextColor", menu, () -> this.textColor, value -> this.textColor = value));
         menu.addOption(new DoubleOption("RainbowSpeed", 1, 4, 1.0f, () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue(),menu));
 
-        /* TEST */
+        /* TEST
         AtomicReference<Enum> enums = new AtomicReference<>(Enum.Enum1);
         AtomicReference<String> option = new AtomicReference<>("Enum1");
         List<String> options = Arrays.asList("List1", "List2", "List3");
@@ -90,9 +90,7 @@ public class TextWidget extends Widget {
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows3", () -> this.shadow, value -> this.shadow = value));
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows4", () -> this.shadow, value -> this.shadow = value));
         menu.addOption(subMenuOption);
-    }
-    public void printStuff(){
-        System.out.println("Runnable works");
+         */
     }
 
     @Override

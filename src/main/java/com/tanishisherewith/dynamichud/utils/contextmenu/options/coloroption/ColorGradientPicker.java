@@ -96,15 +96,6 @@ public class ColorGradientPicker {
         if (!display) {
             return false;
         }
-
-        float[] hsv1 = new float[3];
-        Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv1);
-
-        this.gradientSlider.setHue(hsv1[0]);
-        this.gradientBox.setHue(hsv1[0]);
-        this.gradientBox.setSaturation(hsv1[1]);
-        this.gradientBox.setValue(hsv1[2]);
-
         if (colorPickerButton.onClick(mouseX, mouseY, button)) {
             return true;
         } else if (gradientSlider.isMouseOver(mouseX, mouseY)) {
