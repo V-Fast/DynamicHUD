@@ -13,8 +13,9 @@ import net.minecraft.text.Text;
 import java.util.List;
 
 public class DynamicHudTest implements DynamicHudIntegration {
-    TextWidget textWidget;
-    TextWidget Example2Widget;
+    TextWidget FPSWidget;
+    TextWidget HelloWidget;
+    TextWidget DynamicHUDWidget;
     DynamicValueRegistry registry;
     WidgetRenderer renderer;
 
@@ -25,10 +26,12 @@ public class DynamicHudTest implements DynamicHudIntegration {
 
         //Local registry
         registry = new DynamicValueRegistry(DynamicHUD.MOD_ID);
-        registry.registerLocal("FPS", () -> "FPS C-DVR: " + DynamicHUD.MC.getCurrentFps());
+        registry.registerLocal("Hello", () -> "Hello!");
+        registry.registerLocal("DynamicHUD", () -> "DynamicHUD");
 
-        textWidget = new TextWidget.Builder()
-                .setX(300)
+
+        FPSWidget = new TextWidget.Builder()
+                .setX(250)
                 .setY(100)
                 .setDraggable(true)
                 .rainbow(false)
@@ -37,22 +40,35 @@ public class DynamicHudTest implements DynamicHudIntegration {
                 .shouldScale(false)
                 .build();
 
-        Example2Widget = new TextWidget.Builder()
+        HelloWidget = new TextWidget.Builder()
                 .setX(200)
                 .setY(100)
                 .setDraggable(true)
                 .rainbow(false)
-                .setDRKey("FPS")
+                .setDRKey("Hello")
                 .setDVR(registry)
                 .setModID(DynamicHUD.MOD_ID)
                 .shouldScale(true)
                 .build();
+
+        DynamicHUDWidget = new TextWidget.Builder()
+                .setX(5)
+                .setY(5)
+                .setDraggable(false)
+                .rainbow(true)
+                .setDRKey("DynamicHUD")
+                .setDVR(registry)
+                .setModID(DynamicHUD.MOD_ID)
+                .shouldScale(true)
+                .build();
+
     }
 
     @Override
     public void addWidgets() {
-        WidgetManager.addWidget(textWidget);
-        WidgetManager.addWidget(Example2Widget);
+        WidgetManager.addWidget(FPSWidget);
+        WidgetManager.addWidget(HelloWidget);
+        WidgetManager.addWidget(DynamicHUDWidget);
     }
 
     @Override
@@ -66,12 +82,11 @@ public class DynamicHudTest implements DynamicHudIntegration {
         renderer = new WidgetRenderer(widgets);
         renderer.shouldRenderInGameHud(true);
         renderer.addScreen(TitleScreen.class);
-        renderer.addScreen(MultiplayerScreen.class);
     }
 
     @Override
     public AbstractMoveableScreen getMovableScreen() {
-        return new AbstractMoveableScreen(Text.literal("Editor"), renderer) {
+        return new AbstractMoveableScreen(Text.literal("Editor Screen"), renderer) {
         };
     }
 

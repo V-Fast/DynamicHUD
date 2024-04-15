@@ -74,6 +74,8 @@ public abstract class AbstractMoveableScreen extends Screen {
         if (this.client.world == null) {
             this.renderBackgroundTexture(drawContext);
         }
+        drawContext.drawText(client.textRenderer,title,client.getWindow().getScaledWidth()/2 - client.textRenderer.getWidth(title.getString())/2,textRenderer.fontHeight/2,-1,true);
+
         // Draw each widget
         widgetRenderer.renderWidgets(drawContext, mouseX, mouseY);
     }

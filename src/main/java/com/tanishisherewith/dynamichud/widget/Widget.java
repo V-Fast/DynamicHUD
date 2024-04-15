@@ -189,15 +189,18 @@ public abstract class Widget {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (widgetBox.isMouseOver(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             toggle();
-            startX = (int) (mouseX - x);
-            startY = (int) (mouseY - y);
-            dragging = true;
+            if(isDraggable) {
+                startX = (int) (mouseX - x);
+                startY = (int) (mouseY - y);
+                dragging = true;
+            }
             return true;
         }
         return false;
     }
 
     public boolean mouseDragged(double mouseX, double mouseY, int button, int snapSize) {
+      if(!isDraggable) return false;
         if (dragging && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             int newX = (int) (mouseX - startX);
             int newY = (int) (mouseY - startY);

@@ -41,7 +41,7 @@ public class ContextMenu {
         // Draw the background
         DrawHelper.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(),  this.x - 1, this.y, this.width, this.height, 2,backgroundColor.getRGB());
         if(drawBorder){
-            DrawHelper.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), this.x - 1,this.y,width + 1,this.height,2,0.7f,darkerBorderColor.getRGB());
+            DrawHelper.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), this.x - 1,this.y,this.width,this.height,2,0.7f,darkerBorderColor.getRGB());
         }
 
         int yOffset = this.y + 3;
