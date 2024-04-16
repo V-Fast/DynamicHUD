@@ -20,7 +20,6 @@ public class TextureHelper {
         }
         return null;
     }
-    // Method 4: Resize a texture
     public  static NativeImage resizeTexture(NativeImage image, int newWidth, int newHeight) {
         NativeImage result = new NativeImage(newWidth, newHeight, false);
 
