@@ -21,9 +21,6 @@
     "client": [
       "com.tanishisherewith.dynamichud.DynamicHUD"
     ],
-    "dynamicHud": [
-      "com.tanishisherewith.dynamichud.DynamicHudTest"
-    ],
     "modmenu": [
       "com.tanishisherewith.dynamichud.ModMenuIntegration"
     ]
