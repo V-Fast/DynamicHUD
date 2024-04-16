@@ -5,20 +5,21 @@ DynamicHUD is a special tool for Minecraft mod creators who use Fabric. It works
 
 # Examples
 - [_DynamicHUDtest.java_](src/main/java/com/tanishisherewith/dynamichud/DynamicHUDtest.java)
-- 
 ## Demo
 
 *May vary from version to version*
 
 ### Developed stage
-> In progress
----
+<details>
+	<summary>View Showcase video</summary>
+	[Watch on youtube](https://youtu.be/nQ-oiHyhrm8)
+</details>
 
 ### Mid stage (1.2.0)
 <details>
   <summary>View Demo video</summary>
-  
   [!Mid stage demo video](https://github.com/V-Fast/DynamicHUD/assets/120117618/2abfcdf5-d786-4e58-acae-aefe51b77b4a)
+
 </details>
 
 ### Early stages
