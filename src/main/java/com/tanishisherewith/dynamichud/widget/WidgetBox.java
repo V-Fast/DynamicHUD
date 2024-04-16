@@ -1,40 +1,19 @@
 package com.tanishisherewith.dynamichud.widget;
 
 public class WidgetBox {
-    private final float width;
-    private final float height;
-    public float x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+    public float x = 0, y = 0;
+    private float width;
+    private float height;
 
-    public WidgetBox(float x1, float y1, float x2, float y2, float scale) {
-        this.width = (float) ((x2 - x1) * scale);
-        this.height = (float) ((y2 - y1) * scale);
-        this.x1 = x1;
-        this.x2 = x1 + width;
-        this.y1 = y1;
-        this.y2 = y1 + height;
+    public WidgetBox(int x, int y, int width, int height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
     }
 
-    public WidgetBox(float x1, float y1, double width, double height, float scale) {
-        this.width = (float) (width * scale);
-        this.height = (float) (height * scale);
-        this.x1 = x1;
-        this.x2 = x1 + this.width;
-        this.y1 = y1;
-        this.y2 = y1 + this.height;
-    }
-
-    public boolean contains(Widget widget, double x, double y, float scale) {
-        if (x1 == 0 || x2 == 0 || y1 == 0 || y2 == 0) {
-            x1 = widget.getX() - width / 2;
-            y1 = widget.getY() - height / 2;
-            x2 = widget.getX() + width / 2;
-            y2 = widget.getY() + height / 2;
-        }
-        return x >= x1 && x <= x2 && y >= y1 && y <= y2;
-    }
-
-    public boolean intersects(float otherX1, float otherY1, float otherX2, float otherY2, float scale) {
-        return !(otherX1 > x2 || otherX2 < x1 || otherY1 > y2 || otherY2 < y1);
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
 
     public float getWidth() {
@@ -43,5 +22,47 @@ public class WidgetBox {
 
     public float getHeight() {
         return height;
+    }
+
+    public boolean intersects(WidgetBox other) {
+        // Check if this box is to the right of the other box
+        if (this.x > other.x + other.width) {
+            return false;
+        }
+
+        // Check if this box is to the left of the other box
+        if (this.x + this.width < other.x) {
+            return false;
+        }
+
+        // Check if this box is below the other box
+        if (this.y > other.y + other.height) {
+            return false;
+        }
+
+        // Check if this box is above the other box
+        // If none of the above conditions are met, the boxes must intersect
+        return !(this.y + this.height < other.y);
+    }
+
+    public void setSizeAndPosition(float x, float y, float width, float height) {
+        this.x = x;
+        this.y = y;
+        this.height = height;
+        this.width = width;
+    }
+
+    public void setSizeAndPosition(float x, float y, float width, float height, boolean shouldScale, float scale) {
+        this.x = x;
+        this.y = y;
+        this.height = height * (shouldScale ? scale : 1.0f);
+        this.width = width * (shouldScale ? scale : 1.0f);
+    }
+
+    public void setSize(double width, double height, boolean shouldScale, float scale) {
+        if (width >= 0)
+            this.width = (int) Math.ceil(width * (shouldScale ? scale : 1.0f));
+        if (height >= 0)
+            this.height = (int) Math.ceil(height * (shouldScale ? scale : 1.0f));
     }
 }

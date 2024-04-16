@@ -10,7 +10,7 @@
   "contributors": [
     "LumaaDev"
   ],
-  "icon": "assets/DynamicHUD/DynamicHud-logo.png",
+  "icon": "assets/dynamichud/logo.png",
   "contact": {
     "repo": "https://github.com/V-Fast/DynamicHUD",
     "issues": "https://github.com/V-Fast/DynamicHUD/issues"
@@ -18,7 +18,7 @@
   "license": "All-Rights-Reserved",
   "environment": "client",
   "entrypoints": {
-    "main": [
+    "client": [
       "com.tanishisherewith.dynamichud.DynamicHUD"
     ],
     "modmenu": [

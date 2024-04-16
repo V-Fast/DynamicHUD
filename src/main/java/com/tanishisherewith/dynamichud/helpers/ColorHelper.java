@@ -1,6 +1,5 @@
 package com.tanishisherewith.dynamichud.helpers;
 
-import net.minecraft.network.packet.Packet;
 import net.minecraft.util.math.MathHelper;
 
 import java.awt.*;
@@ -10,28 +9,18 @@ import java.awt.*;
  */
 public class ColorHelper {
     public static int r, g, b, a;
+
     public ColorHelper(int r, int g, int b) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.a = 255;
+        ColorHelper.r = r;
+        ColorHelper.g = g;
+        ColorHelper.b = b;
+        a = 255;
         validate();
     }
+
     public ColorHelper() {
     }
-    public void validate() {
-        if (r < 0) r = 0;
-        else if (r > 255) r = 255;
 
-        if (g < 0) g = 0;
-        else if (g > 255) g = 255;
-
-        if (b < 0) b = 0;
-        else if (b > 255) b = 255;
-
-        if (a < 0) a = 0;
-        else if (a > 255) a = 255;
-    }
     /**
      * Returns a color as an integer value given its red, green and blue components.
      *
@@ -83,10 +72,10 @@ public class ColorHelper {
     public static int ColorToInt(Color color) {
         return color.getRGB();
     }
-    public static float[] getRainbowColor()
-    {
+
+    public static float[] getRainbowColor() {
         float x = System.currentTimeMillis() % 2000 / 1000F;
-        float pi = (float)Math.PI;
+        float pi = (float) Math.PI;
 
         float[] rainbow = new float[3];
         rainbow[0] = 0.5F + 0.5F * MathHelper.sin(x * pi);
@@ -94,6 +83,32 @@ public class ColorHelper {
         rainbow[2] = 0.5F + 0.5F * MathHelper.sin((x + 8F / 3F) * pi);
         return rainbow;
     }
+
+    /**
+     * Rainbow color with custom speed.
+     *
+     * @param speed
+     * @return Current rainbow color.
+     */
+    public static Color getRainbowColor(int speed) {
+        float hue = (System.currentTimeMillis() % (speed * 100)) / (speed * 100.0f);
+        return Color.getHSBColor(hue, 1.0f, 1.0f);
+    }
+
+    /**
+     * Changes alpha on color.
+     *
+     * @param color Target color.
+     * @param alpha Target alpha.
+     * @return Color with changed alpha.
+     */
+    public static Color changeAlpha(Color color, int alpha) {
+        if (color != null)
+            return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
+        else
+            return new Color(0);
+    }
+
     public static int fromRGBA(int r, int g, int b, int a) {
         return (r << 16) + (g << 8) + (b) + (a << 24);
     }
@@ -113,8 +128,22 @@ public class ColorHelper {
     public static int toRGBAA(int color) {
         return (color >> 24) & 0x000000FF;
     }
-    public int toInt()
-    {
-     return new Color(r,b,g,a).getRGB();
+
+    public void validate() {
+        if (r < 0) r = 0;
+        else if (r > 255) r = 255;
+
+        if (g < 0) g = 0;
+        else if (g > 255) g = 255;
+
+        if (b < 0) b = 0;
+        else if (b > 255) b = 255;
+
+        if (a < 0) a = 0;
+        else if (a > 255) a = 255;
+    }
+
+    public int toInt() {
+        return new Color(r, b, g, a).getRGB();
     }
 }

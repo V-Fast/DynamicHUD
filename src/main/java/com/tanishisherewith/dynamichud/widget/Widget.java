@@ -1,59 +1,118 @@
 package com.tanishisherewith.dynamichud.widget;
 
-import com.tanishisherewith.dynamichud.interfaces.TextGenerator;
+import com.tanishisherewith.dynamichud.config.GlobalConfig;
+import com.tanishisherewith.dynamichud.helpers.ColorHelper;
+import com.tanishisherewith.dynamichud.helpers.DrawHelper;
+import com.tanishisherewith.dynamichud.utils.UID;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.MathHelper;
+import org.lwjgl.glfw.GLFW;
 
-import java.awt.*;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.Set;
 
-/**
- * This class represents a widget that can be displayed on the screen.
- */
 public abstract class Widget {
-    protected static Map<String, TextGenerator> textGenerators = new HashMap<>();
 
-    protected final MinecraftClient client; // The Minecraft client instance
-    public boolean enabled = true; // Whether the widget is enabled
-    public boolean isDraggable = true;
-    protected float xPercent; // The x position of the widget as a percentage of the screen width
-    protected float yPercent; // The y position of the widget as a percentage of the screen height
-    protected String label;
-    protected static float scale = 1f; // The scaling factor of the widget
-
+    public static WidgetData<?> DATA;
     /**
-     * Constructs a Widget object.
+     * This is the UID of the widget used to identify during loading and saving.
+     * <p>
+     * It's different from modID because this is unique to each widget.
      *
-     * @param client The Minecraft client instance
+     * @see #modId
      */
-    public Widget(MinecraftClient client, String label) {
-        this.client = client;
-        this.label = label;
-    }
+    public UID uid = UID.generate();
+    public boolean isInEditor = false;
+    // Whether the widget is enabled and should be displayed.
+    public boolean display = true;
+    public boolean isDraggable = true;
 
-    public static void addTextGenerator(String label, TextGenerator textGenerator) {
-        textGenerators.put(label, textGenerator);
-    }
+    //Boolean to check if the widget is being dragged
+    public boolean dragging;
 
-    public abstract void setTextGeneratorFromLabel();
+    //To enable/disable snapping
+    public boolean shiftDown = false;
+    // Absolute position of the widget on screen in pixels.
+    public int x, y;
+    public boolean shouldScale = true;
+    /**
+     * An identifier for widgets to group them under one ID.
+     * <p>
+     * Doesn't necessarily have to be the mod ID of mod, but it's preferred to use mod ID if you are only grouping widgets under one ID.
+     * Can be any string if wanted.
+     *
+     * @see #uid
+     */
+    public String modId = "unknown";
+    protected MinecraftClient mc = MinecraftClient.getInstance();
+    // The x position of the widget as a percentage of the screen width, i.e. the relative x position of the widget for resizing and scaling
+    protected float xPercent;
+    // The y position of the widget as a percentage of the screen height, i.e. the relative y position of the widget for resizing and scaling
+    protected float yPercent;
+    /**
+     * Scale of the current widget.
+     *
+     * @see GlobalConfig#getScale()
+     */
+    protected float scale = 1.0f;
+    //Dimensions of the widget
+    protected WidgetBox widgetBox;
+    int startX, startY;
+
+    public Widget(WidgetData<?> DATA, String modId) {
+        Widget.DATA = DATA;
+        widgetBox = new WidgetBox(0, 0, 0, 0);
+        this.modId = modId;
+        init();
+    }
 
     /**
-     * Gets the box around the widget for some purpose
+     * This method is called at the end of the {@link Widget#Widget(WidgetData, String)} constructor.
      */
-    public abstract WidgetBox getWidgetBox();
+    public void init() {
+
+    }
+
+    /**
+     * Returns the x position of the widget.
+     *
+     * @return The x position of the widget in pixels
+     */
+    public int getX() {
+        return x;
+    }
+
+    /**
+     * Returns the y position of the widget.
+     *
+     * @return The y position of the widget in pixels
+     */
+    public int getY() {
+        return y;
+    }
+
+    public float getWidth() {
+        return widgetBox.getWidth();
+    }
+
+    public float getHeight() {
+        return widgetBox.getHeight();
+    }
+
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
 
     public void setDraggable(boolean draggable) {
         isDraggable = draggable;
     }
 
-
     public boolean isOverlapping(Set<Widget> other) {
-        for (Widget widget : other) {
-            if ((this.getX() < widget.getX() + widget.getWidgetBox().getWidth() && this.getX() + this.getWidgetBox().getWidth() > widget.getX() &&
-                    this.getY() < widget.getY() + widget.getWidgetBox().getHeight() && this.getY() + this.getWidgetBox().getHeight() > widget.getY())) {
+        for (Widget widgetBox : other) {
+            if ((this.getX() < widgetBox.getX() + widgetBox.getWidgetBox().getWidth() && this.getX() + this.getWidgetBox().getWidth() > widgetBox.getX() &&
+                    this.getY() < widgetBox.getY() + widgetBox.getWidgetBox().getHeight() && this.getY() + this.getWidgetBox().getHeight() > widgetBox.getY())) {
                 return true;
             }
         }
@@ -68,104 +127,156 @@ public abstract class Widget {
     /**
      * Renders the widget on the screen.
      */
-    public abstract void render(DrawContext drawContext);
+    public final void render(DrawContext drawContext, int mouseX, int mouseY) {
+        if (!shouldDisplay()) return;
 
-    public void updatePosition() {
-        int screenWidth = client.getWindow().getScaledWidth();
-        int screenHeight = client.getWindow().getScaledHeight();
-    }
-
-    /**
-     * Returns whether the widget is enabled.
-     *
-     * @return True if the widget is enabled, false otherwise
-     */
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    /**
-     * Returns the x position of the widget.
-     *
-     * @return The x position of the widget in pixels
-     */
-    public int getX() {
-        return (int) (client.getWindow().getScaledWidth() * xPercent);
-    }
-    /**
-     * Returns the scaling factor of the widget.
-     *
-     * @return The scaling factor of the widget
-     */
-    public static float getScale() {
-        return scale;
-    }
-
-    /**
-     * Sets the scaling factor of the widget.
-     *
-     * @param scale The new scaling factor of the widget
-     */
-    public static void setScale(float scale) {
-        Widget.scale = scale;
-    }
-    /**
-     * Sets the x position of the widget.
-     *
-     * @param x The new x position of the widget in pixels
-     */
-    public void setX(float x) {
-        int screenWidth = client.getWindow().getScaledWidth();
-        if (x < 0) {
-            x = (0);
-        } else if (x + getWidgetBox().getWidth() > screenWidth) {
-            x = screenWidth - getWidgetBox().getWidth();
+        if (shouldScale) {
+            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().getScale());
         }
-        this.xPercent = (float) x / screenWidth;
-    }
+        renderWidget(drawContext, mouseX, mouseY);
 
-    /**
-     * Returns the y position of the widget.
-     *
-     * @return The y position of the widget in pixels
-     */
-    public int getY() {
-        return (int) (client.getWindow().getScaledHeight() * yPercent);
-    }
-
-    /**
-     * Sets the y position of the widget.
-     *
-     * @param y The new y position of the widget in pixels
-     */
-    public void setY(float y) {
-        int screenHeight = client.getWindow().getScaledHeight();
-        if (y < 0) {
-            y = 0;
-        } else if (y + getWidgetBox().getHeight() > screenHeight) {
-            y = (screenHeight) - getWidgetBox().getHeight();
+        if (shouldScale) {
+            DrawHelper.stopScaling(drawContext.getMatrices());
         }
-        this.yPercent = (float) y / screenHeight;
+
     }
 
     /**
-     * Returns the fontheight
-     *
-     * @return fontHeight from TextRenderer
+     * Renders the widget on the editor screen.
      */
-    public int getHeight() {
-        return client.textRenderer.fontHeight;
+    public final void renderInEditor(DrawContext drawContext, int mouseX, int mouseY) {
+        displayBg(drawContext);
+
+        if (shouldScale) {
+            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().getScale());
+        }
+        renderWidgetInEditor(drawContext, mouseX, mouseY);
+
+        if (shouldScale) {
+            DrawHelper.stopScaling(drawContext.getMatrices());
+        }
     }
+
+
+    /**
+     * Renders the widget on the screen
+     * <p>
+     * The mouse position values are only passed when in a {@link com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen} screen.
+     * </p>
+     *
+     * @param context
+     * @param mouseX  X position of mouse.
+     * @param mouseY  Y position of mouse
+     */
+    public abstract void renderWidget(DrawContext context, int mouseX, int mouseY);
+
+
+    /**
+     * Renders the widget in the editor screen with a background.
+     * Override this method without super call to remove the background.
+     * Could also be used to display placeholder values.
+     *
+     * @param context
+     */
+    private void renderWidgetInEditor(DrawContext context, int mouseX, int mouseY) {
+        //displayBg(context);
+
+        renderWidget(context, mouseX, mouseY);
+    }
+
+    /* Input related methods. Override with super call to add your own input-based code like contextMenu */
+
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (widgetBox.isMouseOver(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            toggle();
+            if(isDraggable) {
+                startX = (int) (mouseX - x);
+                startY = (int) (mouseY - y);
+                dragging = true;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public boolean mouseDragged(double mouseX, double mouseY, int button, int snapSize) {
+      if(!isDraggable) return false;
+        if (dragging && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            int newX = (int) (mouseX - startX);
+            int newY = (int) (mouseY - startY);
+
+            // Divides the screen into several "grid boxes" which the elements snap to.
+            // Higher the snapSize, more the grid boxes
+            if (this.shiftDown) {
+                // Calculate the size of each snap box
+                int snapBoxWidth = mc.getWindow().getScaledWidth() / snapSize;
+                int snapBoxHeight = mc.getWindow().getScaledHeight() / snapSize;
+
+                // Calculate the index of the snap box that the new position would be in and
+                // snap the new position to the top-left corner of the snap box
+                newX = (newX / snapBoxWidth) * snapBoxWidth;
+                newY = (newY / snapBoxHeight) * snapBoxHeight;
+            }
+
+            this.x = (int) MathHelper.clamp(newX, 0, mc.getWindow().getScaledWidth() - getWidth());
+            this.y = (int) MathHelper.clamp(newY, 0, mc.getWindow().getScaledHeight() - getHeight());
+
+            this.xPercent = (float) this.x / mc.getWindow().getScaledWidth();
+            this.yPercent = (float) this.y / mc.getWindow().getScaledHeight();
+
+            return true;
+        }
+        return false;
+    }
+
+    public void mouseReleased(double mouseX, double mouseY, int button) {
+        dragging = false;
+    }
+
+    /**
+     * MouseScrolled event
+     *
+     * @param vAmount vertical amount of scrolling
+     * @param hAmount horizontal amount of scrolling
+     */
+    public void mouseScrolled(double mouseX, double mouseY, double vAmount, double hAmount) {
+    }
+
+
+    public boolean toggle() {
+        return this.display = !this.display;
+    }
+
+    public void onClose() {
+        this.shiftDown = false;
+    }
+
+    /**
+     * Displays a faint grayish background if enabled or faint reddish background if disabled.
+     * Drawn with 2 pixel offset to all sides
+     *
+     * @param context
+     */
+    protected void displayBg(DrawContext context) {
+        int backgroundColor = this.shouldDisplay() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
+        WidgetBox box = this.getWidgetBox();
+        DrawHelper.drawRectangle(context.getMatrices().peek().getPositionMatrix(),
+                box.x,
+                box.y,
+                box.getWidth(),
+                box.getHeight(),
+                backgroundColor);
+    }
+
 
     public void readFromTag(NbtCompound tag) {
-        xPercent = tag.getFloat("xPercent");
-        yPercent = tag.getFloat("yPercent");
-        enabled = tag.getBoolean("Enabled");
+        modId = tag.getString("modId");
+        uid = new UID(tag.getString("UID"));
+        x = tag.getInt("x");
+        y = tag.getInt("y");
+        display = tag.getBoolean("Display");
         isDraggable = tag.getBoolean("isDraggable");
-        label = tag.getString("label");
-        scale = tag.getFloat("scale");
-
-        setTextGeneratorFromLabel();
+        shouldScale = tag.getBoolean("shouldScale");
     }
 
     /**
@@ -174,45 +285,118 @@ public abstract class Widget {
      * @param tag The tag to write to
      */
     public void writeToTag(NbtCompound tag) {
-        tag.putString("class", getClass().getName());
+        tag.putString("name", DATA.name());
+        tag.putString("modId", modId);
+        tag.putString("UID", uid.getUniqueID());
         tag.putBoolean("isDraggable", isDraggable);
-        tag.putFloat("xPercent", xPercent);
-        tag.putFloat("yPercent", yPercent);
-        tag.putBoolean("Enabled", enabled);
-        tag.putString("label", label);
-        tag.putFloat("scale", scale);
+        tag.putBoolean("shouldScale", shouldScale);
+        tag.putInt("x", x);
+        tag.putInt("y", y);
+        tag.putBoolean("Display", display);
+    }
+
+    public boolean shouldDisplay() {
+        return display;
+    }
+
+    public WidgetBox getWidgetBox() {
+        return widgetBox;
+    }
+
+    public void setxPercent(float xPercent) {
+        this.xPercent = xPercent;
+    }
+
+    public void setyPercent(float yPercent) {
+        this.yPercent = yPercent;
+    }
+
+    public void setUid(UID uid) {
+        this.uid = uid;
+    }
+
+    public void setShouldScale(boolean shouldScale) {
+        this.shouldScale = shouldScale;
+    }
+
+    public String getModId() {
+        return modId;
+    }
+
+    @Override
+    public String toString() {
+        return "Widget{" +
+                "uniqueId='" + uid.getUniqueID() + '\'' +
+                ", x=" + x +
+                ", y=" + y +
+                ", display=" + display +
+                ", isDraggable=" + isDraggable +
+                ", shiftDown=" + shiftDown +
+                ", shouldScale=" + shouldScale +
+                '}';
+    }
+
+    public abstract static class WidgetBuilder<T, S> {
+        protected int x;
+        protected int y;
+        protected boolean display = true;
+        protected boolean isDraggable = true;
+        protected boolean shouldScale = true;
+        protected String modID = "unknown";
 
 
-        for (Field field : getClass().getDeclaredFields()) {
-            if (Modifier.isStatic(field.getModifiers())) continue;
-
-            field.setAccessible(true);
-
-            try {
-                Object value = field.get(this);
-
-                if (value instanceof Boolean) {
-                    tag.putBoolean(field.getName(), (Boolean) value);
-                } else if (value instanceof Byte) {
-                    tag.putByte(field.getName(), (Byte) value);
-                } else if (value instanceof Short) {
-                    tag.putShort(field.getName(), (Short) value);
-                } else if (value instanceof Integer) {
-                    tag.putInt(field.getName(), (Integer) value);
-                } else if (value instanceof Long) {
-                    tag.putLong(field.getName(), (Long) value);
-                } else if (value instanceof Float) {
-                    tag.putFloat(field.getName(), (Float) value);
-                } else if (value instanceof Double) {
-                    tag.putDouble(field.getName(), (Double) value);
-                } else if (value instanceof String) {
-                    tag.putString(field.getName(), (String) value);
-                } else if (value instanceof Color colorvalue) {
-                    tag.putInt(field.getName(), colorvalue.getRGB());
-                }// Add more cases here for other data types
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+        /**
+         * X Position of the widget relative to the screen.
+         * Should be between 0f - 1f
+         *
+         * @param x
+         * @return Builder
+         */
+        public T setX(int x) {
+            this.x = x;
+            return self();
         }
+
+        /**
+         * Y Position of the widget relative to the screen.
+         * Should be between 0f - 1f
+         *
+         * @param y
+         * @return
+         */
+        public T setY(int y) {
+            this.y = y;
+            return self();
+        }
+
+        public T setDisplay(boolean display) {
+            this.display = display;
+            return self();
+        }
+
+        public T setDraggable(boolean isDraggable) {
+            this.isDraggable = isDraggable;
+            return self();
+        }
+
+        public T shouldScale(boolean shouldScale) {
+            this.shouldScale = shouldScale;
+            return self();
+        }
+
+        public T setModID(String modID) {
+            this.modID = modID;
+            return self();
+        }
+
+        /**
+         * Method to be overridden in subclasses to return "this" correctly
+         */
+        protected abstract T self();
+
+        /**
+         * Method to construct a Widget object
+         */
+        public abstract S build();
     }
 }

@@ -1,9 +1,32 @@
-
 # DynamicHUD for Minecraft Fabric
 
 DynamicHUD is a special tool for Minecraft mod creators who use Fabric. It works with Minecraft 1.19.1 and newer versions. With DynamicHUD, you can make your own HUD parts that players can change and interact with, making their game look and feel better.
 > _It may be ported back upto 1.16 fabric on demand._
 
+# Examples
+- [_DynamicHUDtest.java_](src/main/java/com/tanishisherewith/dynamichud/DynamicHUDtest.java)
+- 
+## Demo
+
+*May vary from version to version*
+
+### Developed stage
+> In progress
+---
+
+### Mid stage (1.2.0)
+<details>
+  <summary>View Demo video</summary>
+  
+  [!Mid stage demo video](https://github.com/V-Fast/DynamicHUD/assets/120117618/2abfcdf5-d786-4e58-acae-aefe51b77b4a)
+</details>
+
+### Early stages
+<details>
+  <summary>View Demo video</summary>
+  
+  [!Early stage demo video](https://github.com/V-Fast/DynamicHUD/assets/120117618/04de9319-69cd-4456-a555-c026c7e053a2)
+</details>
 
 ## Features
 
@@ -66,29 +89,3 @@ DynamicHUD is released under the MIT License. Feel free to use and modify it in 
 
 ## Support
 Need assistance or have suggestions? Join our [Discord](https://discord.com/invite/Rqpn3C7yR5) community or submit an issue on our GitHub [repository](https://github.com/V-Fast/DynamicHUD).
-# Examples
-- [_DynamicHUDtest.java_](src/main/java/com/tanishisherewith/dynamichud/DynamicHUDtest.java)
-
-# [Modrinth](https://modrinth.com/mod/dynamichud)
-
-## A LIBRARY SIMILAR TO THIS WHICH SUPPORTS OLDER MINECRAFT VERSIONS: https://github.com/LaconicLizard/HudElements
-
-# Demo:
-### *May vary from version to version*
-## New Version 1.2.0
-https://github.com/V-Fast/DynamicHUD/assets/120117618/2abfcdf5-d786-4e58-acae-aefe51b77b4a
-
-
-## Old Version
-https://github.com/V-Fast/DynamicHUD/assets/120117618/04de9319-69cd-4456-a555-c026c7e053a2
-
-
-
-
-
-
-
-
-
-
-
