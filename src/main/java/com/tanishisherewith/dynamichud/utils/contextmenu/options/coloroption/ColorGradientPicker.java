@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption;
 
+import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.DrawContext;
@@ -66,7 +67,7 @@ public class ColorGradientPicker {
         colorPickerButton.render(drawContext, x + 24 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 8);
         alphaSlider.render(drawContext, x + 10 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
 
-        if (colorPickerButton.isPicking()) {
+        if (colorPickerButton.isPicking() && GlobalConfig.get().showColorPickerPreview()) {
             // Draw the preview box near cursor
 
             //Translate cursor screen position to minecraft's scaled window
