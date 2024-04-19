@@ -68,10 +68,10 @@ public class WidgetRenderer {
         }
     }
 
-    public void mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         Screen currentScreen = DynamicHUD.MC.currentScreen;
         if (currentScreen == null) {
-            return;
+            return false;
         }
         if (currentScreen instanceof AbstractMoveableScreen) {
             for (Widget widget : widgets) {
@@ -79,10 +79,11 @@ public class WidgetRenderer {
                 // if they are overlapped on each other.
                 if (widget.mouseClicked(mouseX, mouseY, button)) {
                     selectedWidget = widget;
-                    return;
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     public void mouseDragged(double mouseX, double mouseY, int button, int snapSize) {

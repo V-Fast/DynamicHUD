@@ -36,3 +36,11 @@ jobs:
         with:
           name: Dynamichud
           path: build/libs/
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "DynamicHUD Pre-release"
+          prerelease: true
+          fail_on_unmatched_files: true
+          generate_release_notes: true;
+          files: Dynamichud.zip

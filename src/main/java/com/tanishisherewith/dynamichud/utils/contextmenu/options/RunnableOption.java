@@ -27,8 +27,6 @@ public class RunnableOption extends Option<Boolean> {
     }
     Color DARK_RED = new Color(116, 0, 0);
     Color DARK_GREEN = new Color(24, 132, 0, 226);
-
-
     @Override
     public void render(DrawContext drawContext, int x, int y) {
         super.render(drawContext, x, y);

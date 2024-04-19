@@ -169,12 +169,6 @@ public class TextWidget extends Widget {
          createMenu();
     }
 
-    public enum Enum {
-        Enum1,
-        Enum2,
-        Enum3
-    }
-
     public static class Builder extends WidgetBuilder<Builder, TextWidget> {
         protected boolean shadow = false;
         protected boolean rainbow = false;

@@ -10,7 +10,10 @@ import java.util.List;
 public class ContextMenu {
     private final List<Option<?>> options = new ArrayList<>(); // The list of options in the context menu
     public int x, y;
-    public int width = 0, finalWidth = 0;
+    // Width is counted while the options are being rendered.
+    // FinalWidth is the width at the end of the count.
+    private int width = 0;
+    public int finalWidth = 0;
     public int height = 0;
     public Color backgroundColor = new Color(107, 112, 126, 124);
     private Color darkerBorderColor = backgroundColor.darker().darker().darker().darker().darker().darker();
@@ -134,16 +137,15 @@ public class ContextMenu {
     public int getY() {
         return y;
     }
-
-    public int getWidth() {
-        return width;
-    }
-
     public List<Option<?>> getOptions() {
         return options;
     }
 
     public int getHeight() {
         return height;
+    }
+
+    public int getWidth() {
+        return finalWidth;
     }
 }

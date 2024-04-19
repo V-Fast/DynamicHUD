@@ -45,7 +45,7 @@ public class WidgetBox {
         return !(this.y + this.height < other.y);
     }
 
-    public void setSizeAndPosition(float x, float y, float width, float height) {
+    public void setSizeAndPositionNoScale(float x, float y, float width, float height) {
         this.x = x;
         this.y = y;
         this.height = height;

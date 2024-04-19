@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.screens;
 
+import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -32,7 +33,9 @@ public abstract class AbstractMoveableScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        widgetRenderer.mouseClicked(mouseX, mouseY, button);
+        if(widgetRenderer.mouseClicked(mouseX, mouseY, button)){
+            handleClickOnWidget(widgetRenderer.selectedWidget,mouseX,mouseY,button);
+        }
         return false;
     }
 
@@ -78,6 +81,9 @@ public abstract class AbstractMoveableScreen extends Screen {
 
         // Draw each widget
         widgetRenderer.renderWidgets(drawContext, mouseX, mouseY);
+    }
+    public void handleClickOnWidget(Widget widget, double mouseX, double mouseY, int button){
+
     }
 
     @Override
