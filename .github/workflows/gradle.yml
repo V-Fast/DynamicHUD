@@ -4,12 +4,7 @@
 # against bad commits.
 
 name: build
-on:
-  pull_request:
-  push:
-    tags:
-      - "v*.*.*"
-
+on: [pull_request,push]
 
 jobs:
   build:
@@ -23,29 +18,37 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
+
       - name: validate gradle wrapper
         uses: gradle/wrapper-validation-action@v1
+
       - name: setup jdk ${{ matrix.java }}
         uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java }}
           distribution: 'microsoft'
+
       - name: make gradle wrapper executable
         if: ${{ runner.os != 'Windows' }}
         run: chmod +x ./gradlew
+
       - name: build
         run: ./gradlew build
+
       - name: capture build artifacts
         if: ${{ runner.os == 'Linux' && matrix.java == '17' }} # Only upload artifacts built from the latest java on one OS
         uses: actions/upload-artifact@v3
         with:
           name: Dynamichud
           path: build/libs/
+
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: "latest"
           name: "DynamicHUD Pre-release"
           prerelease: true
           fail_on_unmatched_files: true
           generate_release_notes: true;
-          files: Dynamichud.zip
+          files: |
+            ./build/libs/*.jar
