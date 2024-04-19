@@ -54,7 +54,7 @@ public class ColorOption extends Option<Color> {
         if (isMouseOver(mouseX, mouseY)) {
             isVisible = !isVisible;
             if (isVisible) {
-                colorPicker.setPos(x + parentMenu.width + 10, y - 10);
+                colorPicker.setPos(this.x + parentMenu.finalWidth + 7, y - 10);
                 colorPicker.display();
             } else {
                 colorPicker.close();
