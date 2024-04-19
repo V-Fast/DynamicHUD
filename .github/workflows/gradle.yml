@@ -37,6 +37,9 @@ jobs:
       - name: build
         run: ./gradlew build
 
+      - name: remove *-sources.jar
+        run: rm ./build/libs/*-sources.jar || true
+
       - name: capture build artifacts
         if: ${{ runner.os == 'Linux' && matrix.java == '17' }} # Only upload artifacts built from the latest java on one OS
         uses: actions/upload-artifact@v3
@@ -44,13 +47,15 @@ jobs:
           name: Dynamichud
           path: build/libs/
 
-      - name: Release
+      - name: pre-release tag
         uses: softprops/action-gh-release@v2
         with:
           tag_name: "latest"
           name: "DynamicHUD Pre-release"
           prerelease: true
           fail_on_unmatched_files: true
-          generate_release_notes: true;
+          generate_release_notes: true
+          body:
+            "Pre-release generated from github actions. Maybe unstable to use."
           files: |
             ./build/libs/*.jar
