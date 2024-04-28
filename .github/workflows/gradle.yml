@@ -47,14 +47,14 @@ jobs:
           name: Dynamichud
           path: build/libs/
 
-      - name: pre-release tag
+      - name: pre-release action
         uses: softprops/action-gh-release@v2
         with:
           tag_name: "latest"
           name: "DynamicHUD Pre-release"
           prerelease: true
           body:
-            "Pre-release generated from github actions. Maybe unstable to use."
+            "Pre-release generated from github actions on push commit. Maybe unstable to use."
           fail_on_unmatched_files: true
           generate_release_notes: true
           files: |

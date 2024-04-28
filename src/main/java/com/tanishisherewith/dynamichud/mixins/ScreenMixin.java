@@ -20,7 +20,7 @@ public abstract class ScreenMixin {
     @Shadow
     public int height;
 
-    @Inject(at = @At("TAIL"), method = "render")
+    @Inject(at = @At("RETURN"), method = "render")
     private void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         for (WidgetRenderer widgetRenderer : DynamicHUD.getWidgetRenderers()) {
             widgetRenderer.renderWidgets(context, mouseX, mouseY);

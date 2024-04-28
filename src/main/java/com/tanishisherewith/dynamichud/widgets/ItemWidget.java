@@ -8,6 +8,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 
+/**
+ * This is just an example widget, not supposed to be used.
+ */
 public class ItemWidget extends Widget {
     public static WidgetData<?> DATA = new WidgetData<>("ItemWidget","Displays item texture", ItemWidget::new);
     public ItemStack item;

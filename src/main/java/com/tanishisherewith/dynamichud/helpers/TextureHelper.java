@@ -7,6 +7,9 @@ import net.minecraft.util.Identifier;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * This class is entirely untested so some issues may occur which in case should be reported immediately.
+ */
 public class TextureHelper {
     static MinecraftClient mc = MinecraftClient.getInstance();
 
