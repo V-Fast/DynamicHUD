@@ -86,7 +86,7 @@ public class WidgetManager {
      * and then using that percentage to restore the widget to their appropriate place.
      * <p>
      * Widgets will move around on smaller GUI scales.
-     * Larger the GUI scale, more accurate is the position.
+     * Larger the GUI scale, more accurate is the position on any resolution.
      * </p>
      * <p>
      * Called in {@link com.tanishisherewith.dynamichud.mixins.ScreenMixin}
@@ -100,7 +100,7 @@ public class WidgetManager {
      */
     public static void onScreenResized(int newWidth, int newHeight, int previousWidth, int previousHeight) {
         for (Widget widget : widgets) {
-            // To ensure that infinite coords is not returned
+            // To ensure that infinite coordinates is not returned
             if (widget.xPercent <= 0.0f) {
                 widget.xPercent = (float) widget.getX() / previousWidth;
             }

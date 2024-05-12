@@ -37,11 +37,11 @@ public class ColorHelper {
 
     public static int r, g, b, a;
 
-    public ColorHelper(int r, int g, int b) {
+    public ColorHelper(int r, int g, int b, int a) {
         ColorHelper.r = r;
         ColorHelper.g = g;
         ColorHelper.b = b;
-        a = 255;
+        ColorHelper.a = a;
         validate();
     }
 

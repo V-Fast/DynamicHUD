@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class DynamicHUD implements ClientModInitializer {
     /**
@@ -108,7 +109,7 @@ public class DynamicHUD implements ClientModInitializer {
                         DHIntegration.initAfter();
 
                         // Get the instance of AbstractMoveableScreen
-                        screen = DHIntegration.getMovableScreen();
+                        screen = Objects.requireNonNull( DHIntegration.getMovableScreen());
 
                         // Get the keybind to open the screen instance
                         binding = DHIntegration.getKeyBind();
@@ -156,12 +157,14 @@ public class DynamicHUD implements ClientModInitializer {
                     }
                 });
 
+        //Global config saving (YACL)
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> GlobalConfig.HANDLER.save());
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, s) -> GlobalConfig.HANDLER.save());
         ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> GlobalConfig.HANDLER.save());
         ClientLifecycleEvents.CLIENT_STOPPING.register((minecraftClient) -> GlobalConfig.HANDLER.save());
 
 
+        //In game screen render.
         HudRenderCallback.EVENT.register(new HudRender());
     }
 

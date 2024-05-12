@@ -9,6 +9,7 @@ import com.tanishisherewith.dynamichud.widgets.TextWidget;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.text.Text;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -85,7 +86,7 @@ public class DynamicHudTest implements DynamicHudIntegration {
     }
 
     @Override
-    public AbstractMoveableScreen getMovableScreen() {
+    public @NotNull AbstractMoveableScreen getMovableScreen() {
         return new AbstractMoveableScreen(Text.literal("Editor Screen"), renderer) {
         };
     }

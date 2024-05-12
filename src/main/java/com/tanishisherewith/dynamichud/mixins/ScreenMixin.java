@@ -27,6 +27,7 @@ public abstract class ScreenMixin {
         }
     }
 
+    //Injected before the screen is actually resized to get the new and also the old dimensions.
     @Inject(at = @At("HEAD"), method = "resize")
     private void onScreenResize(MinecraftClient client, int width, int height, CallbackInfo ci) {
         WidgetManager.onScreenResized(width, height, this.width, this.height);
