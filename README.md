@@ -52,7 +52,7 @@ DynamicHUD is a library for Minecraft Fabric designed to provide developers with
 To ensure mods that depend on DynamicHUD work correctly, follow these steps to add DynamicHUD to your Minecraft installation:
 
 0. Make sure you have [Fabric](https://fabricmc.net/) and [Fabric-API](https://modrinth.com/mod/fabric-api/) installed.
-1. Download the `dynamichud-<version>.jar` file from the official [release](https://modrinth.com/mod/dynamichud/versions) page.
+1. Download the `dynamichud-<version>.jar` file from the official [modrinth](https://modrinth.com/mod/dynamichud/versions) or [release](https://github.com/V-Fast/DynamicHUD/releases) page.
 2. Navigate to your Minecraft directory. The default path is usually:
    - Windows: `%APPDATA%\.minecraft`
    - macOS: `~/Library/Application Support/minecraft`
@@ -73,13 +73,16 @@ allprojects {
 	repositories {
 		maven { url 'https://jitpack.io' }
 	}
+	maven {
+		name 'Xander Maven'
+		url 'https://maven.isxander.dev/releases'
+	}
 }
 
 dependencies {
 	// Dynamic HUD
 	modImplementation 'com.github.V-Fast:DynamicHUD:<Version>'
 }
-
 ```
 
 ## Contributing
