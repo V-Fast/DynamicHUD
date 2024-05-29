@@ -156,6 +156,8 @@ public class DynamicHUD implements ClientModInitializer {
                         }
                     }
                 });
+        printInfo("Integration of all mods found was successful");
+
 
         //Global config saving (YACL)
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> GlobalConfig.HANDLER.save());

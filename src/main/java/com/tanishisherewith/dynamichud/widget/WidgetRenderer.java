@@ -86,6 +86,7 @@ public class WidgetRenderer {
                     return true;
                 }
             }
+            selectedWidget = null;
         }
         return false;
     }
@@ -104,6 +105,7 @@ public class WidgetRenderer {
                     return;
                 }
             }
+            selectedWidget = null;
         }
     }
 

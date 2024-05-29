@@ -18,6 +18,9 @@
   "license": "All-Rights-Reserved",
   "environment": "client",
   "entrypoints": {
+    "dynamicHud": [
+      "com.tanishisherewith.dynamichud.DynamicHudTest"
+    ],
     "client": [
       "com.tanishisherewith.dynamichud.DynamicHUD"
     ],

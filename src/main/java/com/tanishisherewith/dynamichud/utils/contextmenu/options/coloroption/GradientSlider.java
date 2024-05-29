@@ -20,7 +20,6 @@ public class GradientSlider {
         this.height = height;
     }
 
-
     /**
      * Sets position.
      *
@@ -39,7 +38,6 @@ public class GradientSlider {
         DrawHelper.drawOutlinedBox(drawContext, x - 2, y - 2, x + width + 2, y + height + 2, -1);
 
         // Draw the gradient
-
         for (int i = 0; i < width; i++) {
             float hue = (float) i / width;
             int color = Color.HSBtoRGB(hue, 1.0f, 1.0f);
