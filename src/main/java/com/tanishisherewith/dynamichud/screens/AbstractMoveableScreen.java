@@ -81,7 +81,7 @@ public abstract class AbstractMoveableScreen extends Screen {
         // Draw each widget
         widgetRenderer.renderWidgets(drawContext, mouseX, mouseY);
 
-        if(widgetRenderer.selectedWidget != null && GlobalConfig.get().shouldDisplayDescriptions()){
+        if(widgetRenderer.selectedWidget != null && GlobalConfig.get().shouldDisplayDescriptions() && widgetRenderer.selectedWidget.DATA.description() != null){
             drawContext.drawTooltip(client.textRenderer,Text.of(widgetRenderer.selectedWidget.DATA.description()),mouseX,mouseY);
         }
     }
