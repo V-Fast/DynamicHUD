@@ -46,6 +46,7 @@ public class WidgetRenderer {
 
         Screen currentScreen = DynamicHUD.MC.currentScreen;
 
+        //Render in game hud
         if (currentScreen == null && renderInGameHud) {
             for (Widget widget : widgets) {
                 widget.isInEditor = false;
@@ -53,6 +54,8 @@ public class WidgetRenderer {
             }
             return;
         }
+
+        //Render in editing screen
         if (currentScreen instanceof AbstractMoveableScreen) {
             for (Widget widget : widgets) {
                 widget.isInEditor = true;
@@ -60,6 +63,7 @@ public class WidgetRenderer {
             }
             return;
         }
+        //Render in any other screen
         if (currentScreen != null && allowedScreens.contains(DynamicHUD.MC.currentScreen.getClass()) && !this.isInEditor) {
             for (Widget widget : widgets) {
                 widget.isInEditor = false;

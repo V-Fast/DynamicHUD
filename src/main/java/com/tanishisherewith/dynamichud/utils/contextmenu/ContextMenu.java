@@ -16,7 +16,7 @@ public class ContextMenu {
     public int finalWidth = 0;
     public int height = 0;
     public Color backgroundColor = new Color(107, 112, 126, 124);
-    private Color darkerBorderColor = backgroundColor.darker().darker().darker().darker().darker().darker();
+    private final Color darkerBorderColor = backgroundColor.darker().darker().darker().darker().darker().darker();
     //Todo: Add padding around the rectangle instead of just one side.
     public int padding = 5; // The amount of padding around the rectangle
     public int heightOffset = 4; // Height offset from the widget

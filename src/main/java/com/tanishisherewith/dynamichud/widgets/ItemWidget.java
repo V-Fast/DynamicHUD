@@ -44,6 +44,7 @@ public class ItemWidget extends Widget {
     public void setItemStack(ItemStack item) {
         this.item = item;
     }
+
     public static class Builder extends WidgetBuilder<Builder,ItemWidget>{
          ItemStack itemStack;
         public Builder setItemStack(ItemStack itemStack) {

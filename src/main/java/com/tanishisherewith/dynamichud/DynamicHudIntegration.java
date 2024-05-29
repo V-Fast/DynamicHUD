@@ -8,8 +8,8 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.system.NonnullDefault;
 
 import java.io.File;
 
@@ -85,6 +85,9 @@ public interface DynamicHudIntegration {
      *     WidgetManager.registerCustomWidget(TextWidget.DATA);
      *     }
      * </pre>
+     *
+     * Custom widgets can be registered in any method in the interface
+     * but to avoid any errors and mishaps it is recommended you add them here
      */
     default void registerCustomWidgets() {
     }
@@ -118,10 +121,15 @@ public interface DynamicHudIntegration {
 
     /**
      * Returns the movable screen for the DynamicHud.
+     * <p>
+     * <h3>
+     * !! Should never be null !!
+     * </h3>
+     *</p>
      *
      * @return The movable screen.
      */
-   @NotNull AbstractMoveableScreen getMovableScreen();
+   AbstractMoveableScreen getMovableScreen();
 
     /**
      * To return a {@link WidgetRenderer} object.

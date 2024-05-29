@@ -7,9 +7,7 @@ import com.tanishisherewith.dynamichud.widget.WidgetManager;
 import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
 import com.tanishisherewith.dynamichud.widgets.TextWidget;
 import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -27,7 +25,7 @@ public class DynamicHudTest implements DynamicHudIntegration {
 
         //Local registry
         registry = new DynamicValueRegistry(DynamicHUD.MOD_ID);
-        registry.registerLocal("Hello", () -> "Hello!");
+        registry.registerLocal("Hello", () -> "Hello " + DynamicHUD.MC.getSession().getUsername() + "!");
         registry.registerLocal("DynamicHUD", () -> "DynamicHUD");
 
 
@@ -82,11 +80,13 @@ public class DynamicHudTest implements DynamicHudIntegration {
 
         renderer = new WidgetRenderer(widgets);
         renderer.shouldRenderInGameHud(true);
+
+        //This will make widgets render in the titlescreen as well.
         renderer.addScreen(TitleScreen.class);
     }
 
     @Override
-    public @NotNull AbstractMoveableScreen getMovableScreen() {
+    public AbstractMoveableScreen getMovableScreen() {
         return new AbstractMoveableScreen(Text.literal("Editor Screen"), renderer) {
         };
     }

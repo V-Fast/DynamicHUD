@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.screens;
 
+import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -9,8 +10,6 @@ import net.minecraft.text.Text;
 public abstract class AbstractMoveableScreen extends Screen {
     public final WidgetRenderer widgetRenderer;
     public int snapSize = 100;
-    protected boolean shouldPause = false; // To pause if the screen is opened or not
-
     /**
      * Constructs a AbstractMoveableScreen object.
      */
@@ -81,6 +80,10 @@ public abstract class AbstractMoveableScreen extends Screen {
 
         // Draw each widget
         widgetRenderer.renderWidgets(drawContext, mouseX, mouseY);
+
+        if(widgetRenderer.selectedWidget != null && GlobalConfig.get().shouldDisplayDescriptions()){
+            drawContext.drawTooltip(client.textRenderer,Text.of(widgetRenderer.selectedWidget.DATA.description()),mouseX,mouseY);
+        }
     }
     public void handleClickOnWidget(Widget widget, double mouseX, double mouseY, int button){
 
@@ -93,13 +96,9 @@ public abstract class AbstractMoveableScreen extends Screen {
         super.close();
     }
 
-    public void setShouldPause(boolean shouldPause) {
-        this.shouldPause = shouldPause;
-    }
-
     @Override
     public boolean shouldPause() {
-        return shouldPause;
+        return false;
     }
 
     public void setSnapSize(int size) {

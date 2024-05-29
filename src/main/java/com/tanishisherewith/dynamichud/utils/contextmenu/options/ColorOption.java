@@ -21,7 +21,6 @@ public class ColorOption extends Option<Color> {
         super(getter, setter);
         this.name = name;
         this.parentMenu = parentMenu;
-        System.out.println(get());
         colorPicker = new ColorGradientPicker(x + this.parentMenu.finalWidth, y - 10, get(), this::set, 50, 100);
     }
 

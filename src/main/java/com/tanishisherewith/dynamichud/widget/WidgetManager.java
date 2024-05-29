@@ -100,7 +100,7 @@ public class WidgetManager {
      */
     public static void onScreenResized(int newWidth, int newHeight, int previousWidth, int previousHeight) {
         for (Widget widget : widgets) {
-            // To ensure that infinite coordinates is not returned
+            // To ensure that infinite coordinates is not returned for the first time its resized.
             if (widget.xPercent <= 0.0f) {
                 widget.xPercent = (float) widget.getX() / previousWidth;
             }

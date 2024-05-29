@@ -145,6 +145,8 @@ public abstract class Widget {
      * Renders the widget on the editor screen.
      */
     public final void renderInEditor(DrawContext drawContext, int mouseX, int mouseY) {
+        if(!isInEditor) return;
+
         displayBg(drawContext);
 
         if (shouldScale) {
@@ -255,7 +257,6 @@ public abstract class Widget {
      * Displays a faint grayish background if enabled or faint reddish background if disabled.
      * Drawn with 2 pixel offset to all sides
      *
-     * @param context
      */
     protected void displayBg(DrawContext context) {
         int backgroundColor = this.shouldDisplay() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
@@ -346,11 +347,7 @@ public abstract class Widget {
 
 
         /**
-         * X Position of the widget relative to the screen.
-         * Should be between 0f - 1f
-         *
-         * @param x
-         * @return Builder
+         * X Position of the widget of the scaled screen.
          */
         public T setX(int x) {
             this.x = x;
@@ -358,11 +355,7 @@ public abstract class Widget {
         }
 
         /**
-         * Y Position of the widget relative to the screen.
-         * Should be between 0f - 1f
-         *
-         * @param y
-         * @return
+         * Y Position of the widget of the scaled screen.
          */
         public T setY(int y) {
             this.y = y;

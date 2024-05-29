@@ -27,6 +27,9 @@ public final class GlobalConfig {
     private float scale = 1.0f;
 
     @SerialEntry
+    private boolean displayDescriptions = false;
+
+    @SerialEntry
     private boolean showColorPickerPreview = true;
 
     public static GlobalConfig get() {
@@ -54,6 +57,12 @@ public final class GlobalConfig {
                                         .binding(true, () -> this.showColorPickerPreview, newVal -> this.showColorPickerPreview = newVal)
                                         .controller(booleanOption -> BooleanControllerBuilder.create(booleanOption).yesNoFormatter())
                                         .build())
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Text.literal("Show widget descriptions/tooltips"))
+                                        .description(OptionDescription.of(Text.literal("Shows the description of widgets as tooltips.")))
+                                        .binding(true, () -> this.displayDescriptions, newVal -> this.displayDescriptions = newVal)
+                                        .controller(booleanOption -> BooleanControllerBuilder.create(booleanOption).yesNoFormatter())
+                                        .build())
                                 .build())
                         .build())
                 .build()
@@ -65,5 +74,9 @@ public final class GlobalConfig {
 
     public boolean showColorPickerPreview() {
         return showColorPickerPreview;
+    }
+
+    public boolean shouldDisplayDescriptions() {
+        return displayDescriptions;
     }
 }

@@ -4,7 +4,6 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.Objects;
@@ -24,7 +23,7 @@ public class SubMenuOption extends Option<Boolean> {
     public String name = "Empty";
 
 
-    public SubMenuOption(String name, @NotNull ContextMenu parentMenu, Supplier<Boolean> getter, Consumer<Boolean> setter) {
+    public SubMenuOption(String name, ContextMenu parentMenu, Supplier<Boolean> getter, Consumer<Boolean> setter) {
         super(getter, setter);
         Objects.requireNonNull(parentMenu, "Parent Menu cannot be null");
         this.name = name;
