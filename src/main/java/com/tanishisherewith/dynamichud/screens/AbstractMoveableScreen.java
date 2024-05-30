@@ -74,7 +74,7 @@ public abstract class AbstractMoveableScreen extends Screen {
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         assert this.client != null;
         if (this.client.world == null) {
-            this.renderBackgroundTexture(drawContext);
+            renderInGameBackground(drawContext);
         }
         drawContext.drawText(client.textRenderer,title,client.getWindow().getScaledWidth()/2 - client.textRenderer.getWidth(title.getString())/2,textRenderer.fontHeight/2,-1,true);
 
