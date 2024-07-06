@@ -41,43 +41,41 @@ public class DrawHelper {
         float endAlpha = (float) (endColor >> 24 & 255) / 255.0F;
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
+        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-
+        
         switch (direction) {
             case LEFT_RIGHT:
-                bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
-                bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
-                bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
-                bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
+                bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha);
+                bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(endRed, endGreen, endBlue, endAlpha);
+                bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha);
+                bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(startRed, startGreen, startBlue, startAlpha);
                 break;
             case TOP_BOTTOM:
-                bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
-                bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
-                bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
-                bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
+                bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(endRed, endGreen, endBlue, endAlpha);
+                bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(endRed, endGreen, endBlue, endAlpha);
+                bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(startRed, startGreen, startBlue, startAlpha);
+                bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(startRed, startGreen, startBlue, startAlpha);
                 break;
             case RIGHT_LEFT:
-                bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
-                bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
-                bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
-                bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
+                bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(endRed, endGreen, endBlue, endAlpha);
+                bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha);
+                bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(startRed, startGreen, startBlue, startAlpha);
+                bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha);
                 break;
             case BOTTOM_TOP:
-                bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
-                bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
-                bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
-                bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
+                bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha);
+                bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha);
+                bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha);
+                bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha);
                 break;
         }
 
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 
         RenderSystem.disableBlend();
     }
@@ -114,21 +112,21 @@ public class DrawHelper {
         float alpha = (float) (color >> 24 & 255) / 255.0F;
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
+        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
-        bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(red, green, blue, alpha);
+        bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(red, green, blue, alpha);
+        bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(red, green, blue, alpha);
+        bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(red, green, blue, alpha);
 
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 
         RenderSystem.disableBlend();
     }
@@ -201,14 +199,12 @@ public class DrawHelper {
     }
 
     public static void drawRainbowGradientRectangle(Matrix4f matrix4f, float x, float y, float width, float height, float alpha) {
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
         for (int i = 0; i <= width; i++) {
             float hue = (float) i / width;
@@ -220,8 +216,8 @@ public class DrawHelper {
             float blue = (color & 255) / 255.0F;
             float alphaVal = (color >> 24 & 255) / 255.0F;
 
-            bufferBuilder.vertex(matrix4f, x + i, y, 0.0f).color(red, green, blue, alphaVal).next();
-            bufferBuilder.vertex(matrix4f, x + i, y + height, 0.0f).color(red, green, blue, alphaVal).next();
+            bufferBuilder.vertex(matrix4f, x + i, y, 0.0f).color(red, green, blue, alphaVal);
+            bufferBuilder.vertex(matrix4f, x + i, y + height, 0.0f).color(red, green, blue, alphaVal);
         }
 
         for (int i = (int) width; i >= 0; i--) {
@@ -234,11 +230,11 @@ public class DrawHelper {
             float blue = (color & 255) / 255.0F;
             float alphaVal = (color >> 24 & 255) / 255.0F;
 
-            bufferBuilder.vertex(matrix4f, x + i, y + height, 0.0f).color(red, green, blue, alphaVal).next();
-            bufferBuilder.vertex(matrix4f, x + i, y, 0.0f).color(red, green, blue, alphaVal).next();
+            bufferBuilder.vertex(matrix4f, x + i, y + height, 0.0f).color(red, green, blue, alphaVal);
+            bufferBuilder.vertex(matrix4f, x + i, y, 0.0f).color(red, green, blue, alphaVal);
         }
 
-        Tessellator.getInstance().draw();
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 
         RenderSystem.disableBlend();
     }
@@ -260,16 +256,15 @@ public class DrawHelper {
         RenderSystem.enableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         for (float i = 0; i < width; i += 1.0f) {
             float hue = (i / width); // Multiply by 1 to go through the whole color spectrum once (red to red)
             Color color = Color.getHSBColor(hue, 1.0f, 1.0f); // Full saturation and brightness
 
-            bufferBuilder.vertex(matrix4f, x + i, y, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
-            bufferBuilder.vertex(matrix4f, x + i + 1.0f, y, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
-            bufferBuilder.vertex(matrix4f, x + i + 1.0f, y + height, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
-            bufferBuilder.vertex(matrix4f, x + i, y + height, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
+            bufferBuilder.vertex(matrix4f, x + i, y, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+            bufferBuilder.vertex(matrix4f, x + i + 1.0f, y, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+            bufferBuilder.vertex(matrix4f, x + i + 1.0f, y + height, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+            bufferBuilder.vertex(matrix4f, x + i, y + height, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
         }
 
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
@@ -297,21 +292,21 @@ public class DrawHelper {
         float alpha = (float) (color >> 24 & 255) / 255.0F;
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
+        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
         for (int i = 0; i <= 360; i++) {
             double x = xCenter + Math.sin(Math.toRadians(i)) * radius;
             double y = yCenter + Math.cos(Math.toRadians(i)) * radius;
             double x2 = xCenter + Math.sin(Math.toRadians(i)) * (radius + lineWidth);
             double y2 = yCenter + Math.cos(Math.toRadians(i)) * (radius + lineWidth);
-            bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f, (float) x2, (float) y2, 0).color(red, green, blue, alpha).next();
+            bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0).color(red, green, blue, alpha);
+            bufferBuilder.vertex(matrix4f, (float) x2, (float) y2, 0).color(red, green, blue, alpha);
         }
 
 
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
     }
 
     /**
@@ -330,24 +325,23 @@ public class DrawHelper {
         float alpha = (float) (color >> 24 & 255) / 255.0F;
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
+        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
 
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
 
 
-        bufferBuilder.vertex(matrix4f, xCenter, yCenter, 0).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, xCenter, yCenter, 0).color(red, green, blue, alpha);
 
         for (int i = 0; i <= 360; i++) {
             double x = xCenter + Math.sin(Math.toRadians(i)) * radius;
             double y = yCenter + Math.cos(Math.toRadians(i)) * radius;
-            bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0).color(red, green, blue, alpha).next();
+            bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0).color(red, green, blue, alpha);
         }
 
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         RenderSystem.disableBlend();
     }
 
@@ -391,9 +385,9 @@ public class DrawHelper {
 
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
+        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         RenderSystem.enableBlend();
 
         for (float angle = startAngle; angle <= endAngle; angle += 1.0F) {
@@ -402,11 +396,11 @@ public class DrawHelper {
             float x2 = x + MathHelper.cos((angle + 1.0F) * 0.017453292F) * radius;
             float y2 = y + MathHelper.sin((angle + 1.0F) * 0.017453292F) * radius;
 
-            bufferBuilder.vertex(matrix4f, x, y, 0).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f, x1, y1, 0).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f, x2, y2, 0).color(red, green, blue, alpha).next();
+            bufferBuilder.vertex(matrix4f, x, y, 0).color(red, green, blue, alpha);
+            bufferBuilder.vertex(matrix4f, x1, y1, 0).color(red, green, blue, alpha);
+            bufferBuilder.vertex(matrix4f, x2, y2, 0).color(red, green, blue, alpha);
         }
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         RenderSystem.disableBlend();
     }
     /* ====  Drawing Quadrants, Arcs, and Triangles  ==== */
@@ -434,12 +428,12 @@ public class DrawHelper {
         float endAlpha = (float) (endColor >> 24 & 255) / 255.0F;
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
+        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
+
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
         RenderSystem.enableBlend();
 
-        bufferBuilder.vertex(matrix4f, xCenter, yCenter, 0).color(startRed, startGreen, startBlue, startAlpha).next();
+        bufferBuilder.vertex(matrix4f, xCenter, yCenter, 0).color(startRed, startGreen, startBlue, startAlpha);
 
         for (int i = quadrant * 90; i <= quadrant * 90 + 90; i++) {
             double x = xCenter + Math.sin(Math.toRadians(i)) * radius;
@@ -452,10 +446,10 @@ public class DrawHelper {
             float blue = startBlue * (1 - t) + endBlue * t;
             float alpha = startAlpha * (1 - t) + endAlpha * t;
 
-            bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0).color(red, green, blue, alpha).next();
+            bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0).color(red, green, blue, alpha);
         }
 
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         RenderSystem.disableBlend();
     }
 
@@ -477,10 +471,9 @@ public class DrawHelper {
         float alpha = (float) (color >> 24 & 255) / 255.0F;
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
+        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
 
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
         RenderSystem.enableBlend();
 
         for (int i = startAngle; i <= endAngle; i++) {
@@ -489,11 +482,11 @@ public class DrawHelper {
             double outerX = xCenter + Math.sin(Math.toRadians(i)) * radius;
             double outerY = yCenter + Math.cos(Math.toRadians(i)) * radius;
 
-            bufferBuilder.vertex(matrix4f, (float) innerX, (float) innerY, 0).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f, (float) outerX, (float) outerY, 0).color(red, green, blue, alpha).next();
+            bufferBuilder.vertex(matrix4f, (float) innerX, (float) innerY, 0).color(red, green, blue, alpha);
+            bufferBuilder.vertex(matrix4f, (float) outerX, (float) outerY, 0).color(red, green, blue, alpha);
         }
 
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 
         RenderSystem.disableBlend();
     }
@@ -515,20 +508,20 @@ public class DrawHelper {
         float alpha = (float) (color >> 24 & 255) / 255.0F;
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
+        BufferBuilder bufferBuilder =  tessellator.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
+
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
         RenderSystem.enableBlend();
 
-        bufferBuilder.vertex(matrix4f, xCenter, yCenter, 0).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, xCenter, yCenter, 0).color(red, green, blue, alpha);
 
         for (int i = quadrant * 90; i <= quadrant * 90 + 90; i++) {
             double x = xCenter + Math.sin(Math.toRadians(i)) * radius;
             double y = yCenter + Math.cos(Math.toRadians(i)) * radius;
-            bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0).color(red, green, blue, alpha).next();
+            bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0).color(red, green, blue, alpha);
         }
 
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         RenderSystem.disableBlend();
 
     }
@@ -552,15 +545,14 @@ public class DrawHelper {
         float alpha = (float) (color >> 24 & 255) / 255.0F;
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
-        bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
-        bufferBuilder.vertex(matrix4f, x1, y1, 0).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x2, y2, 0).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x3, y3, 0).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x1, y1, 0).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x1, y1, 0).color(red, green, blue, alpha);
+        bufferBuilder.vertex(matrix4f, x2, y2, 0).color(red, green, blue, alpha);
+        bufferBuilder.vertex(matrix4f, x3, y3, 0).color(red, green, blue, alpha);
+        bufferBuilder.vertex(matrix4f, x1, y1, 0).color(red, green, blue, alpha);
 
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
     }
 
     /**
@@ -761,14 +753,15 @@ public class DrawHelper {
         RenderSystem.enableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
+        BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
 
-        bufferBuilder.vertex(matrix, x, y + height, 0.0F).color(color1.getRGB()).next();
-        bufferBuilder.vertex(matrix, x + width, y + height, 0.0F).color(color2.getRGB()).next();
-        bufferBuilder.vertex(matrix, x + width, y, 0.0F).color(color3.getRGB()).next();
-        bufferBuilder.vertex(matrix, x, y, 0.0F).color(color4.getRGB()).next();
+        bufferBuilder.vertex(matrix, x, y + height, 0.0F).color(color1.getRGB());
+        bufferBuilder.vertex(matrix, x + width, y + height, 0.0F).color(color2.getRGB());
+        bufferBuilder.vertex(matrix, x + width, y, 0.0F).color(color3.getRGB());
+        bufferBuilder.vertex(matrix, x, y, 0.0F).color(color4.getRGB());
+
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+
         RenderSystem.disableBlend();
 
         RenderSystem.defaultBlendFunc();

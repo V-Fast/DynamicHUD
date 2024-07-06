@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'fabric-loom' version '1.7-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -35,7 +35,7 @@ dependencies {
 
     modImplementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
 
-    modApi "com.terraformersmc:modmenu:10.0.0-beta.1"
+    modApi "com.terraformersmc:modmenu:11.0.1"
 }
 
 processResources {

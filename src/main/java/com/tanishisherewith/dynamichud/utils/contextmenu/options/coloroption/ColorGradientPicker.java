@@ -4,7 +4,6 @@ import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.GlAllocationUtils;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -79,7 +78,7 @@ public class ColorGradientPicker {
             int y = (int) ((client.getWindow().getScaledHeight() - mouseY) * framebuffer.textureHeight / client.getWindow().getScaledHeight());
 
             //Read the pixel color at x,y pos to buffer
-            ByteBuffer buffer = GlAllocationUtils.allocateByteBuffer(4);
+            ByteBuffer buffer = ByteBuffer.allocate(4);
             GL11.glReadPixels(x, y, 1, 1, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
             int red = buffer.get(0) & 0xFF;
             int green = buffer.get(1) & 0xFF;
@@ -109,7 +108,7 @@ public class ColorGradientPicker {
             int x = (int) (mouseX * framebuffer.textureWidth / client.getWindow().getScaledWidth());
             int y = (int) ((client.getWindow().getScaledHeight() - mouseY) * framebuffer.textureHeight / client.getWindow().getScaledHeight());
 
-            ByteBuffer buffer = GlAllocationUtils.allocateByteBuffer(4);
+            ByteBuffer buffer = ByteBuffer.allocate(4);
             GL11.glReadPixels(x, y, 1, 1, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
             int red = buffer.get(0) & 0xFF;
             int green = buffer.get(1) & 0xFF;

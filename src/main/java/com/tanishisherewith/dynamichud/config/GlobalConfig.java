@@ -13,7 +13,7 @@ import net.minecraft.util.Identifier;
 
 public final class GlobalConfig {
     public static final ConfigClassHandler<GlobalConfig> HANDLER = ConfigClassHandler.createBuilder(GlobalConfig.class)
-            .id(new Identifier("dynamichud", "dynamichud_config"))
+            .id(Identifier.of("dynamichud", "dynamichud_config"))
             .serializer(config -> GsonConfigSerializerBuilder.create(config)
                     .setPath(FabricLoader.getInstance().getConfigDir().resolve("dynamichud.json5"))
                     .setJson5(true)
