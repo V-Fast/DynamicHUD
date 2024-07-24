@@ -2,6 +2,7 @@ package com.tanishisherewith.dynamichud;
 
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen;
+import com.tanishisherewith.dynamichud.utils.BooleanPool;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetManager;
 import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
@@ -152,18 +153,20 @@ public class DynamicHUD implements ClientModInitializer {
                         if (e instanceof IOException) {
                             logger.warn("An error has occurred while loading widgets of mod {}", modId, e);
                         } else {
-                            logger.warn("Mod {} has incorrect implementation of DynamicHUD", modId, e);
+                            logger.warn("Mod {} has improper implementation of DynamicHUD", modId, e);
                         }
                     }
                 });
-        printInfo("Integration of all mods found was successful");
+        printInfo("(DynamicHUD) Integration of mods found was successful");
 
 
         //Global config saving (YACL)
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> GlobalConfig.HANDLER.save());
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, s) -> GlobalConfig.HANDLER.save());
         ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> GlobalConfig.HANDLER.save());
-        ClientLifecycleEvents.CLIENT_STOPPING.register((minecraftClient) -> GlobalConfig.HANDLER.save());
+        ClientLifecycleEvents.CLIENT_STOPPING.register((minecraftClient) -> {
+            GlobalConfig.HANDLER.save();
+        });
 
 
         //In game screen render.

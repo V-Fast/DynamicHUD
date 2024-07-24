@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
+import com.tanishisherewith.dynamichud.utils.BooleanPool;
 import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
@@ -14,6 +15,11 @@ public class BooleanOption extends Option<Boolean> {
     public BooleanOption(String name, Supplier<Boolean> getter, Consumer<Boolean> setter) {
         super(getter, setter);
         this.name = name;
+    }
+
+    public BooleanOption(String name, boolean defaultValue) {
+        this(name, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value));
+        BooleanPool.put(name, defaultValue);
     }
 
     @Override

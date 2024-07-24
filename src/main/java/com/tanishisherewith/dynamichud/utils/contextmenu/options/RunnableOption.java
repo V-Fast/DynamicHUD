@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
+import com.tanishisherewith.dynamichud.utils.BooleanPool;
 import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
@@ -25,8 +26,15 @@ public class RunnableOption extends Option<Boolean> {
         this.name = "Run: " + name; // prepend the "run" symbol to the name
         this.task = task;
     }
+
+    public RunnableOption(String name, boolean defaultValue,Runnable task) {
+        this(name, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value),task);
+        BooleanPool.put(name, defaultValue);
+    }
+
     Color DARK_RED = new Color(116, 0, 0);
     Color DARK_GREEN = new Color(24, 132, 0, 226);
+
     @Override
     public void render(DrawContext drawContext, int x, int y) {
         super.render(drawContext, x, y);

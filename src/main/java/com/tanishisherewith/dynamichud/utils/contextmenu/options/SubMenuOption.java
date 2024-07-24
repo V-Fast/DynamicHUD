@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
+import com.tanishisherewith.dynamichud.utils.BooleanPool;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
 import net.minecraft.client.gui.DrawContext;
@@ -31,6 +32,9 @@ public class SubMenuOption extends Option<Boolean> {
         this.subMenu = new ContextMenu(parentMenu.x + parentMenu.finalWidth, this.y);
         this.subMenu.heightOffset = 0;
         this.subMenu.shouldDisplay = get();
+    }
+    public SubMenuOption(String name, ContextMenu parentMenu) {
+        this(name, parentMenu, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value));
     }
 
     @Override
