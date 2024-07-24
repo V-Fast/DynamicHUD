@@ -85,7 +85,9 @@ public class DynamicHUD implements ClientModInitializer {
                 .forEach(entrypoint -> {
                     ModMetadata metadata = entrypoint.getProvider().getMetadata();
                     String modId = metadata.getId();
+
                     printInfo(String.format("Supported mod with id %s was found!", modId));
+
                     AbstractMoveableScreen screen;
                     KeyBinding binding;
                     WidgetRenderer widgetRenderer;
