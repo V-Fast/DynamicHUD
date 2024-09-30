@@ -2,12 +2,14 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
 import com.tanishisherewith.dynamichud.utils.BooleanPool;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
+import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
 import java.awt.*;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -23,31 +25,30 @@ public class SubMenuOption extends Option<Boolean> {
     private final ContextMenu parentMenu;
     public String name = "Empty";
 
-
-    public SubMenuOption(String name, ContextMenu parentMenu, Supplier<Boolean> getter, Consumer<Boolean> setter) {
+    public SubMenuOption(String name, ContextMenu parentMenu, Supplier<Boolean> getter, Consumer<Boolean> setter, ContextMenuProperties properties) {
         super(getter, setter);
         Objects.requireNonNull(parentMenu, "Parent Menu cannot be null");
         this.name = name;
         this.parentMenu = parentMenu;
-        this.subMenu = new ContextMenu(parentMenu.x + parentMenu.finalWidth, this.y);
-        this.subMenu.heightOffset = 0;
+        this.subMenu = new ContextMenu(parentMenu.x + parentMenu.finalWidth, this.y,properties);
+        this.subMenu.getProperties().setHeightOffset(0);
         this.subMenu.shouldDisplay = get();
+        this.renderer.init(this);
+    }
+    public SubMenuOption(String name, ContextMenu parentMenu, ContextMenuProperties properties) {
+        this(name, parentMenu, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value),properties);
+    }
+    public SubMenuOption(String name, ContextMenu parentMenu, Supplier<Boolean> getter, Consumer<Boolean> setter) {
+        this(name,parentMenu,getter,setter,parentMenu.getProperties().copy());
     }
     public SubMenuOption(String name, ContextMenu parentMenu) {
-        this(name, parentMenu, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value));
+        this(name, parentMenu, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value),parentMenu.getProperties().copy());
     }
 
     @Override
     public void render(DrawContext drawContext, int x, int y,int mouseX,int mouseY) {
-        this.x = x;
-        this.y = y;
-
-        int color = value ? Color.GREEN.getRGB() : Color.RED.getRGB();
-        drawContext.drawText(mc.textRenderer, Text.of(name), x, y + 1, color, false);
-        this.height = mc.textRenderer.fontHeight + 2;
-        this.width = mc.textRenderer.getWidth(name) + 1;
-
-        subMenu.render(drawContext, this.x + parentMenu.finalWidth, this.y, 0,mouseX, mouseY);
+        super.render(drawContext,x,y,mouseX,mouseY);
+      //  properties.getSkin().getRenderer(SubMenuOption.class).render(drawContext,this,x,y,mouseX,mouseY);
     }
 
     @Override
@@ -68,9 +69,9 @@ public class SubMenuOption extends Option<Boolean> {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button) {
-        subMenu.mouseDragged(mouseX, mouseY, button);
-        return super.mouseDragged(mouseX, mouseY, button);
+    public boolean mouseDragged(double mouseX, double mouseY, int button,double deltaX, double deltaY) {
+        subMenu.mouseDragged(mouseX, mouseY, button,deltaX, deltaY);
+        return super.mouseDragged(mouseX, mouseY, button,deltaX, deltaY);
     }
 
     public SubMenuOption getOption() {
@@ -79,5 +80,9 @@ public class SubMenuOption extends Option<Boolean> {
 
     public ContextMenu getSubMenu() {
         return subMenu;
+    }
+
+    public ContextMenu getParentMenu() {
+        return parentMenu;
     }
 }

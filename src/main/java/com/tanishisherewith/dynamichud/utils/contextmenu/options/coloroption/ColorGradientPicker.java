@@ -5,6 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import java.awt.*;
 import java.nio.ByteBuffer;
@@ -68,27 +69,40 @@ public class ColorGradientPicker {
 
         if (colorPickerButton.isPicking() && GlobalConfig.get().showColorPickerPreview()) {
             // Draw the preview box near cursor
-
-            //Translate cursor screen position to minecraft's scaled window
-            double mouseX = client.mouse.getX() * client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
-            double mouseY = client.mouse.getY() * client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
-
             Framebuffer framebuffer = client.getFramebuffer();
-            int x = (int) (mouseX * framebuffer.textureWidth / client.getWindow().getScaledWidth());
-            int y = (int) ((client.getWindow().getScaledHeight() - mouseY) * framebuffer.textureHeight / client.getWindow().getScaledHeight());
+            if (framebuffer != null) {
+                //Translate cursor screen position to minecraft's scaled window
+                double mouseX = client.mouse.getX() * client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
+                double mouseY = client.mouse.getY() * client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
 
-            //Read the pixel color at x,y pos to buffer
-            ByteBuffer buffer = ByteBuffer.allocate(4);
-            GL11.glReadPixels(x, y, 1, 1, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-            int red = buffer.get(0) & 0xFF;
-            int green = buffer.get(1) & 0xFF;
-            int blue = buffer.get(2) & 0xFF;
+                int x = (int) (mouseX * framebuffer.textureWidth / client.getWindow().getScaledWidth());
+                int y = (int) ((client.getWindow().getScaledHeight() - mouseY) * framebuffer.textureHeight / client.getWindow().getScaledHeight());
 
-            drawContext.getMatrices().push();
-            drawContext.getMatrices().translate(0, 0, 500);
-            drawContext.fill((int) mouseX + 10, (int) mouseY, (int) mouseX + 26, (int) mouseY + 16, -1);
-            drawContext.fill((int) mouseX + 11, (int) mouseY + 1, (int) mouseX + 25, (int) mouseY + 15, (red << 16) | (green << 8) | blue | 0xFF000000);
-            drawContext.getMatrices().pop();
+                try {
+                    int bufferSize = framebuffer.textureWidth * framebuffer.textureHeight * 4;
+
+                    ByteBuffer buffer = ByteBuffer.allocateDirect(bufferSize);
+                    GL11.glBindTexture(GL11.GL_TEXTURE_2D, framebuffer.getColorAttachment());
+                    GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE, buffer);
+
+                    int index = (x + y * framebuffer.textureWidth) * 4;
+                    if (index >= 0 && index + 3 < bufferSize) {
+                        int blue = buffer.get(index) & 0xFF;
+                        int green = buffer.get(index + 1) & 0xFF;
+                        int red = buffer.get(index + 2) & 0xFF;
+
+                        drawContext.getMatrices().push();
+                        drawContext.getMatrices().translate(0, 0, 500);
+                        drawContext.fill((int) mouseX + 10, (int) mouseY, (int) mouseX + 26, (int) mouseY + 16, -1);
+                        drawContext.fill((int) mouseX + 11, (int) mouseY + 1, (int) mouseX + 25, (int) mouseY + 15, (red << 16) | (green << 8) | blue | 0xFF000000);
+                        drawContext.getMatrices().pop();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.err.println("Framebuffer is null");
+            }
         }
     }
 
@@ -105,26 +119,48 @@ public class ColorGradientPicker {
             gradientBox.onClick(mouseX, mouseY, button);
         } else if (colorPickerButton.isPicking()) {
             Framebuffer framebuffer = client.getFramebuffer();
-            int x = (int) (mouseX * framebuffer.textureWidth / client.getWindow().getScaledWidth());
-            int y = (int) ((client.getWindow().getScaledHeight() - mouseY) * framebuffer.textureHeight / client.getWindow().getScaledHeight());
+            if (framebuffer != null) {
+                int x = (int) (mouseX * framebuffer.textureWidth / client.getWindow().getScaledWidth());
+                int y = (int) ((client.getWindow().getScaledHeight() - mouseY) * framebuffer.textureHeight / client.getWindow().getScaledHeight());
 
-            ByteBuffer buffer = ByteBuffer.allocate(4);
-            GL11.glReadPixels(x, y, 1, 1, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-            int red = buffer.get(0) & 0xFF;
-            int green = buffer.get(1) & 0xFF;
-            int blue = buffer.get(2) & 0xFF;
+                try {
+                    // Calculate the size of the buffer needed to store the texture data
+                    int bufferSize = framebuffer.textureWidth * framebuffer.textureHeight * 4;
 
-            float[] hsv = Color.RGBtoHSB(red, green, blue, null);
-            gradientSlider.setHue(hsv[0]);
-            gradientBox.setHue(hsv[0]);
-            gradientBox.setSaturation(hsv[1]);
-            gradientBox.setValue(hsv[2]);
+                    ByteBuffer buffer = ByteBuffer.allocateDirect(bufferSize);
+                    // Bind the texture from the framebuffer
+                    GL11.glBindTexture(GL11.GL_TEXTURE_2D, framebuffer.getColorAttachment());
+                    // Read the texture data into the buffer
+                    GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE, buffer);
 
-            colorPickerButton.setPicking(false);
+                    // Calculate the index of the pixel in the buffer
+                    int index = (x + y * framebuffer.textureWidth) * 4;
+
+                    // Check if the index is within the bounds of the buffer
+                    if (index >= 0 && index + 3 < bufferSize) {
+                        int blue = buffer.get(index) & 0xFF;
+                        int green = buffer.get(index + 1) & 0xFF;
+                        int red = buffer.get(index + 2) & 0xFF;
+
+                        float[] hsv = Color.RGBtoHSB(red, green, blue, null);
+                        gradientSlider.setHue(hsv[0]);
+                        gradientBox.setHue(hsv[0]);
+                        gradientBox.setSaturation(hsv[1]);
+                        gradientBox.setValue(hsv[2]);
+
+                        colorPickerButton.setPicking(false);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.err.println("Framebuffer is null");
+            }
         }
         alphaSlider.setColor(new Color(gradientBox.getColor()));
         alphaSlider.onClick(mouseX, mouseY, button);
         onColorSelected.accept(alphaSlider.getColor());
+
         return true;
     }
 

@@ -25,25 +25,27 @@ public class ListOption<T> extends Option<T> {
                 break;
             }
         }
+        this.renderer.init(this);
     }
 
     @Override
-    public void render(DrawContext drawContext, int x, int y) {
-        super.render(drawContext, x, y);
-
+    public void render(DrawContext drawContext, int x, int y,int mouseX, int mouseY) {
         value = get();
+        super.render(drawContext, x, y,mouseX,mouseY);
+
+        // properties.getSkin().getRenderer(ListOption.class).render(drawContext,this,x,y,mouseX,mouseY);
+/*
         this.height = mc.textRenderer.fontHeight + 1;
         this.width = mc.textRenderer.getWidth(name + ": " + value.toString()) + 1;
 
         drawContext.drawText(mc.textRenderer, Text.of(name + ": "), x, y, Color.WHITE.getRGB(), false);
         drawContext.drawText(mc.textRenderer, Text.of(value.toString()), x + mc.textRenderer.getWidth(name + ": ") + 1, y, Color.CYAN.getRGB(), false);
-
+*/
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        super.mouseClicked(mouseX, mouseY, button);
-        if (isMouseOver(mouseX, mouseY)) {
+        if (super.mouseClicked(mouseX, mouseY, button)) {
             if (button == 0) {
                 currentIndex = (currentIndex + 1) % values.size();
                 if (currentIndex > values.size() - 1) {
@@ -60,5 +62,9 @@ public class ListOption<T> extends Option<T> {
             set(value);
         }
         return true;
+    }
+
+    public List<T> getValues() {
+        return values;
     }
 }

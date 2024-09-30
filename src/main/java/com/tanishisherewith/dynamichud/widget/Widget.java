@@ -10,11 +10,12 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.Properties;
 import java.util.Set;
 
 public abstract class Widget {
 
-    public static WidgetData<?> DATA;
+    public WidgetData<?> DATA;
     /**
      * This is the UID of the widget used to identify during loading and saving.
      * <p>
@@ -23,7 +24,8 @@ public abstract class Widget {
      * @see #modId
      */
     public UID uid = UID.generate();
-    public boolean isInEditor = false;
+    protected boolean isInEditor = false;
+
     // Whether the widget is enabled and should be displayed.
     public boolean display = true;
     public boolean isDraggable = true;
@@ -33,9 +35,10 @@ public abstract class Widget {
 
     //To enable/disable snapping
     public boolean shiftDown = false;
+
     // Absolute position of the widget on screen in pixels.
-    public int x, y;
-    public boolean shouldScale = true;
+    protected int x, y;
+    protected boolean shouldScale = true;
     /**
      * An identifier for widgets to group them under one ID.
      * <p>
@@ -61,7 +64,7 @@ public abstract class Widget {
     int startX, startY;
 
     public Widget(WidgetData<?> DATA, String modId) {
-        Widget.DATA = DATA;
+        this.DATA = DATA;
         widgetBox = new WidgetBox(0, 0, 0, 0);
         this.modId = modId;
         init();
@@ -71,7 +74,6 @@ public abstract class Widget {
      * This method is called at the end of the {@link Widget#Widget(WidgetData, String)} constructor.
      */
     public void init() {
-
     }
 
     /**
@@ -100,23 +102,31 @@ public abstract class Widget {
         return widgetBox.getHeight();
     }
 
+    private void updatePercentages() {
+        int screenWidth = mc.getWindow().getScaledWidth();
+        int screenHeight = mc.getWindow().getScaledHeight();
+        this.xPercent = (float) (this.x + this.getWidth() / 2) / screenWidth;
+        this.yPercent = (float) (this.y + this.getHeight() / 2) / screenHeight;
+    }
+
+    void updatePositionFromPercentages(int screenWidth, int screenHeight) {
+        this.x = (int) (this.xPercent * screenWidth - this.getWidth() / 2);
+        this.y = (int) (this.yPercent * screenHeight - this.getHeight() / 2);
+
+        this.x = (int) MathHelper.clamp(x, 0, mc.getWindow().getScaledWidth() - getWidth());
+        this.y = (int) MathHelper.clamp(y, 0, mc.getWindow().getScaledHeight() - getHeight());
+    }
+
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
+        if(mc.getWindow() != null) {
+           updatePercentages();
+        }
     }
 
     public void setDraggable(boolean draggable) {
         isDraggable = draggable;
-    }
-
-    public boolean isOverlapping(Set<Widget> other) {
-        for (Widget widgetBox : other) {
-            if ((this.getX() < widgetBox.getX() + widgetBox.getWidgetBox().getWidth() && this.getX() + this.getWidgetBox().getWidth() > widgetBox.getX() &&
-                    this.getY() < widgetBox.getY() + widgetBox.getWidgetBox().getHeight() && this.getY() + this.getWidgetBox().getHeight() > widgetBox.getY())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public boolean isOverlapping(Widget other) {
@@ -223,8 +233,7 @@ public abstract class Widget {
             this.x = (int) MathHelper.clamp(newX, 0, mc.getWindow().getScaledWidth() - getWidth());
             this.y = (int) MathHelper.clamp(newY, 0, mc.getWindow().getScaledHeight() - getHeight());
 
-            this.xPercent = (float) this.x / mc.getWindow().getScaledWidth();
-            this.yPercent = (float) this.y / mc.getWindow().getScaledHeight();
+            updatePercentages();
 
             return true;
         }
@@ -269,7 +278,6 @@ public abstract class Widget {
                 backgroundColor);
     }
 
-
     public void readFromTag(NbtCompound tag) {
         modId = tag.getString("modId");
         uid = new UID(tag.getString("UID"));
@@ -278,6 +286,19 @@ public abstract class Widget {
         display = tag.getBoolean("Display");
         isDraggable = tag.getBoolean("isDraggable");
         shouldScale = tag.getBoolean("shouldScale");
+        xPercent = tag.getFloat("xPercent");
+        yPercent = tag.getFloat("yPercent");
+
+        if(mc.getWindow() != null) {
+            mc.execute(()->{
+            if (x != mc.getWindow().getScaledWidth() * xPercent) {
+                x = (int) MathHelper.clamp(mc.getWindow().getScaledWidth() * xPercent, 0, mc.getWindow().getScaledWidth() - getWidth());
+            }
+            if (y != mc.getWindow().getScaledHeight() * yPercent) {
+                y = (int) MathHelper.clamp(mc.getWindow().getScaledHeight() * yPercent, 0, mc.getWindow().getScaledHeight() - getHeight());
+            }
+            });
+        }
     }
 
     /**
@@ -293,6 +314,8 @@ public abstract class Widget {
         tag.putBoolean("shouldScale", shouldScale);
         tag.putInt("x", x);
         tag.putInt("y", y);
+        tag.putFloat("xPercent", xPercent);
+        tag.putFloat("yPercent", yPercent);
         tag.putBoolean("Display", display);
     }
 
@@ -326,7 +349,7 @@ public abstract class Widget {
 
     @Override
     public String toString() {
-        return "Widget{" +
+        return this.getClass().getName() + "{" +
                 "uniqueId='" + uid.getUniqueID() + '\'' +
                 ", x=" + x +
                 ", y=" + y +

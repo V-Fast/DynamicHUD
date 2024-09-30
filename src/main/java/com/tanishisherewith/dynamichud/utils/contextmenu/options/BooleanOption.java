@@ -3,43 +3,79 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 import com.tanishisherewith.dynamichud.utils.BooleanPool;
 import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
 
-import java.awt.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class BooleanOption extends Option<Boolean> {
     public String name = "Empty";
+    private BooleanType booleanType;
 
-    public BooleanOption(String name, Supplier<Boolean> getter, Consumer<Boolean> setter) {
+    public BooleanOption(String name, Supplier<Boolean> getter, Consumer<Boolean> setter, BooleanType booleanType) {
         super(getter, setter);
         this.name = name;
+        this.booleanType = booleanType;
+        this.renderer.init(this);
+    }
+    public BooleanOption(String name, Supplier<Boolean> getter, Consumer<Boolean> setter) {
+        this(name,getter,setter,BooleanType.TRUE_FALSE);
     }
 
     public BooleanOption(String name, boolean defaultValue) {
-        this(name, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value));
+        this(name,defaultValue,BooleanType.TRUE_FALSE);
+    }
+
+    public BooleanOption(String name, boolean defaultValue,BooleanType type) {
+        this(name, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value),type);
         BooleanPool.put(name, defaultValue);
     }
 
     @Override
-    public void render(DrawContext drawContext, int x, int y) {
-        super.render(drawContext, x, y);
-
+    public void render(DrawContext drawContext, int x, int y,int mouseX, int mouseY) {
         value = get();
+        super.render(drawContext, x, y,mouseX,mouseY);
+
+      //  properties.getSkin().getRenderer(BooleanOption.class).render(drawContext,this,x,y,mouseX,mouseY);
+        /*
         int color = value ? Color.GREEN.getRGB() : Color.RED.getRGB();
         drawContext.drawText(mc.textRenderer, Text.of(name), x, y, color, false);
         this.height = mc.textRenderer.fontHeight;
         this.width = mc.textRenderer.getWidth(name) + 1;
+
+         */
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        super.mouseClicked(mouseX, mouseY, button);
-        if (isMouseOver(mouseX, mouseY)) {
+        if (isMouseOver(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             value = !value;
             set(value);
+            return true;
         }
-        return true;
+        return super.mouseClicked(mouseX,mouseY,button);
+    }
+
+    public BooleanType getBooleanType() {
+        return booleanType;
+    }
+
+    public enum BooleanType{
+        ON_OFF(ScreenTexts::onOrOff),
+        TRUE_FALSE(aBoolean -> aBoolean ? Text.of("True") : Text.of("False")),
+        YES_NO(aBoolean -> aBoolean ? ScreenTexts.YES: ScreenTexts.NO);
+
+        private final Function<Boolean,Text> function;
+
+        BooleanType(Function<Boolean, Text> function){
+            this.function = function;
+        }
+
+        public Text getText(boolean val){
+            return function.apply(val);
+        }
     }
 }

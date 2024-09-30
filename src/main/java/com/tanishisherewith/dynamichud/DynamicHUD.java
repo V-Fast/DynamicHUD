@@ -6,6 +6,7 @@ import com.tanishisherewith.dynamichud.utils.BooleanPool;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetManager;
 import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
+import com.tanishisherewith.dynamichud.widgets.ItemWidget;
 import com.tanishisherewith.dynamichud.widgets.TextWidget;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -73,7 +74,8 @@ public class DynamicHUD implements ClientModInitializer {
 
         // Add WidgetData of included widgets
         WidgetManager.registerCustomWidgets(
-                TextWidget.DATA
+                TextWidget.DATA,
+                ItemWidget.DATA
         );
 
         //YACL load
@@ -112,7 +114,7 @@ public class DynamicHUD implements ClientModInitializer {
                         DHIntegration.initAfter();
 
                         // Get the instance of AbstractMoveableScreen
-                        screen = Objects.requireNonNull( DHIntegration.getMovableScreen());
+                        screen = Objects.requireNonNull(DHIntegration.getMovableScreen());
 
                         // Get the keybind to open the screen instance
                         binding = DHIntegration.getKeyBind();
@@ -155,11 +157,11 @@ public class DynamicHUD implements ClientModInitializer {
                         if (e instanceof IOException) {
                             logger.warn("An error has occurred while loading widgets of mod {}", modId, e);
                         } else {
-                            logger.warn("Mod {} has improper implementation of DynamicHUD", modId, e);
+                            logger.error("Mod {} has improper implementation of DynamicHUD", modId, e);
                         }
                     }
                 });
-        printInfo("(DynamicHUD) Integration of mods found was successful");
+        printInfo("(DynamicHUD) Integration of supported mods was successful");
 
 
         //Global config saving (YACL)

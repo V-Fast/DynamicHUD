@@ -51,8 +51,8 @@ public class DynamicHudTest implements DynamicHudIntegration {
                 .build();
 
         DynamicHUDWidget = new TextWidget.Builder()
-                .setX(5)
-                .setY(5)
+                .setX(0)
+                .setY(0)
                 .setDraggable(false)
                 .rainbow(true)
                 .setDRKey("DynamicHUD")

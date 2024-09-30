@@ -22,12 +22,16 @@ public class ColorOption extends Option<Color> {
         this.name = name;
         this.parentMenu = parentMenu;
         colorPicker = new ColorGradientPicker(x + this.parentMenu.finalWidth, y - 10, get(), this::set, 50, 100);
+        this.renderer.init(this);
     }
 
     @Override
-    public void render(DrawContext drawContext, int x, int y) {
-        super.render(drawContext, x, y);
+    public void render(DrawContext drawContext, int x, int y,int mouseX, int mouseY) {
+        super.render(drawContext, x, y,mouseX,mouseY);
 
+     //   properties.getSkin().getRenderer(ColorOption.class).render(drawContext,this,x,y,mouseX,mouseY);
+
+        /*
         int color = isVisible ? Color.GREEN.getRGB() : Color.RED.getRGB();
         this.height = mc.textRenderer.fontHeight;
         this.width = mc.textRenderer.getWidth(name) + 8;
@@ -46,6 +50,8 @@ public class ColorOption extends Option<Color> {
                 1);
 
         colorPicker.render(drawContext, this.x + parentMenu.finalWidth + 7, y - 10);
+
+         */
     }
 
     @Override
@@ -70,8 +76,18 @@ public class ColorOption extends Option<Color> {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button,double deltaX, double deltaY) {
         colorPicker.mouseDragged(mouseX, mouseY, button);
-        return super.mouseDragged(mouseX, mouseY, button);
+        return super.mouseDragged(mouseX, mouseY, button,deltaX,deltaY);
+    }
+
+    public ColorGradientPicker getColorPicker() {
+        return colorPicker;
+    }
+
+    @Override
+    public void onClose() {
+        isVisible = false;
+        colorPicker.close();
     }
 }

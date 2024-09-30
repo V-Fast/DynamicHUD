@@ -4,7 +4,11 @@ import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
+import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
+import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
+import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProvider;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
+import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.MinecraftSkin;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
 import net.minecraft.client.gui.DrawContext;
@@ -18,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
-public class TextWidget extends Widget {
+public class TextWidget extends Widget implements ContextMenuProvider {
     public Color textColor;
     protected boolean shadow; // Whether to draw a shadow behind the text
     public static WidgetData<TextWidget> DATA = new WidgetData<>("TextWidget", "Display Text on screen", TextWidget::new);
@@ -28,10 +32,10 @@ public class TextWidget extends Widget {
     String dynamicRegistryKey;
     DynamicValueRegistry dynamicValueRegistry = null;
     private ContextMenu menu;
+
     public TextWidget() {
         this(null, null, false, false, Color.WHITE, "unknown");
     }
-
     /**
      * Searches for the supplier within the {@link DynamicValueRegistry#globalRegistry} using the given registryKey
      *
@@ -47,6 +51,7 @@ public class TextWidget extends Widget {
         this.rainbow = rainbow;
         this.textColor = color;
         createMenu();
+        ContextMenuManager.getInstance().registerProvider(this);
     }
 
     /**
@@ -67,29 +72,34 @@ public class TextWidget extends Widget {
         this.shadow = shadow;
         this.rainbow = rainbow;
         createMenu();
+        ContextMenuManager.getInstance().registerProvider(this);
     }
 
     public void createMenu() {
-        menu = new ContextMenu(getX(), getY());
-        menu.addOption(new BooleanOption("Shadow", () -> this.shadow, value -> this.shadow = value));
-        menu.addOption(new BooleanOption("Rainbow", () -> this.rainbow, value -> this.rainbow = value));
-        menu.addOption(new ColorOption("TextColor", menu, () -> this.textColor, value -> this.textColor = value));
-        menu.addOption(new DoubleOption("RainbowSpeed", 1, 4, 1.0f, () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue(),menu));
+        ContextMenuProperties properties = ContextMenuProperties.builder()
+                .skin(new MinecraftSkin(MinecraftSkin.PanelColor.CREAMY))
+                .build();
 
-        /* TEST
-        AtomicReference<Enum> enums = new AtomicReference<>(Enum.Enum1);
+        menu = new ContextMenu(getX(), getY(), properties);
+        menu.getProperties().getSkin().setContextMenu(menu);
+        menu.addOption(new BooleanOption("Shadow", () -> this.shadow, value -> this.shadow = value, BooleanOption.BooleanType.ON_OFF));
+        menu.addOption(new BooleanOption("Rainbow", () -> this.rainbow, value -> this.rainbow = value, BooleanOption.BooleanType.ON_OFF));
+        menu.addOption(new ColorOption("TextColor", menu, () -> this.textColor, value -> this.textColor = value));
+        menu.addOption(new DoubleOption("RainbowSpeed", 1, 5.0f, 1, () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue(),menu));
+
+        /*
         AtomicReference<String> option = new AtomicReference<>("Enum1");
-        List<String> options = Arrays.asList("List1", "List2", "List3");
+        List<String> options = Arrays.asList("List1", "LONGER LIST 2", "List3");
         AtomicBoolean running = new AtomicBoolean(false);
         AtomicBoolean subMenu = new AtomicBoolean(false);
-        menu.addOption(new EnumOption<>("Enum", enums::get, enums::set, Enum.values()));
         menu.addOption(new ListOption<>("List", option::get, option::set, options));
-        menu.addOption(new RunnableOption("Runnable Test",running::get,running::set, this::printStuff));
+        menu.addOption(new RunnableOption("Runnable Test",running::get,running::set, ()-> System.out.println("Runnable ran")));
         SubMenuOption subMenuOption = new SubMenuOption("SubMenu",menu,subMenu::get,subMenu::set);
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows2", () -> this.shadow, value -> this.shadow = value));
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows3", () -> this.shadow, value -> this.shadow = value));
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows4", () -> this.shadow, value -> this.shadow = value));
         menu.addOption(subMenuOption);
+
          */
     }
 
@@ -101,7 +111,7 @@ public class TextWidget extends Widget {
             drawContext.drawText(mc.textRenderer, text, getX() + 2, getY() + 2, color, shadow);
             widgetBox.setSizeAndPosition(getX(), getY(), mc.textRenderer.getWidth(text) + 3, mc.textRenderer.fontHeight + 2, this.shouldScale, GlobalConfig.get().getScale());
         }
-        menu.render(drawContext, getX(), getY(), (int) Math.ceil(getHeight()),mouseX,mouseY);
+        menu.set(getX(),getY(),(int) Math.ceil(getHeight()));
     }
 
     @Override
@@ -109,19 +119,16 @@ public class TextWidget extends Widget {
         if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && widgetBox.isMouseOver(mouseX, mouseY)) {
             menu.toggleDisplay();
         }
-        menu.mouseClicked(mouseX, mouseY, button);
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public void mouseReleased(double mouseX, double mouseY, int button) {
-        menu.mouseReleased(mouseX, mouseY, button);
         super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, int snapSize) {
-        menu.mouseDragged(mouseX, mouseY, button);
         return super.mouseDragged(mouseX, mouseY, button, snapSize);
     }
 
@@ -167,6 +174,11 @@ public class TextWidget extends Widget {
             return;
         }
          createMenu();
+    }
+
+    @Override
+    public ContextMenu getContextMenu() {
+        return menu;
     }
 
     public static class Builder extends WidgetBuilder<Builder, TextWidget> {

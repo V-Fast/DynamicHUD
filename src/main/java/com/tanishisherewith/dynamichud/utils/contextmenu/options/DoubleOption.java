@@ -6,6 +6,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import org.apache.commons.lang3.Validate;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.util.function.Consumer;
@@ -15,7 +16,8 @@ public class DoubleOption extends Option<Double> {
     public String name = "Empty";
     float step = 0.1f;
     private boolean isDragging = false;
-    private double minValue = 0.0, maxValue = 0.0;
+    public double minValue = 0.0;
+    public double maxValue = 0.0;
     ContextMenu parentMenu;
 
     public DoubleOption(String name, double minValue, double maxValue, float step, Supplier<Double> getter, Consumer<Double> setter, ContextMenu parentMenu) {
@@ -29,13 +31,17 @@ public class DoubleOption extends Option<Double> {
         this.step = step;
         this.parentMenu = parentMenu;
         Validate.isTrue(this.step > 0.0f, "Step cannot be less than or equal to 0 (zero)");
+        this.renderer.init(this);
     }
 
     @Override
-    public void render(DrawContext drawContext, int x, int y) {
-        super.render(drawContext, x, y);
+    public void render(DrawContext drawContext, int x, int y,int mouseX, int mouseY) {
         value = get();
+        super.render(drawContext, x, y,mouseX,mouseY);
 
+        //properties.getSkin().getRenderer(DoubleOption.class).render(drawContext,this,x,y,mouseX,mouseY);
+
+        /*
         this.width = 35;
         this.height = 16;
 
@@ -68,9 +74,11 @@ public class DoubleOption extends Option<Double> {
                 90,
                 0.6f,
                 0.6f);
+
+         */
     }
 
-    private void drawSlider(DrawContext drawContext, int sliderX, int sliderY, int sliderWidth, double handleX) {
+    public void drawSlider(DrawContext drawContext, int sliderX, int sliderY, int sliderWidth, double handleX) {
         DrawHelper.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), sliderX, sliderY, sliderWidth, 2, 0xFFFFFFFF);
         if (handleX - sliderX > 0) {
             DrawHelper.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), (float) sliderX, (float) sliderY, (float) ((value - minValue) / (maxValue - minValue) * (width - 3)), 2, Color.ORANGE.getRGB());
@@ -79,8 +87,7 @@ public class DoubleOption extends Option<Double> {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        super.mouseClicked(mouseX, mouseY, button);
-        if (isMouseOver(mouseX, mouseY)) {
+        if (super.mouseClicked(mouseX, mouseY, button) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             step(mouseX);
             isDragging = true;
         }
@@ -93,7 +100,7 @@ public class DoubleOption extends Option<Double> {
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
-    private void step(double mouseX) {
+    public void step(double mouseX) {
         double newValue = minValue + (float) (mouseX - x) / width * (maxValue - minValue);
         // Round the new value to the nearest step
         newValue = Math.round(newValue / step) * step;
@@ -101,10 +108,10 @@ public class DoubleOption extends Option<Double> {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button,double deltaX, double deltaY) {
         if (isMouseOver(mouseX, mouseY) && isDragging) {
             step(mouseX);
         }
-        return super.mouseDragged(mouseX, mouseY, button);
+        return super.mouseDragged(mouseX, mouseY, button,deltaX,deltaY);
     }
 }

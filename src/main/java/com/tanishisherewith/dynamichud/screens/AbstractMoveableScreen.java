@@ -1,6 +1,7 @@
 package com.tanishisherewith.dynamichud.screens;
 
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
+import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -27,6 +28,7 @@ public abstract class AbstractMoveableScreen extends Screen {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         widgetRenderer.mouseDragged(mouseX, mouseY, button, snapSize);
+        ContextMenuManager.getInstance().handleMouseDragged(mouseX,mouseY,button,deltaX,deltaY);
         return false;
     }
 
@@ -35,30 +37,35 @@ public abstract class AbstractMoveableScreen extends Screen {
         if(widgetRenderer.mouseClicked(mouseX, mouseY, button)){
             handleClickOnWidget(widgetRenderer.selectedWidget,mouseX,mouseY,button);
         }
+        ContextMenuManager.getInstance().handleMouseClicked(mouseX,mouseY,button);
         return false;
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         widgetRenderer.mouseReleased(mouseX, mouseY, button);
+        ContextMenuManager.getInstance().handleMouseReleased(mouseX,mouseY,button);
         return false;
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         widgetRenderer.keyPressed(keyCode);
+        ContextMenuManager.getInstance().handleKeyPressed(keyCode, scanCode, modifiers);
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         widgetRenderer.keyReleased(keyCode);
+        ContextMenuManager.getInstance().handleKeyReleased(keyCode, scanCode, modifiers);
         return super.keyReleased(keyCode, scanCode, modifiers);
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         widgetRenderer.mouseScrolled(mouseX, mouseY, verticalAmount, horizontalAmount);
+        ContextMenuManager.getInstance().handleMouseScrolled(mouseX, mouseY, horizontalAmount,verticalAmount);
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
@@ -81,8 +88,17 @@ public abstract class AbstractMoveableScreen extends Screen {
         // Draw each widget
         widgetRenderer.renderWidgets(drawContext, mouseX, mouseY);
 
-        if(widgetRenderer.selectedWidget != null && GlobalConfig.get().shouldDisplayDescriptions() && widgetRenderer.selectedWidget.DATA.description() != null){
-            drawContext.drawTooltip(client.textRenderer,Text.of(widgetRenderer.selectedWidget.DATA.description()),mouseX,mouseY);
+        ContextMenuManager.getInstance().renderAll(drawContext,mouseX,mouseY);
+
+        if(GlobalConfig.get().shouldDisplayDescriptions()) {
+            for (Widget widget : widgetRenderer.getWidgets()) {
+                if (widget == null || widget.shiftDown) continue;
+
+                if (widget.getWidgetBox().isMouseOver(mouseX, mouseY)) {
+                    drawContext.drawTooltip(client.textRenderer, Text.of(widget.DATA.description()), mouseX, mouseY);
+                    break;
+                }
+            }
         }
     }
     public void handleClickOnWidget(Widget widget, double mouseX, double mouseY, int button){
@@ -93,6 +109,7 @@ public abstract class AbstractMoveableScreen extends Screen {
     public void close() {
         widgetRenderer.isInEditor = false;
         widgetRenderer.onCloseScreen();
+        ContextMenuManager.getInstance().onClose();
         super.close();
     }
 

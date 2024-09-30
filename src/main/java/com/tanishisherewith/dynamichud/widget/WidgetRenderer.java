@@ -2,6 +2,7 @@ package com.tanishisherewith.dynamichud.widget;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen;
+import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.ContextMenuScreen;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -27,6 +28,7 @@ public class WidgetRenderer {
     public WidgetRenderer(List<Widget> widgets) {
         this.widgets = widgets;
         addScreen(GameMenuScreen.class);
+        addScreen(ContextMenuScreen.class);
     }
 
     public void addWidget(Widget widget) {
@@ -64,7 +66,7 @@ public class WidgetRenderer {
             return;
         }
         //Render in any other screen
-        if (currentScreen != null && allowedScreens.contains(DynamicHUD.MC.currentScreen.getClass()) && !this.isInEditor) {
+        if (currentScreen != null && allowedScreens.contains(DynamicHUD.MC.currentScreen.getClass())) {
             for (Widget widget : widgets) {
                 widget.isInEditor = false;
                 widget.render(context, 0, 0);

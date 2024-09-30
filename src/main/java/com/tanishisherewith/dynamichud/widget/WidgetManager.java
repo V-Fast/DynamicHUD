@@ -108,20 +108,10 @@ public class WidgetManager {
                 widget.yPercent = (float) widget.getY() / previousHeight;
             }
 
-            // Use the stored percentages to calculate the new position
-            float newX = widget.xPercent * newWidth;
-            float newY = widget.yPercent * newHeight;
+            widget.updatePositionFromPercentages(newWidth, newHeight);
 
-            // Ensure the widget is within the screen bounds
-            newX = MathHelper.clamp(newX, 0, newWidth - widget.getWidth());
-            newY = MathHelper.clamp(newY, 0, newHeight - widget.getHeight());
-
-            // Update the widget's position
-            widget.setPosition((int) newX, (int) newY);
-
-            // Update the stored percentages with the new screen size (after resize).
-            widget.xPercent = (float) widget.getX() / newWidth;
-            widget.yPercent = (float) widget.getY() / newHeight;
+            widget.xPercent = (widget.getX() + widget.getWidth() / 2) / newWidth;
+            widget.yPercent = (widget.getY() + widget.getHeight() / 2) / newHeight;
         }
     }
 
@@ -184,25 +174,30 @@ public class WidgetManager {
     public static void loadWidgets(File file) throws IOException {
         widgets.clear();
 
-        if (file.exists()) {
+        if (file.exists() || (file = new File(file.getAbsolutePath() + ".backup")).exists()) {
+            if(!file.exists()){
+                printWarn("Main file " + file.getAbsolutePath() + " was not found... Loading from a found backup file");
+            }
+
             NbtCompound rootTag = NbtIo.read(file.toPath());
             NbtList widgetList = rootTag.getList("widgets", NbtType.COMPOUND);
             if (widgetList == null) {
-                printWarn("RootTag is null. File is either empty or corrupted," + file);
+                printWarn("RootTag or WidgetList is null. File is either empty or corrupted: " + file);
                 return;
             }
             for (int i = 0; i < widgetList.size(); i++) {
                 NbtCompound widgetTag = widgetList.getCompound(i);
                 WidgetData<?> widgetData = widgetDataMap.get(widgetTag.getString("name"));
                 Widget widget = widgetData.createWidget();
-                printInfo("Loading Widget: " + widget);
                 widget.readFromTag(widgetTag);
+                printInfo("Loaded Widget: " + widget);
                 widgets.add(widget);
             }
         } else {
             printWarn("Widget File does not exist. Try saving one first");
         }
     }
+
 
     /**
      * Returns the list of managed widgets.
