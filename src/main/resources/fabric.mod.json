@@ -15,7 +15,7 @@
     "repo": "https://github.com/V-Fast/DynamicHUD",
     "issues": "https://github.com/V-Fast/DynamicHUD/issues"
   },
-  "license": "All-Rights-Reserved",
+  "license": "MIT",
   "environment": "client",
   "entrypoints": {
     "client": [
@@ -31,11 +31,15 @@
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
+    "java": ">=21",
     "minecraft": "~${minecraft_version}"
   },
   "custom": {
     "modmenu": {
       "badges": ["library"]
     }
+  },
+  "suggests": {
+    "yet_another_config_lib_v3": "3.5.0+1.21-fabric"
   }
 }

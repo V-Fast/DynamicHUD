@@ -105,13 +105,13 @@ public abstract class Widget {
     private void updatePercentages() {
         int screenWidth = mc.getWindow().getScaledWidth();
         int screenHeight = mc.getWindow().getScaledHeight();
-        this.xPercent = (float) (this.x + this.getWidth() / 2) / screenWidth;
-        this.yPercent = (float) (this.y + this.getHeight() / 2) / screenHeight;
+        this.xPercent = (float) (this.x) / screenWidth;
+        this.yPercent = (float) (this.y) / screenHeight;
     }
 
     void updatePositionFromPercentages(int screenWidth, int screenHeight) {
-        this.x = (int) (this.xPercent * screenWidth - this.getWidth() / 2);
-        this.y = (int) (this.yPercent * screenHeight - this.getHeight() / 2);
+        this.x = (int) (this.xPercent * screenWidth);
+        this.y = (int) (this.yPercent * screenHeight);
 
         this.x = (int) MathHelper.clamp(x, 0, mc.getWindow().getScaledWidth() - getWidth());
         this.y = (int) MathHelper.clamp(y, 0, mc.getWindow().getScaledHeight() - getHeight());
