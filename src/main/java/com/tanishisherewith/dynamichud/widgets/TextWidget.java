@@ -232,8 +232,4 @@ public class TextWidget extends Widget implements ContextMenuProvider {
             return widget;
         }
     }
-
-
-
-
 }

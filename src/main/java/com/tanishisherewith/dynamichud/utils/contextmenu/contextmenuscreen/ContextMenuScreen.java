@@ -21,20 +21,20 @@ public class ContextMenuScreen extends Screen {
     @Override
     public void onDisplayed() {
         super.onDisplayed();
-        contextMenu.shouldDisplay = true;
+        contextMenu.setVisible(true);
     }
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         contextMenu.update();
-        DrawHelper.scaleAndPosition(drawContext.getMatrices(), (float) width /2, (float) height /2,contextMenu.scale);
+        DrawHelper.scaleAndPosition(drawContext.getMatrices(), (float) width /2, (float) height /2,contextMenu.getScale());
 
         properties.getSkin().setContextMenu(contextMenu);
         properties.getSkin().renderContextMenu(drawContext,contextMenu,mouseX,mouseY);
 
         DrawHelper.stopScaling(drawContext.getMatrices());
 
-        if(contextMenu.scale <= 0 && !contextMenu.shouldDisplay){
+        if(contextMenu.getScale() <= 0 && !contextMenu.isVisible()){
             contextMenu.close();
         }
     }

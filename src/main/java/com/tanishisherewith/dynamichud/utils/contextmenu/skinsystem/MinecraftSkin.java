@@ -32,22 +32,22 @@ public class MinecraftSkin extends Skin {
     private double scrollVelocity = 0;
 
     public enum PanelColor {
-        DARK_PANEL(0.2f, 0.2f, 0.2f, 0.9f),
+        COFFEE_BROWN(0.6f, 0.3f, 0.1f, 0.9f),
         CREAMY(1.0f, 0.9f, 0.8f, 0.9f),
-        LIGHT_BLUE(0.6f, 0.8f, 1.0f, 0.9f),
-        SOFT_GREEN(0.6f, 1.0f, 0.6f, 0.9f),
-        WARM_YELLOW(1.0f, 1.0f, 0.6f, 0.9f),
-        SUNSET_ORANGE(1.0f, 0.5f, 0.0f, 0.9f),
-        OCEAN_BLUE(0.0f, 0.5f, 1.0f, 0.9f),
+        DARK_PANEL(0.2f, 0.2f, 0.2f, 0.9f),
         FOREST_GREEN(0.0f, 0.6f, 0.2f, 0.9f),
-        MIDNIGHT_PURPLE(0.3f, 0.0f, 0.5f, 0.9f),
         GOLDEN_YELLOW(1.0f, 0.8f, 0.0f, 0.9f),
+        LAVENDER(0.8f, 0.6f, 1.0f, 0.9f),
+        LIGHT_BLUE(0.6f, 0.8f, 1.0f, 0.9f),
+        LIME_GREEN(0.7f, 1.0f, 0.3f, 0.9f),
+        MIDNIGHT_PURPLE(0.3f, 0.0f, 0.5f, 0.9f),
+        OCEAN_BLUE(0.0f, 0.5f, 1.0f, 0.9f),
         ROSE_PINK(1.0f, 0.4f, 0.6f, 0.9f),
         SKY_BLUE(0.5f, 0.8f, 1.0f, 0.9f),
-        LIME_GREEN(0.7f, 1.0f, 0.3f, 0.9f),
-        COFFEE_BROWN(0.6f, 0.3f, 0.1f, 0.9f),
-        LAVENDER(0.8f, 0.6f, 1.0f, 0.9f),
-        CUSTOM(0.0f, 0.0f, 0.0f, 0.0f); // Placeholder for custom colors
+        SOFT_GREEN(0.6f, 1.0f, 0.6f, 0.9f),
+        SUNSET_ORANGE(1.0f, 0.5f, 0.0f, 0.9f),
+        WARM_YELLOW(1.0f, 1.0f, 0.6f, 0.9f),
+        CUSTOM(0.0f, 0.0f, 0.0f, 0.0f); // PlaceHolder for custom colors
 
         private float red;
         private float green;
@@ -90,9 +90,7 @@ public class MinecraftSkin extends Skin {
         this.panelWidth = panelWidth;
         this.BACKGROUND_PANEL = backgroundPanel;
 
-        if(contextMenu != null){
-            contextMenu.newScreenFlag = true;
-        }
+        setCreateNewScreen(true);
     }
     public MinecraftSkin(PanelColor color) {
         this(color,Identifier.of("minecraft","textures/gui/demo_background.png"),248,165);
@@ -101,10 +99,6 @@ public class MinecraftSkin extends Skin {
     @Override
     public void renderContextMenu(DrawContext drawContext, ContextMenu contextMenu, int mouseX, int mouseY) {
         this.contextMenu = contextMenu;
-        if (!contextMenu.newScreenFlag) {
-            contextMenu.newScreenFlag = true;
-            return;
-        }
 
         int screenWidth = mc.getWindow().getScaledWidth();
         int screenHeight = mc.getWindow().getScaledHeight();
@@ -136,19 +130,19 @@ public class MinecraftSkin extends Skin {
         for (Option<?> option : contextMenu.getOptions()) {
             if (!option.shouldRender()) continue;
 
-            if (yOffset >= imageY && yOffset <= maxYOffset - option.height + 4) {
+            if (yOffset >= imageY && yOffset <= maxYOffset - option.getHeight() + 4) {
                 option.render(drawContext, imageX + 4, yOffset, mouseX, mouseY);
             }
 
-            yOffset += option.height + 1;
+            yOffset += option.getHeight() + 1;
         }
 
-        contextMenu.height = (yOffset - imageY) + 25;
+        contextMenu.setHeight(yOffset - imageY + 25);
 
         applyMomentum();
 
         // Calculate max scroll offset
-        maxScrollOffset = Math.max(0, contextMenu.height - panelHeight + 10);
+        maxScrollOffset = Math.max(0, contextMenu.getHeight() - panelHeight + 10);
         scrollOffset = MathHelper.clamp(scrollOffset, 0, maxScrollOffset);
 
         // Disable scissor after rendering
@@ -197,29 +191,28 @@ public class MinecraftSkin extends Skin {
         public void render(DrawContext drawContext, BooleanOption option, int x, int y, int mouseX, int mouseY) {
             drawContext.drawText(mc.textRenderer, option.name, x + 15, y + 25/2 - 5, -1, true);
 
-            option.x = x + panelWidth - 75;
-            option.y = y;
+            option.set(x + panelWidth - 75, y);
 
             int width = 50;
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.enableBlend();
             RenderSystem.enableDepthTest();
-            drawContext.drawGuiTexture(TEXTURES.get(true, option.isMouseOver(mouseX,mouseY)), option.x,y,width,20);
+            drawContext.drawGuiTexture(TEXTURES.get(true, option.isMouseOver(mouseX,mouseY)), option.getX(),y,width,20);
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             Text text = option.getBooleanType().getText(option.value);
             int color = option.value ? Color.GREEN.getRGB() : Color.RED.getRGB();
-            drawContext.drawText(mc.textRenderer,text,(int) (option.x + (width/2.0f) -(mc.textRenderer.getWidth(text)/2.0f)) ,y + 5,color,true);
+            drawContext.drawText(mc.textRenderer,text,(int) (option.getX() + (width/2.0f) -(mc.textRenderer.getWidth(text)/2.0f)) ,y + 5,color,true);
             //drawContext.drawTexture(BOOLEAN_TEXTURE);
 
-            option.height = 25;
+            option.setHeight(25);
 
-            //Widths dont matter in this skin.
-            option.width = width;
+            //Widths dont matter in this skin
+            option.setWidth(width);
         }
 
         @Override
         public boolean mouseClicked(BooleanOption option, double mouseX, double mouseY, int button) {
-            if(mouseX >= option.x && mouseX <= option.x + 50 && mouseY >= option.y && mouseY <= option.y + option.height){
+            if(mouseX >= option.getX() && mouseX <= option.getX() + 50 && mouseY >= option.getY() && mouseY <= option.getY() + option.getHeight()){
                 option.set(!option.get());
             }
             return SkinRenderer.super.mouseClicked(option, mouseX, mouseY, button);
@@ -231,17 +224,16 @@ public class MinecraftSkin extends Skin {
         public void render(DrawContext drawContext, ColorOption option, int x, int y, int mouseX, int mouseY) {
             drawContext.drawText(mc.textRenderer, option.name, x + 15, y + 25/2 - 5, -1, true);
 
-            option.x = x + panelWidth - 75;
-            option.y = y;
+            option.set(x + panelWidth - 75 , y);
 
             int width = 20;
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.enableBlend();
             RenderSystem.enableDepthTest();
-            drawContext.drawGuiTexture(TEXTURES.get(!option.isVisible, option.isMouseOver(mouseX,mouseY)), option.x,y,width,20);
+            drawContext.drawGuiTexture(TEXTURES.get(!option.isVisible, option.isMouseOver(mouseX,mouseY)), option.getX(),y,width,20);
             int shadowOpacity = Math.min(option.value.getAlpha(),45);
             DrawHelper.drawRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(),
-                    option.x + 4,
+                    option.getX() + 4,
                     y + 4,
                     width - 8,
                     20 - 8,
@@ -252,8 +244,8 @@ public class MinecraftSkin extends Skin {
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
 
-            option.height = 25;
-            option.width = width;
+            option.setHeight(25);
+            option.setWidth(width);
 
             option.getColorPicker().render(drawContext, x + panelWidth + 10, y - 10);
         }
@@ -274,12 +266,11 @@ public class MinecraftSkin extends Skin {
         public void render(DrawContext drawContext, DoubleOption option, int x, int y, int mouseX, int mouseY) {
             drawContext.drawText(mc.textRenderer, option.name, x + 15, y + 25/2 - 5, -1, true);
 
-            option.width = panelWidth - 150;
-            option.height = 25;
+            option.setWidth(panelWidth - 150);
+            option.setHeight(25);
 
-            option.x = x + panelWidth - 122;
-            option.y = y;
-            double sliderX = option.x + (option.value - option.minValue) / (option.maxValue - option.minValue) * (option.width - 8);
+            option.set(x + panelWidth - 122,y);
+            double sliderX = option.getX() + (option.value - option.minValue) / (option.maxValue - option.minValue) * (option.getWidth() - 8);
             boolean isMouseOverHandle = isMouseOver(mouseX,mouseY, sliderX, y);
 
             RenderSystem.enableBlend();
@@ -287,11 +278,11 @@ public class MinecraftSkin extends Skin {
             RenderSystem.enableDepthTest();
 
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            drawContext.drawGuiTexture(option.isMouseOver(mouseX,mouseY)? HIGHLIGHTED_TEXTURE : TEXTURE, option.x, y, option.width, 20);
+            drawContext.drawGuiTexture(option.isMouseOver(mouseX,mouseY)? HIGHLIGHTED_TEXTURE : TEXTURE, option.getX(), y, option.getWidth(), 20);
             drawContext.drawGuiTexture(isMouseOverHandle ? HANDLE_HIGHLIGHTED_TEXTURE : HANDLE_TEXTURE , (int) Math.round(sliderX), y, 8, 20);
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-            drawContext.drawText(mc.textRenderer, String.valueOf(option.value),option.x + option.width/2 - mc.textRenderer.getWidth(option.value.toString())/2 ,y + 5,16777215,false);
+            drawContext.drawText(mc.textRenderer, String.valueOf(option.value),option.getX() + option.getWidth()/2 - mc.textRenderer.getWidth(option.value.toString())/2 ,y + 5,16777215,false);
         }
         private boolean isMouseOver(double mouseX, double mouseY, double x, double y){
             return mouseX >= x && mouseX <= x + 10 && mouseY >= y && mouseY <= y + 20;
@@ -299,7 +290,7 @@ public class MinecraftSkin extends Skin {
 
         @Override
         public boolean mouseClicked(DoubleOption option, double mouseX, double mouseY, int button) {
-            return isMouseOver(mouseX,mouseY,option.x,option.y);
+            return isMouseOver(mouseX,mouseY,option.getX(),option.getY());
         }
     }
 
@@ -318,21 +309,20 @@ public class MinecraftSkin extends Skin {
         @Override
         public void render(DrawContext drawContext, EnumOption<E> option, int x, int y, int mouseX, int mouseY) {
             calculateMaxWidth(option);
-            option.height = 25;
-            option.width = maxWidth;
+            option.setHeight(25);
+            option.setWidth(maxWidth);
 
             drawContext.drawText(mc.textRenderer, option.name + ": ", x + 15, y + 25/2 - 5, -1, true);
 
-            option.x = x + panelWidth - maxWidth - 25;
-            option.y = y;
+            option.set(x + panelWidth - maxWidth - 25, y);
 
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.enableBlend();
             RenderSystem.enableDepthTest();
-            drawContext.drawGuiTexture(TEXTURES.get(true, option.isMouseOver(mouseX,mouseY)), option.x,y,maxWidth,20);
+            drawContext.drawGuiTexture(TEXTURES.get(true, option.isMouseOver(mouseX,mouseY)), option.getX(),y,maxWidth,20);
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             String text = option.get().toString();
-            drawContext.drawText(mc.textRenderer,text,option.x + maxWidth/2 - mc.textRenderer.getWidth(text)/2 ,y + 5,Color.CYAN.getRGB(),true);
+            drawContext.drawText(mc.textRenderer,text,option.getX() + maxWidth/2 - mc.textRenderer.getWidth(text)/2 ,y + 5,Color.CYAN.getRGB(),true);
         }
     }
 
@@ -351,44 +341,42 @@ public class MinecraftSkin extends Skin {
         @Override
         public void render(DrawContext drawContext, ListOption<E> option, int x, int y, int mouseX, int mouseY) {
             calculateMaxWidth(option);
-            option.height = 25;
-            option.width = maxWidth;
+            option.setHeight(25);
+            option.setWidth(maxWidth);
 
             drawContext.drawText(mc.textRenderer, option.name + ": ", x + 15, y + 25/2 - 5, -1, true);
 
-            option.x = x + panelWidth - maxWidth - 25;
-            option.y = y;
+            option.set(x + panelWidth - maxWidth - 25, y);
 
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.enableBlend();
             RenderSystem.enableDepthTest();
-            drawContext.drawGuiTexture(TEXTURES.get(true, option.isMouseOver(mouseX,mouseY)), option.x,y,maxWidth,20);
+            drawContext.drawGuiTexture(TEXTURES.get(true, option.isMouseOver(mouseX,mouseY)), option.getX(),y,maxWidth,20);
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             String text = option.get().toString();
-            drawContext.drawText(mc.textRenderer,text,option.x + maxWidth/2 - mc.textRenderer.getWidth(text)/2 ,y + 5,Color.CYAN.getRGB(),true);
+            drawContext.drawText(mc.textRenderer,text,option.getX() + maxWidth/2 - mc.textRenderer.getWidth(text)/2 ,y + 5,Color.CYAN.getRGB(),true);
         }
     }
 
     public class MinecraftSubMenuRenderer implements SkinRenderer<SubMenuOption> {
         @Override
         public void render(DrawContext drawContext, SubMenuOption option, int x, int y, int mouseX, int mouseY) {
-            option.height = 20;
-            option.width = 30;
+            option.setHeight(20);
+            option.setWidth(30);
 
             drawContext.drawText(mc.textRenderer, option.name, x + 15, y + 25/2 - 5, -1, true);
 
-            option.x = x + panelWidth - 75;
-            option.y = y;
+            option.set(x + panelWidth - 75, y);
 
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.enableBlend();
             RenderSystem.enableDepthTest();
-            drawContext.drawGuiTexture(TEXTURES.get(true, option.isMouseOver(mouseX,mouseY)), option.x,y, option.width,20);
+            drawContext.drawGuiTexture(TEXTURES.get(true, option.isMouseOver(mouseX,mouseY)), option.getX(),y, option.getWidth(),20);
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             String text = "Open";
-            drawContext.drawText(mc.textRenderer,text,option.x +  option.width/2 - mc.textRenderer.getWidth(text)/2 ,y + 5,Color.YELLOW.getRGB(),true);
+            drawContext.drawText(mc.textRenderer,text,option.getX() +  option.getWidth()/2 - mc.textRenderer.getWidth(text)/2 ,y + 5,Color.YELLOW.getRGB(),true);
 
-            option.getSubMenu().render(drawContext, x + option.getParentMenu().finalWidth, y, mouseX, mouseY);
+            option.getSubMenu().render(drawContext, x + option.getParentMenu().getFinalWidth(), y, mouseX, mouseY);
         }
     }
 
@@ -398,22 +386,19 @@ public class MinecraftSkin extends Skin {
 
         @Override
         public void render(DrawContext drawContext, RunnableOption option, int x, int y, int mouseX, int mouseY) {
-            option.height = 25;
-            option.width = 26;
+            option.setHeight(25);
+            option.setWidth(26);
 
             drawContext.drawText(mc.textRenderer, option.name.replaceFirst("Run: ","") + ": ", x + 15, y + 25/2 - 5, -1, true);
 
-            option.x = x + panelWidth - 75;
-            option.y = y;
+            option.set(x + panelWidth - 75, y);
 
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.enableBlend();
             RenderSystem.enableDepthTest();
-            drawContext.drawGuiTexture(TEXTURES.get(!option.value, option.isMouseOver(mouseX,mouseY)), option.x,y, option.width,20);
+            drawContext.drawGuiTexture(TEXTURES.get(!option.value, option.isMouseOver(mouseX,mouseY)), option.getX(),y, option.getWidth(),20);
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            drawContext.drawText(mc.textRenderer,"Run",option.x +  option.width/2 - mc.textRenderer.getWidth("Run")/2 ,y + 5, option.value ? DARK_GREEN.getRGB() : DARK_RED.getRGB(),true);
+            drawContext.drawText(mc.textRenderer,"Run",option.getX() +  option.getWidth()/2 - mc.textRenderer.getWidth("Run")/2 ,y + 5, option.value ? DARK_GREEN.getRGB() : DARK_RED.getRGB(),true);
         }
     }
-
-
 }

@@ -21,7 +21,7 @@ public class ColorOption extends Option<Color> {
         super(getter, setter);
         this.name = name;
         this.parentMenu = parentMenu;
-        colorPicker = new ColorGradientPicker(x + this.parentMenu.finalWidth, y - 10, get(), this::set, 50, 100);
+        colorPicker = new ColorGradientPicker(x + this.parentMenu.getFinalWidth(), y - 10, get(), this::set, 50, 100);
         this.renderer.init(this);
     }
 
@@ -59,7 +59,7 @@ public class ColorOption extends Option<Color> {
         if (isMouseOver(mouseX, mouseY)) {
             isVisible = !isVisible;
             if (isVisible) {
-                colorPicker.setPos(this.x + parentMenu.finalWidth + 7, y - 10);
+                colorPicker.setPos(this.x + parentMenu.getFinalWidth() + 7, y - 10);
                 colorPicker.display();
             } else {
                 colorPicker.close();

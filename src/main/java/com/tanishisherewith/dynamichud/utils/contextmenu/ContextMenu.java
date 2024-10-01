@@ -24,15 +24,15 @@ public class ContextMenu {
     // Width is counted while the options are being rendered.
     // FinalWidth is the width at the end of the count.
     private int width = 0;
-    public int finalWidth = 0;
-    public int height = 0, widgetHeight = 0;
+    private int finalWidth = 0;
+    private int height = 0, widgetHeight = 0;
     //Todo: Add padding around the rectangle instead of just one side.
-    public boolean shouldDisplay = false;
-    public float scale = 0.0f;
+    private boolean shouldDisplay = false;
+    private float scale = 0.0f;
     public final Color darkerBackgroundColor;
-    public boolean newScreenFlag = false;
-    public Screen parentScreen = null;
+    private Screen parentScreen = null;
     private final ContextMenuScreenFactory screenFactory;
+    private boolean newScreenFlag = false;
 
     public ContextMenu(int x, int y, ContextMenuProperties properties) {
         this(x, y, properties, new DefaultContextMenuScreenFactory());
@@ -52,8 +52,8 @@ public class ContextMenu {
     }
 
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
-        if(newScreenFlag && screenFactory != null) {
-            DynamicHUD.MC.setScreen(screenFactory.create(this,properties));
+        if (newScreenFlag && screenFactory != null) {
+            DynamicHUD.MC.setScreen(screenFactory.create(this, properties));
             return;
         }
 
@@ -66,35 +66,6 @@ public class ContextMenu {
 
         properties.getSkin().setContextMenu(this);
         properties.getSkin().renderContextMenu(drawContext,this,mouseX,mouseY);
-
-        /*
-        // Draw the background
-        DrawHelper.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(),  this.x - 1, this.y, this.width, this.height, 2,properties.getBackgroundColor().getRGB());
-        if(properties.shouldDrawBorder()){
-            DrawHelper.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), this.x - 1,this.y,this.width,this.height,2, properties.getBorderWidth(), darkerBorderColor.getRGB());
-        }
-
-        int yOffset = this.y + 3;
-        this.width = 10;
-        for (Option<?> option : options) {
-            if (!option.shouldRender()) continue;
-
-            // Adjust mouse coordinates based on the scale
-            int adjustedMouseX = (int) (mouseX / GlobalConfig.get().getScale());
-            int adjustedMouseY = (int) (mouseY / GlobalConfig.get().getScale());
-
-            if (isMouseOver(adjustedMouseX, adjustedMouseY, this.x + 1, yOffset - 1, this.finalWidth - 2, option.height)) {
-                DrawHelper.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), this.x, yOffset - 1.24f, this.finalWidth - 2, option.height + 0.48f, 2,properties.getBackgroundColor().darker().darker().getRGB());
-            }
-            option.render(drawContext, x + 2, yOffset,mouseX,mouseY);
-            this.width = Math.max(this.width, option.width);
-            yOffset += option.height + 1;
-        }
-        this.width = this.width + properties.getPadding();
-        this.finalWidth = this.width;
-        this.height = (yOffset - this.y);
-
-         */
 
         DrawHelper.stopScaling(drawContext.getMatrices());
     }
@@ -119,7 +90,7 @@ public class ContextMenu {
     }
 
     public void close() {
-        if(newScreenFlag && scale <= 0 && parentScreen != null){
+        if(properties.getSkin().shouldCreateNewScreen() && scale <= 0 && parentScreen != null){
             shouldDisplay = false;
             newScreenFlag = false;
             DynamicHUD.MC.setScreen(parentScreen);
@@ -135,6 +106,9 @@ public class ContextMenu {
         shouldDisplay = true;
         update();
         parentScreen = DynamicHUD.MC.currentScreen;
+        if (properties.getSkin().shouldCreateNewScreen()) {
+            newScreenFlag = true;
+        }
     }
 
     public void toggleDisplay() {
@@ -176,7 +150,6 @@ public class ContextMenu {
         }
 
         properties.getSkin().keyPressed(this,key,scanCode,modifiers);
-
     }
 
     public void keyReleased(int key, int scanCode, int modifiers) {
@@ -233,5 +206,24 @@ public class ContextMenu {
 
     public ContextMenuProperties getProperties() {
         return properties;
+    }
+    public void setWidgetHeight(int widgetHeight) {
+        this.widgetHeight = widgetHeight;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
+    public void setVisible(boolean shouldDisplay) {
+        this.shouldDisplay = shouldDisplay;
+    }
+
+    public boolean isVisible() {
+        return shouldDisplay;
     }
 }

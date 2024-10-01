@@ -11,6 +11,7 @@ import java.util.Map;
 public abstract class Skin {
     protected ContextMenu contextMenu;
     protected Map<Class<? extends Option<?>>, SkinRenderer<? extends Option<?>>> renderers = new HashMap<>();
+    private boolean createNewScreen;
 
     public <T extends Option<?>> void addRenderer(Class<T> optionClass, SkinRenderer<? super T> renderer) {
         renderers.put(optionClass, renderer);
@@ -52,4 +53,12 @@ public abstract class Skin {
     public void keyPressed(ContextMenu menu, int key,int scanCode, int modifiers) {}
     public void keyReleased(ContextMenu menu, int key,int scanCode, int modifiers) {}
     public void mouseScrolled(ContextMenu menu, double mouseX, double mouseY, double horizontalAmount, double verticalAmount){}
+
+    public boolean shouldCreateNewScreen() {
+        return createNewScreen;
+    }
+
+    public void setCreateNewScreen(boolean createNewScreen) {
+        this.createNewScreen = createNewScreen;
+    }
 }

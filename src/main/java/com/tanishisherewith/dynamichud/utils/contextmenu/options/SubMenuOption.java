@@ -30,9 +30,9 @@ public class SubMenuOption extends Option<Boolean> {
         Objects.requireNonNull(parentMenu, "Parent Menu cannot be null");
         this.name = name;
         this.parentMenu = parentMenu;
-        this.subMenu = new ContextMenu(parentMenu.x + parentMenu.finalWidth, this.y,properties);
+        this.subMenu = new ContextMenu(parentMenu.x + parentMenu.getFinalWidth(), this.y,properties);
         this.subMenu.getProperties().setHeightOffset(0);
-        this.subMenu.shouldDisplay = get();
+        this.subMenu.setVisible(get());
         this.renderer.init(this);
     }
     public SubMenuOption(String name, ContextMenu parentMenu, ContextMenuProperties properties) {
@@ -55,7 +55,7 @@ public class SubMenuOption extends Option<Boolean> {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (super.mouseClicked(mouseX, mouseY, button)) {
             subMenu.toggleDisplay();
-            set(subMenu.shouldDisplay);
+            set(subMenu.isVisible());
             return true;
         }
         subMenu.mouseClicked(mouseX, mouseY, button);
