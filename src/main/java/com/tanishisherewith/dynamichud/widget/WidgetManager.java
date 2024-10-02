@@ -1,6 +1,7 @@
 package com.tanishisherewith.dynamichud.widget;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
+import com.tanishisherewith.dynamichud.mixins.ScreenMixin;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
@@ -89,7 +90,7 @@ public class WidgetManager {
      * Larger the GUI scale, more accurate is the position on any resolution.
      * </p>
      * <p>
-     * Called in {@link com.tanishisherewith.dynamichud.mixins.ScreenMixin}
+     * Called in {@link ScreenMixin}
      * </p>
      * </p>
      *
@@ -101,6 +102,10 @@ public class WidgetManager {
     public static void onScreenResized(int newWidth, int newHeight, int previousWidth, int previousHeight) {
         for (Widget widget : widgets) {
             // To ensure that infinite coordinates is not returned for the first time its resized.
+
+            widget.updatePosition(newWidth, newHeight);
+
+            /*
             if (widget.xPercent <= 0.0f) {
                 widget.xPercent = (float) widget.getX() / previousWidth;
             }
@@ -112,6 +117,8 @@ public class WidgetManager {
 
             widget.xPercent = (widget.getX() + widget.getWidth() / 2) / newWidth;
             widget.yPercent = (widget.getY() + widget.getHeight() / 2) / newHeight;
+
+             */
         }
     }
 
@@ -198,6 +205,9 @@ public class WidgetManager {
         }
     }
 
+    public static boolean doesWidgetFileExist(File file){
+        return file.exists() || new File(file.getAbsolutePath() + ".backup").exists();
+    }
 
     /**
      * Returns the list of managed widgets.

@@ -8,6 +8,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ButtonTextures;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -29,7 +30,12 @@ public class MinecraftSkin extends Skin {
     private final int panelHeight;
     private final PanelColor panelColor;
     public static final ButtonTextures TEXTURES = new ButtonTextures(Identifier.ofVanilla("widget/button"), Identifier.ofVanilla("widget/button_disabled"), Identifier.ofVanilla("widget/button_highlighted"));
+    private static final Identifier SCROLLER = Identifier.ofVanilla("widget/scroller");
+    private static final Identifier SCROLL_BAR_BACKGROUND = Identifier.ofVanilla("widget/scroller_background");
     private double scrollVelocity = 0;
+    public static int SCROLLBAR_WIDTH = 10;
+
+    int imageX, imageY;
 
     public enum PanelColor {
         COFFEE_BROWN(0.6f, 0.3f, 0.1f, 0.9f),
@@ -109,8 +115,9 @@ public class MinecraftSkin extends Skin {
         contextMenu.set(centerX,centerY,0);
 
         // Calculate the top-left corner of the image
-        int imageX = centerX - panelWidth / 2;
-        int imageY = centerY - panelHeight / 2;
+        imageX = (screenWidth - panelWidth) / 2;
+        imageY = (screenHeight - panelHeight) / 2;
+
 
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
@@ -139,6 +146,8 @@ public class MinecraftSkin extends Skin {
 
         contextMenu.setHeight(yOffset - imageY + 25);
 
+        drawScrollbar(drawContext);
+
         applyMomentum();
 
         // Calculate max scroll offset
@@ -148,21 +157,46 @@ public class MinecraftSkin extends Skin {
         // Disable scissor after rendering
         DrawHelper.disableScissor();
     }
+
+    private void drawScrollbar(DrawContext context) {
+        int scrollbarX = imageX + panelWidth + 5;
+        int scrollbarY = imageY;
+
+        // Draw scrollbar background
+        context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.enableBlend();
+        RenderSystem.enableDepthTest();
+        context.drawGuiTexture(SCROLL_BAR_BACKGROUND, scrollbarX, scrollbarY, SCROLLBAR_WIDTH, panelHeight);
+        context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
+        if (maxScrollOffset > 0) {
+            float scrollPercentage = (float) scrollOffset / maxScrollOffset;
+            int handleHeight = Math.max(15, (int) ((float) panelHeight * (panelHeight / (float) contextMenu.getHeight())));
+            int handleY = scrollbarY + (int) ((panelHeight - handleHeight) * scrollPercentage);
+
+            // Draw scrollbar handle
+            context.drawGuiTexture(SCROLLER, scrollbarX, handleY, SCROLLBAR_WIDTH, handleHeight);
+        }
+    }
+
     private boolean isMouseOver(double mouseX, double mouseY, double x, double y,double width, double height){
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
+
     private void applyMomentum() {
         if (scrollVelocity != 0) {
             scrollOffset += (int) scrollVelocity;
             scrollOffset = MathHelper.clamp(scrollOffset, 0, maxScrollOffset);
-            scrollVelocity *= 0.9; //Friction
 
-            // Stop the scrolling if the velocity is very low
-            if (Math.abs(scrollVelocity) < 0.12) {
+            // Stop the scrolling if the velocity is very low or if we've reached the limits
+            if (Math.abs(scrollVelocity) < 0.12 || scrollOffset == 0 || scrollOffset-maxScrollOffset <= 3) {
                 scrollVelocity = 0;
+            } else {
+                scrollVelocity *= 0.89; // Apply friction
             }
         }
     }
+
 
     @Override
     public void mouseScrolled(ContextMenu menu, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
@@ -172,18 +206,27 @@ public class MinecraftSkin extends Skin {
 
     @Override
     public boolean mouseClicked(ContextMenu menu, double mouseX, double mouseY, int button) {
-        int screenWidth = mc.getWindow().getScaledWidth();
-        int screenHeight = mc.getWindow().getScaledHeight();
-
-        // Calculate the top-left corner of the image
-        int imageX = (screenWidth - panelWidth) / 2;
-        int imageY = (screenHeight - panelHeight) / 2;
-
         if(button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX,mouseY,imageX + 3,imageY + 3,14,14)){
             contextMenu.close();
         }
 
         return super.mouseClicked(menu, mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(ContextMenu menu, double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (button == 0 && mouseX >= imageX + panelWidth + 5 && mouseX <= imageX + panelWidth + 20) {
+            if (mouseY >= imageY && mouseY <= imageY + panelHeight) {
+                float scrollPercentage = (float) (mouseY - imageY) / panelHeight;
+                int handleY = imageY + (int) ((panelHeight - 15) * scrollPercentage);
+
+                // Draw scrollbar handle
+                scrollOffset = (int) (maxScrollOffset * scrollPercentage);
+                scrollOffset = MathHelper.clamp(scrollOffset, 0, maxScrollOffset);
+                return true;
+            }
+        }
+        return super.mouseDragged(menu, mouseX, mouseY, button, deltaX, deltaY);
     }
 
     public class MinecraftBooleanRenderer implements SkinRenderer<BooleanOption> {

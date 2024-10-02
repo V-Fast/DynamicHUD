@@ -104,7 +104,7 @@ public class DynamicHUD implements ClientModInitializer {
                         widgetsFile = DHIntegration.getWidgetsFile();
 
                         // Adds / loads widgets from file
-                        if (widgetsFile.exists()) {
+                        if (WidgetManager.doesWidgetFileExist(widgetsFile)) {
                             WidgetManager.loadWidgets(widgetsFile);
                         } else {
                             DHIntegration.addWidgets();

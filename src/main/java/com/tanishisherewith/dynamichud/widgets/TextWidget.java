@@ -87,7 +87,7 @@ public class TextWidget extends Widget implements ContextMenuProvider {
         menu.addOption(new ColorOption("TextColor", menu, () -> this.textColor, value -> this.textColor = value));
         menu.addOption(new DoubleOption("RainbowSpeed", 1, 5.0f, 1, () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue(),menu));
 
-        /*
+        /* TEST
         AtomicReference<String> option = new AtomicReference<>("Enum1");
         List<String> options = Arrays.asList("List1", "LONGER LIST 2", "List3");
         AtomicBoolean running = new AtomicBoolean(false);
