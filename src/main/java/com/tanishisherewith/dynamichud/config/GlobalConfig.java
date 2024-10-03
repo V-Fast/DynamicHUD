@@ -3,6 +3,7 @@ package com.tanishisherewith.dynamichud.config;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
 import dev.isxander.yacl3.api.controller.FloatSliderControllerBuilder;
+import dev.isxander.yacl3.api.controller.IntegerFieldControllerBuilder;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
@@ -19,6 +20,7 @@ public final class GlobalConfig {
                     .setJson5(true)
                     .build())
             .build();
+
     private static final GlobalConfig INSTANCE = new GlobalConfig();
     /**
      * Common scale for all widgets. Set by the user using YACL.
@@ -31,6 +33,9 @@ public final class GlobalConfig {
 
     @SerialEntry
     private boolean showColorPickerPreview = true;
+
+    @SerialEntry
+    private int snapSize = 100;
 
     public static GlobalConfig get() {
         return INSTANCE;
@@ -63,8 +68,15 @@ public final class GlobalConfig {
                                         .binding(true, () -> this.displayDescriptions, newVal -> this.displayDescriptions = newVal)
                                         .controller(booleanOption -> BooleanControllerBuilder.create(booleanOption).yesNoFormatter())
                                         .build())
+                                .option(Option.<Integer>createBuilder()
+                                        .name(Text.literal("Snap Size"))
+                                        .description(OptionDescription.of(Text.literal("Grid size for snapping widgets")))
+                                        .binding( 100, () -> this.snapSize, newVal -> this.snapSize = newVal)
+                                        .controller(integerOption -> IntegerFieldControllerBuilder.create(integerOption).range(10,500))
+                                        .build())
                                 .build())
                         .build())
+                .save(HANDLER::save)
                 .build()
                 .generateScreen(null);
     }
@@ -78,5 +90,9 @@ public final class GlobalConfig {
 
     public boolean shouldDisplayDescriptions() {
         return displayDescriptions;
+    }
+
+    public int getSnapSize() {
+        return snapSize;
     }
 }

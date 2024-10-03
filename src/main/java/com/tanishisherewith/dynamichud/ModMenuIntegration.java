@@ -7,10 +7,8 @@ import net.minecraft.client.gui.screen.Screen;
 
 
 public class ModMenuIntegration implements ModMenuApi {
-    public static Screen YACL_CONFIG_SCREEN = GlobalConfig.get().createYACLGUI();
-
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return parent -> YACL_CONFIG_SCREEN;
+        return parent -> GlobalConfig.get().createYACLGUI();
     }
 }

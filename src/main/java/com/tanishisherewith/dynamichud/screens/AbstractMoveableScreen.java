@@ -10,7 +10,7 @@ import net.minecraft.text.Text;
 
 public abstract class AbstractMoveableScreen extends Screen {
     public final WidgetRenderer widgetRenderer;
-    public int snapSize = 100;
+
     /**
      * Constructs a AbstractMoveableScreen object.
      */
@@ -27,7 +27,7 @@ public abstract class AbstractMoveableScreen extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        widgetRenderer.mouseDragged(mouseX, mouseY, button, snapSize);
+        widgetRenderer.mouseDragged(mouseX, mouseY, button, GlobalConfig.get().getSnapSize());
         ContextMenuManager.getInstance().handleMouseDragged(mouseX,mouseY,button,deltaX,deltaY);
         return false;
     }
@@ -116,10 +116,6 @@ public abstract class AbstractMoveableScreen extends Screen {
     @Override
     public boolean shouldPause() {
         return false;
-    }
-
-    public void setSnapSize(int size) {
-        this.snapSize = size;
     }
 }
 

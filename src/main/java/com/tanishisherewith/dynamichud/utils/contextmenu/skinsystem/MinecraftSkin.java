@@ -22,20 +22,30 @@ import java.awt.*;
  * It tries to imitate the minecraft look and provides various form of panel shades {@link PanelColor}
  */
 public class MinecraftSkin extends Skin {
-    public static MinecraftClient mc = MinecraftClient.getInstance();
-    public Identifier BACKGROUND_PANEL;
-    private int scrollOffset = 0;
-    private int maxScrollOffset = 0;
+    private static final MinecraftClient mc = MinecraftClient.getInstance();
+    private static final int DEFAULT_SCROLLBAR_WIDTH = 10;
+    private static final int DEFAULT_PANEL_WIDTH = 248;
+    private static final int DEFAULT_PANEL_HEIGHT = 165;
+    private static final Identifier DEFAULT_BACKGROUND_PANEL = Identifier.of("minecraft", "textures/gui/demo_background.png");
+
+    public static final ButtonTextures TEXTURES = new ButtonTextures(
+            Identifier.ofVanilla("widget/button"),
+            Identifier.ofVanilla("widget/button_disabled"),
+            Identifier.ofVanilla("widget/button_highlighted")
+    );
+
+    private static final Identifier SCROLLER_TEXTURE = Identifier.ofVanilla("widget/scroller");
+    private static final Identifier SCROLL_BAR_BACKGROUND = Identifier.ofVanilla("widget/scroller_background");
+
+    private final Identifier BACKGROUND_PANEL;
     private final int panelWidth;
     private final int panelHeight;
     private final PanelColor panelColor;
-    public static final ButtonTextures TEXTURES = new ButtonTextures(Identifier.ofVanilla("widget/button"), Identifier.ofVanilla("widget/button_disabled"), Identifier.ofVanilla("widget/button_highlighted"));
-    private static final Identifier SCROLLER = Identifier.ofVanilla("widget/scroller");
-    private static final Identifier SCROLL_BAR_BACKGROUND = Identifier.ofVanilla("widget/scroller_background");
-    private double scrollVelocity = 0;
-    public static int SCROLLBAR_WIDTH = 10;
 
-    int imageX, imageY;
+    private int scrollOffset = 0;
+    private int maxScrollOffset = 0;
+    private double scrollVelocity = 0;
+    private int imageX, imageY;
 
     public enum PanelColor {
         COFFEE_BROWN(0.6f, 0.3f, 0.1f, 0.9f),
@@ -99,7 +109,7 @@ public class MinecraftSkin extends Skin {
         setCreateNewScreen(true);
     }
     public MinecraftSkin(PanelColor color) {
-        this(color,Identifier.of("minecraft","textures/gui/demo_background.png"),248,165);
+        this(color,DEFAULT_BACKGROUND_PANEL,DEFAULT_PANEL_WIDTH,DEFAULT_PANEL_HEIGHT);
     }
 
     @Override
@@ -166,7 +176,7 @@ public class MinecraftSkin extends Skin {
         context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
-        context.drawGuiTexture(SCROLL_BAR_BACKGROUND, scrollbarX, scrollbarY, SCROLLBAR_WIDTH, panelHeight);
+        context.drawGuiTexture(SCROLL_BAR_BACKGROUND, scrollbarX, scrollbarY, DEFAULT_SCROLLBAR_WIDTH, panelHeight);
         context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         if (maxScrollOffset > 0) {
@@ -175,7 +185,7 @@ public class MinecraftSkin extends Skin {
             int handleY = scrollbarY + (int) ((panelHeight - handleHeight) * scrollPercentage);
 
             // Draw scrollbar handle
-            context.drawGuiTexture(SCROLLER, scrollbarX, handleY, SCROLLBAR_WIDTH, handleHeight);
+            context.drawGuiTexture(SCROLLER_TEXTURE, scrollbarX, handleY, DEFAULT_SCROLLBAR_WIDTH, handleHeight);
         }
     }
 

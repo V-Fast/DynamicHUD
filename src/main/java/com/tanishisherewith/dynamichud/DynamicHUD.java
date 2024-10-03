@@ -163,16 +163,6 @@ public class DynamicHUD implements ClientModInitializer {
                 });
         printInfo("(DynamicHUD) Integration of supported mods was successful");
 
-
-        //Global config saving (YACL)
-        ServerLifecycleEvents.SERVER_STOPPING.register(server -> GlobalConfig.HANDLER.save());
-        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, s) -> GlobalConfig.HANDLER.save());
-        ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> GlobalConfig.HANDLER.save());
-        ClientLifecycleEvents.CLIENT_STOPPING.register((minecraftClient) -> {
-            GlobalConfig.HANDLER.save();
-        });
-
-
         //In game screen render.
         HudRenderCallback.EVENT.register(new HudRender());
     }

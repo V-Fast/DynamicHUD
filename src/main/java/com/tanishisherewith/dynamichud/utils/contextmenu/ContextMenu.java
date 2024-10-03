@@ -26,7 +26,6 @@ public class ContextMenu {
     private int width = 0;
     private int finalWidth = 0;
     private int height = 0, widgetHeight = 0;
-    //Todo: Add padding around the rectangle instead of just one side.
     private boolean shouldDisplay = false;
     private float scale = 0.0f;
     public final Color darkerBackgroundColor;
