@@ -9,25 +9,33 @@ import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
 import com.tanishisherewith.dynamichud.widgets.ItemWidget;
 import com.tanishisherewith.dynamichud.widgets.TextWidget;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
+import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import net.fabricmc.loader.api.metadata.ModMetadata;
+import net.fabricmc.loader.api.metadata.ModOrigin;
+import net.fabricmc.loader.language.JavaLanguageAdapter;
+import net.fabricmc.loader.language.LanguageAdapter;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.main.Main;
 import net.minecraft.client.option.KeyBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.nio.file.Path;
+import java.util.*;
 
+@Environment(EnvType.CLIENT)
 public class DynamicHUD implements ClientModInitializer {
     /**
      * This is a map to store the list of widgets for each widget file to be saved.
@@ -39,6 +47,7 @@ public class DynamicHUD implements ClientModInitializer {
     private static final List<WidgetRenderer> widgetRenderers = new ArrayList<>();
     public static MinecraftClient MC = MinecraftClient.getInstance();
     public static String MOD_ID = "dynamichud";
+    private static boolean enableTestIntegration = false;
 
     public static void addWidgetRenderer(WidgetRenderer widgetRenderer) {
         widgetRenderers.add(widgetRenderer);
@@ -81,10 +90,26 @@ public class DynamicHUD implements ClientModInitializer {
         //YACL load
         GlobalConfig.HANDLER.load();
 
+        String[] args = FabricLoader.getInstance().getLaunchArguments(true);
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("--dynamicHudTest") && i + 1 < args.length) {
+                enableTestIntegration = Boolean.parseBoolean(args[i + 1]);
+                break;
+            }
+        }
+
         printInfo("Integrating mods...");
-        FabricLoader.getInstance()
-                .getEntrypointContainers("dynamicHud", DynamicHudIntegration.class)
-                .forEach(entrypoint -> {
+        List<EntrypointContainer<DynamicHudIntegration>> integrations = new ArrayList<>(getRegisteredIntegrations());
+
+        if (enableTestIntegration) {
+            EntrypointContainer<DynamicHudIntegration> testIntegration = getTestIntegration();
+            if (testIntegration != null) {
+                integrations.add(testIntegration);
+                printInfo("Test integration enabled and loaded successfully.");
+            }
+        }
+
+        for (EntrypointContainer<DynamicHudIntegration> entrypoint : integrations) {
                     ModMetadata metadata = entrypoint.getProvider().getMetadata();
                     String modId = metadata.getId();
 
@@ -160,7 +185,7 @@ public class DynamicHUD implements ClientModInitializer {
                             logger.error("Mod {} has improper implementation of DynamicHUD", modId, e);
                         }
                     }
-                });
+        }
         printInfo("(DynamicHUD) Integration of supported mods was successful");
 
         //In game screen render.
@@ -174,6 +199,46 @@ public class DynamicHUD implements ClientModInitializer {
             logger.error("Failed to save widgets. Widgets passed: {}", widgets);
             throw new RuntimeException(e);
         }
+    }
+
+    private List<EntrypointContainer<DynamicHudIntegration>> getRegisteredIntegrations() {
+        return new ArrayList<>(FabricLoader.getInstance()
+                .getEntrypointContainers("dynamicHud", DynamicHudIntegration.class));
+    }
+
+    /**
+     * This makes it so that if minecraft is launched with the program arguments
+     * <p>
+     *     {@code --dynamicHudTest true}
+     * </p>
+     * then it will
+     * load the {@link DynamicHudTest} class as an entrypoint, eliminating any errors due to human incapacity of
+     * adding/removing a single line from the `fabric.mod.json`
+     */
+    private EntrypointContainer<DynamicHudIntegration> getTestIntegration() {
+        DynamicHudIntegration testIntegration;
+        try {
+            Class<?> testClass = Class.forName("com.tanishisherewith.dynamichud.DynamicHudTest");
+            testIntegration = (DynamicHudIntegration) testClass.getDeclaredConstructor().newInstance();
+        } catch (ClassNotFoundException e) {
+            logger.info("DynamicHudTest class not found. Skipping test integration.");
+            return null;
+        } catch (Exception e) {
+            logger.error("Error instantiating DynamicHudTest", e);
+            return null;
+        }
+
+        return new EntrypointContainer<>() {
+            @Override
+            public DynamicHudIntegration getEntrypoint() {
+                return testIntegration;
+            }
+
+            @Override
+            public ModContainer getProvider() {
+                return FabricLoader.getInstance().getModContainer("dynamichud").orElseThrow();
+            }
+        };
     }
 
 }
