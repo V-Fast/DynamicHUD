@@ -180,27 +180,29 @@ public class WidgetManager {
     public static void loadWidgets(File file) throws IOException {
         widgets.clear();
 
-        if (file.exists() || (file = new File(file.getAbsolutePath() + ".backup")).exists()) {
-            if (!file.exists()) {
-                printWarn("Main file " + file.getAbsolutePath() + " was not found... Loading from a found backup file");
-            }
+        if (!file.exists()) {
+            DynamicHUD.logger.warn("Main file {} was not found... Loading from a found backup file", file.getAbsolutePath());
+            file = new File(file.getAbsolutePath() + ".backup");
+        }
 
-            NbtCompound rootTag = NbtIo.read(file.toPath());
-            NbtList widgetList = rootTag.getList("widgets", NbtType.COMPOUND);
-            if (widgetList == null) {
-                printWarn("RootTag or WidgetList is null. File is either empty or corrupted: " + file);
-                return;
-            }
-            for (int i = 0; i < widgetList.size(); i++) {
-                NbtCompound widgetTag = widgetList.getCompound(i);
-                WidgetData<?> widgetData = widgetDataMap.get(widgetTag.getString("name"));
-                Widget widget = widgetData.createWidget();
-                widget.readFromTag(widgetTag);
-                printInfo("Loaded Widget: " + widget);
-                widgets.add(widget);
-            }
-        } else {
-            printWarn("Widget File does not exist. Try saving one first");
+        NbtCompound rootTag = NbtIo.read(file.toPath());
+
+        if (rootTag == null) {
+            printWarn("RootTag is null. File is either empty or corrupted: " + file);
+            return;
+        }
+        NbtList widgetList = rootTag.getList("widgets", NbtType.COMPOUND);
+        if (widgetList == null) {
+            printWarn("WidgetList is null. File is empty: " + file);
+            return;
+        }
+        for (int i = 0; i < widgetList.size(); i++) {
+            NbtCompound widgetTag = widgetList.getCompound(i);
+            WidgetData<?> widgetData = widgetDataMap.get(widgetTag.getString("name"));
+            Widget widget = widgetData.createWidget();
+            widget.readFromTag(widgetTag);
+            printInfo("Loaded Widget: " + widget);
+            widgets.add(widget);
         }
     }
 

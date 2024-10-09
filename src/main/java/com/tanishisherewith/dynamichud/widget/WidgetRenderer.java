@@ -31,6 +31,10 @@ public class WidgetRenderer {
         addScreen(ContextMenuScreen.class);
     }
 
+    public WidgetRenderer(String modID) {
+        this(WidgetManager.getWidgetsForMod(modID));
+    }
+
     public void addWidget(Widget widget) {
         widgets.add(widget);
     }

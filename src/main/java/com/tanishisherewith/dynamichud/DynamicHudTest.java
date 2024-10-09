@@ -87,8 +87,7 @@ public class DynamicHudTest implements DynamicHudIntegration {
 
     @Override
     public AbstractMoveableScreen getMovableScreen() {
-        return new AbstractMoveableScreen(Text.literal("Editor Screen"), renderer) {
-        };
+        return new AbstractMoveableScreen(Text.literal("Editor Screen"), renderer) {};
     }
 
     @Override

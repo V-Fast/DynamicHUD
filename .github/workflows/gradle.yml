@@ -48,7 +48,7 @@ jobs:
           path: build/libs/
 
       - name: pre-release action
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.0.8
         with:
           tag_name: "latest"
           name: "DynamicHUD Pre-release"
