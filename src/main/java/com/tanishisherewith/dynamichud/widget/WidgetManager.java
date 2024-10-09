@@ -6,7 +6,6 @@ import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.util.math.MathHelper;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -182,7 +181,7 @@ public class WidgetManager {
         widgets.clear();
 
         if (file.exists() || (file = new File(file.getAbsolutePath() + ".backup")).exists()) {
-            if(!file.exists()){
+            if (!file.exists()) {
                 printWarn("Main file " + file.getAbsolutePath() + " was not found... Loading from a found backup file");
             }
 
@@ -205,7 +204,7 @@ public class WidgetManager {
         }
     }
 
-    public static boolean doesWidgetFileExist(File file){
+    public static boolean doesWidgetFileExist(File file) {
         return file.exists() || new File(file.getAbsolutePath() + ".backup").exists();
     }
 

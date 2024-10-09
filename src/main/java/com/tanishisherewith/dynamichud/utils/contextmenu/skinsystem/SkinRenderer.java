@@ -18,9 +18,15 @@ public interface SkinRenderer<T extends Option<?>> {
         return option.isMouseOver(mouseX, mouseY);
     }
 
-    default void keyPressed(T option, int key) {}
+    default void keyPressed(T option, int key, int scanCode, int modifiers) {
+    }
 
-    default void keyReleased(T option, int key) {}
-    default void mouseScrolled(T option, double mouseX, double mouseY, double horizontalAmount, double verticalAmount){}
-    default void init(T option){}
+    default void keyReleased(T option, int key, int scanCode, int modifiers) {
+    }
+
+    default void mouseScrolled(T option, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+    }
+
+    default void init(T option) {
+    }
 }

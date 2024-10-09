@@ -2,9 +2,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
 import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
 
-import java.awt.*;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -29,9 +27,9 @@ public class ListOption<T> extends Option<T> {
     }
 
     @Override
-    public void render(DrawContext drawContext, int x, int y,int mouseX, int mouseY) {
+    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
         value = get();
-        super.render(drawContext, x, y,mouseX,mouseY);
+        super.render(drawContext, x, y, mouseX, mouseY);
 
         // properties.getSkin().getRenderer(ListOption.class).render(drawContext,this,x,y,mouseX,mouseY);
 /*

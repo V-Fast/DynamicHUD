@@ -1,7 +1,6 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem;
 
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
-import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProvider;
 import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
 import net.minecraft.client.gui.DrawContext;
 
@@ -13,14 +12,15 @@ public abstract class Skin {
     protected Map<Class<? extends Option<?>>, SkinRenderer<? extends Option<?>>> renderers = new HashMap<>();
     private boolean createNewScreen;
 
-    public <T extends Option<?>> void addRenderer(Class<T> optionClass, SkinRenderer<? super T> renderer) {
-        renderers.put(optionClass, renderer);
-    }
-
-    public Skin(ContextMenu menu){
+    public Skin(ContextMenu menu) {
         this.contextMenu = menu;
     }
-    public Skin(){
+
+    public Skin() {
+    }
+
+    public <T extends Option<?>> void addRenderer(Class<T> optionClass, SkinRenderer<? super T> renderer) {
+        renderers.put(optionClass, renderer);
     }
 
     @SuppressWarnings("unchecked")
@@ -50,9 +50,14 @@ public abstract class Skin {
         return false;
     }
 
-    public void keyPressed(ContextMenu menu, int key,int scanCode, int modifiers) {}
-    public void keyReleased(ContextMenu menu, int key,int scanCode, int modifiers) {}
-    public void mouseScrolled(ContextMenu menu, double mouseX, double mouseY, double horizontalAmount, double verticalAmount){}
+    public void keyPressed(ContextMenu menu, int key, int scanCode, int modifiers) {
+    }
+
+    public void keyReleased(ContextMenu menu, int key, int scanCode, int modifiers) {
+    }
+
+    public void mouseScrolled(ContextMenu menu, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+    }
 
     public boolean shouldCreateNewScreen() {
         return createNewScreen;

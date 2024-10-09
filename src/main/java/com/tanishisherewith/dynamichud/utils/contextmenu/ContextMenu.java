@@ -2,7 +2,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
-import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.ContextMenuScreen;
+import com.tanishisherewith.dynamichud.utils.Input;
 import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.ContextMenuScreenFactory;
 import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.DefaultContextMenuScreenFactory;
 import net.minecraft.client.gui.DrawContext;
@@ -14,12 +14,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ContextMenu {
+public class ContextMenu implements Input {
 
+    public final Color darkerBackgroundColor;
     //The properties of a context menu
     protected final ContextMenuProperties properties;
-
     private final List<Option<?>> options = new ArrayList<>(); // The list of options in the context menu
+    private final ContextMenuScreenFactory screenFactory;
     public int x, y;
     // Width is counted while the options are being rendered.
     // FinalWidth is the width at the end of the count.
@@ -28,9 +29,7 @@ public class ContextMenu {
     private int height = 0, widgetHeight = 0;
     private boolean shouldDisplay = false;
     private float scale = 0.0f;
-    public final Color darkerBackgroundColor;
     private Screen parentScreen = null;
-    private final ContextMenuScreenFactory screenFactory;
     private boolean newScreenFlag = false;
 
     public ContextMenu(int x, int y, ContextMenuProperties properties) {
@@ -64,37 +63,34 @@ public class ContextMenu {
         DrawHelper.scaleAndPosition(drawContext.getMatrices(), x, y, scale);
 
         properties.getSkin().setContextMenu(this);
-        properties.getSkin().renderContextMenu(drawContext,this,mouseX,mouseY);
+        properties.getSkin().renderContextMenu(drawContext, this, mouseX, mouseY);
 
         DrawHelper.stopScaling(drawContext.getMatrices());
     }
-    public boolean isMouseOver(int mouseX, int mouseY, int x, int y, int width, int height){
-        return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
-    }
 
     public void update() {
-        if(!properties.enableAnimations()){
+        if (!properties.enableAnimations()) {
             scale = 1.0f;
             return;
         }
 
         // Update the scale
-        if(shouldDisplay){
-           scale += 0.1f;
-        } else{
-           scale -= 0.1f;
+        if (shouldDisplay) {
+            scale += 0.1f;
+        } else {
+            scale -= 0.1f;
         }
 
-        scale = MathHelper.clamp(scale,0,1.0f);
+        scale = MathHelper.clamp(scale, 0, 1.0f);
     }
 
     public void close() {
-        if(properties.getSkin().shouldCreateNewScreen() && scale <= 0 && parentScreen != null){
+        if (properties.getSkin().shouldCreateNewScreen() && scale <= 0 && parentScreen != null) {
             shouldDisplay = false;
             newScreenFlag = false;
             DynamicHUD.MC.setScreen(parentScreen);
         }
-        for(Option<?> option: options){
+        for (Option<?> option : options) {
             option.onClose();
         }
         shouldDisplay = false;
@@ -118,56 +114,67 @@ public class ContextMenu {
         }
     }
 
-    public void mouseClicked(double mouseX, double mouseY, int button) {
-        if (!shouldDisplay) return;
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (!shouldDisplay) return false;
         for (Option<?> option : options) {
             option.mouseClicked(mouseX, mouseY, button);
         }
-        properties.getSkin().mouseClicked(this,mouseX,mouseY,button);
+        return properties.getSkin().mouseClicked(this, mouseX, mouseY, button);
     }
 
-    public void mouseReleased(double mouseX, double mouseY, int button) {
-        if (!shouldDisplay) return;
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (!shouldDisplay) return false;
         for (Option<?> option : options) {
             option.mouseReleased(mouseX, mouseY, button);
         }
-        properties.getSkin().mouseReleased(this,mouseX,mouseY,button);
+        return properties.getSkin().mouseReleased(this, mouseX, mouseY, button);
     }
 
-    public void mouseDragged(double mouseX, double mouseY, int button,double deltaX, double deltaY) {
-        if (!shouldDisplay) return;
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (!shouldDisplay) return false;
         for (Option<?> option : options) {
-            option.mouseDragged(mouseX, mouseY, button,deltaX,deltaY);
+            option.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
         }
-        properties.getSkin().mouseDragged(this,mouseX,mouseY,button,deltaX,deltaY);
+        return properties.getSkin().mouseDragged(this, mouseX, mouseY, button, deltaX, deltaY);
     }
 
+    @Override
     public void keyPressed(int key, int scanCode, int modifiers) {
         if (!shouldDisplay) return;
         for (Option<?> option : options) {
-            option.keyPressed(key);
+            option.keyPressed(key, scanCode, modifiers);
         }
 
-        properties.getSkin().keyPressed(this,key,scanCode,modifiers);
+        properties.getSkin().keyPressed(this, key, scanCode, modifiers);
     }
 
+    @Override
     public void keyReleased(int key, int scanCode, int modifiers) {
         if (!shouldDisplay) return;
         for (Option<?> option : options) {
-            option.keyReleased(key);
+            option.keyReleased(key, scanCode, modifiers);
         }
-        properties.getSkin().keyReleased(this,key,scanCode,modifiers);
+        properties.getSkin().keyReleased(this, key, scanCode, modifiers);
 
     }
 
+    @Override
     public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        for(Option<?> option: options){
-            option.mouseScrolled(mouseX,mouseY,horizontalAmount,verticalAmount);
+        for (Option<?> option : options) {
+            option.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
         }
-        properties.getSkin().mouseScrolled(this,mouseX,mouseY,horizontalAmount,verticalAmount);
+        properties.getSkin().mouseScrolled(this, mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
-    public void set(int x,int y, int widgetHeight){
+    @Override
+    public void charTyped(char c) {
+
+    }
+
+    public void set(int x, int y, int widgetHeight) {
         this.x = x;
         this.y = y;
         this.widgetHeight = widgetHeight;
@@ -180,6 +187,7 @@ public class ContextMenu {
     public int getY() {
         return y;
     }
+
     public List<Option<?>> getOptions() {
         return Collections.unmodifiableList(options);
     }
@@ -188,9 +196,18 @@ public class ContextMenu {
         return height;
     }
 
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
     public int getFinalWidth() {
         return finalWidth;
     }
+
+    public void setFinalWidth(int finalWidth) {
+        this.finalWidth = finalWidth;
+    }
+
     public int getWidth() {
         return width;
     }
@@ -199,30 +216,23 @@ public class ContextMenu {
         this.width = width;
     }
 
-    public void setFinalWidth(int finalWidth) {
-        this.finalWidth = finalWidth;
-    }
-
     public ContextMenuProperties getProperties() {
         return properties;
     }
+
     public void setWidgetHeight(int widgetHeight) {
         this.widgetHeight = widgetHeight;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
     }
 
     public float getScale() {
         return scale;
     }
 
-    public void setVisible(boolean shouldDisplay) {
-        this.shouldDisplay = shouldDisplay;
-    }
-
     public boolean isVisible() {
         return shouldDisplay;
+    }
+
+    public void setVisible(boolean shouldDisplay) {
+        this.shouldDisplay = shouldDisplay;
     }
 }

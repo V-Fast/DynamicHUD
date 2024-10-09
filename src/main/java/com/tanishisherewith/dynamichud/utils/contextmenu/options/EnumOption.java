@@ -2,9 +2,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
 import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
 
-import java.awt.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -28,9 +26,9 @@ public class EnumOption<E extends Enum<E>> extends Option<E> {
     }
 
     @Override
-    public void render(DrawContext drawContext, int x, int y,int mouseX, int mouseY) {
+    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
         value = get();
-        super.render(drawContext, x, y,mouseX,mouseY);
+        super.render(drawContext, x, y, mouseX, mouseY);
 
         //  properties.getSkin().getRenderer(EnumOption.class).render(drawContext,this,x,y,mouseX,mouseY);
 
@@ -46,7 +44,7 @@ public class EnumOption<E extends Enum<E>> extends Option<E> {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (super.mouseClicked(mouseX,mouseY,button)) {
+        if (super.mouseClicked(mouseX, mouseY, button)) {
             if (button == 0) {
                 currentIndex = (currentIndex + 1) % values.length;
                 if (currentIndex > values.length - 1) {

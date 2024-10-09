@@ -51,7 +51,7 @@ public class ClassicSkin extends Skin {
 
             // Adjust mouse coordinates based on the scale
             if (contextMenu.getProperties().hoverEffect() && contextMenu.isMouseOver(mouseX, mouseY, contextMenu.x + 1, yOffset - 1, contextMenu.getFinalWidth() - 2, option.getHeight())) {
-                drawBackground(matrices, contextMenu, properties, yOffset - 1,contextMenu.getFinalWidth(), option.getHeight() + 1, contextMenu.getProperties().getHoverColor().getRGB(),false);
+                drawBackground(matrices, contextMenu, properties, yOffset - 1, contextMenu.getFinalWidth(), option.getHeight() + 1, contextMenu.getProperties().getHoverColor().getRGB(), false);
             }
 
             option.render(drawContext, contextMenu.x + 4, yOffset, mouseX, mouseY);
@@ -69,13 +69,13 @@ public class ClassicSkin extends Skin {
     }
 
     private void drawBackground(MatrixStack matrices, ContextMenu contextMenu, ContextMenuProperties properties) {
-        drawBackground(matrices, contextMenu, properties, contextMenu.y,contextMenu.getWidth(), contextMenu.getHeight(), properties.getBackgroundColor().getRGB(),properties.shadow());
+        drawBackground(matrices, contextMenu, properties, contextMenu.y, contextMenu.getWidth(), contextMenu.getHeight(), properties.getBackgroundColor().getRGB(), properties.shadow());
     }
 
-    private void drawBackground(MatrixStack matrices, ContextMenu contextMenu, ContextMenuProperties properties, int yOffset,int width, int height, int color,boolean shadow) {
+    private void drawBackground(MatrixStack matrices, ContextMenu contextMenu, ContextMenuProperties properties, int yOffset, int width, int height, int color, boolean shadow) {
         // Wow so good code.
         if (properties.roundedCorners()) {
-            if(shadow){
+            if (shadow) {
                 DrawHelper.drawRoundedRectangleWithShadowBadWay(matrices.peek().getPositionMatrix(),
                         contextMenu.x,
                         yOffset,
@@ -87,7 +87,7 @@ public class ClassicSkin extends Skin {
                         1,
                         1
                 );
-            }else {
+            } else {
                 DrawHelper.drawRoundedRectangle(matrices.peek().getPositionMatrix(),
                         contextMenu.x,
                         yOffset,
@@ -98,7 +98,7 @@ public class ClassicSkin extends Skin {
                 );
             }
         } else {
-            if(shadow){
+            if (shadow) {
                 DrawHelper.drawRectangleWithShadowBadWay(matrices.peek().getPositionMatrix(),
                         contextMenu.x,
                         yOffset,
@@ -109,7 +109,7 @@ public class ClassicSkin extends Skin {
                         1,
                         1
                 );
-            }else {
+            } else {
                 DrawHelper.drawRectangle(matrices.peek().getPositionMatrix(),
                         contextMenu.x,
                         yOffset,
@@ -162,7 +162,7 @@ public class ClassicSkin extends Skin {
             option.setHeight(mc.textRenderer.fontHeight);
             option.setWidth(mc.textRenderer.getWidth(option.name) + 1);
 
-            int shadowOpacity = Math.min(option.value.getAlpha(),90);
+            int shadowOpacity = Math.min(option.value.getAlpha(), 90);
             DrawHelper.drawRoundedRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(),
                     x + option.getWidth(),
                     y - 1,
@@ -175,6 +175,42 @@ public class ClassicSkin extends Skin {
                     1);
 
             option.getColorPicker().render(drawContext, x + option.parentMenu.getFinalWidth() + 7, y - 10);
+        }
+    }
+
+    public static class ClassicEnumRenderer<E extends Enum<E>> implements SkinRenderer<EnumOption<E>> {
+        @Override
+        public void render(DrawContext drawContext, EnumOption<E> option, int x, int y, int mouseX, int mouseY) {
+            option.setHeight(mc.textRenderer.fontHeight + 1);
+            option.setWidth(mc.textRenderer.getWidth(option.name + ": " + option.value.name()) + 1);
+
+            drawContext.drawText(mc.textRenderer, Text.of(option.name + ": "), x, y, Color.WHITE.getRGB(), false);
+            drawContext.drawText(mc.textRenderer, Text.of(option.value.name()), x + mc.textRenderer.getWidth(option.name + ": ") + 1, y, Color.CYAN.getRGB(), false);
+        }
+    }
+
+    public static class ClassicSubMenuRenderer implements SkinRenderer<SubMenuOption> {
+        @Override
+        public void render(DrawContext drawContext, SubMenuOption option, int x, int y, int mouseX, int mouseY) {
+            int color = option.value ? Color.GREEN.getRGB() : Color.RED.getRGB();
+            drawContext.drawText(mc.textRenderer, Text.of(option.name), x, y, color, false);
+            option.setHeight(mc.textRenderer.fontHeight);
+            option.setWidth(mc.textRenderer.getWidth(option.name) + 1);
+
+            option.getSubMenu().render(drawContext, x + option.getParentMenu().getFinalWidth(), y, mouseX, mouseY);
+        }
+    }
+
+    public static class ClassicRunnableRenderer implements SkinRenderer<RunnableOption> {
+        Color DARK_RED = new Color(116, 0, 0);
+        Color DARK_GREEN = new Color(24, 132, 0, 226);
+
+        @Override
+        public void render(DrawContext drawContext, RunnableOption option, int x, int y, int mouseX, int mouseY) {
+            option.setHeight(mc.textRenderer.fontHeight);
+            option.setWidth(mc.textRenderer.getWidth("Run: " + option.name));
+            int color = option.value ? DARK_GREEN.getRGB() : DARK_RED.getRGB();
+            drawContext.drawText(mc.textRenderer, Text.of(option.name), x, y, color, false);
         }
     }
 
@@ -218,17 +254,6 @@ public class ClassicSkin extends Skin {
         }
     }
 
-    public static class ClassicEnumRenderer<E extends Enum<E>> implements SkinRenderer<EnumOption<E>> {
-        @Override
-        public void render(DrawContext drawContext, EnumOption<E> option, int x, int y, int mouseX, int mouseY) {
-            option.setHeight(mc.textRenderer.fontHeight + 1);
-            option.setWidth(mc.textRenderer.getWidth(option.name + ": " + option.value.name()) + 1);
-
-            drawContext.drawText(mc.textRenderer, Text.of(option.name + ": "), x, y, Color.WHITE.getRGB(), false);
-            drawContext.drawText(mc.textRenderer, Text.of(option.value.name()), x + mc.textRenderer.getWidth(option.name + ": ") + 1, y, Color.CYAN.getRGB(), false);
-        }
-    }
-
     public class ClassicListRenderer<E> implements SkinRenderer<ListOption<E>> {
         @Override
         public void render(DrawContext drawContext, ListOption<E> option, int x, int y, int mouseX, int mouseY) {
@@ -237,31 +262,6 @@ public class ClassicSkin extends Skin {
 
             drawContext.drawText(mc.textRenderer, Text.of(option.name + ": "), x, y + 1, Color.WHITE.getRGB(), false);
             drawContext.drawText(mc.textRenderer, Text.of(option.value.toString()), x + mc.textRenderer.getWidth(option.name + ": ") + 1, y + 1, Color.CYAN.getRGB(), false);
-        }
-    }
-
-    public static class ClassicSubMenuRenderer implements SkinRenderer<SubMenuOption> {
-        @Override
-        public void render(DrawContext drawContext, SubMenuOption option, int x, int y, int mouseX, int mouseY) {
-            int color = option.value ? Color.GREEN.getRGB() : Color.RED.getRGB();
-            drawContext.drawText(mc.textRenderer, Text.of(option.name), x, y, color, false);
-            option.setHeight(mc.textRenderer.fontHeight);
-            option.setWidth(mc.textRenderer.getWidth(option.name) + 1);
-
-            option.getSubMenu().render(drawContext, x + option.getParentMenu().getFinalWidth(), y, mouseX, mouseY);
-        }
-    }
-
-    public static class ClassicRunnableRenderer implements SkinRenderer<RunnableOption> {
-        Color DARK_RED = new Color(116, 0, 0);
-        Color DARK_GREEN = new Color(24, 132, 0, 226);
-
-        @Override
-        public void render(DrawContext drawContext, RunnableOption option, int x, int y, int mouseX, int mouseY) {
-            option.setHeight(mc.textRenderer.fontHeight);
-            option.setWidth(mc.textRenderer.getWidth("Run: " + option.name));
-            int color = option.value ? DARK_GREEN.getRGB() : DARK_RED.getRGB();
-            drawContext.drawText(mc.textRenderer, Text.of(option.name), x, y, color, false);
         }
     }
 }

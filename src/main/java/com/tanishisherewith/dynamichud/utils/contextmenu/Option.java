@@ -1,19 +1,20 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu;
 
+import com.tanishisherewith.dynamichud.DynamicHUD;
+import com.tanishisherewith.dynamichud.utils.Input;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.SkinRenderer;
-import com.tanishisherewith.dynamichud.widget.Widget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public abstract class Option<T> {
+public abstract class Option<T> implements Input {
+    public T value = null;
     protected int x, y;
     protected int width = 0;
     protected int height = 0;
-    public T value = null;
-    protected Supplier<Boolean> shouldRender = () -> true;
+    protected Supplier<Boolean> shouldRender;
     protected Supplier<T> getter;
     protected Consumer<T> setter;
     protected T defaultValue = null;
@@ -22,10 +23,10 @@ public abstract class Option<T> {
     protected SkinRenderer<Option<T>> renderer;
 
     public Option(Supplier<T> getter, Consumer<T> setter) {
-        this(getter,setter,()->true);
+        this(getter, setter, () -> true);
     }
 
-    public Option(Supplier<T> getter, Consumer<T> setter, Supplier<Boolean> shouldRender,ContextMenuProperties properties) {
+    public Option(Supplier<T> getter, Consumer<T> setter, Supplier<Boolean> shouldRender, ContextMenuProperties properties) {
         this.getter = getter;
         this.setter = setter;
         this.shouldRender = shouldRender;
@@ -35,7 +36,7 @@ public abstract class Option<T> {
     }
 
     public Option(Supplier<T> getter, Consumer<T> setter, Supplier<Boolean> shouldRender) {
-       this(getter,setter,shouldRender,ContextMenuProperties.createGenericSimplified());
+        this(getter, setter, shouldRender, ContextMenuProperties.createGenericSimplified());
     }
 
     public T get() {
@@ -47,16 +48,16 @@ public abstract class Option<T> {
         setter.accept(value);
     }
 
-    public void updateProperties(ContextMenuProperties properties){
+    public void updateProperties(ContextMenuProperties properties) {
         this.properties = properties;
         this.renderer = properties.getSkin().getRenderer((Class<Option<T>>) this.getClass());
         if (renderer == null) {
-            System.err.println("Renderer not found for class: " + this.getClass().getName());
+            DynamicHUD.logger.error("Renderer not found for class: {}", this.getClass().getName());
             throw new RuntimeException();
         }
     }
 
-    public void render(DrawContext drawContext, int x, int y,int mouseX, int mouseY) {
+    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
         this.x = x;
         this.y = y;
 
@@ -65,30 +66,41 @@ public abstract class Option<T> {
     }
 
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return isMouseOver(mouseX, mouseY) || renderer.mouseClicked(this,mouseX,mouseY,button);
-
+        return isMouseOver(mouseX, mouseY) || renderer.mouseClicked(this, mouseX, mouseY, button);
     }
 
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        return isMouseOver(mouseX, mouseY) || renderer.mouseReleased(this,mouseX,mouseY,button);
+        return isMouseOver(mouseX, mouseY) || renderer.mouseReleased(this, mouseX, mouseY, button);
     }
 
-    public boolean mouseDragged(double mouseX, double mouseY, int button,double deltaX, double deltaY) {
-        return isMouseOver(mouseX, mouseY) || renderer.mouseDragged(this,mouseX,mouseY,button,deltaX,deltaY);
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        return isMouseOver(mouseX, mouseY) || renderer.mouseDragged(this, mouseX, mouseY, button, deltaX, deltaY);
     }
 
-    public void keyPressed(int key) {
-         renderer.keyPressed(this,key);
-    }
-    public void keyReleased(int key) {
-         renderer.keyReleased(this,key);
-    }
     public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        renderer.mouseScrolled(this,mouseX,mouseY,horizontalAmount,verticalAmount);
+        renderer.mouseScrolled(this, mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
-    //Called when the context menu closes
-    public void onClose(){}
+    @Override
+    public void keyPressed(int key, int scanCode, int modifiers) {
+        renderer.keyPressed(this, key, scanCode, modifiers);
+    }
+
+    @Override
+    public void charTyped(char c) {
+
+    }
+
+    @Override
+    public void keyReleased(int key, int scanCode, int modifiers) {
+        renderer.keyReleased(this, key, scanCode, modifiers);
+    }
+
+    /**
+     * Called when the context menu closes
+     */
+    public void onClose() {
+    }
 
     public boolean isMouseOver(double mouseX, double mouseY) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
@@ -107,38 +119,39 @@ public abstract class Option<T> {
         return properties;
     }
 
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
     public int getY() {
         return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
     }
 
     public int getX() {
         return x;
     }
 
+    public void setX(int x) {
+        this.x = x;
+    }
+
     public int getHeight() {
         return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     public int getWidth() {
         return width;
     }
-    public void set(int x, int y){
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void set(int x, int y) {
         this.x = x;
         this.y = y;
     }

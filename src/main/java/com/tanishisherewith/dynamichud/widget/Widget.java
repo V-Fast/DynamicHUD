@@ -6,17 +6,12 @@ import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.UID;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.option.VideoOptionsScreen;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.Properties;
-import java.util.Set;
-
 public abstract class Widget {
-    public enum Anchor { TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTER }
-
+    private final Anchor anchor;         // The chosen anchor point
     public WidgetData<?> DATA;
     /**
      * This is the UID of the widget used to identify during loading and saving.
@@ -26,23 +21,13 @@ public abstract class Widget {
      * @see #modId
      */
     public UID uid = UID.generate();
-    protected boolean isInEditor = false;
-
     // Whether the widget is enabled and should be displayed.
     public boolean display = true;
     public boolean isDraggable = true;
-
-    private int offsetX, offsetY;  // Offset from the anchor point
-
     //Boolean to check if the widget is being dragged
     public boolean dragging;
-
     //To enable/disable snapping
     public boolean shiftDown = false;
-
-    // Absolute position of the widget on screen in pixels.
-    protected int x, y;
-    protected boolean shouldScale = true;
     /**
      * An identifier for widgets to group them under one ID.
      * <p>
@@ -52,6 +37,10 @@ public abstract class Widget {
      * @see #uid
      */
     public String modId = "unknown";
+    protected boolean isInEditor = false;
+    // Absolute position of the widget on screen in pixels.
+    protected int x, y;
+    protected boolean shouldScale = true;
     protected MinecraftClient mc = MinecraftClient.getInstance();
     /**
      * Scale of the current widget.
@@ -62,19 +51,18 @@ public abstract class Widget {
     //Dimensions of the widget
     protected WidgetBox widgetBox;
     int startX, startY;
-    private final Anchor anchor;         // The chosen anchor point
-
+    private int offsetX, offsetY;  // Offset from the anchor point
     public Widget(WidgetData<?> DATA, String modId) {
-       this(DATA,modId,Anchor.CENTER);
+        this(DATA, modId, Anchor.CENTER);
     }
-    public Widget(WidgetData<?> DATA, String modId,Anchor anchor) {
+
+    public Widget(WidgetData<?> DATA, String modId, Anchor anchor) {
         this.DATA = DATA;
         widgetBox = new WidgetBox(0, 0, 0, 0);
         this.modId = modId;
         this.anchor = anchor;
         init();
     }
-
 
     /**
      * This method is called at the end of the {@link Widget#Widget(WidgetData, String)} constructor.
@@ -133,8 +121,8 @@ public abstract class Widget {
 
     // Update position based on anchor and offset
     void updatePosition(int screenWidth, int screenHeight) {
-        if(offsetX == 0 || offsetY == 0){
-            calculateOffset(x,y,screenWidth,screenHeight);
+        if (offsetX == 0 || offsetY == 0) {
+            calculateOffset(x, y, screenWidth, screenHeight);
         }
 
         int anchorX = getAnchorX(screenWidth);
@@ -148,10 +136,10 @@ public abstract class Widget {
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
-        if(mc.getWindow() != null){
+        if (mc.getWindow() != null) {
             //updatePercentages();
             calculateOffset(x, y, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());  // Set initial offset
-            updatePosition( mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());  // Initial placement
+            updatePosition(mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());  // Initial placement
         }
     }
 
@@ -185,7 +173,7 @@ public abstract class Widget {
      * Renders the widget on the editor screen.
      */
     public final void renderInEditor(DrawContext drawContext, int mouseX, int mouseY) {
-        if(!isInEditor) return;
+        if (!isInEditor) return;
 
         displayBg(drawContext);
 
@@ -200,7 +188,6 @@ public abstract class Widget {
         clampPosition();
     }
 
-
     /**
      * Renders the widget on the screen
      * <p>
@@ -213,12 +200,10 @@ public abstract class Widget {
      */
     public abstract void renderWidget(DrawContext context, int mouseX, int mouseY);
 
-
     /**
      * Renders the widget in the editor screen with a background.
      * Override this method without super call to remove the background.
      * Could also be used to display placeholder values.
-     *
      */
     private void renderWidgetInEditor(DrawContext context, int mouseX, int mouseY) {
         //displayBg(context);
@@ -226,12 +211,10 @@ public abstract class Widget {
         renderWidget(context, mouseX, mouseY);
     }
 
-    /* Input related methods. Override with super call to add your own input-based code like contextMenu */
-
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (widgetBox.isMouseOver(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             toggle();
-            if(isDraggable) {
+            if (isDraggable) {
                 startX = (int) (mouseX - x);
                 startY = (int) (mouseY - y);
                 dragging = true;
@@ -240,13 +223,16 @@ public abstract class Widget {
         }
         return false;
     }
-    public void clampPosition(){
+
+    /* Input related methods. Override with super call to add your own input-based code like contextMenu */
+
+    public void clampPosition() {
         this.x = (int) MathHelper.clamp(this.x, 0, mc.getWindow().getScaledWidth() - getWidth());
         this.y = (int) MathHelper.clamp(this.y, 0, mc.getWindow().getScaledHeight() - getHeight());
     }
 
     public boolean mouseDragged(double mouseX, double mouseY, int button, int snapSize) {
-      if(!isDraggable) return false;
+        if (!isDraggable) return false;
         if (dragging && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             int newX = (int) (mouseX - startX);
             int newY = (int) (mouseY - startY);
@@ -287,7 +273,6 @@ public abstract class Widget {
     public void mouseScrolled(double mouseX, double mouseY, double vAmount, double hAmount) {
     }
 
-
     public boolean toggle() {
         return this.display = !this.display;
     }
@@ -299,7 +284,6 @@ public abstract class Widget {
     /**
      * Displays a faint grayish background if enabled or faint reddish background if disabled.
      * Drawn with 2 pixel offset to all sides
-     *
      */
     protected void displayBg(DrawContext context) {
         int backgroundColor = this.shouldDisplay() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
@@ -371,6 +355,8 @@ public abstract class Widget {
                 ", shouldScale=" + shouldScale +
                 '}';
     }
+
+    public enum Anchor {TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTER}
 
     public abstract static class WidgetBuilder<T, S> {
         protected int x;

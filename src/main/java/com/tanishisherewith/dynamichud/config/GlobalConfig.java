@@ -41,7 +41,7 @@ public final class GlobalConfig {
         return INSTANCE;
     }
 
-    public final Screen createYACLGUI() {
+    public Screen createYACLGUI() {
         return YetAnotherConfigLib.createBuilder()
                 .title(Text.literal("DynamicHUD config screen."))
                 .category(ConfigCategory.createBuilder()
@@ -71,8 +71,8 @@ public final class GlobalConfig {
                                 .option(Option.<Integer>createBuilder()
                                         .name(Text.literal("Snap Size"))
                                         .description(OptionDescription.of(Text.literal("Grid size for snapping widgets")))
-                                        .binding( 100, () -> this.snapSize, newVal -> this.snapSize = newVal)
-                                        .controller(integerOption -> IntegerFieldControllerBuilder.create(integerOption).range(10,500))
+                                        .binding(100, () -> this.snapSize, newVal -> this.snapSize = newVal)
+                                        .controller(integerOption -> IntegerFieldControllerBuilder.create(integerOption).range(10, 500))
                                         .build())
                                 .build())
                         .build())
@@ -80,7 +80,8 @@ public final class GlobalConfig {
                 .build()
                 .generateScreen(null);
     }
-    public float getScale(){
+
+    public float getScale() {
         return scale;
     }
 

@@ -1,7 +1,6 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu;
 
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.ClassicSkin;
-import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.MinecraftSkin;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.Skin;
 
 import java.awt.*;
@@ -21,7 +20,8 @@ public class ContextMenuProperties {
     private boolean enableAnimations = true;
     private Skin skin = new ClassicSkin();
 
-    private ContextMenuProperties() {}
+    private ContextMenuProperties() {
+    }
 
     public static Builder builder() {
         return new ContextMenuProperties().new Builder();
@@ -31,8 +31,84 @@ public class ContextMenuProperties {
         return new ContextMenuProperties().new Builder().build();
     }
 
+    // Getters for all properties
+    public Color getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public Color getBorderColor() {
+        return borderColor;
+    }
+
+    public float getBorderWidth() {
+        return borderWidth;
+    }
+
+    public int getPadding() {
+        return padding;
+    }
+
+    public int getHeightOffset() {
+        return heightOffset;
+    }
+
+    public void setHeightOffset(int heightOffset) {
+        this.heightOffset = heightOffset;
+    }
+
+    public boolean shouldDrawBorder() {
+        return drawBorder;
+    }
+
+    public boolean shadow() {
+        return shadow;
+    }
+
+    public boolean roundedCorners() {
+        return roundedCorners;
+    }
+
+    public int getCornerRadius() {
+        return cornerRadius;
+    }
+
+    public boolean hoverEffect() {
+        return hoverEffect;
+    }
+
+    public Color getHoverColor() {
+        return hoverColor;
+    }
+
+    public boolean enableAnimations() {
+        return enableAnimations;
+    }
+
+    public Skin getSkin() {
+        return skin;
+    }
+
+    public ContextMenuProperties copy() {
+        return ContextMenuProperties.builder()
+                .backgroundColor(backgroundColor)
+                .borderColor(borderColor)
+                .borderWidth(borderWidth)
+                .padding(padding)
+                .heightOffset(heightOffset)
+                .drawBorder(drawBorder)
+                .shadow(shadow)
+                .roundedCorners(roundedCorners)
+                .cornerRadius(cornerRadius)
+                .hoverEffect(hoverEffect)
+                .hoverColor(hoverColor)
+                .skin(skin)
+                .enableAnimations(enableAnimations)
+                .build();
+    }
+
     public class Builder {
-        private Builder() {}
+        private Builder() {
+        }
 
         public Builder backgroundColor(Color backgroundColor) {
             ContextMenuProperties.this.backgroundColor = backgroundColor;
@@ -102,80 +178,5 @@ public class ContextMenuProperties {
         public ContextMenuProperties build() {
             return ContextMenuProperties.this;
         }
-    }
-
-    // Getters for all properties
-    public Color getBackgroundColor() {
-        return backgroundColor;
-    }
-
-    public Color getBorderColor() {
-        return borderColor;
-    }
-
-    public float getBorderWidth() {
-        return borderWidth;
-    }
-
-    public int getPadding() {
-        return padding;
-    }
-
-    public int getHeightOffset() {
-        return heightOffset;
-    }
-
-    public boolean shouldDrawBorder() {
-        return drawBorder;
-    }
-
-    public boolean shadow() {
-        return shadow;
-    }
-
-    public boolean roundedCorners() {
-        return roundedCorners;
-    }
-
-    public int getCornerRadius() {
-        return cornerRadius;
-    }
-
-    public boolean hoverEffect() {
-        return hoverEffect;
-    }
-
-    public Color getHoverColor() {
-        return hoverColor;
-    }
-
-    public boolean enableAnimations() {
-        return enableAnimations;
-    }
-
-    public Skin getSkin() {
-        return skin;
-    }
-
-    public void setHeightOffset(int heightOffset) {
-        this.heightOffset = heightOffset;
-    }
-
-    public ContextMenuProperties copy(){
-        return ContextMenuProperties.builder()
-                .backgroundColor(backgroundColor)
-                .borderColor(borderColor)
-                .borderWidth(borderWidth)
-                .padding(padding)
-                .heightOffset(heightOffset)
-                .drawBorder(drawBorder)
-                .shadow(shadow)
-                .roundedCorners(roundedCorners)
-                .cornerRadius(cornerRadius)
-                .hoverEffect(hoverEffect)
-                .hoverColor(hoverColor)
-                .skin(skin)
-                .enableAnimations(enableAnimations)
-                .build();
     }
 }

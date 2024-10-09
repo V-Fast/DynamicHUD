@@ -3,7 +3,6 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import org.apache.commons.lang3.Validate;
 import org.lwjgl.glfw.GLFW;
@@ -14,11 +13,11 @@ import java.util.function.Supplier;
 
 public class DoubleOption extends Option<Double> {
     public String name = "Empty";
-    float step = 0.1f;
-    private boolean isDragging = false;
     public double minValue = 0.0;
     public double maxValue = 0.0;
+    float step = 0.1f;
     ContextMenu parentMenu;
+    private boolean isDragging = false;
 
     public DoubleOption(String name, double minValue, double maxValue, float step, Supplier<Double> getter, Consumer<Double> setter, ContextMenu parentMenu) {
         super(getter, setter);
@@ -35,9 +34,9 @@ public class DoubleOption extends Option<Double> {
     }
 
     @Override
-    public void render(DrawContext drawContext, int x, int y,int mouseX, int mouseY) {
+    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
         value = get();
-        super.render(drawContext, x, y,mouseX,mouseY);
+        super.render(drawContext, x, y, mouseX, mouseY);
 
         //properties.getSkin().getRenderer(DoubleOption.class).render(drawContext,this,x,y,mouseX,mouseY);
 
@@ -108,10 +107,10 @@ public class DoubleOption extends Option<Double> {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button,double deltaX, double deltaY) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (isMouseOver(mouseX, mouseY) && isDragging) {
             step(mouseX);
         }
-        return super.mouseDragged(mouseX, mouseY, button,deltaX,deltaY);
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 }

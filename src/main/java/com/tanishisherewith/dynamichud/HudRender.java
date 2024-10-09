@@ -9,7 +9,7 @@ import net.minecraft.client.render.RenderTickCounter;
  * Using the fabric event {@link HudRenderCallback} to render widgets in the game HUD.
  * Mouse positions are passed in the negatives even though theoretically it's in the centre of the screen.
  */
-public class HudRender implements HudRenderCallback{
+public class HudRender implements HudRenderCallback {
 
     @Override
     public void onHudRender(DrawContext drawContext, RenderTickCounter tickCounter) {

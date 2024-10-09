@@ -28,44 +28,50 @@ public abstract class AbstractMoveableScreen extends Screen {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         widgetRenderer.mouseDragged(mouseX, mouseY, button, GlobalConfig.get().getSnapSize());
-        ContextMenuManager.getInstance().handleMouseDragged(mouseX,mouseY,button,deltaX,deltaY);
+        ContextMenuManager.getInstance().mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
         return false;
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if(widgetRenderer.mouseClicked(mouseX, mouseY, button)){
-            handleClickOnWidget(widgetRenderer.selectedWidget,mouseX,mouseY,button);
+        if (widgetRenderer.mouseClicked(mouseX, mouseY, button)) {
+            handleClickOnWidget(widgetRenderer.selectedWidget, mouseX, mouseY, button);
         }
-        ContextMenuManager.getInstance().handleMouseClicked(mouseX,mouseY,button);
+        ContextMenuManager.getInstance().mouseClicked(mouseX, mouseY, button);
         return false;
+    }
+
+    @Override
+    public boolean charTyped(char chr, int modifiers) {
+        ContextMenuManager.getInstance().charTyped(chr);
+        return super.charTyped(chr, modifiers);
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         widgetRenderer.mouseReleased(mouseX, mouseY, button);
-        ContextMenuManager.getInstance().handleMouseReleased(mouseX,mouseY,button);
+        ContextMenuManager.getInstance().mouseReleased(mouseX, mouseY, button);
         return false;
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         widgetRenderer.keyPressed(keyCode);
-        ContextMenuManager.getInstance().handleKeyPressed(keyCode, scanCode, modifiers);
+        ContextMenuManager.getInstance().keyPressed(keyCode, scanCode, modifiers);
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         widgetRenderer.keyReleased(keyCode);
-        ContextMenuManager.getInstance().handleKeyReleased(keyCode, scanCode, modifiers);
+        ContextMenuManager.getInstance().keyReleased(keyCode, scanCode, modifiers);
         return super.keyReleased(keyCode, scanCode, modifiers);
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         widgetRenderer.mouseScrolled(mouseX, mouseY, verticalAmount, horizontalAmount);
-        ContextMenuManager.getInstance().handleMouseScrolled(mouseX, mouseY, horizontalAmount,verticalAmount);
+        ContextMenuManager.getInstance().mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
@@ -83,14 +89,14 @@ public abstract class AbstractMoveableScreen extends Screen {
         if (this.client.world == null) {
             renderInGameBackground(drawContext);
         }
-        drawContext.drawText(client.textRenderer,title,client.getWindow().getScaledWidth()/2 - client.textRenderer.getWidth(title.getString())/2,textRenderer.fontHeight/2,-1,true);
+        drawContext.drawText(client.textRenderer, title, client.getWindow().getScaledWidth() / 2 - client.textRenderer.getWidth(title.getString()) / 2, textRenderer.fontHeight / 2, -1, true);
 
         // Draw each widget
         widgetRenderer.renderWidgets(drawContext, mouseX, mouseY);
 
-        ContextMenuManager.getInstance().renderAll(drawContext,mouseX,mouseY);
+        ContextMenuManager.getInstance().renderAll(drawContext, mouseX, mouseY);
 
-        if(GlobalConfig.get().shouldDisplayDescriptions()) {
+        if (GlobalConfig.get().shouldDisplayDescriptions()) {
             for (Widget widget : widgetRenderer.getWidgets()) {
                 if (widget == null || widget.shiftDown) continue;
 
@@ -101,7 +107,8 @@ public abstract class AbstractMoveableScreen extends Screen {
             }
         }
     }
-    public void handleClickOnWidget(Widget widget, double mouseX, double mouseY, int button){
+
+    public void handleClickOnWidget(Widget widget, double mouseX, double mouseY, int button) {
 
     }
 

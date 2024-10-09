@@ -1,11 +1,9 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
-import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption.ColorGradientPicker;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
 
 import java.awt.*;
 import java.util.function.Consumer;
@@ -26,10 +24,10 @@ public class ColorOption extends Option<Color> {
     }
 
     @Override
-    public void render(DrawContext drawContext, int x, int y,int mouseX, int mouseY) {
-        super.render(drawContext, x, y,mouseX,mouseY);
+    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
+        super.render(drawContext, x, y, mouseX, mouseY);
 
-     //   properties.getSkin().getRenderer(ColorOption.class).render(drawContext,this,x,y,mouseX,mouseY);
+        //   properties.getSkin().getRenderer(ColorOption.class).render(drawContext,this,x,y,mouseX,mouseY);
 
         /*
         int color = isVisible ? Color.GREEN.getRGB() : Color.RED.getRGB();
@@ -76,9 +74,9 @@ public class ColorOption extends Option<Color> {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button,double deltaX, double deltaY) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         colorPicker.mouseDragged(mouseX, mouseY, button);
-        return super.mouseDragged(mouseX, mouseY, button,deltaX,deltaY);
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
     public ColorGradientPicker getColorPicker() {

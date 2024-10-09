@@ -19,9 +19,9 @@ public class ColorGradientPicker {
     private final ColorPickerButton colorPickerButton;
     private final AlphaSlider alphaSlider;
     private final int boxSize;
+    private final Color initialColor;
     private int x, y;
     private boolean display = false;
-    private final Color initialColor;
 
     public ColorGradientPicker(int x, int y, Color initialColor, Consumer<Color> onColorSelected, int boxSize, int colors) {
         this.x = x;

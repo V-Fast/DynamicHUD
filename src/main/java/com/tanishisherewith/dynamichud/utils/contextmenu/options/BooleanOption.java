@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 
 public class BooleanOption extends Option<Boolean> {
     public String name = "Empty";
-    private BooleanType booleanType;
+    private final BooleanType booleanType;
 
     public BooleanOption(String name, Supplier<Boolean> getter, Consumer<Boolean> setter, BooleanType booleanType) {
         super(getter, setter);
@@ -21,25 +21,26 @@ public class BooleanOption extends Option<Boolean> {
         this.booleanType = booleanType;
         this.renderer.init(this);
     }
+
     public BooleanOption(String name, Supplier<Boolean> getter, Consumer<Boolean> setter) {
-        this(name,getter,setter,BooleanType.TRUE_FALSE);
+        this(name, getter, setter, BooleanType.TRUE_FALSE);
     }
 
     public BooleanOption(String name, boolean defaultValue) {
-        this(name,defaultValue,BooleanType.TRUE_FALSE);
+        this(name, defaultValue, BooleanType.TRUE_FALSE);
     }
 
-    public BooleanOption(String name, boolean defaultValue,BooleanType type) {
-        this(name, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value),type);
+    public BooleanOption(String name, boolean defaultValue, BooleanType type) {
+        this(name, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value), type);
         BooleanPool.put(name, defaultValue);
     }
 
     @Override
-    public void render(DrawContext drawContext, int x, int y,int mouseX, int mouseY) {
+    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
         value = get();
-        super.render(drawContext, x, y,mouseX,mouseY);
+        super.render(drawContext, x, y, mouseX, mouseY);
 
-      //  properties.getSkin().getRenderer(BooleanOption.class).render(drawContext,this,x,y,mouseX,mouseY);
+        //  properties.getSkin().getRenderer(BooleanOption.class).render(drawContext,this,x,y,mouseX,mouseY);
         /*
         int color = value ? Color.GREEN.getRGB() : Color.RED.getRGB();
         drawContext.drawText(mc.textRenderer, Text.of(name), x, y, color, false);
@@ -56,25 +57,25 @@ public class BooleanOption extends Option<Boolean> {
             set(value);
             return true;
         }
-        return super.mouseClicked(mouseX,mouseY,button);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     public BooleanType getBooleanType() {
         return booleanType;
     }
 
-    public enum BooleanType{
+    public enum BooleanType {
         ON_OFF(ScreenTexts::onOrOff),
         TRUE_FALSE(aBoolean -> aBoolean ? Text.of("True") : Text.of("False")),
-        YES_NO(aBoolean -> aBoolean ? ScreenTexts.YES: ScreenTexts.NO);
+        YES_NO(aBoolean -> aBoolean ? ScreenTexts.YES : ScreenTexts.NO);
 
-        private final Function<Boolean,Text> function;
+        private final Function<Boolean, Text> function;
 
-        BooleanType(Function<Boolean, Text> function){
+        BooleanType(Function<Boolean, Text> function) {
             this.function = function;
         }
 
-        public Text getText(boolean val){
+        public Text getText(boolean val) {
             return function.apply(val);
         }
     }
