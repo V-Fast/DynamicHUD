@@ -10,11 +10,9 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.Set;
-
 public abstract class Widget {
-
-    public static WidgetData<?> DATA;
+    private final Anchor anchor;         // The chosen anchor point
+    public WidgetData<?> DATA;
     /**
      * This is the UID of the widget used to identify during loading and saving.
      * <p>
@@ -23,19 +21,13 @@ public abstract class Widget {
      * @see #modId
      */
     public UID uid = UID.generate();
-    public boolean isInEditor = false;
     // Whether the widget is enabled and should be displayed.
     public boolean display = true;
     public boolean isDraggable = true;
-
     //Boolean to check if the widget is being dragged
     public boolean dragging;
-
     //To enable/disable snapping
     public boolean shiftDown = false;
-    // Absolute position of the widget on screen in pixels.
-    public int x, y;
-    public boolean shouldScale = true;
     /**
      * An identifier for widgets to group them under one ID.
      * <p>
@@ -45,11 +37,11 @@ public abstract class Widget {
      * @see #uid
      */
     public String modId = "unknown";
+    protected boolean isInEditor = false;
+    // Absolute position of the widget on screen in pixels.
+    protected int x, y;
+    protected boolean shouldScale = true;
     protected MinecraftClient mc = MinecraftClient.getInstance();
-    // The x position of the widget as a percentage of the screen width, i.e. the relative x position of the widget for resizing and scaling
-    protected float xPercent;
-    // The y position of the widget as a percentage of the screen height, i.e. the relative y position of the widget for resizing and scaling
-    protected float yPercent;
     /**
      * Scale of the current widget.
      *
@@ -59,11 +51,16 @@ public abstract class Widget {
     //Dimensions of the widget
     protected WidgetBox widgetBox;
     int startX, startY;
-
+    private int offsetX, offsetY;  // Offset from the anchor point
     public Widget(WidgetData<?> DATA, String modId) {
-        Widget.DATA = DATA;
+        this(DATA, modId, Anchor.CENTER);
+    }
+
+    public Widget(WidgetData<?> DATA, String modId, Anchor anchor) {
+        this.DATA = DATA;
         widgetBox = new WidgetBox(0, 0, 0, 0);
         this.modId = modId;
+        this.anchor = anchor;
         init();
     }
 
@@ -71,7 +68,6 @@ public abstract class Widget {
      * This method is called at the end of the {@link Widget#Widget(WidgetData, String)} constructor.
      */
     public void init() {
-
     }
 
     /**
@@ -100,23 +96,55 @@ public abstract class Widget {
         return widgetBox.getHeight();
     }
 
+    private void calculateOffset(int initialX, int initialY, int screenWidth, int screenHeight) {
+        int anchorX = getAnchorX(screenWidth);
+        int anchorY = getAnchorY(screenHeight);
+        this.offsetX = initialX - anchorX;
+        this.offsetY = initialY - anchorY;
+    }
+
+    private int getAnchorX(int screenWidth) {
+        return switch (anchor) {
+            case TOP_RIGHT, BOTTOM_RIGHT -> screenWidth;
+            case CENTER -> screenWidth / 2;
+            default -> 0;  // TOP_LEFT and BOTTOM_LEFT
+        };
+    }
+
+    private int getAnchorY(int screenHeight) {
+        return switch (anchor) {
+            case BOTTOM_LEFT, BOTTOM_RIGHT -> screenHeight;
+            case CENTER -> screenHeight / 2;
+            default -> 0;  // TOP_LEFT and TOP_RIGHT
+        };
+    }
+
+    // Update position based on anchor and offset
+    void updatePosition(int screenWidth, int screenHeight) {
+        if (offsetX == 0 || offsetY == 0) {
+            calculateOffset(x, y, screenWidth, screenHeight);
+        }
+
+        int anchorX = getAnchorX(screenWidth);
+        int anchorY = getAnchorY(screenHeight);
+        this.x = anchorX + offsetX;
+        this.y = anchorY + offsetY;
+
+        clampPosition();
+    }
+
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
+        if (mc.getWindow() != null) {
+            //updatePercentages();
+            calculateOffset(x, y, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());  // Set initial offset
+            updatePosition(mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());  // Initial placement
+        }
     }
 
     public void setDraggable(boolean draggable) {
         isDraggable = draggable;
-    }
-
-    public boolean isOverlapping(Set<Widget> other) {
-        for (Widget widgetBox : other) {
-            if ((this.getX() < widgetBox.getX() + widgetBox.getWidgetBox().getWidth() && this.getX() + this.getWidgetBox().getWidth() > widgetBox.getX() &&
-                    this.getY() < widgetBox.getY() + widgetBox.getWidgetBox().getHeight() && this.getY() + this.getWidgetBox().getHeight() > widgetBox.getY())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public boolean isOverlapping(Widget other) {
@@ -138,14 +166,14 @@ public abstract class Widget {
         if (shouldScale) {
             DrawHelper.stopScaling(drawContext.getMatrices());
         }
-
+        clampPosition();
     }
 
     /**
      * Renders the widget on the editor screen.
      */
     public final void renderInEditor(DrawContext drawContext, int mouseX, int mouseY) {
-        if(!isInEditor) return;
+        if (!isInEditor) return;
 
         displayBg(drawContext);
 
@@ -157,8 +185,8 @@ public abstract class Widget {
         if (shouldScale) {
             DrawHelper.stopScaling(drawContext.getMatrices());
         }
+        clampPosition();
     }
-
 
     /**
      * Renders the widget on the screen
@@ -172,13 +200,10 @@ public abstract class Widget {
      */
     public abstract void renderWidget(DrawContext context, int mouseX, int mouseY);
 
-
     /**
      * Renders the widget in the editor screen with a background.
      * Override this method without super call to remove the background.
      * Could also be used to display placeholder values.
-     *
-     * @param context
      */
     private void renderWidgetInEditor(DrawContext context, int mouseX, int mouseY) {
         //displayBg(context);
@@ -186,12 +211,10 @@ public abstract class Widget {
         renderWidget(context, mouseX, mouseY);
     }
 
-    /* Input related methods. Override with super call to add your own input-based code like contextMenu */
-
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (widgetBox.isMouseOver(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             toggle();
-            if(isDraggable) {
+            if (isDraggable) {
                 startX = (int) (mouseX - x);
                 startY = (int) (mouseY - y);
                 dragging = true;
@@ -201,8 +224,15 @@ public abstract class Widget {
         return false;
     }
 
+    /* Input related methods. Override with super call to add your own input-based code like contextMenu */
+
+    public void clampPosition() {
+        this.x = (int) MathHelper.clamp(this.x, 0, mc.getWindow().getScaledWidth() - getWidth());
+        this.y = (int) MathHelper.clamp(this.y, 0, mc.getWindow().getScaledHeight() - getHeight());
+    }
+
     public boolean mouseDragged(double mouseX, double mouseY, int button, int snapSize) {
-      if(!isDraggable) return false;
+        if (!isDraggable) return false;
         if (dragging && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             int newX = (int) (mouseX - startX);
             int newY = (int) (mouseY - startY);
@@ -223,8 +253,7 @@ public abstract class Widget {
             this.x = (int) MathHelper.clamp(newX, 0, mc.getWindow().getScaledWidth() - getWidth());
             this.y = (int) MathHelper.clamp(newY, 0, mc.getWindow().getScaledHeight() - getHeight());
 
-            this.xPercent = (float) this.x / mc.getWindow().getScaledWidth();
-            this.yPercent = (float) this.y / mc.getWindow().getScaledHeight();
+            calculateOffset(x, y, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());  // Set initial offset
 
             return true;
         }
@@ -244,7 +273,6 @@ public abstract class Widget {
     public void mouseScrolled(double mouseX, double mouseY, double vAmount, double hAmount) {
     }
 
-
     public boolean toggle() {
         return this.display = !this.display;
     }
@@ -256,7 +284,6 @@ public abstract class Widget {
     /**
      * Displays a faint grayish background if enabled or faint reddish background if disabled.
      * Drawn with 2 pixel offset to all sides
-     *
      */
     protected void displayBg(DrawContext context) {
         int backgroundColor = this.shouldDisplay() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
@@ -268,7 +295,6 @@ public abstract class Widget {
                 box.getHeight(),
                 backgroundColor);
     }
-
 
     public void readFromTag(NbtCompound tag) {
         modId = tag.getString("modId");
@@ -294,6 +320,7 @@ public abstract class Widget {
         tag.putInt("x", x);
         tag.putInt("y", y);
         tag.putBoolean("Display", display);
+
     }
 
     public boolean shouldDisplay() {
@@ -302,14 +329,6 @@ public abstract class Widget {
 
     public WidgetBox getWidgetBox() {
         return widgetBox;
-    }
-
-    public void setxPercent(float xPercent) {
-        this.xPercent = xPercent;
-    }
-
-    public void setyPercent(float yPercent) {
-        this.yPercent = yPercent;
     }
 
     public void setUid(UID uid) {
@@ -326,7 +345,7 @@ public abstract class Widget {
 
     @Override
     public String toString() {
-        return "Widget{" +
+        return this.getClass().getName() + "{" +
                 "uniqueId='" + uid.getUniqueID() + '\'' +
                 ", x=" + x +
                 ", y=" + y +
@@ -336,6 +355,8 @@ public abstract class Widget {
                 ", shouldScale=" + shouldScale +
                 '}';
     }
+
+    public enum Anchor {TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTER}
 
     public abstract static class WidgetBuilder<T, S> {
         protected int x;

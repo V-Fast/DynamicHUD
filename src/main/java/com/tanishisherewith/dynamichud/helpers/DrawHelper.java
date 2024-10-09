@@ -47,7 +47,7 @@ public class DrawHelper {
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        
+
         switch (direction) {
             case LEFT_RIGHT:
                 bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha);
@@ -508,7 +508,7 @@ public class DrawHelper {
         float alpha = (float) (color >> 24 & 255) / 255.0F;
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder =  tessellator.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
+        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
 
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderSystem.enableBlend();

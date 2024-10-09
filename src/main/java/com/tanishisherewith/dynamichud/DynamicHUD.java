@@ -2,18 +2,22 @@ package com.tanishisherewith.dynamichud;
 
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen;
-import com.tanishisherewith.dynamichud.utils.BooleanPool;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetManager;
 import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
+import com.tanishisherewith.dynamichud.widgets.ItemWidget;
 import com.tanishisherewith.dynamichud.widgets.TextWidget;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
@@ -27,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+@Environment(EnvType.CLIENT)
 public class DynamicHUD implements ClientModInitializer {
     /**
      * This is a map to store the list of widgets for each widget file to be saved.
@@ -34,10 +39,12 @@ public class DynamicHUD implements ClientModInitializer {
      * Allows saving widgets across different mods with same save file name.
      */
     public static final HashMap<String, List<Widget>> FILE_MAP = new HashMap<>();
+
     public static final Logger logger = LoggerFactory.getLogger("DynamicHud");
     private static final List<WidgetRenderer> widgetRenderers = new ArrayList<>();
     public static MinecraftClient MC = MinecraftClient.getInstance();
     public static String MOD_ID = "dynamichud";
+    private static boolean enableTestIntegration = false;
 
     public static void addWidgetRenderer(WidgetRenderer widgetRenderer) {
         widgetRenderers.add(widgetRenderer);
@@ -67,109 +74,121 @@ public class DynamicHUD implements ClientModInitializer {
         }
     }
 
+    public void checkToEnableTestIntegration(){
+        String[] args = FabricLoader.getInstance().getLaunchArguments(true);
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("--dynamicHudTest") && i + 1 < args.length) {
+                enableTestIntegration = Boolean.parseBoolean(args[i + 1]);
+                break;
+            }
+        }
+    }
+
     @Override
     public void onInitializeClient() {
         printInfo("Initialising DynamicHud");
 
         // Add WidgetData of included widgets
         WidgetManager.registerCustomWidgets(
-                TextWidget.DATA
+                TextWidget.DATA,
+                ItemWidget.DATA
         );
 
         //YACL load
         GlobalConfig.HANDLER.load();
 
+        checkToEnableTestIntegration();
+
         printInfo("Integrating mods...");
-        FabricLoader.getInstance()
-                .getEntrypointContainers("dynamicHud", DynamicHudIntegration.class)
-                .forEach(entrypoint -> {
-                    ModMetadata metadata = entrypoint.getProvider().getMetadata();
-                    String modId = metadata.getId();
+        List<EntrypointContainer<DynamicHudIntegration>> integrations = new ArrayList<>(getRegisteredIntegrations());
 
-                    printInfo(String.format("Supported mod with id %s was found!", modId));
+        if (enableTestIntegration) {
+            EntrypointContainer<DynamicHudIntegration> testIntegration = getTestIntegration();
+            if (testIntegration != null) {
+                integrations.add(testIntegration);
+                printInfo("Test integration enabled and loaded successfully.");
+            }
+        }
 
-                    AbstractMoveableScreen screen;
-                    KeyBinding binding;
-                    WidgetRenderer widgetRenderer;
-                    File widgetsFile;
-                    try {
-                        DynamicHudIntegration DHIntegration = entrypoint.getEntrypoint();
+        for (EntrypointContainer<DynamicHudIntegration> entrypoint : integrations) {
+            ModMetadata metadata = entrypoint.getProvider().getMetadata();
+            String modId = metadata.getId();
 
-                        //Calls the init method
-                        DHIntegration.init();
+            printInfo(String.format("Supported mod with id %s was found!", modId));
 
-                        //Gets the widget file to save and load the widgets from
-                        widgetsFile = DHIntegration.getWidgetsFile();
+            AbstractMoveableScreen screen;
+            KeyBinding binding;
+            WidgetRenderer widgetRenderer;
+            File widgetsFile;
+            try {
+                DynamicHudIntegration DHIntegration = entrypoint.getEntrypoint();
 
-                        // Adds / loads widgets from file
-                        if (widgetsFile.exists()) {
-                            WidgetManager.loadWidgets(widgetsFile);
-                        } else {
-                            DHIntegration.addWidgets();
-                        }
+                //Calls the init method
+                DHIntegration.init();
 
-                        //Calls the second init method
-                        DHIntegration.initAfter();
+                //Gets the widget file to save and load the widgets from
+                widgetsFile = DHIntegration.getWidgetsFile();
 
-                        // Get the instance of AbstractMoveableScreen
-                        screen = Objects.requireNonNull( DHIntegration.getMovableScreen());
+                // Adds / loads widgets from file
+                if (WidgetManager.doesWidgetFileExist(widgetsFile)) {
+                    WidgetManager.loadWidgets(widgetsFile);
+                } else {
+                    DHIntegration.addWidgets();
+                }
 
-                        // Get the keybind to open the screen instance
-                        binding = DHIntegration.getKeyBind();
+                //Calls the second init method
+                DHIntegration.initAfter();
 
-                        //Register custom widget datas by WidgetManager.registerCustomWidgets();
-                        DHIntegration.registerCustomWidgets();
+                // Get the instance of AbstractMoveableScreen
+                screen = Objects.requireNonNull(DHIntegration.getMovableScreen());
 
-                        //WidgetRenderer with widgets instance
-                        widgetRenderer = DHIntegration.getWidgetRenderer();
-                        addWidgetRenderer(widgetRenderer);
+                // Get the keybind to open the screen instance
+                binding = DHIntegration.getKeyBind();
 
-                        List<Widget> widgets = FILE_MAP.get(widgetsFile.getName());
+                //Register custom widget datas by WidgetManager.registerCustomWidgets();
+                DHIntegration.registerCustomWidgets();
 
-                        if (widgets == null || widgets.isEmpty()) {
-                            FILE_MAP.put(widgetsFile.getName(), widgetRenderer.getWidgets());
-                        } else {
-                            widgets.addAll(widgetRenderer.getWidgets());
-                            FILE_MAP.put(widgetsFile.getName(), widgets);
-                        }
+                //WidgetRenderer with widgets instance
+                widgetRenderer = DHIntegration.getWidgetRenderer();
+                addWidgetRenderer(widgetRenderer);
 
-                        //Register events for rendering, saving, loading, and opening the hudEditor
-                        ClientTickEvents.START_CLIENT_TICK.register((client) -> openDynamicScreen(binding, screen));
+                List<Widget> widgets = FILE_MAP.get(widgetsFile.getName());
 
-                        /* === Saving === */
+                if (widgets == null || widgets.isEmpty()) {
+                    FILE_MAP.put(widgetsFile.getName(), widgetRenderer.getWidgets());
+                } else {
+                    widgets.addAll(widgetRenderer.getWidgets());
+                    FILE_MAP.put(widgetsFile.getName(), widgets);
+                }
 
-                        //When a player exits a world (SinglePlayer worlds) or a server stops
-                        ServerLifecycleEvents.SERVER_STOPPING.register(server -> saveWidgetsSafely(widgetsFile, FILE_MAP.get(widgetsFile.getName())));
+                //Register events for rendering, saving, loading, and opening the hudEditor
+                ClientTickEvents.START_CLIENT_TICK.register((client) -> openDynamicScreen(binding, screen));
 
-                        // When a resource pack is reloaded.
-                        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, s) -> saveWidgetsSafely(widgetsFile, FILE_MAP.get(widgetsFile.getName())));
+                /* === Saving === */
+                // Each mod is hooked to the fabric's event system to save its widget.
 
-                        //When player disconnects
-                        ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> saveWidgetsSafely(widgetsFile, FILE_MAP.get(widgetsFile.getName())));
+                //When a player exits a world (SinglePlayer worlds) or a server stops
+                ServerLifecycleEvents.SERVER_STOPPING.register(server -> saveWidgetsSafely(widgetsFile, FILE_MAP.get(widgetsFile.getName())));
 
-                        //When minecraft closes
-                        ClientLifecycleEvents.CLIENT_STOPPING.register((minecraftClient) -> saveWidgetsSafely(widgetsFile, FILE_MAP.get(widgetsFile.getName())));
+                // When a resource pack is reloaded.
+                ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, s) -> saveWidgetsSafely(widgetsFile, FILE_MAP.get(widgetsFile.getName())));
 
-                        printInfo(String.format("Integration of mod %s was successful", modId));
-                    } catch (Throwable e) {
-                        if (e instanceof IOException) {
-                            logger.warn("An error has occurred while loading widgets of mod {}", modId, e);
-                        } else {
-                            logger.warn("Mod {} has improper implementation of DynamicHUD", modId, e);
-                        }
-                    }
-                });
-        printInfo("(DynamicHUD) Integration of mods found was successful");
+                //When player disconnects
+                ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> saveWidgetsSafely(widgetsFile, FILE_MAP.get(widgetsFile.getName())));
 
+                //When minecraft closes
+                ClientLifecycleEvents.CLIENT_STOPPING.register((minecraftClient) -> saveWidgetsSafely(widgetsFile, FILE_MAP.get(widgetsFile.getName())));
 
-        //Global config saving (YACL)
-        ServerLifecycleEvents.SERVER_STOPPING.register(server -> GlobalConfig.HANDLER.save());
-        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, s) -> GlobalConfig.HANDLER.save());
-        ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> GlobalConfig.HANDLER.save());
-        ClientLifecycleEvents.CLIENT_STOPPING.register((minecraftClient) -> {
-            GlobalConfig.HANDLER.save();
-        });
-
+                printInfo(String.format("Integration of mod %s was successful", modId));
+            } catch (Throwable e) {
+                if (e instanceof IOException) {
+                    logger.warn("An error has occurred while loading widgets of mod {}", modId, e);
+                } else {
+                    logger.error("Mod {} has improper implementation of DynamicHUD", modId, e);
+                }
+            }
+        }
+        printInfo("(DynamicHUD) Integration of supported mods was successful");
 
         //In game screen render.
         HudRenderCallback.EVENT.register(new HudRender());
@@ -182,6 +201,46 @@ public class DynamicHUD implements ClientModInitializer {
             logger.error("Failed to save widgets. Widgets passed: {}", widgets);
             throw new RuntimeException(e);
         }
+    }
+
+    private List<EntrypointContainer<DynamicHudIntegration>> getRegisteredIntegrations() {
+        return new ArrayList<>(FabricLoader.getInstance()
+                .getEntrypointContainers("dynamicHud", DynamicHudIntegration.class));
+    }
+
+    /**
+     * This makes it so that if minecraft is launched with the program arguments
+     * <p>
+     * {@code --dynamicHudTest true}
+     * </p>
+     * then it will
+     * load the {@link DynamicHudTest} class as an entrypoint, eliminating any errors due to human incapacity of
+     * adding/removing a single line from the `fabric.mod.json`
+     */
+    private EntrypointContainer<DynamicHudIntegration> getTestIntegration() {
+        DynamicHudIntegration testIntegration;
+        try {
+            Class<?> testClass = Class.forName("com.tanishisherewith.dynamichud.DynamicHudTest");
+            testIntegration = (DynamicHudIntegration) testClass.getDeclaredConstructor().newInstance();
+        } catch (ClassNotFoundException e) {
+            logger.info("DynamicHudTest class not found. Skipping test integration.");
+            return null;
+        } catch (Exception e) {
+            logger.error("Error instantiating DynamicHudTest", e);
+            return null;
+        }
+
+        return new EntrypointContainer<>() {
+            @Override
+            public DynamicHudIntegration getEntrypoint() {
+                return testIntegration;
+            }
+
+            @Override
+            public ModContainer getProvider() {
+                return FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow();
+            }
+        };
     }
 
 }

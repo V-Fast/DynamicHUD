@@ -1,11 +1,11 @@
 package com.tanishisherewith.dynamichud.widget;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
+import com.tanishisherewith.dynamichud.mixins.ScreenMixin;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.util.math.MathHelper;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -89,7 +89,7 @@ public class WidgetManager {
      * Larger the GUI scale, more accurate is the position on any resolution.
      * </p>
      * <p>
-     * Called in {@link com.tanishisherewith.dynamichud.mixins.ScreenMixin}
+     * Called in {@link ScreenMixin}
      * </p>
      * </p>
      *
@@ -101,6 +101,10 @@ public class WidgetManager {
     public static void onScreenResized(int newWidth, int newHeight, int previousWidth, int previousHeight) {
         for (Widget widget : widgets) {
             // To ensure that infinite coordinates is not returned for the first time its resized.
+
+            widget.updatePosition(newWidth, newHeight);
+
+            /*
             if (widget.xPercent <= 0.0f) {
                 widget.xPercent = (float) widget.getX() / previousWidth;
             }
@@ -108,20 +112,12 @@ public class WidgetManager {
                 widget.yPercent = (float) widget.getY() / previousHeight;
             }
 
-            // Use the stored percentages to calculate the new position
-            float newX = widget.xPercent * newWidth;
-            float newY = widget.yPercent * newHeight;
+            widget.updatePositionFromPercentages(newWidth, newHeight);
 
-            // Ensure the widget is within the screen bounds
-            newX = MathHelper.clamp(newX, 0, newWidth - widget.getWidth());
-            newY = MathHelper.clamp(newY, 0, newHeight - widget.getHeight());
+            widget.xPercent = (widget.getX() + widget.getWidth() / 2) / newWidth;
+            widget.yPercent = (widget.getY() + widget.getHeight() / 2) / newHeight;
 
-            // Update the widget's position
-            widget.setPosition((int) newX, (int) newY);
-
-            // Update the stored percentages with the new screen size (after resize).
-            widget.xPercent = (float) widget.getX() / newWidth;
-            widget.yPercent = (float) widget.getY() / newHeight;
+             */
         }
     }
 
@@ -184,24 +180,34 @@ public class WidgetManager {
     public static void loadWidgets(File file) throws IOException {
         widgets.clear();
 
-        if (file.exists()) {
-            NbtCompound rootTag = NbtIo.read(file.toPath());
-            NbtList widgetList = rootTag.getList("widgets", NbtType.COMPOUND);
-            if (widgetList == null) {
-                printWarn("RootTag is null. File is either empty or corrupted," + file);
-                return;
-            }
-            for (int i = 0; i < widgetList.size(); i++) {
-                NbtCompound widgetTag = widgetList.getCompound(i);
-                WidgetData<?> widgetData = widgetDataMap.get(widgetTag.getString("name"));
-                Widget widget = widgetData.createWidget();
-                printInfo("Loading Widget: " + widget);
-                widget.readFromTag(widgetTag);
-                widgets.add(widget);
-            }
-        } else {
-            printWarn("Widget File does not exist. Try saving one first");
+        if (!file.exists()) {
+            DynamicHUD.logger.warn("Main file {} was not found... Loading from a found backup file", file.getAbsolutePath());
+            file = new File(file.getAbsolutePath() + ".backup");
         }
+
+        NbtCompound rootTag = NbtIo.read(file.toPath());
+
+        if (rootTag == null) {
+            printWarn("RootTag is null. File is either empty or corrupted: " + file);
+            return;
+        }
+        NbtList widgetList = rootTag.getList("widgets", NbtType.COMPOUND);
+        if (widgetList == null) {
+            printWarn("WidgetList is null. File is empty: " + file);
+            return;
+        }
+        for (int i = 0; i < widgetList.size(); i++) {
+            NbtCompound widgetTag = widgetList.getCompound(i);
+            WidgetData<?> widgetData = widgetDataMap.get(widgetTag.getString("name"));
+            Widget widget = widgetData.createWidget();
+            widget.readFromTag(widgetTag);
+            printInfo("Loaded Widget: " + widget);
+            widgets.add(widget);
+        }
+    }
+
+    public static boolean doesWidgetFileExist(File file) {
+        return file.exists() || new File(file.getAbsolutePath() + ".backup").exists();
     }
 
     /**

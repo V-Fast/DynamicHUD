@@ -2,9 +2,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
 import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
 
-import java.awt.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -24,24 +22,29 @@ public class EnumOption<E extends Enum<E>> extends Option<E> {
                 break;
             }
         }
+        this.renderer.init(this);
     }
 
     @Override
-    public void render(DrawContext drawContext, int x, int y) {
-        super.render(drawContext, x, y);
-
+    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
         value = get();
+        super.render(drawContext, x, y, mouseX, mouseY);
+
+        //  properties.getSkin().getRenderer(EnumOption.class).render(drawContext,this,x,y,mouseX,mouseY);
+
+        /*
         this.height = mc.textRenderer.fontHeight + 1;
         this.width = mc.textRenderer.getWidth(name + ": " + value.name()) + 1;
 
         drawContext.drawText(mc.textRenderer, Text.of(name + ": "), x, y, Color.WHITE.getRGB(), false);
         drawContext.drawText(mc.textRenderer, Text.of(value.name()), x + mc.textRenderer.getWidth(name + ": ") + 1, y, Color.CYAN.getRGB(), false);
+
+         */
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        super.mouseClicked(mouseX, mouseY, button);
-        if (isMouseOver(mouseX, mouseY)) {
+        if (super.mouseClicked(mouseX, mouseY, button)) {
             if (button == 0) {
                 currentIndex = (currentIndex + 1) % values.length;
                 if (currentIndex > values.length - 1) {
@@ -58,5 +61,9 @@ public class EnumOption<E extends Enum<E>> extends Option<E> {
             set(value);
         }
         return true;
+    }
+
+    public E[] getValues() {
+        return values;
     }
 }

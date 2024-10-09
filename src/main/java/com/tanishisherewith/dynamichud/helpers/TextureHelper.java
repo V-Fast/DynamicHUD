@@ -14,7 +14,7 @@ public class TextureHelper {
     static MinecraftClient mc = MinecraftClient.getInstance();
 
     public static NativeImage loadTexture(Identifier textureId) {
-        if(mc.getResourceManager().getResource(textureId).isPresent()) {
+        if (mc.getResourceManager().getResource(textureId).isPresent()) {
             try (InputStream inputStream = mc.getResourceManager().getResource(textureId).get().getInputStream()) {
                 return NativeImage.read(inputStream);
             } catch (IOException e) {
@@ -24,7 +24,7 @@ public class TextureHelper {
         return null;
     }
 
-    public  static NativeImage resizeTexture(NativeImage image, int newWidth, int newHeight) {
+    public static NativeImage resizeTexture(NativeImage image, int newWidth, int newHeight) {
         NativeImage result = new NativeImage(newWidth, newHeight, false);
 
         int oldWidth = image.getWidth();
@@ -41,49 +41,51 @@ public class TextureHelper {
 
         return result;
     }
+
     public static NativeImage resizeTextureUsingBilinearInterpolation(NativeImage image, int newWidth, int newHeight) {
         NativeImage result = new NativeImage(newWidth, newHeight, false);
 
-        float x_ratio = ((float)(image.getWidth()-1))/newWidth;
-        float y_ratio = ((float)(image.getHeight()-1))/newHeight;
+        float x_ratio = ((float) (image.getWidth() - 1)) / newWidth;
+        float y_ratio = ((float) (image.getHeight() - 1)) / newHeight;
         float x_diff, y_diff, blue, red, green;
         int offset, a, b, c, d, index;
 
-        for (int i=0;i<newHeight;i++) {
-            for (int j=0;j<newWidth;j++) {
-                int x = (int)(x_ratio * j);
-                int y = (int)(y_ratio * i);
+        for (int i = 0; i < newHeight; i++) {
+            for (int j = 0; j < newWidth; j++) {
+                int x = (int) (x_ratio * j);
+                int y = (int) (y_ratio * i);
                 x_diff = (x_ratio * j) - x;
                 y_diff = (y_ratio * i) - y;
 
                 // Indexes of the 4 surrounding pixels
                 a = image.getColor(x, y);
-                b = image.getColor(x+1, y);
-                c = image.getColor(x, y+1);
-                d = image.getColor(x+1, y+1);
+                b = image.getColor(x + 1, y);
+                c = image.getColor(x, y + 1);
+                d = image.getColor(x + 1, y + 1);
 
                 // Blue element
-                blue = (a&0xff)*(1-x_diff)*(1-y_diff) + (b&0xff)*(x_diff)*(1-y_diff) +
-                        (c&0xff)*(y_diff)*(1-x_diff)   + (d&0xff)*(x_diff*y_diff);
+                blue = (a & 0xff) * (1 - x_diff) * (1 - y_diff) + (b & 0xff) * (x_diff) * (1 - y_diff) +
+                        (c & 0xff) * (y_diff) * (1 - x_diff) + (d & 0xff) * (x_diff * y_diff);
 
                 // Green element
-                green = ((a>>8)&0xff)*(1-x_diff)*(1-y_diff) + ((b>>8)&0xff)*(x_diff)*(1-y_diff) +
-                        ((c>>8)&0xff)*(y_diff)*(1-x_diff)   + ((d>>8)&0xff)*(x_diff*y_diff);
+                green = ((a >> 8) & 0xff) * (1 - x_diff) * (1 - y_diff) + ((b >> 8) & 0xff) * (x_diff) * (1 - y_diff) +
+                        ((c >> 8) & 0xff) * (y_diff) * (1 - x_diff) + ((d >> 8) & 0xff) * (x_diff * y_diff);
 
                 // Red element
-                red = ((a>>16)&0xff)*(1-x_diff)*(1-y_diff) + ((b>>16)&0xff)*(x_diff)*(1-y_diff) +
-                        ((c>>16)&0xff)*(y_diff)*(1-x_diff)   + ((d>>16)&0xff)*(x_diff*y_diff);
+                red = ((a >> 16) & 0xff) * (1 - x_diff) * (1 - y_diff) + ((b >> 16) & 0xff) * (x_diff) * (1 - y_diff) +
+                        ((c >> 16) & 0xff) * (y_diff) * (1 - x_diff) + ((d >> 16) & 0xff) * (x_diff * y_diff);
 
                 result.setColor(j, i,
-                        ((((int)red)<<16)&0xff0000) |
-                                ((((int)green)<<8)&0xff00) |
-                                ((int)blue)&0xff);
+                        ((((int) red) << 16) & 0xff0000) |
+                                ((((int) green) << 8) & 0xff00) |
+                                ((int) blue) & 0xff);
             }
         }
 
         return result;
     }
-    public  static NativeImage invertTexture(NativeImage image) {
+
+    public static NativeImage invertTexture(NativeImage image) {
         int width = image.getWidth();
         int height = image.getHeight();
         NativeImage result = new NativeImage(width, height, false);
@@ -117,8 +119,8 @@ public class TextureHelper {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int newX = (int)((x - centerX) * Math.cos(angle) - (y - centerY) * Math.sin(angle) + centerX);
-                int newY = (int)((x - centerX) * Math.sin(angle) + (y - centerY) * Math.cos(angle) + centerY);
+                int newX = (int) ((x - centerX) * Math.cos(angle) - (y - centerY) * Math.sin(angle) + centerX);
+                int newY = (int) ((x - centerX) * Math.sin(angle) + (y - centerY) * Math.cos(angle) + centerY);
 
                 if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
                     result.setColor(newY, newX, image.getColor(x, y));
@@ -188,6 +190,7 @@ public class TextureHelper {
 
         return result;
     }
+
     public static NativeImage cropTexture(NativeImage image, int x, int y, int width, int height) {
         NativeImage result = new NativeImage(width, height, false);
 
@@ -263,9 +266,9 @@ public class TextureHelper {
             }
         }
 
-        int redAverage = (int)(redTotal / pixelCount);
-        int greenAverage = (int)(greenTotal / pixelCount);
-        int blueAverage = (int)(blueTotal / pixelCount);
+        int redAverage = (int) (redTotal / pixelCount);
+        int greenAverage = (int) (greenTotal / pixelCount);
+        int blueAverage = (int) (blueTotal / pixelCount);
 
         return (redAverage << 16) | (greenAverage << 8) | blueAverage;
     }
