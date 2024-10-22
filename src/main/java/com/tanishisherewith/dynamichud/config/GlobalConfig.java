@@ -1,16 +1,21 @@
 package com.tanishisherewith.dynamichud.config;
 
+import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
+import dev.isxander.yacl3.api.controller.ColorControllerBuilder;
 import dev.isxander.yacl3.api.controller.FloatSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.IntegerFieldControllerBuilder;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
+import dev.isxander.yacl3.config.v2.impl.autogen.ColorFieldImpl;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+
+import java.awt.*;
 
 public final class GlobalConfig {
     public static final ConfigClassHandler<GlobalConfig> HANDLER = ConfigClassHandler.createBuilder(GlobalConfig.class)
@@ -36,6 +41,12 @@ public final class GlobalConfig {
 
     @SerialEntry
     private int snapSize = 100;
+
+    @SerialEntry
+    private Color hudActiveColor = new Color(0, 0, 0, 128);
+
+    @SerialEntry
+    private Color hudInactiveColor = new Color(255, 0, 0, 128);
 
     public static GlobalConfig get() {
         return INSTANCE;
@@ -75,6 +86,18 @@ public final class GlobalConfig {
                                         .controller(integerOption -> IntegerFieldControllerBuilder.create(integerOption).range(10, 500))
                                         .build())
                                 .build())
+                                .option(Option.<Color>createBuilder()
+                                        .name(Text.literal("Widget HUD Active Background Color"))
+                                        .description(OptionDescription.of(Text.literal("Color of the background of the widget when it will be rendered")))
+                                        .binding(new Color(0, 0, 0, 128), () -> this.hudActiveColor, newVal -> this.hudActiveColor = newVal)
+                                        .controller(ColorControllerBuilder::create)
+                                .build())
+                        .option(Option.<Color>createBuilder()
+                                .name(Text.literal("Widget HUD Inactive Background Color"))
+                                .description(OptionDescription.of(Text.literal("Color of the background of the widget when it will NOT be rendered")))
+                                .binding(new Color(255, 0, 0, 128), () -> this.hudInactiveColor, newVal -> this.hudInactiveColor = newVal)
+                                .controller(ColorControllerBuilder::create)
+                                .build())
                         .build())
                 .save(HANDLER::save)
                 .build()
@@ -95,5 +118,13 @@ public final class GlobalConfig {
 
     public int getSnapSize() {
         return snapSize;
+    }
+
+    public Color getHudInactiveColor() {
+        return hudInactiveColor;
+    }
+
+    public Color getHudActiveColor() {
+        return hudActiveColor;
     }
 }

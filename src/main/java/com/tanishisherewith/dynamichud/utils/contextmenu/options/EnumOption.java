@@ -1,8 +1,5 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
-import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
-import net.minecraft.client.gui.DrawContext;
-
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 

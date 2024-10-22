@@ -3,7 +3,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
-import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
+import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -86,7 +86,7 @@ public class MinecraftSkin extends Skin {
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
         panelColor.applyColor();
-        drawContext.drawTexture(BACKGROUND_PANEL, imageX, imageY, 0, 0, panelWidth, panelHeight);
+        drawContext.drawTexture(BACKGROUND_PANEL, imageX, imageY, 0, 0, panelWidth, panelHeight, 256, 254);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         drawContext.drawGuiTexture(TEXTURES.get(true, isMouseOver(mouseX, mouseY, imageX + 3, imageY + 3, 14, 14)), imageX + 3, imageY + 3, 14, 14);
         drawContext.drawText(mc.textRenderer, "X", imageX + 10 - mc.textRenderer.getWidth("X") / 2, imageY + 6, -1, true);
@@ -251,11 +251,10 @@ public class MinecraftSkin extends Skin {
             Text text = option.getBooleanType().getText(option.value);
             int color = option.value ? Color.GREEN.getRGB() : Color.RED.getRGB();
             drawContext.drawText(mc.textRenderer, text, (int) (option.getX() + (width / 2.0f) - (mc.textRenderer.getWidth(text) / 2.0f)), y + 5, color, true);
-            //drawContext.drawTexture(BOOLEAN_TEXTURE);
 
             option.setHeight(25);
 
-            //Widths dont matter in this skin
+            //Widths don't matter in this skin
             option.setWidth(width);
         }
 
@@ -296,7 +295,19 @@ public class MinecraftSkin extends Skin {
             option.setHeight(25);
             option.setWidth(width);
 
-            option.getColorPicker().render(drawContext, x + panelWidth + 10, y - 10);
+            DrawHelper.disableScissor(); // Disable scissor test for the color-picker
+            if(option.getColorGradient().isDisplay()) {
+                RenderSystem.enableBlend();
+                RenderSystem.enableDepthTest();
+                panelColor.applyColor();
+                int colorGradientWidth = 28 + option.getColorGradient().getBoxSize() + option.getColorGradient().getAlphaSlider().getWidth() + option.getColorGradient().getColorPickerButton().getWidth();
+                int colorGradientHeight = 18 + option.getColorGradient().getBoxSize() + option.getColorGradient().getGradientBox().getSize() + option.getColorGradient().getGradientSlider().getHeight();
+                drawContext.drawTexture(BACKGROUND_PANEL, x + panelWidth + 3, y - 6, 0, 0, colorGradientWidth,colorGradientHeight, colorGradientWidth, colorGradientHeight);
+                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+            }
+            option.getColorGradient().render(drawContext, x + panelWidth + 10, y - 10);
+
+           DrawHelper.enableScissor(imageX, imageY + 2, panelWidth, panelHeight - 4);
         }
     }
 

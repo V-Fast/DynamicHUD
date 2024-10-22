@@ -286,7 +286,7 @@ public abstract class Widget {
      * Drawn with 2 pixel offset to all sides
      */
     protected void displayBg(DrawContext context) {
-        int backgroundColor = this.shouldDisplay() ? ColorHelper.getColor(0, 0, 0, 128) : ColorHelper.getColor(255, 0, 0, 128);
+        int backgroundColor = this.shouldDisplay() ? GlobalConfig.get().getHudActiveColor().getRGB() : GlobalConfig.get().getHudInactiveColor().getRGB();
         WidgetBox box = this.getWidgetBox();
         DrawHelper.drawRectangle(context.getMatrices().peek().getPositionMatrix(),
                 box.x,

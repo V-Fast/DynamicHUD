@@ -1,6 +1,6 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem;
 
-import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
+import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
 import net.minecraft.client.gui.DrawContext;
 
 public interface SkinRenderer<T extends Option<?>>  {

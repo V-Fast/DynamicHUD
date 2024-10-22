@@ -5,7 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 
-public class GradientSlider {
+public class HueSlider {
     private final int width;
     private final int height;
     private int x;
@@ -13,7 +13,7 @@ public class GradientSlider {
     private float hue = 0.0f;
     private boolean isDragging = false;
 
-    public GradientSlider(int x, int y, int width, int height) {
+    public HueSlider(int x, int y, int width, int height) {
         this.x = x;
         this.y = y;
         this.width = width;

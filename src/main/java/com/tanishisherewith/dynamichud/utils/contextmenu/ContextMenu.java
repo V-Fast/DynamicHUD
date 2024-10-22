@@ -5,6 +5,7 @@ import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.Input;
 import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.ContextMenuScreenFactory;
 import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.DefaultContextMenuScreenFactory;
+import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.math.MathHelper;
@@ -19,18 +20,18 @@ public class ContextMenu implements Input {
     public final Color darkerBackgroundColor;
     //The properties of a context menu
     protected final ContextMenuProperties properties;
-    private final List<Option<?>> options = new ArrayList<>(); // The list of options in the context menu
-    private final ContextMenuScreenFactory screenFactory;
+    protected final List<Option<?>> options = new ArrayList<>(); // The list of options in the context menu
+    protected final ContextMenuScreenFactory screenFactory;
     public int x, y;
     // Width is counted while the options are being rendered.
     // FinalWidth is the width at the end of the count.
-    private int width = 0;
-    private int finalWidth = 0;
-    private int height = 0, widgetHeight = 0;
-    private boolean shouldDisplay = false;
-    private float scale = 0.0f;
-    private Screen parentScreen = null;
-    private boolean newScreenFlag = false;
+    protected int width = 0;
+    protected int finalWidth = 0;
+    protected int height = 0, widgetHeight = 0;
+    protected boolean shouldDisplay = false;
+    protected float scale = 0.0f;
+    protected Screen parentScreen = null;
+    protected boolean newScreenFlag = false;
 
     public ContextMenu(int x, int y, ContextMenuProperties properties) {
         this(x, y, properties, new DefaultContextMenuScreenFactory());
@@ -85,16 +86,14 @@ public class ContextMenu implements Input {
     }
 
     public void close() {
-        if (properties.getSkin().shouldCreateNewScreen() && scale <= 0 && parentScreen != null) {
-            shouldDisplay = false;
-            newScreenFlag = false;
-            DynamicHUD.MC.setScreen(parentScreen);
-        }
+        shouldDisplay = false;
+        newScreenFlag = false;
         for (Option<?> option : options) {
             option.onClose();
         }
-        shouldDisplay = false;
-        newScreenFlag = false;
+        if (properties.getSkin().shouldCreateNewScreen() && scale <= 0 && parentScreen != null) {
+            DynamicHUD.MC.setScreen(parentScreen);
+        }
     }
 
     public void open() {

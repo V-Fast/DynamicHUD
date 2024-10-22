@@ -3,8 +3,6 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 import com.tanishisherewith.dynamichud.utils.BooleanPool;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
-import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
-import net.minecraft.client.gui.DrawContext;
 
 import java.util.Objects;
 import java.util.function.Consumer;

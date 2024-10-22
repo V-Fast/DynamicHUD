@@ -2,7 +2,6 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
-import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
 import net.minecraft.client.gui.DrawContext;
 import org.apache.commons.lang3.Validate;
 import org.lwjgl.glfw.GLFW;

@@ -82,5 +82,6 @@ public class ContextMenuScreen extends Screen {
     @Override
     public void close() {
         contextMenu.close();
+        contextMenu.setVisible(false);
     }
 }

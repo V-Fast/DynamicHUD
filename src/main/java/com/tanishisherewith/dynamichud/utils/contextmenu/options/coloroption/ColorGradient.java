@@ -11,11 +11,11 @@ import java.awt.*;
 import java.nio.ByteBuffer;
 import java.util.function.Consumer;
 
-public class ColorGradientPicker {
+public class ColorGradient {
     final MinecraftClient client = MinecraftClient.getInstance();
     private final Consumer<Color> onColorSelected; // The callback to call when a color is selected
-    private final GradientSlider gradientSlider;
-    private final GradientBox gradientBox;
+    private final HueSlider gradientSlider;
+    private final SaturationHueBox gradientBox;
     private final ColorPickerButton colorPickerButton;
     private final AlphaSlider alphaSlider;
     private final int boxSize;
@@ -23,13 +23,13 @@ public class ColorGradientPicker {
     private int x, y;
     private boolean display = false;
 
-    public ColorGradientPicker(int x, int y, Color initialColor, Consumer<Color> onColorSelected, int boxSize, int colors) {
+    public ColorGradient(int x, int y, Color initialColor, Consumer<Color> onColorSelected, int boxSize, int colors) {
         this.x = x;
         this.y = y;
         this.initialColor = initialColor;
         this.onColorSelected = onColorSelected;
-        this.gradientSlider = new GradientSlider(x, y, colors, 10);
-        this.gradientBox = new GradientBox(x, y + 20, boxSize);
+        this.gradientSlider = new HueSlider(x, y, colors, 10);
+        this.gradientBox = new SaturationHueBox(x, y + 20, boxSize);
         this.alphaSlider = new AlphaSlider(x, y, 10, boxSize, initialColor);
 
         float[] hsv = new float[3];
@@ -182,4 +182,27 @@ public class ColorGradientPicker {
         onColorSelected.accept(alphaSlider.getColor());
     }
 
+    public int getBoxSize() {
+        return boxSize;
+    }
+
+    public boolean isDisplay() {
+        return display;
+    }
+
+    public ColorPickerButton getColorPickerButton() {
+        return colorPickerButton;
+    }
+
+    public AlphaSlider getAlphaSlider() {
+        return alphaSlider;
+    }
+
+    public HueSlider getGradientSlider() {
+        return gradientSlider;
+    }
+
+    public SaturationHueBox getGradientBox() {
+        return gradientBox;
+    }
 }

@@ -3,7 +3,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
-import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
+import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -174,7 +174,7 @@ public class ClassicSkin extends Skin {
                     1,
                     1);
 
-            option.getColorPicker().render(drawContext, x + option.getParentMenu().getFinalWidth() + 7, y - 10);
+            option.getColorGradient().render(drawContext, x + option.getParentMenu().getFinalWidth() + 7, y - 10);
         }
     }
 
