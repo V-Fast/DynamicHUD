@@ -30,10 +30,10 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     String dynamicRegistryKey;
     DynamicValueRegistry dynamicValueRegistry = null;
     private ContextMenu menu;
+
     public TextWidget() {
         this(null, null, false, false, Color.WHITE, "unknown");
     }
-
     /**
      * Searches for the supplier within the {@link DynamicValueRegistry#globalRegistry} using the given registryKey
      *

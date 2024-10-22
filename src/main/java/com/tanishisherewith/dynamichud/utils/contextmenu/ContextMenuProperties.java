@@ -6,6 +6,8 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.Skin;
 import java.awt.*;
 
 public class ContextMenuProperties {
+    //Note: Not all of these properties are used in all skins or all places.
+
     private Color backgroundColor = new Color(107, 112, 126, 124);
     private Color borderColor = Color.BLACK;
     private float borderWidth = 1f;
