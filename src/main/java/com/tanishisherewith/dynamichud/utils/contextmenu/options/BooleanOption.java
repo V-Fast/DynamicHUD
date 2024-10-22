@@ -36,21 +36,6 @@ public class BooleanOption extends Option<Boolean> {
     }
 
     @Override
-    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
-        value = get();
-        super.render(drawContext, x, y, mouseX, mouseY);
-
-        //  properties.getSkin().getRenderer(BooleanOption.class).render(drawContext,this,x,y,mouseX,mouseY);
-        /*
-        int color = value ? Color.GREEN.getRGB() : Color.RED.getRGB();
-        drawContext.drawText(mc.textRenderer, Text.of(name), x, y, color, false);
-        this.height = mc.textRenderer.fontHeight;
-        this.width = mc.textRenderer.getWidth(name) + 1;
-
-         */
-    }
-
-    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (isMouseOver(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             value = !value;

@@ -22,15 +22,14 @@ public class ContextMenuProperties {
     private boolean enableAnimations = true;
     private Skin skin = new ClassicSkin();
 
-    private ContextMenuProperties() {
-    }
+    private ContextMenuProperties() {}
 
     public static Builder builder() {
         return new ContextMenuProperties().new Builder();
     }
 
     public static ContextMenuProperties createGenericSimplified() {
-        return new ContextMenuProperties().new Builder().build();
+        return new ContextMenuProperties();
     }
 
     // Getters for all properties

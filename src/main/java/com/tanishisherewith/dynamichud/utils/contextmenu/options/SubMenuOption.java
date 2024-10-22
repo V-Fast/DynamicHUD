@@ -46,12 +46,6 @@ public class SubMenuOption extends Option<Boolean> {
     }
 
     @Override
-    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
-        super.render(drawContext, x, y, mouseX, mouseY);
-        //  properties.getSkin().getRenderer(SubMenuOption.class).render(drawContext,this,x,y,mouseX,mouseY);
-    }
-
-    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (super.mouseClicked(mouseX, mouseY, button)) {
             subMenu.toggleDisplay();

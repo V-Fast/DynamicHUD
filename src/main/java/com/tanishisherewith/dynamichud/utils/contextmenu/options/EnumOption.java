@@ -26,23 +26,6 @@ public class EnumOption<E extends Enum<E>> extends Option<E> {
     }
 
     @Override
-    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
-        value = get();
-        super.render(drawContext, x, y, mouseX, mouseY);
-
-        //  properties.getSkin().getRenderer(EnumOption.class).render(drawContext,this,x,y,mouseX,mouseY);
-
-        /*
-        this.height = mc.textRenderer.fontHeight + 1;
-        this.width = mc.textRenderer.getWidth(name + ": " + value.name()) + 1;
-
-        drawContext.drawText(mc.textRenderer, Text.of(name + ": "), x, y, Color.WHITE.getRGB(), false);
-        drawContext.drawText(mc.textRenderer, Text.of(value.name()), x + mc.textRenderer.getWidth(name + ": ") + 1, y, Color.CYAN.getRGB(), false);
-
-         */
-    }
-
-    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (super.mouseClicked(mouseX, mouseY, button)) {
             if (button == 0) {

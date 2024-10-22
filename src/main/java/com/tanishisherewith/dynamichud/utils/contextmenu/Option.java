@@ -52,7 +52,7 @@ public abstract class Option<T> implements Input {
         this.properties = properties;
         this.renderer = properties.getSkin().getRenderer((Class<Option<T>>) this.getClass());
         if (renderer == null) {
-            DynamicHUD.logger.error("Renderer not found for class: {}", this.getClass().getName());
+            DynamicHUD.logger.error("Renderer not found for class: {} in the following skin: {}", this.getClass().getName(), properties.getSkin());
             throw new RuntimeException();
         }
     }
@@ -60,6 +60,7 @@ public abstract class Option<T> implements Input {
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
         this.x = x;
         this.y = y;
+        this.value = get();
 
         // Retrieve the renderer and ensure it is not null
         renderer.render(drawContext, this, x, y, mouseX, mouseY);

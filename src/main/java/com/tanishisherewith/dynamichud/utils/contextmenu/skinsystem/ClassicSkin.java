@@ -174,7 +174,7 @@ public class ClassicSkin extends Skin {
                     1,
                     1);
 
-            option.getColorPicker().render(drawContext, x + option.parentMenu.getFinalWidth() + 7, y - 10);
+            option.getColorPicker().render(drawContext, x + option.getParentMenu().getFinalWidth() + 7, y - 10);
         }
     }
 
@@ -254,7 +254,7 @@ public class ClassicSkin extends Skin {
         }
     }
 
-    public class ClassicListRenderer<E> implements SkinRenderer<ListOption<E>> {
+    public static class ClassicListRenderer<E> implements SkinRenderer<ListOption<E>> {
         @Override
         public void render(DrawContext drawContext, ListOption<E> option, int x, int y, int mouseX, int mouseY) {
             option.setHeight(mc.textRenderer.fontHeight + 1);

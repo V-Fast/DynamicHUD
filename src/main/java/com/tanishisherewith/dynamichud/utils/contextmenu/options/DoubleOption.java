@@ -33,50 +33,6 @@ public class DoubleOption extends Option<Double> {
         this.renderer.init(this);
     }
 
-    @Override
-    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
-        value = get();
-        super.render(drawContext, x, y, mouseX, mouseY);
-
-        //properties.getSkin().getRenderer(DoubleOption.class).render(drawContext,this,x,y,mouseX,mouseY);
-
-        /*
-        this.width = 35;
-        this.height = 16;
-
-        // Draw the label
-        TextRenderer textRenderer = mc.textRenderer;
-        DrawHelper.scaleAndPosition(drawContext.getMatrices(), x, y, 0.7f);
-        String labelText = name + ": " + String.format("%.1f", value);
-        int labelWidth = textRenderer.getWidth(labelText);
-        this.width = Math.max(this.width, labelWidth);
-        drawContext.drawTextWithShadow(textRenderer, labelText, x, y + 1, 0xFFFFFFFF);
-        DrawHelper.stopScaling(drawContext.getMatrices());
-
-        float handleWidth = 3;
-        float handleHeight = 8;
-        double handleX = x + (value - minValue) / (maxValue - minValue) * (width - handleWidth);
-        double handleY = y + textRenderer.fontHeight + 1 + ((2 - handleHeight) / 2);
-
-        // Draw the slider
-        drawSlider(drawContext, x, y + textRenderer.fontHeight + 1, width, handleX);
-
-        // Draw the handle
-
-        DrawHelper.drawRoundedRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(),
-                (float) handleX,
-                (float) handleY,
-                handleWidth,
-                handleHeight,
-                1,
-                0xFFFFFFFF,
-                90,
-                0.6f,
-                0.6f);
-
-         */
-    }
-
     public void drawSlider(DrawContext drawContext, int sliderX, int sliderY, int sliderWidth, double handleX) {
         DrawHelper.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), sliderX, sliderY, sliderWidth, 2, 0xFFFFFFFF);
         if (handleX - sliderX > 0) {

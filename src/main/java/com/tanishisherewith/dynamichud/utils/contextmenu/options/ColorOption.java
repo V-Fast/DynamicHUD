@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 public class ColorOption extends Option<Color> {
     public String name = "Empty";
     public boolean isVisible = false;
-    public ContextMenu parentMenu = null;
+    private ContextMenu parentMenu = null;
     private ColorGradientPicker colorPicker = null;
 
     public ColorOption(String name, ContextMenu parentMenu, Supplier<Color> getter, Consumer<Color> setter) {
@@ -21,35 +21,6 @@ public class ColorOption extends Option<Color> {
         this.parentMenu = parentMenu;
         colorPicker = new ColorGradientPicker(x + this.parentMenu.getFinalWidth(), y - 10, get(), this::set, 50, 100);
         this.renderer.init(this);
-    }
-
-    @Override
-    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
-        super.render(drawContext, x, y, mouseX, mouseY);
-
-        //   properties.getSkin().getRenderer(ColorOption.class).render(drawContext,this,x,y,mouseX,mouseY);
-
-        /*
-        int color = isVisible ? Color.GREEN.getRGB() : Color.RED.getRGB();
-        this.height = mc.textRenderer.fontHeight;
-        this.width = mc.textRenderer.getWidth(name) + 8;
-        drawContext.drawText(mc.textRenderer, Text.of(name), x, y, color, false);
-
-        int shadowOpacity = Math.min(value.getAlpha(),90);
-        DrawHelper.drawRoundedRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(),
-                x + width - 4,
-                y - 1,
-                8,
-                8,
-                2,
-                value.getRGB(),
-                shadowOpacity,
-                1,
-                1);
-
-        colorPicker.render(drawContext, this.x + parentMenu.finalWidth + 7, y - 10);
-
-         */
     }
 
     @Override
@@ -87,5 +58,9 @@ public class ColorOption extends Option<Color> {
     public void onClose() {
         isVisible = false;
         colorPicker.close();
+    }
+
+    public ContextMenu getParentMenu() {
+        return parentMenu;
     }
 }
