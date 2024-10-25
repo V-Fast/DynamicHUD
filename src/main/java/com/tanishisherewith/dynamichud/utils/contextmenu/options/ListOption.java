@@ -6,12 +6,10 @@ import java.util.function.Supplier;
 
 public class ListOption<T> extends Option<T> {
     private final List<T> values;
-    public String name = "Empty";
     private int currentIndex = 0;
 
     public ListOption(String name, Supplier<T> getter, Consumer<T> setter, List<T> values) {
-        super(getter, setter);
-        this.name = name;
+        super(name,getter, setter);
         this.values = values;
         this.value = getter.get();
         for (int i = 0; i < values.size(); i++) {

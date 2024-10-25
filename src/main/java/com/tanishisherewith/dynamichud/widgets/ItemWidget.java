@@ -12,7 +12,9 @@ import net.minecraft.nbt.NbtCompound;
  * This is just an example widget, not supposed to be used.
  */
 public class ItemWidget extends Widget {
-    public ItemStack item;    public static WidgetData<?> DATA = new WidgetData<>("ItemWidget", "Displays item texture", ItemWidget::new);
+    public ItemStack item;
+    public static WidgetData<?> DATA = new WidgetData<>("ItemWidget", "Displays item texture", ItemWidget::new);
+
     public ItemWidget(ItemStack itemStack, String modId) {
         super(DATA, modId);
         this.item = itemStack;
@@ -62,6 +64,4 @@ public class ItemWidget extends Widget {
             return new ItemWidget(itemStack, modID);
         }
     }
-
-
 }

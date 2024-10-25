@@ -7,7 +7,6 @@ import java.util.function.Supplier;
 
 public class RunnableOption extends Option<Boolean> {
     private final Runnable task;
-    public String name = "Empty";
 
     /**
      * Runnable option which runs a task when clicked on it.
@@ -18,7 +17,7 @@ public class RunnableOption extends Option<Boolean> {
      * @param task   The task to run
      */
     public RunnableOption(String name, Supplier<Boolean> getter, Consumer<Boolean> setter, Runnable task) {
-        super(getter, setter);
+        super(name,getter, setter);
         this.name = "Run: " + name; // prepend the "run" symbol to the name
         this.task = task;
         this.renderer.init(this);

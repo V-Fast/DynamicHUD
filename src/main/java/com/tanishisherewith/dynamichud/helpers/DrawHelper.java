@@ -2,6 +2,7 @@ package com.tanishisherewith.dynamichud.helpers;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.systems.VertexSorter;
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
@@ -12,10 +13,13 @@ import org.lwjgl.opengl.GL40C;
 
 import java.awt.*;
 
+import static com.tanishisherewith.dynamichud.helpers.TextureHelper.mc;
+
 /**
  * Credits: <a href="https://github.com/HeliosMinecraft/HeliosClient/blob/main/src/main/java/dev/heliosclient/util/ColorUtils.java">HeliosClient</a>
  */
 public class DrawHelper {
+    public static VertexSorter vertexSorter;
 
     /**
      * Draws a singular gradient rectangle  on screen with the given parameters
@@ -791,6 +795,21 @@ public class DrawHelper {
         drawContext.fill(x1, y1 + 1, x1 + 1, y2 - 1, color);
         drawContext.fill(x2 - 1, y1 + 1, x2, y2 - 1, color);
     }
+
+    public static void unscaledProjection() {
+        vertexSorter = RenderSystem.getVertexSorting();
+        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight(), 0, 1000, 21000), VertexSorter.BY_Z);
+    }
+
+    public static void scaledProjection() {
+        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, (float) (mc.getWindow().getFramebufferWidth() / mc.getWindow().getScaleFactor()), (float) (mc.getWindow().getFramebufferHeight() / mc.getWindow().getScaleFactor()), 0, 1000, 21000), vertexSorter);
+    }
+
+    public static void customScaledProjection(float scale) {
+        vertexSorter = RenderSystem.getVertexSorting();
+        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getFramebufferWidth() / scale, mc.getWindow().getFramebufferHeight() / scale, 0, 1000, 21000), VertexSorter.BY_Z);
+    }
+
 
     /**
      * This method assumes that the x, y coords are the origin of a widget.

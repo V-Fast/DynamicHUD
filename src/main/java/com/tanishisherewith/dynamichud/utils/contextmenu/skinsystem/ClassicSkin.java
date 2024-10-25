@@ -5,7 +5,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
-import net.minecraft.client.MinecraftClient;
+import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
@@ -18,18 +18,16 @@ import java.awt.*;
  * which should be used when you have a low amount of settings and want quicker way of changing the settings.
  */
 public class ClassicSkin extends Skin {
-    public static MinecraftClient mc = MinecraftClient.getInstance();
-
     public ClassicSkin() {
         super();
 
-        addRenderer(BooleanOption.class, new ClassicBooleanRenderer());
-        addRenderer(DoubleOption.class, new ClassicDoubleRenderer());
-        addRenderer(EnumOption.class, new ClassicEnumRenderer());
-        addRenderer(ListOption.class, new ClassicListRenderer());
-        addRenderer(SubMenuOption.class, new ClassicSubMenuRenderer());
-        addRenderer(RunnableOption.class, new ClassicRunnableRenderer());
-        addRenderer(ColorOption.class, new ClassicColorOptionRenderer());
+        addRenderer(BooleanOption.class, ClassicBooleanRenderer::new);
+        addRenderer(DoubleOption.class, ClassicDoubleRenderer::new);
+        addRenderer(EnumOption.class, ClassicEnumRenderer::new);
+        addRenderer(ListOption.class, ClassicListRenderer::new);
+        addRenderer(SubMenuOption.class, ClassicSubMenuRenderer::new);
+        addRenderer(RunnableOption.class, ClassicRunnableRenderer::new);
+        addRenderer(ColorOption.class, ClassicColorOptionRenderer::new);
 
         setCreateNewScreen(false);
     }
@@ -45,21 +43,20 @@ public class ClassicSkin extends Skin {
         drawBackground(matrices, contextMenu, properties);
 
         int yOffset = contextMenu.y + 3;
-        contextMenu.setWidth(10);
-        for (Option<?> option : contextMenu.getOptions()) {
+        int width = 10;
+        for (Option<?> option : getOptions(contextMenu)) {
             if (!option.shouldRender()) continue;
 
             // Adjust mouse coordinates based on the scale
-            if (contextMenu.getProperties().hoverEffect() && contextMenu.isMouseOver(mouseX, mouseY, contextMenu.x + 1, yOffset - 1, contextMenu.getFinalWidth() - 2, option.getHeight())) {
-                drawBackground(matrices, contextMenu, properties, yOffset - 1, contextMenu.getFinalWidth(), option.getHeight() + 1, contextMenu.getProperties().getHoverColor().getRGB(), false);
+            if (contextMenu.getProperties().hoverEffect() && contextMenu.isMouseOver(mouseX, mouseY, contextMenu.x + 1, yOffset - 1, contextMenu.getWidth() - 2, option.getHeight())) {
+                drawBackground(matrices, contextMenu, properties, yOffset - 1, contextMenu.getWidth(), option.getHeight() + 1, contextMenu.getProperties().getHoverColor().getRGB(), false);
             }
 
             option.render(drawContext, contextMenu.x + 4, yOffset, mouseX, mouseY);
-            contextMenu.setWidth(Math.max(contextMenu.getWidth(), option.getWidth()));
+            width = Math.max(width, option.getWidth());
             yOffset += option.getHeight() + 1;
         }
-        contextMenu.setWidth(contextMenu.getWidth() + properties.getPadding());
-        contextMenu.setFinalWidth(contextMenu.getWidth());
+        contextMenu.setWidth(width + properties.getPadding());
         contextMenu.setHeight(yOffset - contextMenu.y);
 
         // Draw the border if needed
@@ -174,7 +171,7 @@ public class ClassicSkin extends Skin {
                     1,
                     1);
 
-            option.getColorGradient().render(drawContext, x + option.getParentMenu().getFinalWidth() + 7, y - 10);
+            option.getColorGradient().render(drawContext, x + option.getParentMenu().getWidth() + 7, y - 10);
         }
     }
 
@@ -197,7 +194,7 @@ public class ClassicSkin extends Skin {
             option.setHeight(mc.textRenderer.fontHeight);
             option.setWidth(mc.textRenderer.getWidth(option.name) + 1);
 
-            option.getSubMenu().render(drawContext, x + option.getParentMenu().getFinalWidth(), y, mouseX, mouseY);
+            option.getSubMenu().render(drawContext, x + option.getParentMenu().getWidth(), y, mouseX, mouseY);
         }
     }
 
@@ -217,7 +214,7 @@ public class ClassicSkin extends Skin {
     public class ClassicDoubleRenderer implements SkinRenderer<DoubleOption> {
         @Override
         public void render(DrawContext drawContext, DoubleOption option, int x, int y, int mouseX, int mouseY) {
-            option.setWidth(Math.max(35, contextMenu != null ? contextMenu.getFinalWidth() - option.getProperties().getPadding() - 2 : 0));
+            option.setWidth(Math.max(35, contextMenu != null ? contextMenu.getWidth() - option.getProperties().getPadding() - 2 : 0));
             option.setHeight(16);
 
             // Draw the label

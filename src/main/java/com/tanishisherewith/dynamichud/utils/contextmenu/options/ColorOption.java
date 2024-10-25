@@ -8,16 +8,14 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ColorOption extends Option<Color> {
-    public String name = "Empty";
     public boolean isVisible = false;
     private ContextMenu parentMenu = null;
     private ColorGradient colorGradient = null;
 
     public ColorOption(String name, ContextMenu parentMenu, Supplier<Color> getter, Consumer<Color> setter) {
-        super(getter, setter);
-        this.name = name;
+        super(name,getter, setter);
         this.parentMenu = parentMenu;
-        colorGradient = new ColorGradient(x + this.parentMenu.getFinalWidth(), y - 10, get(), this::set, 50, 100);
+        colorGradient = new ColorGradient(x + this.parentMenu.getWidth(), y - 10, get(), this::set, 50, 100);
         this.renderer.init(this);
     }
 
@@ -26,7 +24,7 @@ public class ColorOption extends Option<Color> {
         if (isMouseOver(mouseX, mouseY)) {
             isVisible = !isVisible;
             if (isVisible) {
-                colorGradient.setPos(this.x + parentMenu.getFinalWidth() + 7, y - 10);
+                colorGradient.setPos(this.x + parentMenu.getWidth() + 7, y - 10);
                 colorGradient.display();
             } else {
                 colorGradient.close();

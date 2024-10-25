@@ -19,14 +19,12 @@ public class ColorGradient {
     private final ColorPickerButton colorPickerButton;
     private final AlphaSlider alphaSlider;
     private final int boxSize;
-    private final Color initialColor;
     private int x, y;
     private boolean display = false;
 
     public ColorGradient(int x, int y, Color initialColor, Consumer<Color> onColorSelected, int boxSize, int colors) {
         this.x = x;
         this.y = y;
-        this.initialColor = initialColor;
         this.onColorSelected = onColorSelected;
         this.gradientSlider = new HueSlider(x, y, colors, 10);
         this.gradientBox = new SaturationHueBox(x, y + 20, boxSize);

@@ -10,12 +10,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class BooleanOption extends Option<Boolean> {
-    public String name = "Empty";
     private final BooleanType booleanType;
 
     public BooleanOption(String name, Supplier<Boolean> getter, Consumer<Boolean> setter, BooleanType booleanType) {
-        super(getter, setter);
-        this.name = name;
+        super(name,getter, setter);
         this.booleanType = booleanType;
         this.renderer.init(this);
     }

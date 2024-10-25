@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class ContextMenu implements Input {
-
     public final Color darkerBackgroundColor;
     //The properties of a context menu
     protected final ContextMenuProperties properties;
@@ -26,7 +25,6 @@ public class ContextMenu implements Input {
     // Width is counted while the options are being rendered.
     // FinalWidth is the width at the end of the count.
     protected int width = 0;
-    protected int finalWidth = 0;
     protected int height = 0, widgetHeight = 0;
     protected boolean shouldDisplay = false;
     protected float scale = 0.0f;
@@ -116,8 +114,8 @@ public class ContextMenu implements Input {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (!shouldDisplay) return false;
-        for (Option<?> option : options) {
-            option.mouseClicked(mouseX, mouseY, button);
+        for (Option option : options) {
+            option.getRenderer().mouseClicked(option, mouseX, mouseY, button);
         }
         return properties.getSkin().mouseClicked(this, mouseX, mouseY, button);
     }
@@ -125,8 +123,8 @@ public class ContextMenu implements Input {
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         if (!shouldDisplay) return false;
-        for (Option<?> option : options) {
-            option.mouseReleased(mouseX, mouseY, button);
+        for (Option option : options) {
+            option.getRenderer().mouseReleased(option,mouseX, mouseY, button);
         }
         return properties.getSkin().mouseReleased(this, mouseX, mouseY, button);
     }
@@ -134,8 +132,8 @@ public class ContextMenu implements Input {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (!shouldDisplay) return false;
-        for (Option<?> option : options) {
-            option.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        for (Option option : options) {
+            option.getRenderer().mouseDragged(option,mouseX, mouseY, button, deltaX, deltaY);
         }
         return properties.getSkin().mouseDragged(this, mouseX, mouseY, button, deltaX, deltaY);
     }
@@ -143,8 +141,8 @@ public class ContextMenu implements Input {
     @Override
     public void keyPressed(int key, int scanCode, int modifiers) {
         if (!shouldDisplay) return;
-        for (Option<?> option : options) {
-            option.keyPressed(key, scanCode, modifiers);
+        for (Option option : options) {
+            option.getRenderer().keyPressed(option,key, scanCode, modifiers);
         }
 
         properties.getSkin().keyPressed(this, key, scanCode, modifiers);
@@ -153,8 +151,8 @@ public class ContextMenu implements Input {
     @Override
     public void keyReleased(int key, int scanCode, int modifiers) {
         if (!shouldDisplay) return;
-        for (Option<?> option : options) {
-            option.keyReleased(key, scanCode, modifiers);
+        for (Option option : options) {
+            option.getRenderer().keyReleased(option,key, scanCode, modifiers);
         }
         properties.getSkin().keyReleased(this, key, scanCode, modifiers);
 
@@ -162,15 +160,17 @@ public class ContextMenu implements Input {
 
     @Override
     public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        for (Option<?> option : options) {
-            option.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+        for (Option option : options) {
+            option.getRenderer().mouseScrolled(option,mouseX, mouseY, horizontalAmount, verticalAmount);
         }
         properties.getSkin().mouseScrolled(this, mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     @Override
     public void charTyped(char c) {
-
+        for (Option<?> option : options) {
+            option.charTyped(c);
+        }
     }
 
     public void set(int x, int y, int widgetHeight) {
@@ -197,14 +197,6 @@ public class ContextMenu implements Input {
 
     public void setHeight(int height) {
         this.height = height;
-    }
-
-    public int getFinalWidth() {
-        return finalWidth;
-    }
-
-    public void setFinalWidth(int finalWidth) {
-        this.finalWidth = finalWidth;
     }
 
     public int getWidth() {

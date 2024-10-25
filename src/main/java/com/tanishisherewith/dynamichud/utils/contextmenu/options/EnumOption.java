@@ -5,12 +5,10 @@ import java.util.function.Supplier;
 
 public class EnumOption<E extends Enum<E>> extends Option<E> {
     private final E[] values;
-    public String name = "Empty";
     private int currentIndex = 0;
 
     public EnumOption(String name, Supplier<E> getter, Consumer<E> setter, E[] values) {
-        super(getter, setter);
-        this.name = name;
+        super(name,getter, setter);
         this.values = values;
         this.value = get();
         for (int i = 0; i < values.length; i++) {

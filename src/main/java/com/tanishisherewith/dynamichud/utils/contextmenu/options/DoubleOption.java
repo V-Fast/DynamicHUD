@@ -11,16 +11,14 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class DoubleOption extends Option<Double> {
-    public String name = "Empty";
     public double minValue = 0.0;
     public double maxValue = 0.0;
-    float step = 0.1f;
+    public float step = 0.1f;
     ContextMenu parentMenu;
     private boolean isDragging = false;
 
     public DoubleOption(String name, double minValue, double maxValue, float step, Supplier<Double> getter, Consumer<Double> setter, ContextMenu parentMenu) {
-        super(getter, setter);
-        this.name = name;
+        super(name,getter, setter);
         this.value = get();
         this.minValue = minValue;
         this.maxValue = maxValue;
@@ -54,12 +52,18 @@ public class DoubleOption extends Option<Double> {
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
-    public void step(double mouseX) {
+    private void step(double mouseX) {
+       this.step(mouseX,x);
+    }
+
+    public void step(double mouseX,double x) {
         double newValue = minValue + (float) (mouseX - x) / width * (maxValue - minValue);
         // Round the new value to the nearest step
         newValue = Math.round(newValue / step) * step;
+        newValue = Math.clamp(newValue,minValue,maxValue);
         set(newValue);
     }
+
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
@@ -67,5 +71,13 @@ public class DoubleOption extends Option<Double> {
             step(mouseX);
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    }
+
+    public void setDragging(boolean dragging) {
+        isDragging = dragging;
+    }
+
+    public boolean isDragging() {
+        return isDragging;
     }
 }

@@ -86,7 +86,7 @@ public class DynamicHUD implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        printInfo("Initialising DynamicHud");
+        printInfo("Initialising DynamicHUD");
 
         // Add WidgetData of included widgets
         WidgetManager.registerCustomWidgets(

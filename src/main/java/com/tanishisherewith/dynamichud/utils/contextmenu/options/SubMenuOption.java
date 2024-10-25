@@ -18,14 +18,12 @@ import java.util.function.Supplier;
 public class SubMenuOption extends Option<Boolean> {
     private final ContextMenu subMenu;
     private final ContextMenu parentMenu;
-    public String name = "Empty";
 
     public SubMenuOption(String name, ContextMenu parentMenu, Supplier<Boolean> getter, Consumer<Boolean> setter, ContextMenuProperties properties) {
-        super(getter, setter);
+        super(name,getter, setter);
         Objects.requireNonNull(parentMenu, "Parent Menu cannot be null");
-        this.name = name;
         this.parentMenu = parentMenu;
-        this.subMenu = new ContextMenu(parentMenu.x + parentMenu.getFinalWidth(), this.y, properties);
+        this.subMenu = new ContextMenu(parentMenu.x + parentMenu.getWidth(), this.y, properties);
         this.subMenu.getProperties().setHeightOffset(0);
         this.subMenu.setVisible(get());
         this.renderer.init(this);

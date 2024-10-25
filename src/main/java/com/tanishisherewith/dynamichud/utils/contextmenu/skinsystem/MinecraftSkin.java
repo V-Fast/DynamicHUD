@@ -5,9 +5,11 @@ import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
-import net.minecraft.client.MinecraftClient;
+import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ButtonTextures;
+import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -26,7 +28,6 @@ public class MinecraftSkin extends Skin {
             Identifier.ofVanilla("widget/button_disabled"),
             Identifier.ofVanilla("widget/button_highlighted")
     );
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
     private static final int DEFAULT_SCROLLBAR_WIDTH = 10;
     private static final int DEFAULT_PANEL_WIDTH = 248;
     private static final int DEFAULT_PANEL_HEIGHT = 165;
@@ -47,13 +48,13 @@ public class MinecraftSkin extends Skin {
     public MinecraftSkin(PanelColor color, Identifier backgroundPanel, int panelWidth, int panelHeight) {
         super();
         this.panelColor = color;
-        addRenderer(BooleanOption.class, new MinecraftBooleanRenderer());
-        addRenderer(DoubleOption.class, new MinecraftDoubleRenderer());
-        addRenderer(EnumOption.class, new MinecraftEnumRenderer());
-        addRenderer(ListOption.class, new MinecraftListRenderer());
-        addRenderer(SubMenuOption.class, new MinecraftSubMenuRenderer());
-        addRenderer(RunnableOption.class, new MinecraftRunnableRenderer());
-        addRenderer(ColorOption.class, new MinecraftColorOptionRenderer());
+        addRenderer(BooleanOption.class, MinecraftBooleanRenderer::new);
+        addRenderer(DoubleOption.class, MinecraftDoubleRenderer::new);
+        addRenderer(EnumOption.class, MinecraftEnumRenderer::new);
+        addRenderer(ListOption.class, MinecraftListRenderer::new);
+        addRenderer(SubMenuOption.class, MinecraftSubMenuRenderer::new);
+        addRenderer(RunnableOption.class, MinecraftRunnableRenderer::new);
+        addRenderer(ColorOption.class, MinecraftColorOptionRenderer::new);
 
         this.panelHeight = panelHeight;
         this.panelWidth = panelWidth;
@@ -94,11 +95,10 @@ public class MinecraftSkin extends Skin {
         DrawHelper.enableScissor(imageX, imageY + 2, screenWidth, panelHeight - 4);
         int yOffset = imageY + 10 - scrollOffset;
         contextMenu.setWidth(panelWidth - 4);
-        contextMenu.setFinalWidth(panelWidth - 4);
         contextMenu.y = imageY;
         int maxYOffset = imageY + panelHeight - 4;
 
-        for (Option<?> option : contextMenu.getOptions()) {
+        for (Option<?> option : getOptions(contextMenu)) {
             if (!option.shouldRender()) continue;
 
             if (yOffset >= imageY && yOffset <= maxYOffset - option.getHeight() + 4) {
@@ -142,10 +142,6 @@ public class MinecraftSkin extends Skin {
         }
     }
 
-    private boolean isMouseOver(double mouseX, double mouseY, double x, double y, double width, double height) {
-        return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
-    }
-
     private void applyMomentum() {
         if (scrollVelocity != 0) {
             scrollOffset += (int) scrollVelocity;
@@ -169,6 +165,9 @@ public class MinecraftSkin extends Skin {
     @Override
     public boolean mouseClicked(ContextMenu menu, double mouseX, double mouseY, int button) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX, mouseY, imageX + 3, imageY + 3, 14, 14)) {
+            mc.getSoundManager().play(PositionedSoundInstance.master(
+                    SoundEvents.UI_BUTTON_CLICK, 1.0F));
+
             contextMenu.close();
         }
 
@@ -180,7 +179,6 @@ public class MinecraftSkin extends Skin {
         if (button == 0 && mouseX >= imageX + panelWidth + 5 && mouseX <= imageX + panelWidth + 20) {
             if (mouseY >= imageY && mouseY <= imageY + panelHeight) {
                 float scrollPercentage = (float) (mouseY - imageY) / panelHeight;
-                int handleY = imageY + (int) ((panelHeight - 15) * scrollPercentage);
 
                 // Draw scrollbar handle
                 scrollOffset = (int) (maxScrollOffset * scrollPercentage);
@@ -437,7 +435,7 @@ public class MinecraftSkin extends Skin {
             String text = "Open";
             drawContext.drawText(mc.textRenderer, text, option.getX() + option.getWidth() / 2 - mc.textRenderer.getWidth(text) / 2, y + 5, Color.YELLOW.getRGB(), true);
 
-            option.getSubMenu().render(drawContext, x + option.getParentMenu().getFinalWidth(), y, mouseX, mouseY);
+            option.getSubMenu().render(drawContext, x + option.getParentMenu().getWidth(), y, mouseX, mouseY);
         }
     }
 

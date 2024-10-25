@@ -14,7 +14,7 @@ public class ContextMenuProperties {
     private int padding = 5;  // The amount of padding around the rectangle
     private int heightOffset = 4; // Height offset from the widget
     private boolean drawBorder = true;
-    private boolean shadow = false;
+    private boolean shadow = true;
     private boolean roundedCorners = true;
     private int cornerRadius = 3;
     private boolean hoverEffect = true;

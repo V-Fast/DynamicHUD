@@ -3,7 +3,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.utils.Input;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
-import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.SkinRenderer;
+import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 
@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class Option<T> implements Input {
+    public String name = "Empty", description = "";
     public T value = null;
     protected int x, y;
     protected int width = 0;
@@ -23,11 +24,12 @@ public abstract class Option<T> implements Input {
     protected ContextMenuProperties properties;
     protected SkinRenderer<Option<T>> renderer;
 
-    public Option(Supplier<T> getter, Consumer<T> setter) {
-        this(getter, setter, () -> true);
+    public Option(String name,Supplier<T> getter, Consumer<T> setter) {
+        this(name,getter, setter, () -> true);
     }
 
-    public Option(Supplier<T> getter, Consumer<T> setter, Supplier<Boolean> shouldRender, ContextMenuProperties properties) {
+    public Option(String name,Supplier<T> getter, Consumer<T> setter, Supplier<Boolean> shouldRender, ContextMenuProperties properties) {
+        this.name = name;
         this.getter = getter;
         this.setter = setter;
         this.shouldRender = shouldRender;
@@ -36,8 +38,8 @@ public abstract class Option<T> implements Input {
         updateProperties(properties);
     }
 
-    public Option(Supplier<T> getter, Consumer<T> setter, Supplier<Boolean> shouldRender) {
-        this(getter, setter, shouldRender, ContextMenuProperties.createGenericSimplified());
+    public Option(String name,Supplier<T> getter, Consumer<T> setter, Supplier<Boolean> shouldRender) {
+        this(name,getter, setter, shouldRender, ContextMenuProperties.createGenericSimplified());
     }
 
     public T get() {
@@ -68,41 +70,32 @@ public abstract class Option<T> implements Input {
     }
 
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return isMouseOver(mouseX, mouseY) || renderer.mouseClicked(this, mouseX, mouseY, button);
+        return isMouseOver(mouseX, mouseY);
     }
 
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        return isMouseOver(mouseX, mouseY) || renderer.mouseReleased(this, mouseX, mouseY, button);
+        return isMouseOver(mouseX, mouseY);
     }
 
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        return isMouseOver(mouseX, mouseY) || renderer.mouseDragged(this, mouseX, mouseY, button, deltaX, deltaY);
+        return isMouseOver(mouseX, mouseY);
     }
 
-    public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        renderer.mouseScrolled(this, mouseX, mouseY, horizontalAmount, verticalAmount);
-    }
+    public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {}
 
     @Override
-    public void keyPressed(int key, int scanCode, int modifiers) {
-        renderer.keyPressed(this, key, scanCode, modifiers);
-    }
+    public void keyPressed(int key, int scanCode, int modifiers) {}
 
     @Override
-    public void charTyped(char c) {
-
-    }
+    public void charTyped(char c) {}
 
     @Override
-    public void keyReleased(int key, int scanCode, int modifiers) {
-        renderer.keyReleased(this, key, scanCode, modifiers);
-    }
+    public void keyReleased(int key, int scanCode, int modifiers) {}
 
     /**
      * Called when the context menu closes
      */
-    public void onClose() {
-    }
+    public void onClose() {}
 
     public boolean isMouseOver(double mouseX, double mouseY) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
@@ -156,5 +149,13 @@ public abstract class Option<T> implements Input {
     public void set(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+    public Option<T> description(String description){
+        this.description = description;
+        return this;
+    }
+
+    public SkinRenderer<Option<T>> getRenderer() {
+        return renderer;
     }
 }

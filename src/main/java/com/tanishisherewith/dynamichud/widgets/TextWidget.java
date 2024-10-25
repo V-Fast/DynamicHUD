@@ -10,7 +10,10 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProvider;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.BooleanOption;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.ColorOption;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.DoubleOption;
+import com.tanishisherewith.dynamichud.utils.contextmenu.options.OptionGroup;
+import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.ClassicSkin;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.MinecraftSkin;
+import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.ModernSkin;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
 import net.minecraft.client.gui.DrawContext;
@@ -74,14 +77,41 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     }
 
     public void createMenu() {
-        ContextMenuProperties properties = ContextMenuProperties.builder().skin(new MinecraftSkin(MinecraftSkin.PanelColor.COFFEE_BROWN)).build();
+        ContextMenuProperties properties = ContextMenuProperties.builder().skin(new ModernSkin()).build();
 
         menu = new ContextMenu(getX(), getY(), properties);
         menu.getProperties().getSkin().setContextMenu(menu);
-        menu.addOption(new BooleanOption("Shadow", () -> this.shadow, value -> this.shadow = value, BooleanOption.BooleanType.ON_OFF));
-        menu.addOption(new BooleanOption("Rainbow", () -> this.rainbow, value -> this.rainbow = value, BooleanOption.BooleanType.ON_OFF));
-        menu.addOption(new ColorOption("TextColor", menu, () -> this.textColor, value -> this.textColor = value));
-        menu.addOption(new DoubleOption("RainbowSpeed", 1, 5.0f, 1, () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue(), menu));
+        menu.addOption(new BooleanOption("Shadow", () -> this.shadow, value -> this.shadow = value, BooleanOption.BooleanType.ON_OFF)
+                .description("Adds shadow to your text")
+        );
+        menu.addOption(new BooleanOption("Rainbow",
+                () -> this.rainbow, value -> this.rainbow = value, BooleanOption.BooleanType.ON_OFF)
+                .description("Adds rainbow effect to your text")
+        );
+
+        OptionGroup group = new OptionGroup("Color");
+        group.addOption(new ColorOption("TextColor", menu,
+                () -> this.textColor, value -> this.textColor = value)
+                .description("Specify the color you want to add to your text")
+        );
+        group.addOption(new DoubleOption(
+                "RainbowSpeed",
+                1, 5.0f, 1,
+                () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue(), menu)
+                .setShouldRender( ()-> this.rainbow)
+        );
+        menu.addOption(group);
+
+        /*
+        menu.addOption(new ColorOption("TextColor", menu, () -> this.textColor, value -> this.textColor = value).description("Specify the color you want to add to your text"));
+        menu.addOption(new DoubleOption(
+                "RainbowSpeed",
+                1, 5.0f, 1,
+                () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue(), menu)
+                .setShouldRender( ()-> this.rainbow)
+        );
+
+         */
 
         /* TEST
         AtomicReference<String> option = new AtomicReference<>("Enum1");
@@ -228,6 +258,4 @@ public class TextWidget extends Widget implements ContextMenuProvider {
             return widget;
         }
     }
-
-
 }

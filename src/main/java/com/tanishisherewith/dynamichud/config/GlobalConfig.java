@@ -16,6 +16,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.awt.*;
+import java.util.LinkedList;
 
 public final class GlobalConfig {
     public static final ConfigClassHandler<GlobalConfig> HANDLER = ConfigClassHandler.createBuilder(GlobalConfig.class)
@@ -28,7 +29,7 @@ public final class GlobalConfig {
 
     private static final GlobalConfig INSTANCE = new GlobalConfig();
     /**
-     * Common scale for all widgets. Set by the user using YACL.
+     * Common scale for all widgets.
      */
     @SerialEntry
     private float scale = 1.0f;
@@ -92,11 +93,11 @@ public final class GlobalConfig {
                                         .binding(new Color(0, 0, 0, 128), () -> this.hudActiveColor, newVal -> this.hudActiveColor = newVal)
                                         .controller(ColorControllerBuilder::create)
                                 .build())
-                        .option(Option.<Color>createBuilder()
-                                .name(Text.literal("Widget HUD Inactive Background Color"))
-                                .description(OptionDescription.of(Text.literal("Color of the background of the widget when it will NOT be rendered")))
-                                .binding(new Color(255, 0, 0, 128), () -> this.hudInactiveColor, newVal -> this.hudInactiveColor = newVal)
-                                .controller(ColorControllerBuilder::create)
+                                .option(Option.<Color>createBuilder()
+                                        .name(Text.literal("Widget HUD Inactive Background Color"))
+                                        .description(OptionDescription.of(Text.literal("Color of the background of the widget when it will NOT be rendered")))
+                                        .binding(new Color(255, 0, 0, 128), () -> this.hudInactiveColor, newVal -> this.hudInactiveColor = newVal)
+                                        .controller(ColorControllerBuilder::create)
                                 .build())
                         .build())
                 .save(HANDLER::save)
