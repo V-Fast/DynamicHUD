@@ -7,12 +7,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProvider;
-import com.tanishisherewith.dynamichud.utils.contextmenu.options.BooleanOption;
-import com.tanishisherewith.dynamichud.utils.contextmenu.options.ColorOption;
-import com.tanishisherewith.dynamichud.utils.contextmenu.options.DoubleOption;
-import com.tanishisherewith.dynamichud.utils.contextmenu.options.OptionGroup;
-import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.ClassicSkin;
-import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.MinecraftSkin;
+import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.ModernSkin;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
@@ -20,7 +15,10 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
 import org.lwjgl.glfw.GLFW;
 
-import java.awt.*;
+import java.awt.Color;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public class TextWidget extends Widget implements ContextMenuProvider {
@@ -77,7 +75,7 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     }
 
     public void createMenu() {
-        ContextMenuProperties properties = ContextMenuProperties.builder().skin(new ModernSkin()).build();
+        ContextMenuProperties properties = ContextMenuProperties.createGenericSimplified();
 
         menu = new ContextMenu(getX(), getY(), properties);
         menu.getProperties().getSkin().setContextMenu(menu);
@@ -88,6 +86,15 @@ public class TextWidget extends Widget implements ContextMenuProvider {
                 () -> this.rainbow, value -> this.rainbow = value, BooleanOption.BooleanType.ON_OFF)
                 .description("Adds rainbow effect to your text")
         );
+        menu.addOption(new ColorOption("TextColor", menu, () -> this.textColor, value -> this.textColor = value).description("Specify the color you want to add to your text"));
+        menu.addOption(new DoubleOption(
+                "RainbowSpeed",
+                1, 5.0f, 1,
+                () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue(), menu)
+                .setShouldRender( ()-> this.rainbow)
+        );
+
+        /* TEST
 
         OptionGroup group = new OptionGroup("Color");
         group.addOption(new ColorOption("TextColor", menu,
@@ -101,32 +108,18 @@ public class TextWidget extends Widget implements ContextMenuProvider {
                 .setShouldRender( ()-> this.rainbow)
         );
         menu.addOption(group);
-
-        /*
-        menu.addOption(new ColorOption("TextColor", menu, () -> this.textColor, value -> this.textColor = value).description("Specify the color you want to add to your text"));
-        menu.addOption(new DoubleOption(
-                "RainbowSpeed",
-                1, 5.0f, 1,
-                () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue(), menu)
-                .setShouldRender( ()-> this.rainbow)
-        );
-
-         */
-
-        /* TEST
         AtomicReference<String> option = new AtomicReference<>("Enum1");
         List<String> options = Arrays.asList("List1", "LONGER LIST 2", "List3");
         AtomicBoolean running = new AtomicBoolean(false);
         AtomicBoolean subMenu = new AtomicBoolean(false);
-        menu.addOption(new ListOption<>("List", option::get, option::set, options));
+        menu.addOption(new ListOption<>("List??? ", option::get, option::set, options));
         menu.addOption(new RunnableOption("Runnable Test",running::get,running::set, ()-> System.out.println("Runnable ran")));
         SubMenuOption subMenuOption = new SubMenuOption("SubMenu",menu,subMenu::get,subMenu::set);
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows2", () -> this.shadow, value -> this.shadow = value));
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows3", () -> this.shadow, value -> this.shadow = value));
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows4", () -> this.shadow, value -> this.shadow = value));
         menu.addOption(subMenuOption);
-
-         */
+        */
     }
 
     @Override

@@ -146,7 +146,7 @@ public abstract class Option<T> implements Input {
         this.width = width;
     }
 
-    public void set(int x, int y) {
+    public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
     }

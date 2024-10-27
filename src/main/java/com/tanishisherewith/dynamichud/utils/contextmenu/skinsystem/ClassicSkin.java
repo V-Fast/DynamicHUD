@@ -171,7 +171,7 @@ public class ClassicSkin extends Skin {
                     1,
                     1);
 
-            option.getColorGradient().render(drawContext, x + option.getParentMenu().getWidth() + 7, y - 10);
+            option.getColorGradient().render(drawContext, x + option.getParentMenu().getWidth() + 7, y - 10,mouseX,mouseY);
         }
     }
 
@@ -207,7 +207,7 @@ public class ClassicSkin extends Skin {
             option.setHeight(mc.textRenderer.fontHeight);
             option.setWidth(mc.textRenderer.getWidth("Run: " + option.name));
             int color = option.value ? DARK_GREEN.getRGB() : DARK_RED.getRGB();
-            drawContext.drawText(mc.textRenderer, Text.of(option.name), x, y, color, false);
+            drawContext.drawText(mc.textRenderer, Text.of("Run: " + option.name), x, y, color, false);
         }
     }
 

@@ -18,6 +18,7 @@ import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
+import java.util.Arrays;
 import java.util.List;
 
 //TODO: Complete this
@@ -35,6 +36,9 @@ public class ModernSkin extends Skin implements GroupableSkin {
     private String TOOLTIP_TEXT;
     private String TOOLTIP_HEAD;
     private static int SCALE_FACTOR = 4;
+    private int scrollOffset = 0;
+    private double scrollVelocity = 0;
+    private long lastScrollTime = 0;
 
     public ModernSkin(Color themeColor, float radius, String defaultToolTipHeader, String defaultToolTipText) {
         this.themeColor = themeColor;
@@ -71,6 +75,9 @@ public class ModernSkin extends Skin implements GroupableSkin {
     public LayoutContext.Offset getGroupIndent() {
         return new LayoutContext.Offset(2, 2);
     }
+    public void enableSkinScissor(){
+        DrawHelper.enableScissor(contextMenuX + (int) (width * 0.2f) + 10,contextMenuY + 19,  (int) (width * 0.8f - 14),height - 23,SCALE_FACTOR);
+    }
 
     @Override
     public void renderGroup(DrawContext drawContext, OptionGroup group, int groupX, int groupY, int mouseX, int mouseY) {
@@ -79,7 +86,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
         if(group.isExpanded()) {
             DrawHelper.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(),
-                    groupX + 1, groupY + 14, width - groupX - 8 + contextMenuX, group.getHeight(), radius, DARKER_GRAY_2.getRGB());
+                    groupX + 1, groupY + 14, width - groupX - 8 + contextMenuX, group.getHeight() - 16, radius, DARKER_GRAY_2.getRGB());
         }
 
         String groupText = group.name + " " + (group.isExpanded() ? "-" : "+");
@@ -97,9 +104,20 @@ public class ModernSkin extends Skin implements GroupableSkin {
                 yOffset += option.getHeight() + 1;
             }
 
-            group.setHeight(yOffset - groupY - 16);
+            group.setHeight(yOffset - groupY);
         } else{
-            group.setHeight(16);
+            group.setHeight(20);
+        }
+    }
+    private void drawScrollbar(DrawContext drawContext) {
+        if (getMaxScrollOffset() > 0) {
+            int scrollbarX = contextMenuX + width + 5; // Position at the right of the panel
+            int scrollbarY = contextMenuY + 19; // Position below the header
+            int handleHeight = (int) ((float) (height- 23) * ( (height- 23) / (float) contextMenu.getHeight()));
+            int handleY = scrollbarY + (int) ((float) ((height- 23) - handleHeight) * ((float) scrollOffset / getMaxScrollOffset()));
+
+            DrawHelper.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), scrollbarX,scrollbarY,2,height - 23,1,DARKER_GRAY.getRGB());
+            DrawHelper.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), scrollbarX,handleY,2,handleHeight,1,Color.LIGHT_GRAY.getRGB());
         }
     }
 
@@ -130,7 +148,8 @@ public class ModernSkin extends Skin implements GroupableSkin {
         DrawHelper.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(),
                 optionStartX, contextMenuY + 19, width * 0.8f - 14, height - 23, radius, DARK_GRAY.getRGB());
 
-        int yOffset = contextMenu.y + 19 + 3;
+        enableSkinScissor();
+        int yOffset = contextMenu.y + 19 + 3 - scrollOffset;
         for (Option<?> option : getOptions(contextMenu)) {
             if (!option.shouldRender()) continue;
 
@@ -146,9 +165,15 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
             yOffset += option.getHeight() + 1;
         }
+        RenderSystem.disableScissor();
 
         contextMenu.setWidth(width);
         contextMenu.setHeight(height);
+
+        applyMomentum();
+        scrollOffset = MathHelper.clamp(scrollOffset, 0, Math.max(0, getMaxScrollOffset()));
+
+        drawScrollbar(drawContext);
 
         renderToolTipText(drawContext, mouseX, mouseY);
 
@@ -210,6 +235,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         );
 
         if (TOOLTIP_TEXT.isEmpty() || TOOLTIP_HEAD.isEmpty()) {
+            setTooltipText(defaultToolTipHeader, defaultToolTipText);
             return;
         }
 
@@ -251,6 +277,25 @@ public class ModernSkin extends Skin implements GroupableSkin {
         TOOLTIP_HEAD = head_text;
     }
 
+    private int getMaxScrollOffset() {
+        return contextMenu.getHeight() - height + 23;
+    }
+
+private void applyMomentum() {
+    long currentTime = System.currentTimeMillis();
+    double timeDelta = (currentTime - lastScrollTime) / 1000.0;
+    scrollOffset += (int) (scrollVelocity * timeDelta);
+    scrollVelocity *= 0.9; // Decay factor
+    scrollOffset = MathHelper.clamp(scrollOffset, 0, getMaxScrollOffset());
+}
+
+    @Override
+    public void mouseScrolled(ContextMenu menu, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        scrollVelocity -= verticalAmount * 10;
+        lastScrollTime = System.currentTimeMillis();
+        super.mouseScrolled(menu, mouseX, mouseY, horizontalAmount, verticalAmount);
+    }
+
     @Override
     public boolean mouseClicked(ContextMenu menu, double mouseX, double mouseY, int button) {
         mouseX = mc.mouse.getX()/SCALE_FACTOR;
@@ -280,6 +325,19 @@ public class ModernSkin extends Skin implements GroupableSkin {
         }
         return super.mouseClicked(menu, mouseX, mouseY, button);
     }
+    @Override
+    public boolean mouseDragged(ContextMenu menu, double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        mouseX = mc.mouse.getX()/SCALE_FACTOR;
+        mouseY = mc.mouse.getY()/SCALE_FACTOR;
+
+        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX,mouseY, contextMenuX + width - 5,contextMenuY,15,height)) {
+            float scrollPercentage = (float) (mouseY - contextMenuY - 19) / (height - 23);
+            scrollOffset = (int) (getMaxScrollOffset() * scrollPercentage);
+            scrollOffset = MathHelper.clamp(scrollOffset, 0, getMaxScrollOffset());
+            lastScrollTime = System.currentTimeMillis();
+        }
+        return super.mouseDragged(menu, mouseX, mouseY, button, deltaX, deltaY);
+    }
 
     public Color getThemeColor() {
         return themeColor;
@@ -294,7 +352,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             int backgroundWidth = (int) (width * 0.8f - 14);
 
             option.setHeight(14);
-            option.set(x,y);
+            option.setPosition(x,y);
             option.setWidth(backgroundWidth);
 
             MatrixStack matrices = drawContext.getMatrices();
@@ -312,12 +370,13 @@ public class ModernSkin extends Skin implements GroupableSkin {
             // Background
             boolean active = option.get();
             Color backgroundColor = active ? getThemeColor() : DARKER_GRAY;
+            Color hoveredColor = isMouseOver(mouseX,mouseY,toggleBgX,y + 2,14,7) ? backgroundColor.darker() : backgroundColor;
 
             DrawHelper.drawRoundedRectangleWithShadowBadWay(
                     matrices.peek().getPositionMatrix(),
                     toggleBgX, y + 2, 14, 7,
                     3,
-                    backgroundColor.getRGB(),
+                    hoveredColor.getRGB(),
                     125, 1, 1
             );
 
@@ -353,7 +412,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                 animating = true;
                 return true;
             }
-            return SkinRenderer.super.mouseClicked(option, mouseX, mouseY, button);
+            return false;
         }
     }
 
@@ -391,19 +450,23 @@ public class ModernSkin extends Skin implements GroupableSkin {
                     false
             );
 
-            option.set(x, y);
+            option.setHeight(14);
+            option.setWidth(20);
+            option.setPosition(x, y);
+
 
             int width = 20;
             int shadowOpacity = Math.min(option.value.getAlpha(), 45);
 
             //The shape behind the preview
+            Color behindColor = isMouseOver(mouseX,mouseY,x + backgroundWidth - width - 17, y + 1,width + 2,14) ?  getThemeColor().darker().darker() : getThemeColor();
             DrawHelper.drawRoundedRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(),
                     x + backgroundWidth - width - 17,
                     y + 1,
                     width + 2,
                     14,
                     2,
-                    getThemeColor().getRGB(),
+                    behindColor.getRGB(),
                     shadowOpacity,
                     1,
                     1);
@@ -434,18 +497,18 @@ public class ModernSkin extends Skin implements GroupableSkin {
             option.setHeight(targetHeight);
             option.setWidth(width);
 
+            RenderSystem.disableScissor(); //Disable scissor so the color picker preview works
             DrawHelper.scaleAndPosition(drawContext.getMatrices(),x + backgroundWidth/2.0f,y, scale);
-
-            option.getColorGradient().render(drawContext, x + backgroundWidth/2 - 50, y + 6);
-
+            option.getColorGradient().render(drawContext, x + backgroundWidth/2 - 50, y + 6,mouseX,mouseY);
             DrawHelper.stopScaling(drawContext.getMatrices());
+            enableSkinScissor(); // re-enable the scissor
         }
 
         @Override
         public boolean mouseClicked(ColorOption option, double mouseX, double mouseY, int button) {
             mouseX = mc.mouse.getX()/SCALE_FACTOR;
             mouseY = mc.mouse.getY()/SCALE_FACTOR;
-            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX, mouseY, option.getX() + (int) (width * 0.8f - 14) - 37, option.getY(), 30, 23)) {
+            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX, mouseY, option.getX() + (int) (width * 0.8f - 14) - 37, option.getY(), 22, 16)) {
                 option.isVisible = !option.isVisible;
                 if (option.isVisible) {
                     option.getColorGradient().display();
@@ -456,7 +519,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                 return true;
             }
             option.getColorGradient().mouseClicked(mouseX,mouseY,button);
-            return SkinRenderer.super.mouseClicked(option, mouseX, mouseY, button);
+            return false;
         }
 
         @Override
@@ -480,6 +543,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
     public class ModernDoubleRenderer implements SkinRenderer<DoubleOption> {
         private double displayValue;
         private static final float ANIMATION_SPEED = 0.1f;
+
         @Override
         public void render(DrawContext drawContext, DoubleOption option, int x, int y, int mouseX, int mouseY) {
             // Draw option name
@@ -497,7 +561,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             int sliderBackgroundHeight = 2;
             int sliderX = x + backgroundWidth - sliderBackgroundWidth - 10;
 
-            option.set(x,y);
+            option.setPosition(x,y);
             option.setWidth(sliderBackgroundWidth);
             option.setHeight(14);
 
@@ -512,10 +576,10 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
             // Active fill
             int activeFillWidth = (int) ((displayValue - option.minValue) / (option.maxValue - option.minValue) * option.getWidth());
-            Color activeColor = getThemeColor();
+            Color fillColor = isMouseOver(mouseX,mouseY,sliderX, y,sliderBackgroundWidth,sliderBackgroundHeight + 4) ?  getThemeColor().darker().darker() : getThemeColor();
             DrawHelper.drawRoundedRectangle(
                     drawContext.getMatrices().peek().getPositionMatrix(),
-                    sliderX, y, activeFillWidth, sliderBackgroundHeight,1, activeColor.getRGB()
+                    sliderX, y, activeFillWidth, sliderBackgroundHeight,1, fillColor.getRGB()
             );
 
             // Draw slider handle
@@ -569,86 +633,265 @@ public class ModernSkin extends Skin implements GroupableSkin {
             return false;
         }
     }
-    public class ModernEnumRenderer<E extends Enum<E>> implements SkinRenderer<EnumOption<E>> {
-        private int maxWidth = 50;
 
-        private void calculateMaxWidth(EnumOption<E> option) {
-            for (E listValues : option.getValues()) {
-                int width = mc.textRenderer.getWidth(listValues.toString()) + 5;
-                if (width > maxWidth) {
-                    maxWidth = width;
-                }
-            }
+    public class ModernEnumRenderer<E extends Enum<E>> implements SkinRenderer<EnumOption<E>> {
+        @Override
+        public void render(DrawContext drawContext, EnumOption<E> option, int x, int y, int mouseX, int mouseY) {
+            // Set dimensions for the main label and dropdown area
+            option.setHeight(mc.textRenderer.fontHeight + 2);
+
+            // Draw main option name and selected option
+            String mainLabel = option.name + ": ";
+            String selectedOption = option.get().toString();
+            drawContext.drawText(mc.textRenderer, mainLabel, x + 4, y + 2, -1, false);
+            Color fillColor = isMouseOver(mouseX,mouseY,x + 4 + mc.textRenderer.getWidth(mainLabel), y,mc.textRenderer.getWidth(selectedOption) + 5, mc.textRenderer.fontHeight + 2) ?  getThemeColor().darker().darker() : getThemeColor();
+            DrawHelper.drawRoundedRectangle(
+                    drawContext.getMatrices().peek().getPositionMatrix(),
+                    x + 4 + mc.textRenderer.getWidth(mainLabel), y, mc.textRenderer.getWidth(selectedOption) + 5, mc.textRenderer.fontHeight + 2,2,
+                    fillColor.getRGB()
+            );
+            // "<" and ">" buttons
+            int contextMenuWidth = (int)(width * 0.8f - 14);
+            int leftX = x + contextMenuWidth - 30;
+            boolean hoveredOverLeft = isMouseOver(mouseX,mouseY,leftX,y,mc.textRenderer.getWidth("<") + 5,mc.textRenderer.fontHeight);
+            boolean hoveredOverRight = isMouseOver(mouseX,mouseY,leftX + mc.textRenderer.getWidth("<") + 6,y,mc.textRenderer.getWidth(">") + 5,mc.textRenderer.fontHeight);
+            // Shadow
+            DrawHelper.drawRoundedRectangle(
+                    drawContext.getMatrices().peek().getPositionMatrix(),
+                    leftX + 1, y + 3,
+                    (mc.textRenderer.getWidth("<") * 2) + 10, mc.textRenderer.fontHeight,2,
+                    ColorHelper.changeAlpha(Color.BLACK,128).getRGB()
+            );
+            DrawHelper.drawRoundedRectangle(
+                    drawContext.getMatrices().peek().getPositionMatrix(),
+                    leftX, y + 2,
+                    true,false,true,false,
+                    mc.textRenderer.getWidth("<") + 5, mc.textRenderer.fontHeight,2,
+                    hoveredOverLeft ? getThemeColor().darker().darker().getRGB() : getThemeColor().getRGB()
+            );
+            DrawHelper.drawRoundedRectangle(
+                    drawContext.getMatrices().peek().getPositionMatrix(),
+                    leftX + mc.textRenderer.getWidth("<") + 6, y + 2,
+                    false,true,false,true,
+                    mc.textRenderer.getWidth(">") + 5, mc.textRenderer.fontHeight,2,
+                    hoveredOverRight ? getThemeColor().darker().darker().getRGB() : getThemeColor().getRGB()
+            );
+            DrawHelper.drawVerticalLine(
+                    drawContext.getMatrices().peek().getPositionMatrix(),
+                    leftX + mc.textRenderer.getWidth("<") + 5,
+                    y + 2,
+                    mc.textRenderer.fontHeight,
+                    0.7f,
+                    Color.WHITE.getRGB()
+            );
+            drawContext.drawText(mc.textRenderer, "<", leftX + mc.textRenderer.getWidth("<")/2 + 1, y + 3, -1, false);
+            drawContext.drawText(mc.textRenderer, ">", leftX + mc.textRenderer.getWidth("<") + 7 + mc.textRenderer.getWidth(">")/2, y + 3, -1, false);
+
+            drawContext.drawText(mc.textRenderer, selectedOption, x + 6 + mc.textRenderer.getWidth(mainLabel), y + 2, Color.LIGHT_GRAY.getRGB(), false);
         }
 
         @Override
-        public void render(DrawContext drawContext, EnumOption<E> option, int x, int y, int mouseX, int mouseY) {
-            calculateMaxWidth(option);
-            option.setHeight(25);
-            option.setWidth(maxWidth);
+        public boolean mouseClicked(EnumOption<E> option, double mouseX, double mouseY, int button) {
+            if (option.getValues().length == 0) return false;
 
-            drawContext.drawText(mc.textRenderer, option.name + ": ", x + 15, y + 25 / 2 - 5, -1, true);
+            mouseX = mc.mouse.getX() / SCALE_FACTOR;
+            mouseY = mc.mouse.getY() / SCALE_FACTOR;
 
-            option.set(x + width - maxWidth - 25, y);
+            int x = option.getX();
+            int y = option.getY();
+            String mainLabel = option.name + ": ";
+            String selectedOption = option.get().toString();
 
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            RenderSystem.enableBlend();
-            RenderSystem.enableDepthTest();
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            String text = option.get().toString();
-            drawContext.drawText(mc.textRenderer, text, option.getX() + maxWidth / 2 - mc.textRenderer.getWidth(text) / 2, y + 5, Color.CYAN.getRGB(), true);
+            // Check if the main label is clicked to cycle
+            // "<" and ">" buttons
+            int contextMenuWidth = (int)(width * 0.8f - 14);
+            int leftX = x + contextMenuWidth - 30;
+            boolean hoveredOverLeft = isMouseOver(mouseX,mouseY,leftX,y,mc.textRenderer.getWidth("<") + 5,mc.textRenderer.fontHeight);
+            boolean hoveredOverRight = isMouseOver(mouseX,mouseY,leftX + mc.textRenderer.getWidth("<") + 6,y,mc.textRenderer.getWidth(">") + 5,mc.textRenderer.fontHeight);
+            if (hoveredOverLeft || hoveredOverRight || isMouseOver(mouseX,mouseY,x + 4 + mc.textRenderer.getWidth(mainLabel), y,mc.textRenderer.getWidth(selectedOption) + 5, mc.textRenderer.fontHeight + 2)) {
+                E[] values = option.getValues();
+                int index = Arrays.asList(values).indexOf(option.value);
+
+                if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT || hoveredOverLeft) {
+                    // Cycle forward
+                    E nextVal = values[(index + 1) % values.length];
+                    option.set(nextVal);
+                } else if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT || hoveredOverRight) {
+                    // Cycle backward with wrap-around
+                    E nextVal = values[(index - 1 + values.length) % values.length];
+                    option.set(nextVal);
+                }
+                return true;
+            }
+
+            return SkinRenderer.super.mouseClicked(option, mouseX, mouseY, button);
         }
+
     }
 
     public class ModernListRenderer<E> implements SkinRenderer<ListOption<E>> {
-        private int maxWidth = 50;
+        @Override
+        public void render(DrawContext drawContext, ListOption<E> option, int x, int y, int mouseX, int mouseY) {
+            // Set dimensions for the main label and dropdown area
+            option.setHeight(mc.textRenderer.fontHeight + 2);
 
-        private void calculateMaxWidth(ListOption<E> option) {
-            for (E listValues : option.getValues()) {
-                int width = mc.textRenderer.getWidth(listValues.toString()) + 5;
-                if (width > maxWidth) {
-                    maxWidth = width;
-                }
-            }
+            // Draw main option name and selected option
+            String mainLabel = option.name + ": ";
+            String selectedOption = option.get().toString();
+            drawContext.drawText(mc.textRenderer, mainLabel, x + 4, y + 2, -1, false);
+            Color fillColor = isMouseOver(mouseX,mouseY,x + 4 + mc.textRenderer.getWidth(mainLabel), y,mc.textRenderer.getWidth(selectedOption) + 5, mc.textRenderer.fontHeight + 2) ?  getThemeColor().darker().darker() : getThemeColor();
+            DrawHelper.drawRoundedRectangle(
+                    drawContext.getMatrices().peek().getPositionMatrix(),
+                    x + 4 + mc.textRenderer.getWidth(mainLabel), y, mc.textRenderer.getWidth(selectedOption) + 5, mc.textRenderer.fontHeight + 2,2,
+                    fillColor.getRGB()
+            );
+
+            // "<" and ">" buttons
+            int contextMenuWidth = (int)(width * 0.8f - 14);
+            int leftX = x + contextMenuWidth - 30;
+            boolean hoveredOverLeft = isMouseOver(mouseX,mouseY,leftX,y,mc.textRenderer.getWidth("<") + 5,mc.textRenderer.fontHeight);
+            boolean hoveredOverRight = isMouseOver(mouseX,mouseY,leftX + mc.textRenderer.getWidth("<") + 6,y,mc.textRenderer.getWidth(">") + 5,mc.textRenderer.fontHeight);
+            // Shadow
+            DrawHelper.drawRoundedRectangle(
+                    drawContext.getMatrices().peek().getPositionMatrix(),
+                    leftX + 1, y + 3,
+                    (mc.textRenderer.getWidth("<") * 2) + 10, mc.textRenderer.fontHeight,2,
+                    ColorHelper.changeAlpha(Color.BLACK,128).getRGB()
+            );
+            DrawHelper.drawRoundedRectangle(
+                    drawContext.getMatrices().peek().getPositionMatrix(),
+                    leftX, y + 2,
+                    true,false,true,false,
+                    mc.textRenderer.getWidth("<") + 5, mc.textRenderer.fontHeight,2,
+                    hoveredOverLeft ? getThemeColor().darker().darker().getRGB() : getThemeColor().getRGB()
+            );
+            DrawHelper.drawRoundedRectangle(
+                    drawContext.getMatrices().peek().getPositionMatrix(),
+                    leftX + mc.textRenderer.getWidth("<") + 6, y + 2,
+                    false,true,false,true,
+                    mc.textRenderer.getWidth(">") + 5, mc.textRenderer.fontHeight,2,
+                    hoveredOverRight ? getThemeColor().darker().darker().getRGB() : getThemeColor().getRGB()
+            );
+            DrawHelper.drawVerticalLine(
+                    drawContext.getMatrices().peek().getPositionMatrix(),
+                    leftX + mc.textRenderer.getWidth("<") + 5,
+                    y + 2,
+                    mc.textRenderer.fontHeight,
+                    0.7f,
+                    Color.WHITE.getRGB()
+            );
+            drawContext.drawText(mc.textRenderer, "<", leftX + mc.textRenderer.getWidth("<")/2 + 1, y + 3, -1, false);
+            drawContext.drawText(mc.textRenderer, ">", leftX + mc.textRenderer.getWidth("<") + 7 + mc.textRenderer.getWidth(">")/2, y + 3, -1, false);
+
+            drawContext.drawText(mc.textRenderer, selectedOption, x + 6 + mc.textRenderer.getWidth(mainLabel), y + 2, Color.LIGHT_GRAY.getRGB(), false);
         }
 
         @Override
-        public void render(DrawContext drawContext, ListOption<E> option, int x, int y, int mouseX, int mouseY) {
-            calculateMaxWidth(option);
-            option.setHeight(25);
-            option.setWidth(maxWidth);
+        public boolean mouseClicked(ListOption<E> option, double mouseX, double mouseY, int button) {
+            if(option.getValues().isEmpty()) return false;
 
-            drawContext.drawText(mc.textRenderer, option.name + ": ", x + 15, y + 25 / 2 - 5, -1, true);
+            mouseX = mc.mouse.getX() / SCALE_FACTOR;
+            mouseY = mc.mouse.getY() / SCALE_FACTOR;
 
-            option.set(x + width - maxWidth - 25, y);
+            int x = option.getX();
+            int y = option.getY();
+            String mainLabel = option.name + ": ";
+            String selectedOption = option.get().toString();
 
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            RenderSystem.enableBlend();
-            RenderSystem.enableDepthTest();
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            String text = option.get().toString();
-            drawContext.drawText(mc.textRenderer, text, option.getX() + maxWidth / 2 - mc.textRenderer.getWidth(text) / 2, y + 5, Color.CYAN.getRGB(), true);
+            // Check if the main label is clicked to cycle
+            // "<" and ">" buttons
+            int contextMenuWidth = (int)(width * 0.8f - 14);
+            int leftX = x + contextMenuWidth - 30;
+            boolean hoveredOverLeft = isMouseOver(mouseX,mouseY,leftX,y,mc.textRenderer.getWidth("<") + 5,mc.textRenderer.fontHeight);
+            boolean hoveredOverRight = isMouseOver(mouseX,mouseY,leftX + mc.textRenderer.getWidth("<") + 6,y,mc.textRenderer.getWidth(">") + 5,mc.textRenderer.fontHeight);
+            if (hoveredOverLeft || hoveredOverRight || isMouseOver(mouseX,mouseY,x + 4 + mc.textRenderer.getWidth(mainLabel), y,mc.textRenderer.getWidth(selectedOption) + 5, mc.textRenderer.fontHeight + 2)) {
+                List<E> values = option.getValues();
+                int currentIndex = values.indexOf(option.value);
+
+                if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT || hoveredOverLeft) {
+                    // Cycle forward (left-click)
+                    int nextIndex = (currentIndex + 1) % values.size();
+                    option.set(values.get(nextIndex));
+                } else if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT || hoveredOverRight) {
+                    // Cycle backward (right-click)
+                    int nextIndex = (currentIndex - 1 + values.size()) % values.size();
+                    option.set(values.get(nextIndex));
+                }
+                return true;
+            }
+
+            return SkinRenderer.super.mouseClicked(option, mouseX, mouseY, button);
         }
     }
 
     public class ModernSubMenuRenderer implements SkinRenderer<SubMenuOption> {
         @Override
         public void render(DrawContext drawContext, SubMenuOption option, int x, int y, int mouseX, int mouseY) {
-            option.setHeight(20);
-            option.setWidth(30);
+            mouseX = (int) (mc.mouse.getX() / SCALE_FACTOR);
+            mouseY = (int) (mc.mouse.getY() / SCALE_FACTOR);
 
-            drawContext.drawText(mc.textRenderer, option.name, x + 15, y + 25 / 2 - 5, -1, true);
-
-            option.set(x + width - 75, y);
-
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            RenderSystem.enableBlend();
-            RenderSystem.enableDepthTest();
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             String text = "Open";
-            drawContext.drawText(mc.textRenderer, text, option.getX() + option.getWidth() / 2 - mc.textRenderer.getWidth(text) / 2, y + 5, Color.YELLOW.getRGB(), true);
+            int contextMenuWidth = (int)(width * 0.8f - 14);
+            int xPos = x + 4 + contextMenuWidth - 40;
+
+            option.setPosition( xPos - 1, y);
+            option.setWidth(mc.textRenderer.getWidth(text) + 5);
+            option.setHeight(16);
+
+            drawContext.drawText(mc.textRenderer, option.name, x + 4, y + 4, -1, false);
+
+            drawContext.drawText(mc.textRenderer, text, xPos + 2, y + 4, Color.WHITE.getRGB(), true);
+
+            Color fillColor = isMouseOver(mouseX,mouseY,xPos + 2, y + 4,mc.textRenderer.getWidth(text) + 5, mc.textRenderer.fontHeight + 4) ?  getThemeColor().darker().darker() : getThemeColor();
+
+            DrawHelper.drawRoundedRectangleWithShadowBadWay(
+                    drawContext.getMatrices().peek().getPositionMatrix(),
+                    xPos - 1, y + 1,
+                    mc.textRenderer.getWidth(text) + 5, mc.textRenderer.fontHeight + 4,
+                    2,
+                    fillColor.getRGB(),
+                    180,
+                    1,
+                    1
+            );
+            DrawHelper.drawOutlineRoundedBox(
+                    drawContext.getMatrices().peek().getPositionMatrix(),
+                    xPos - 1, y + 1,
+                    mc.textRenderer.getWidth(text) + 5, mc.textRenderer.fontHeight + 4,
+                    2,
+                    0.7f,
+                    Color.WHITE.getRGB()
+            );
 
             option.getSubMenu().render(drawContext, x + option.getParentMenu().getWidth(), y, mouseX, mouseY);
+        }
+
+        @Override
+        public void mouseScrolled(SubMenuOption option, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+            mouseX = mc.mouse.getX() / SCALE_FACTOR;
+            mouseY = mc.mouse.getY() / SCALE_FACTOR;
+            SkinRenderer.super.mouseScrolled(option, mouseX, mouseY, horizontalAmount, verticalAmount);
+        }
+
+        @Override
+        public boolean mouseDragged(SubMenuOption option, double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+            mouseX = mc.mouse.getX() / SCALE_FACTOR;
+            mouseY = mc.mouse.getY() / SCALE_FACTOR;
+            return SkinRenderer.super.mouseDragged(option, mouseX, mouseY, button, deltaX, deltaY);
+        }
+
+        @Override
+        public boolean mouseReleased(SubMenuOption option, double mouseX, double mouseY, int button) {
+            mouseX = mc.mouse.getX() / SCALE_FACTOR;
+            mouseY = mc.mouse.getY() / SCALE_FACTOR;
+            return SkinRenderer.super.mouseReleased(option, mouseX, mouseY, button);
+        }
+
+        @Override
+        public boolean mouseClicked(SubMenuOption option, double mouseX, double mouseY, int button) {
+            mouseX = mc.mouse.getX() / SCALE_FACTOR;
+            mouseY = mc.mouse.getY() / SCALE_FACTOR;
+            return SkinRenderer.super.mouseClicked(option, mouseX, mouseY, button);
         }
     }
 
@@ -658,18 +901,36 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
         @Override
         public void render(DrawContext drawContext, RunnableOption option, int x, int y, int mouseX, int mouseY) {
-            option.setHeight(25);
-            option.setWidth(26);
+            String text = "Run ▶";
+            int contextMenuWidth = (int)(width * 0.8f - 14);
+            int xPos = x + 4 + contextMenuWidth - 45;
 
-            drawContext.drawText(mc.textRenderer, option.name.replaceFirst("Run: ", "") + ": ", x + 15, y + 25 / 2 - 5, -1, true);
+            option.setPosition( xPos - 1, y);
+            option.setWidth(mc.textRenderer.getWidth(text) + 5);
+            option.setHeight(mc.textRenderer.fontHeight + 6);
 
-            option.set(x + width - 75, y);
+            drawContext.drawText(mc.textRenderer, option.name, x + 4, y + 4, -1, false);
 
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            RenderSystem.enableBlend();
-            RenderSystem.enableDepthTest();
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            drawContext.drawText(mc.textRenderer, "Run", option.getX() + option.getWidth() / 2 - mc.textRenderer.getWidth("Run") / 2, y + 5, option.value ? DARK_GREEN.getRGB() : DARK_RED.getRGB(), true);
+            drawContext.drawText(mc.textRenderer, text, xPos + 2, y + 4, option.value ? DARK_GREEN.getRGB() : DARK_RED.getRGB(), true);
+
+            Color fillColor = isMouseOver(mouseX,mouseY,xPos + 2, y + 4,mc.textRenderer.getWidth(text) + 5, mc.textRenderer.fontHeight + 4) ?  getThemeColor().darker().darker() : getThemeColor();
+
+            DrawHelper.drawRoundedRectangleWithShadowBadWay(
+                    drawContext.getMatrices().peek().getPositionMatrix(),
+                    xPos - 1, y + 1,
+                    mc.textRenderer.getWidth(text) + 5, mc.textRenderer.fontHeight + 4,
+                    2,
+                    fillColor.getRGB(),
+                    180,
+                    1,
+                    1
+            );
+        }
+        @Override
+        public boolean mouseClicked(RunnableOption option, double mouseX, double mouseY, int button) {
+            mouseX = mc.mouse.getX() / SCALE_FACTOR;
+            mouseY = mc.mouse.getY() / SCALE_FACTOR;
+            return SkinRenderer.super.mouseClicked(option, mouseX, mouseY, button);
         }
     }
 }

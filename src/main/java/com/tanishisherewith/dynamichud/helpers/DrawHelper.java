@@ -85,8 +85,9 @@ public class DrawHelper {
     }
 
     public static void enableScissor(int x, int y, int width, int height) {
-        double scaleFactor = DynamicHUD.MC.getWindow().getScaleFactor();
-
+      enableScissor(x,y,width,height,mc.getWindow().getScaleFactor());
+    }
+    public static void enableScissor(int x, int y, int width, int height, double scaleFactor) {
         int scissorX = (int) (x * scaleFactor);
         int scissorY = (int) (DynamicHUD.MC.getWindow().getHeight() - ((y + height) * scaleFactor));
         int scissorWidth = (int) (width * scaleFactor);

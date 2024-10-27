@@ -1,9 +1,11 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
+import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.utils.BooleanPool;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 public class RunnableOption extends Option<Boolean> {
     private final Runnable task;
@@ -18,7 +20,7 @@ public class RunnableOption extends Option<Boolean> {
      */
     public RunnableOption(String name, Supplier<Boolean> getter, Consumer<Boolean> setter, Runnable task) {
         super(name,getter, setter);
-        this.name = "Run: " + name; // prepend the "run" symbol to the name
+        this.name = name;
         this.task = task;
         this.renderer.init(this);
     }
@@ -34,8 +36,15 @@ public class RunnableOption extends Option<Boolean> {
             value = !value;
             set(value);
             if (value) {
-                task.run();
+                try{
+                    task.run();
+                } catch (Throwable e){
+                    DynamicHUD.logger.error("Encountered error while running task for {}", this.name,e);
+                    return false;
+                }
+                set(false);
             }
+            return true;
         }
         return true;
     }

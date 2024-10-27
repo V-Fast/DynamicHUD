@@ -55,7 +55,7 @@ public class ColorGradient {
         display = false;
     }
 
-    public void render(DrawContext drawContext, int x1, int y1) {
+    public void render(DrawContext drawContext, int x1, int y1, int mouseX, int mouseY) {
         setPos(x1, y1);
         if (!display) {
             return;
@@ -69,10 +69,7 @@ public class ColorGradient {
             // Draw the preview box near cursor
             Framebuffer framebuffer = client.getFramebuffer();
             if (framebuffer != null) {
-                //Translate cursor screen position to minecraft's scaled window
-                double mouseX = client.mouse.getX() * client.getWindow().getScaledWidth() / (double) client.getWindow().getWidth();
-                double mouseY = client.mouse.getY() * client.getWindow().getScaledHeight() / (double) client.getWindow().getHeight();
-
+                //Translate cursor screen position to minecraft's scaled windo
                 int x = (int) (mouseX * framebuffer.textureWidth / client.getWindow().getScaledWidth());
                 int y = (int) ((client.getWindow().getScaledHeight() - mouseY) * framebuffer.textureHeight / client.getWindow().getScaledHeight());
 

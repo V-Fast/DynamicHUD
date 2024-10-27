@@ -34,16 +34,17 @@ public class SubMenuOption extends Option<Boolean> {
     }
 
     public SubMenuOption(String name, ContextMenu parentMenu, Supplier<Boolean> getter, Consumer<Boolean> setter) {
-        this(name, parentMenu, getter, setter, parentMenu.getProperties().copy());
+        this(name, parentMenu, getter, setter, parentMenu.getProperties().copyNewSkin());
     }
 
     public SubMenuOption(String name, ContextMenu parentMenu) {
-        this(name, parentMenu, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value), parentMenu.getProperties().copy());
+        this(name, parentMenu, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value), parentMenu.getProperties().copyNewSkin());
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (super.mouseClicked(mouseX, mouseY, button)) {
+            System.out.println("SUBMENU clicked");
             subMenu.toggleDisplay();
             set(subMenu.isVisible());
             return true;

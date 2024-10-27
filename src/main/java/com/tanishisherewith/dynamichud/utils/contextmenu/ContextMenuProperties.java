@@ -106,6 +106,31 @@ public class ContextMenuProperties {
                 .enableAnimations(enableAnimations)
                 .build();
     }
+    public Builder copyAsBuilder() {
+        return ContextMenuProperties.builder()
+                .backgroundColor(backgroundColor)
+                .borderColor(borderColor)
+                .borderWidth(borderWidth)
+                .padding(padding)
+                .heightOffset(heightOffset)
+                .drawBorder(drawBorder)
+                .shadow(shadow)
+                .roundedCorners(roundedCorners)
+                .cornerRadius(cornerRadius)
+                .hoverEffect(hoverEffect)
+                .hoverColor(hoverColor)
+                .skin(skin)
+                .enableAnimations(enableAnimations);
+    }
+    public ContextMenuProperties copyNewSkin() {
+        try {
+            return this.copyAsBuilder()
+                    .skin(skin.getClass().newInstance())
+                    .build();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public class Builder {
         private Builder() {
