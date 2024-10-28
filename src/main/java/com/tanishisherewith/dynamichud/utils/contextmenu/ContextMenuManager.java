@@ -10,8 +10,7 @@ public class ContextMenuManager implements Input {
     private static final ContextMenuManager INSTANCE = new ContextMenuManager();
     private final List<ContextMenuProvider> providers = new ArrayList<>();
 
-    private ContextMenuManager() {
-    }
+    private ContextMenuManager() {}
 
     public static ContextMenuManager getInstance() {
         return INSTANCE;

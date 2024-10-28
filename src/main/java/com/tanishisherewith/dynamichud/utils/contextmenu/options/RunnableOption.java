@@ -33,17 +33,13 @@ public class RunnableOption extends Option<Boolean> {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (super.mouseClicked(mouseX, mouseY, button)) {
-            value = !value;
-            set(value);
-            if (value) {
-                try{
-                    task.run();
-                } catch (Throwable e){
-                    DynamicHUD.logger.error("Encountered error while running task for {}", this.name,e);
-                    return false;
-                }
-                set(false);
+            set(true);
+            try{
+                task.run();
+            } catch (Throwable e){
+                DynamicHUD.logger.error("Encountered error while running task for {}", this.name,e);
             }
+            set(false);
             return true;
         }
         return true;

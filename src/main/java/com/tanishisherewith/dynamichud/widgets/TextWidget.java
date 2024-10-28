@@ -15,17 +15,19 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
 import org.lwjgl.glfw.GLFW;
 
-import java.awt.Color;
-import java.util.*;
+import java.awt.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public class TextWidget extends Widget implements ContextMenuProvider {
+    public static WidgetData<TextWidget> DATA = new WidgetData<>("TextWidget", "Display Text on screen", TextWidget::new);
+
     public Color textColor;
     protected boolean shadow; // Whether to draw a shadow behind the text
     protected boolean rainbow; // Whether to apply a rainbow effect to the text
-    public static WidgetData<TextWidget> DATA = new WidgetData<>("TextWidget", "Display Text on screen", TextWidget::new);
     protected int rainbowSpeed = 2; //Speed of the rainbow effect
     Supplier<String> textSupplier;
     String dynamicRegistryKey;
@@ -35,12 +37,9 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     public TextWidget() {
         this(null, null, false, false, Color.WHITE, "unknown");
     }
+
     /**
      * Searches for the supplier within the {@link DynamicValueRegistry#globalRegistry} using the given registryKey
-     *
-     * @param dynamicRegistryKey
-     * @param shadow
-     * @param rainbow
      */
     public TextWidget(String dynamicRegistryKey, boolean shadow, boolean rainbow, Color color, String modID) {
         super(DATA, modID);
@@ -55,10 +54,6 @@ public class TextWidget extends Widget implements ContextMenuProvider {
 
     /**
      * Searches for the supplier within the {@link DynamicValueRegistry#localRegistry} using the given registryKey and registryValue
-     *
-     * @param dynamicRegistryKey
-     * @param shadow
-     * @param rainbow
      */
     public TextWidget(DynamicValueRegistry dynamicValueRegistry, String dynamicRegistryKey, boolean shadow, boolean rainbow, Color color, String modID) {
         super(DATA, modID);
@@ -75,26 +70,31 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     }
 
     public void createMenu() {
-        ContextMenuProperties properties = ContextMenuProperties.createGenericSimplified();
+        ContextMenuProperties properties = ContextMenuProperties.builder().skin(new ModernSkin()).build();
 
         menu = new ContextMenu(getX(), getY(), properties);
-        menu.getProperties().getSkin().setContextMenu(menu);
-        menu.addOption(new BooleanOption("Shadow", () -> this.shadow, value -> this.shadow = value, BooleanOption.BooleanType.ON_OFF)
-                .description("Adds shadow to your text")
+        menu.addOption(new BooleanOption("Shadow",
+                        () -> this.shadow, value -> this.shadow = value,
+                        BooleanOption.BooleanType.ON_OFF
+                ).description("Adds shadow to your text")
         );
         menu.addOption(new BooleanOption("Rainbow",
                 () -> this.rainbow, value -> this.rainbow = value, BooleanOption.BooleanType.ON_OFF)
                 .description("Adds rainbow effect to your text")
         );
-        menu.addOption(new ColorOption("TextColor", menu, () -> this.textColor, value -> this.textColor = value).description("Specify the color you want to add to your text"));
+        menu.addOption(new ColorOption("TextColor", menu,
+                () -> this.textColor, value -> this.textColor = value)
+                .description("Specify the color you want to add to your text")
+        );
         menu.addOption(new DoubleOption(
                 "RainbowSpeed",
                 1, 5.0f, 1,
                 () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue(), menu)
-                .setShouldRender( ()-> this.rainbow)
+                .setShouldRender(() -> this.rainbow)
         );
 
         /* TEST
+         */
 
         OptionGroup group = new OptionGroup("Color");
         group.addOption(new ColorOption("TextColor", menu,
@@ -105,7 +105,7 @@ public class TextWidget extends Widget implements ContextMenuProvider {
                 "RainbowSpeed",
                 1, 5.0f, 1,
                 () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue(), menu)
-                .setShouldRender( ()-> this.rainbow)
+                .setShouldRender(() -> this.rainbow)
         );
         menu.addOption(group);
         AtomicReference<String> option = new AtomicReference<>("Enum1");
@@ -113,13 +113,13 @@ public class TextWidget extends Widget implements ContextMenuProvider {
         AtomicBoolean running = new AtomicBoolean(false);
         AtomicBoolean subMenu = new AtomicBoolean(false);
         menu.addOption(new ListOption<>("List??? ", option::get, option::set, options));
-        menu.addOption(new RunnableOption("Runnable Test",running::get,running::set, ()-> System.out.println("Runnable ran")));
-        SubMenuOption subMenuOption = new SubMenuOption("SubMenu",menu,subMenu::get,subMenu::set);
+        menu.addOption(new RunnableOption("Runnable Test", running::get, running::set, () -> System.out.println("Runnable ran")));
+        SubMenuOption subMenuOption = new SubMenuOption("SubMenu", menu, subMenu::get, subMenu::set);
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows2", () -> this.shadow, value -> this.shadow = value));
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows3", () -> this.shadow, value -> this.shadow = value));
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows4", () -> this.shadow, value -> this.shadow = value));
         menu.addOption(subMenuOption);
-        */
+        //  */
     }
 
     @Override
@@ -251,4 +251,6 @@ public class TextWidget extends Widget implements ContextMenuProvider {
             return widget;
         }
     }
+
+
 }

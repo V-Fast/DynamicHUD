@@ -168,7 +168,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         RenderSystem.disableScissor();
 
         contextMenu.setWidth(width);
-        contextMenu.setHeight(height);
+        contextMenu.setHeight(yOffset - (contextMenu.y + 19 + 3 - scrollOffset) + 4);
 
         applyMomentum();
         scrollOffset = MathHelper.clamp(scrollOffset, 0, Math.max(0, getMaxScrollOffset()));

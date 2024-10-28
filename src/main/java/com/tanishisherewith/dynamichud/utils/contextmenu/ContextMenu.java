@@ -40,7 +40,8 @@ public class ContextMenu implements Input {
         this.y = y + properties.getHeightOffset();
         this.properties = properties;
         this.screenFactory = screenFactory;
-        darkerBackgroundColor = properties.getBackgroundColor().darker().darker().darker().darker().darker().darker();
+        this.darkerBackgroundColor = properties.getBackgroundColor().darker().darker().darker().darker().darker().darker();
+        this.properties.getSkin().setContextMenu(this);
     }
 
     public void addOption(Option<?> option) {
