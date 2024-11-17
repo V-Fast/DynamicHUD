@@ -1,38 +1,45 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
+import com.tanishisherewith.dynamichud.utils.contextmenu.layout.LayoutContext;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
+import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.GroupableSkin;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
+import com.tanishisherewith.dynamichud.utils.handlers.ScrollHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.IntSupplier;
 
 /**
  * This is one of the Skins provided by DynamicHUD featuring the minecraft-like style rendering.
  * It runs on a separate screen and provides more complex features like scrolling and larger dimension.
  * It tries to imitate the minecraft look and provides various form of panel shades {@link PanelColor}
  */
-public class MinecraftSkin extends Skin {
+public class MinecraftSkin extends Skin implements GroupableSkin {
     public static final ButtonTextures TEXTURES = new ButtonTextures(
             Identifier.ofVanilla("widget/button"),
             Identifier.ofVanilla("widget/button_disabled"),
             Identifier.ofVanilla("widget/button_highlighted")
     );
-    private static final int DEFAULT_SCROLLBAR_WIDTH = 10;
+    private static final int DEFAULT_SCROLLBAR_WIDTH = 8;
     private static final int DEFAULT_PANEL_WIDTH = 248;
     private static final int DEFAULT_PANEL_HEIGHT = 165;
-    private static final Identifier DEFAULT_BACKGROUND_PANEL = Identifier.of("minecraft", "textures/gui/demo_background.png");
-    private static final Identifier SCROLLER_TEXTURE = Identifier.of("minecraft","textures/gui/sprites/widget/scroller.png");
-    private static final Identifier SCROLL_BAR_BACKGROUND = Identifier.of("minecraft","textures/gui/sprites/widget/scroller_background.png");
+    private static final Identifier DEFAULT_BACKGROUND_PANEL = Identifier.ofVanilla("textures/gui/demo_background.png");
+    private static final Identifier SCROLLER_TEXTURE = Identifier.ofVanilla("widget/scroller");
+    private static final Identifier SCROLL_BAR_BACKGROUND = Identifier.ofVanilla("widget/scroller_background");
+    private static final Identifier GROUP_BACKGROUND = Identifier.of(DynamicHUD.MOD_ID,"textures/minecraftskin/group_panel.png");
 
     private final Identifier BACKGROUND_PANEL;
     private final int panelWidth;
@@ -40,12 +47,15 @@ public class MinecraftSkin extends Skin {
     private final PanelColor panelColor;
 
     private int imageX, imageY;
-    private int scrollOffset = 0;
-    private double scrollVelocity = 0;
-    private long lastScrollTime = 0;
-    private boolean isDragging = false;
+    private final ScrollHandler scrollHandler;
 
-    public MinecraftSkin(PanelColor color, Identifier backgroundPanel, int panelWidth, int panelHeight) {
+    private List<OptionGroup> optionGroups;
+    private OptionGroup selectedGroup;
+    private final ScrollHandler groupScrollHandler;
+    private int groupPanelWidth = 60; // Width for the group panel
+    private IntSupplier groupPanelX = ()-> imageX - groupPanelWidth - 15;
+
+    public MinecraftSkin(PanelColor color) {
         super();
         this.panelColor = color;
         addRenderer(BooleanOption.class, MinecraftBooleanRenderer::new);
@@ -56,24 +66,49 @@ public class MinecraftSkin extends Skin {
         addRenderer(RunnableOption.class, MinecraftRunnableRenderer::new);
         addRenderer(ColorOption.class, MinecraftColorOptionRenderer::new);
 
-        this.panelHeight = panelHeight;
-        this.panelWidth = panelWidth;
-        this.BACKGROUND_PANEL = backgroundPanel;
+        this.panelHeight = DEFAULT_PANEL_HEIGHT;
+        this.panelWidth = DEFAULT_PANEL_WIDTH;
+        this.BACKGROUND_PANEL = DEFAULT_BACKGROUND_PANEL;
+        this.scrollHandler = new ScrollHandler();
+        this.groupScrollHandler = new ScrollHandler();
 
         setCreateNewScreen(true);
     }
 
-    public MinecraftSkin(PanelColor color) {
-        this(color, DEFAULT_BACKGROUND_PANEL, DEFAULT_PANEL_WIDTH, DEFAULT_PANEL_HEIGHT);
+    private void enableContextMenuScissor() {
+        DrawHelper.enableScissor(0, imageY + 3, mc.getWindow().getScaledWidth(), panelHeight - 6);
     }
 
-    private void enableContextMenuScissor() {
-        DrawHelper.enableScissor(imageX, imageY + 3, mc.getWindow().getScaledWidth(), panelHeight - 8);
+    private void createGroups() {
+        OptionGroup generalGroup = new OptionGroup("General");
+        for(Option<?> option: getOptions(contextMenu)){
+            if(option instanceof OptionGroup og){
+                optionGroups.add(og);
+                og.setExpanded(false);
+            } else{
+                generalGroup.addOption(option);
+            }
+        }
+        optionGroups.addFirst(generalGroup);
     }
+
+    private void initOptionGroups(){
+        if(this.optionGroups == null) {
+            this.optionGroups = new ArrayList<>();
+            createGroups();
+            selectedGroup = optionGroups.getFirst(); // Default to the first group
+            selectedGroup.setExpanded(true);
+            scrollHandler.updateScrollPosition(0);
+        }
+    }
+
+
 
     @Override
     public void renderContextMenu(DrawContext drawContext, ContextMenu contextMenu, int mouseX, int mouseY) {
         this.contextMenu = contextMenu;
+
+        initOptionGroups();
 
         int screenWidth = mc.getWindow().getScaledWidth();
         int screenHeight = mc.getWindow().getScaledHeight();
@@ -84,86 +119,128 @@ public class MinecraftSkin extends Skin {
         contextMenu.set(centerX, centerY, 0);
 
         // Calculate the top-left corner of the image
-        imageX = (screenWidth - panelWidth) / 2;
+        imageX = (screenWidth - panelWidth + 25) / 2;
         imageY = (screenHeight - panelHeight) / 2;
-
 
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
         panelColor.applyColor();
+
         drawContext.drawTexture(BACKGROUND_PANEL, imageX, imageY, 0, 0, panelWidth, panelHeight, 256, 254);
+
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        drawContext.drawGuiTexture(TEXTURES.get(true, isMouseOver(mouseX, mouseY, imageX + 3, imageY + 3, 14, 14)), imageX + 3, imageY + 3, 14, 14);
-        drawContext.drawText(mc.textRenderer, "X", imageX + 10 - mc.textRenderer.getWidth("X") / 2, imageY + 6, -1, true);
+
+        drawSingularButton(drawContext,"X",mouseX,mouseY,imageX + 3,imageY + 3, 14,14);
+
+        //Up and down arrows near the group panel
+        int size = (int) (groupPanelWidth * 0.5f);
+        drawSingularButton(drawContext,"^",mouseX,mouseY,groupPanelX.getAsInt() + groupPanelWidth/2 - size/2,imageY - 14,size,14);
+        drawSingularButton(drawContext,"v",mouseX,mouseY,groupPanelX.getAsInt() + groupPanelWidth/2 -  size/2,imageY + panelHeight - 2,size,14);
+
+//        drawContext.drawGuiTexture(TEXTURES.get(true, isMouseOver(mouseX, mouseY, imageX + 3, imageY + 3, 14, 14)), imageX + 3, imageY + 3, 14, 14);
+  //      drawContext.drawText(mc.textRenderer, "X", imageX + 10 - mc.textRenderer.getWidth("X") / 2, imageY + 6, -1, true);
+
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        RenderSystem.disableBlend();
+        RenderSystem.disableDepthTest();
 
         this.enableContextMenuScissor();
 
-        int yOffset = imageY + 10 - scrollOffset;
         contextMenu.setWidth(panelWidth - 4);
         contextMenu.y = imageY;
-        int maxYOffset = imageY + panelHeight - 4;
 
-        for (Option<?> option : getOptions(contextMenu)) {
-            if (!option.shouldRender()) continue;
+        renderOptionGroups(drawContext,mouseX,mouseY);
+        renderSelectedGroupOptions(drawContext,mouseX,mouseY);
 
-            if (yOffset >= imageY - 10 && yOffset <= maxYOffset - option.getHeight() + 10) {
-                option.render(drawContext, imageX + 4, yOffset, mouseX, mouseY);
-            }
-
-            yOffset += option.getHeight() + 1;
-        }
-
-        contextMenu.setHeight(yOffset - imageY + 25);
-
-        // Clamp the scroll offset
-        applyMomentum();
-        scrollOffset = MathHelper.clamp(scrollOffset, 0, Math.max(0, getMaxScrollOffset()));
+        contextMenu.setHeight(getContentHeight() + 15);
 
         drawScrollbar(drawContext);
+
+        scrollHandler.updateScrollOffset(getMaxScrollOffset());
 
         // Disable scissor after rendering
         DrawHelper.disableScissor();
     }
 
+    public void drawSingularButton(DrawContext drawContext, String text, int mouseX, int mouseY, int x, int y, int width, int height){
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        drawContext.drawGuiTexture(TEXTURES.get(true, isMouseOver(mouseX, mouseY, x, y, width, height)), x, y, width, height);
+        drawContext.drawText(mc.textRenderer, text, x + width/2 - mc.textRenderer.getWidth(text) / 2, y + mc.textRenderer.fontHeight/2 - 1, -1, true);
+    }
+
+    private void renderOptionGroups(DrawContext drawContext, int mouseX, int mouseY) {
+        int groupX = groupPanelX.getAsInt();
+        int groupY = imageY;
+
+        RenderSystem.enableBlend();
+        RenderSystem.enableDepthTest();
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        drawContext.drawTexture(GROUP_BACKGROUND, groupX - 10, groupY + 2,groupPanelWidth + 20, panelHeight,0,0, 147,165,147,165);
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+        int yOffset = groupY + 12 - groupScrollHandler.getScrollOffset();
+        for (OptionGroup group : optionGroups) {
+            if (yOffset >= groupY + 12 && yOffset <= groupY + panelHeight - 15) {
+                drawContext.drawGuiTexture(TEXTURES.get(!group.isExpanded(), isMouseOver(mouseX, mouseY, groupX, yOffset, groupPanelWidth, 20)), groupX, yOffset, groupPanelWidth, 20);
+
+                DrawHelper.drawScrollableText(drawContext,mc.textRenderer,Text.literal(group.getName()),groupX + groupPanelWidth/2,groupX + 2,yOffset,groupX + groupPanelWidth - 2, yOffset + 20,-1);
+
+                //Scrollable text uses scissor so we need to enable the context menu scissor again
+                this.enableContextMenuScissor();
+
+                yOffset += 20; // Space for the header
+            }
+            yOffset += 10; // Space for the group
+        }
+
+        groupScrollHandler.updateScrollOffset(yOffset - groupY - 12 + groupScrollHandler.getScrollOffset() - panelHeight);
+
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        RenderSystem.disableBlend();
+        RenderSystem.disableDepthTest();
+    }
+
+    private int renderSelectedGroupOptions(DrawContext drawContext, int mouseX, int mouseY) {
+        int yOffset = imageY + 12 - scrollHandler.getScrollOffset();
+        for (Option<?> option : selectedGroup.getGroupOptions()) {
+            if (yOffset >= imageY - option.getHeight() && yOffset <= imageY + option.getHeight() + panelHeight) {
+                option.render(drawContext, imageX + 4, yOffset, mouseX, mouseY);
+            }
+            yOffset += option.getHeight() + 1;
+        }
+        return yOffset;
+    }
 
     private void drawScrollbar(DrawContext drawContext) {
         if (getMaxScrollOffset() > 0) {
-            int scrollbarX = imageX + panelWidth + 20;
+            int scrollbarX = imageX + panelWidth + 10;
             int scrollbarY = imageY;
-            int handleHeight = (int) ((float) panelHeight * (panelHeight / (float) getContentHeight()));
-            int handleY = scrollbarY + (int) ((float) (panelHeight - handleHeight) * ((float) scrollOffset / getMaxScrollOffset()));
+            double ratio = (double) panelHeight / getContentHeight();
+            double handleHeight = panelHeight * ratio;
+            int handleY = (int) (scrollbarY + (panelHeight - handleHeight) * ((double) scrollHandler.getScrollOffset() / getMaxScrollOffset()));
 
             RenderSystem.enableBlend();
-            RenderSystem.enableDepthTest();
-
-            drawContext.drawTexture(SCROLL_BAR_BACKGROUND, scrollbarX, scrollbarY,0,0, 10, panelHeight);
-            drawContext.drawTexture(SCROLLER_TEXTURE, scrollbarX, handleY,0,0, 10, handleHeight);
-
+            drawContext.drawGuiTexture(SCROLL_BAR_BACKGROUND, scrollbarX, scrollbarY,DEFAULT_SCROLLBAR_WIDTH, panelHeight);
+            drawContext.drawGuiTexture(SCROLLER_TEXTURE, scrollbarX, handleY,DEFAULT_SCROLLBAR_WIDTH, (int) handleHeight);
             RenderSystem.disableBlend();
-            RenderSystem.disableDepthTest();
         }
     }
     private int getMaxScrollOffset() {
-        return getContentHeight() - panelHeight;
+        return getContentHeight() - panelHeight + 10;
     }
 
     private int getContentHeight() {
-        return contextMenu.getHeight() + 10;
-    }
-
-    private void applyMomentum() {
-        long currentTime = System.currentTimeMillis();
-        double timeDelta = (currentTime - lastScrollTime) / 1000.0;
-        scrollOffset += (int) (scrollVelocity * timeDelta);
-        scrollVelocity *= 0.9; // Decay factor
-        scrollOffset = MathHelper.clamp(scrollOffset, 0, getMaxScrollOffset());
+        return selectedGroup.getHeightOfOptions() + 10;
     }
 
     @Override
     public void mouseScrolled(ContextMenu menu, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        scrollVelocity -= verticalAmount * 10;
-        lastScrollTime = System.currentTimeMillis();
+        if (isMouseOver(mouseX, mouseY, imageX, imageY, panelWidth, panelHeight)) {
+            scrollHandler.mouseScrolled(verticalAmount);
+        }
+        if (isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() - 10, imageY,groupPanelWidth + 10, panelHeight)) {
+            groupScrollHandler.mouseScrolled(verticalAmount);
+        }
     }
 
     @Override
@@ -174,11 +251,40 @@ public class MinecraftSkin extends Skin {
                         SoundEvents.UI_BUTTON_CLICK, 1.0F));
 
                 contextMenu.close();
+                scrollHandler.stopDragging();
                 return true;
             }
+            int size = (int)(groupPanelWidth * 0.5f);
+            if(isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() + (double) groupPanelWidth /2 - size/2,imageY - 14,size,14)) {
+                mc.getSoundManager().play(PositionedSoundInstance.master(
+                        SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                groupScrollHandler.addOffset(-10);
+            }
+            if(isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() + (double) groupPanelWidth /2 - size/2,imageY + panelHeight - 2,size,14)) {
+                mc.getSoundManager().play(PositionedSoundInstance.master(
+                        SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                groupScrollHandler.addOffset(10);
+            }
+
             if (isMouseOver(mouseX, mouseY, imageX + panelWidth + 10, imageY, 10, panelHeight)) {
-                isDragging = true;
+                scrollHandler.startDragging(mouseY);
                 return true;
+            }
+            int groupX = groupPanelX.getAsInt();
+            int groupY = imageY;
+
+            int yOffset = groupY + 10 - groupScrollHandler.getScrollOffset();
+            for (OptionGroup group : optionGroups) {
+                if (yOffset >= groupY && yOffset <= groupY + panelHeight) {
+                    // Handle click to select the group
+                    if (isMouseOver(mouseX, mouseY, groupX + 10, yOffset, groupPanelWidth - 20, 20)) {
+                        selectedGroup.setExpanded(false);
+                        selectedGroup = group;
+                        selectedGroup.setExpanded(true);
+                    }
+                    yOffset += 20;
+                }
+                yOffset += 10;
             }
         }
 
@@ -188,23 +294,33 @@ public class MinecraftSkin extends Skin {
     @Override
     public boolean mouseReleased(ContextMenu menu, double mouseX, double mouseY, int button) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            isDragging = false;
+            scrollHandler.stopDragging();
+            groupScrollHandler.stopDragging();
         }
         return super.mouseReleased(menu, mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseDragged(ContextMenu menu,double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (isDragging && button == 0) {
-            float scrollPercentage = (float) (mouseY - imageY) / panelHeight;
-            scrollOffset = (int) (getMaxScrollOffset() * scrollPercentage);
-            scrollOffset = MathHelper.clamp(scrollOffset, 0, getMaxScrollOffset());
-            lastScrollTime = System.currentTimeMillis();
+        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            if(isMouseOver(mouseX,mouseY,imageX + panelWidth + 5,imageY - 5,DEFAULT_SCROLLBAR_WIDTH + 5,panelHeight + 10)) {
+                scrollHandler.updateScrollPosition(mouseY);
+            }
             return true;
         }
         return super.mouseDragged(menu,mouseX, mouseY, button, deltaX, deltaY);
     }
 
+    @Override
+    public LayoutContext.Offset getGroupIndent() {
+        return LayoutContext.Offset.zero();
+    }
+
+    /**
+     * Group rendering handled already
+     */
+    @Override
+    public void renderGroup(DrawContext drawContext, OptionGroup group, int groupX, int groupY, int mouseX, int mouseY) {}
 
     public enum PanelColor {
         COFFEE_BROWN(0.6f, 0.3f, 0.1f, 0.9f),
@@ -262,6 +378,9 @@ public class MinecraftSkin extends Skin {
             RenderSystem.enableBlend();
             RenderSystem.enableDepthTest();
             drawContext.drawGuiTexture(TEXTURES.get(true, option.isMouseOver(mouseX, mouseY)), option.getX(), y, width, 20);
+            RenderSystem.disableBlend();
+            RenderSystem.disableDepthTest();
+
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             Text text = option.getBooleanType().getText(option.value);
             int color = option.value ? Color.GREEN.getRGB() : Color.RED.getRGB();
@@ -291,6 +410,9 @@ public class MinecraftSkin extends Skin {
             RenderSystem.enableBlend();
             RenderSystem.enableDepthTest();
             drawContext.drawGuiTexture(TEXTURES.get(!option.isVisible, option.isMouseOver(mouseX, mouseY)), option.getX(), y, width, 20);
+            RenderSystem.disableBlend();
+            RenderSystem.disableDepthTest();
+
             int shadowOpacity = Math.min(option.value.getAlpha(), 45);
             DrawHelper.drawRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(),
                     option.getX() + 4,
@@ -307,19 +429,21 @@ public class MinecraftSkin extends Skin {
             option.setHeight(25);
             option.setWidth(width);
 
-            DrawHelper.disableScissor(); // Disable scissor test for the color-picker
-            if (option.getColorGradient().isDisplay()) {
-                RenderSystem.enableBlend();
-                RenderSystem.enableDepthTest();
-                panelColor.applyColor();
-                int colorGradientWidth = 28 + option.getColorGradient().getBoxSize() + option.getColorGradient().getAlphaSlider().getWidth() + option.getColorGradient().getColorPickerButton().getWidth();
-                int colorGradientHeight = 18 + option.getColorGradient().getBoxSize() + option.getColorGradient().getGradientBox().getSize() + option.getColorGradient().getGradientSlider().getHeight();
-                drawContext.drawTexture(BACKGROUND_PANEL, x + panelWidth + 3, y - 6, 0, 0, colorGradientWidth, colorGradientHeight, colorGradientWidth, colorGradientHeight);
-                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+            if(option.getColorGradient().getColorPickerButton().isPicking()) {
+                DrawHelper.disableScissor(); // Disable scissor test for the colorpicker
             }
-            option.getColorGradient().render(drawContext, x + panelWidth + 10, y - 10,mouseX,mouseY);
+            //TODO: WHAT IS THISSSSS
+            int colorGradientWidth = option.getColorGradient().getBoxSize() + option.getColorGradient().getAlphaSlider().getWidth() + option.getColorGradient().getColorPickerButton().getWidth();
+            option.getColorGradient().render(drawContext, x + panelWidth/2 - colorGradientWidth/2, y + 12,mouseX,mouseY);
 
-            DrawHelper.enableScissor(imageX, imageY + 2, panelWidth, panelHeight - 4);
+            if(option.getColorGradient().shouldDisplay()) {
+                int colorGradientHeight = option.getColorGradient().getBoxSize() + 10 + option.getColorGradient().getGradientSlider().getHeight();
+                option.setHeight(option.getHeight() + colorGradientHeight);
+            }
+
+            if(option.getColorGradient().getColorPickerButton().isPicking()) {
+                DrawHelper.enableScissor(imageX, imageY + 2, panelWidth, panelHeight - 4);
+            }
         }
     }
 
@@ -353,6 +477,8 @@ public class MinecraftSkin extends Skin {
             drawContext.drawGuiTexture(option.isMouseOver(mouseX, mouseY) ? HIGHLIGHTED_TEXTURE : TEXTURE, option.getX(), y, option.getWidth(), 20);
             drawContext.drawGuiTexture(isMouseOverHandle ? HANDLE_HIGHLIGHTED_TEXTURE : HANDLE_TEXTURE, (int) Math.round(sliderX), y, 8, 20);
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.disableBlend();
+            RenderSystem.disableDepthTest();
 
             drawContext.drawText(mc.textRenderer, String.valueOf(option.value), option.getX() + option.getWidth() / 2 - mc.textRenderer.getWidth(option.value.toString()) / 2, y + 5, 16777215, false);
         }
@@ -391,6 +517,8 @@ public class MinecraftSkin extends Skin {
             drawContext.drawGuiTexture(TEXTURES.get(true, option.isMouseOver(mouseX, mouseY)), option.getX(), y, maxWidth, 20);
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             String text = option.get().toString();
+            RenderSystem.disableBlend();
+            RenderSystem.disableDepthTest();
             drawContext.drawText(mc.textRenderer, text, option.getX() + maxWidth / 2 - mc.textRenderer.getWidth(text) / 2, y + 5, Color.CYAN.getRGB(), true);
         }
     }
@@ -423,6 +551,8 @@ public class MinecraftSkin extends Skin {
             drawContext.drawGuiTexture(TEXTURES.get(true, option.isMouseOver(mouseX, mouseY)), option.getX(), y, maxWidth, 20);
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             String text = option.get().toString();
+            RenderSystem.disableBlend();
+            RenderSystem.disableDepthTest();
             drawContext.drawText(mc.textRenderer, text, option.getX() + maxWidth / 2 - mc.textRenderer.getWidth(text) / 2, y + 5, Color.CYAN.getRGB(), true);
         }
     }
@@ -439,11 +569,11 @@ public class MinecraftSkin extends Skin {
 
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.enableBlend();
-            RenderSystem.enableDepthTest();
             drawContext.drawGuiTexture(TEXTURES.get(true, option.isMouseOver(mouseX, mouseY)), option.getX(), y, option.getWidth(), 20);
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             String text = "Open";
             drawContext.drawText(mc.textRenderer, text, option.getX() + option.getWidth() / 2 - mc.textRenderer.getWidth(text) / 2, y + 5, Color.YELLOW.getRGB(), true);
+            RenderSystem.disableBlend();
 
             option.getSubMenu().render(drawContext, x + option.getParentMenu().getWidth(), y, mouseX, mouseY);
         }

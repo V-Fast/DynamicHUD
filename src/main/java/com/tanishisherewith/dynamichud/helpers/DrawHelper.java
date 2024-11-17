@@ -4,14 +4,18 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.systems.VertexSorter;
 import com.tanishisherewith.dynamichud.DynamicHUD;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL40C;
 
 import java.awt.*;
+import java.util.Objects;
 
 import static com.tanishisherewith.dynamichud.helpers.TextureHelper.mc;
 
@@ -854,6 +858,32 @@ public class DrawHelper {
 
     public static void stopScaling(MatrixStack matrices) {
         matrices.pop(); // Restore the previous transformation state
+    }
+
+    /**
+     * From minecraft
+     */
+    public static void drawScrollableText(DrawContext context, TextRenderer textRenderer, Text text, int centerX, int startX, int startY, int endX, int endY, int color) {
+        int i = textRenderer.getWidth(text);
+        int var10000 = startY + endY;
+        Objects.requireNonNull(textRenderer);
+        int j = (var10000 - 9) / 2 + 1;
+        int k = endX - startX;
+        int l;
+        if (i > k) {
+            l = i - k;
+            double d = (double) Util.getMeasuringTimeMs() / 1000.0;
+            double e = Math.max((double)l * 0.5, 3.0);
+            double f = Math.sin(1.5707963267948966 * Math.cos(6.283185307179586 * d / e)) / 2.0 + 0.5;
+            double g = MathHelper.lerp(f, 0.0, (double)l);
+            context.enableScissor(startX, startY, endX, endY);
+            context.drawTextWithShadow(textRenderer, text, startX - (int)g, j, color);
+            context.disableScissor();
+        } else {
+            l = MathHelper.clamp(centerX, startX + i / 2, endX - i / 2);
+            context.drawCenteredTextWithShadow(textRenderer, text, l, j, color);
+        }
+
     }
 
     public enum Direction {

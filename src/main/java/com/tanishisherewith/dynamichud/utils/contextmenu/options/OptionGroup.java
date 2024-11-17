@@ -10,18 +10,19 @@ import java.util.List;
 
 // A group is just another type of Option that contains other options
 public class OptionGroup extends Option<OptionGroup> {
-    private final List<Option> groupOptions = new ArrayList<>();
+    private final List<Option<?>> groupOptions = new ArrayList<>();
     protected boolean expanded = false; // Skins can choose to use this or ignore it
 
     public OptionGroup(String name) {
         super(name, () -> null, (v) -> {}, () -> true);
+        this.expanded = false;
     }
 
-    public void addOption(Option option) {
+    public void addOption(Option<?> option) {
         groupOptions.add(option);
     }
 
-    public List<Option> getGroupOptions() {
+    public List<Option<?>> getGroupOptions() {
         return Collections.unmodifiableList(groupOptions);
     }
 
@@ -31,7 +32,7 @@ public class OptionGroup extends Option<OptionGroup> {
 
         if(groupOptions == null) return;
 
-        for(Option option: groupOptions){
+        for(Option<?> option: groupOptions){
             option.updateProperties(properties);
         }
     }
@@ -46,6 +47,19 @@ public class OptionGroup extends Option<OptionGroup> {
     public void setExpanded(boolean expanded) {
         this.expanded = expanded;
     }
+
+    public int getHeightOfOptions() {
+        int height = 0;
+        for(Option<?> option : getGroupOptions()){
+            height += option.getHeight() + 1;
+        }
+        return height;
+    }
+    @Override
+    public int getHeight() {
+       return super.getHeight();
+    }
+
     public class OptionGroupRenderer implements SkinRenderer<Option<OptionGroup>> {
 
         @Override

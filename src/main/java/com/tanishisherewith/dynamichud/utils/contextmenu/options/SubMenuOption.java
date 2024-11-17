@@ -44,7 +44,6 @@ public class SubMenuOption extends Option<Boolean> {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (super.mouseClicked(mouseX, mouseY, button)) {
-            System.out.println("SUBMENU clicked");
             subMenu.toggleDisplay();
             set(subMenu.isVisible());
             return true;

@@ -158,4 +158,12 @@ public abstract class Option<T> implements Input {
     public SkinRenderer<Option<T>> getRenderer() {
         return renderer;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 }

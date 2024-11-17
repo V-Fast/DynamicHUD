@@ -8,6 +8,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProvider;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
+import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.MinecraftSkin;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.ModernSkin;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
@@ -94,7 +95,7 @@ public class TextWidget extends Widget implements ContextMenuProvider {
         );
 
         /* TEST
-         */
+
 
         OptionGroup group = new OptionGroup("Color");
         group.addOption(new ColorOption("TextColor", menu,
@@ -119,7 +120,8 @@ public class TextWidget extends Widget implements ContextMenuProvider {
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows3", () -> this.shadow, value -> this.shadow = value));
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows4", () -> this.shadow, value -> this.shadow = value));
         menu.addOption(subMenuOption);
-        //  */
+
+       //  */
     }
 
     @Override

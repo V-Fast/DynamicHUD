@@ -21,6 +21,10 @@ import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.util.BufferAllocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

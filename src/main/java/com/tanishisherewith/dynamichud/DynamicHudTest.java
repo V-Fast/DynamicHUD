@@ -28,7 +28,6 @@ public class DynamicHudTest implements DynamicHudIntegration {
         registry.registerLocal("Hello", () -> "Hello " + DynamicHUD.MC.getSession().getUsername() + "!");
         registry.registerLocal("DynamicHUD", () -> "DynamicHUD");
 
-
         FPSWidget = new TextWidget.Builder()
                 .setX(250)
                 .setY(100)

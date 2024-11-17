@@ -4,6 +4,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.ClassicSkin;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.Skin;
 
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 
 public class ContextMenuProperties {
     //Note: Not all of these properties are used in all skins or all places.
@@ -123,13 +124,9 @@ public class ContextMenuProperties {
                 .enableAnimations(enableAnimations);
     }
     public ContextMenuProperties copyNewSkin() {
-        try {
             return this.copyAsBuilder()
-                    .skin(skin.getClass().newInstance())
+                    .skin(skin)
                     .build();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public class Builder {

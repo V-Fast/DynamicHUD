@@ -181,7 +181,7 @@ public class ColorGradient {
         return boxSize;
     }
 
-    public boolean isDisplay() {
+    public boolean shouldDisplay() {
         return display;
     }
 

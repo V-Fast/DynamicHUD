@@ -8,6 +8,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.layout.LayoutContext;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.GroupableSkin;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
+import com.tanishisherewith.dynamichud.utils.handlers.ScrollHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
@@ -36,9 +37,8 @@ public class ModernSkin extends Skin implements GroupableSkin {
     private String TOOLTIP_TEXT;
     private String TOOLTIP_HEAD;
     private static int SCALE_FACTOR = 4;
-    private int scrollOffset = 0;
-    private double scrollVelocity = 0;
-    private long lastScrollTime = 0;
+    private final ScrollHandler scrollHandler;
+
 
     public ModernSkin(Color themeColor, float radius, String defaultToolTipHeader, String defaultToolTipText) {
         this.themeColor = themeColor;
@@ -55,6 +55,8 @@ public class ModernSkin extends Skin implements GroupableSkin {
         addRenderer(SubMenuOption.class, ModernSubMenuRenderer::new);
         addRenderer(RunnableOption.class, ModernRunnableRenderer::new);
         addRenderer(ColorOption.class, ModernColorOptionRenderer::new);
+
+        this.scrollHandler = new ScrollHandler();
 
         setCreateNewScreen(true);
     }
@@ -84,7 +86,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         mouseX = (int) (mc.mouse.getX()/SCALE_FACTOR);
         mouseY = (int) (mc.mouse.getY()/SCALE_FACTOR);
 
-        if(group.isExpanded()) {
+        if(group.isExpanded() && group.getHeight() > 20) {
             DrawHelper.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(),
                     groupX + 1, groupY + 14, width - groupX - 8 + contextMenuX, group.getHeight() - 16, radius, DARKER_GRAY_2.getRGB());
         }
@@ -114,7 +116,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             int scrollbarX = contextMenuX + width + 5; // Position at the right of the panel
             int scrollbarY = contextMenuY + 19; // Position below the header
             int handleHeight = (int) ((float) (height- 23) * ( (height- 23) / (float) contextMenu.getHeight()));
-            int handleY = scrollbarY + (int) ((float) ((height- 23) - handleHeight) * ((float) scrollOffset / getMaxScrollOffset()));
+            int handleY = scrollbarY + (int) ((float) ((height- 23) - handleHeight) * ((float) scrollHandler.getScrollOffset() / getMaxScrollOffset()));
 
             DrawHelper.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), scrollbarX,scrollbarY,2,height - 23,1,DARKER_GRAY.getRGB());
             DrawHelper.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), scrollbarX,handleY,2,handleHeight,1,Color.LIGHT_GRAY.getRGB());
@@ -141,7 +143,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
         drawBackButton(drawContext, mouseX, mouseY);
 
-        //Tool-Tip width + padding
+        //OptionStartX = Tool-Tip width + padding
         int optionStartX = contextMenu.x + (int) (width * 0.2f) + 10;
 
         //Background behind the options
@@ -149,7 +151,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                 optionStartX, contextMenuY + 19, width * 0.8f - 14, height - 23, radius, DARK_GRAY.getRGB());
 
         enableSkinScissor();
-        int yOffset = contextMenu.y + 19 + 3 - scrollOffset;
+        int yOffset = contextMenu.y + 19 + 3 - scrollHandler.getScrollOffset();
         for (Option<?> option : getOptions(contextMenu)) {
             if (!option.shouldRender()) continue;
 
@@ -158,7 +160,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             }
 
             if (option instanceof OptionGroup group) {
-                renderGroup(drawContext, group, optionStartX + 2, yOffset, mouseX, mouseY);
+                this.renderGroup(drawContext, group, optionStartX + 2, yOffset, mouseX, mouseY);
             } else {
                 option.render(drawContext, optionStartX + 2, yOffset, mouseX, mouseY);
             }
@@ -168,10 +170,9 @@ public class ModernSkin extends Skin implements GroupableSkin {
         RenderSystem.disableScissor();
 
         contextMenu.setWidth(width);
-        contextMenu.setHeight(yOffset - (contextMenu.y + 19 + 3 - scrollOffset) + 4);
+        contextMenu.setHeight(yOffset - (contextMenu.y + 19 + 3 - scrollHandler.getScrollOffset()) + 4);
 
-        applyMomentum();
-        scrollOffset = MathHelper.clamp(scrollOffset, 0, Math.max(0, getMaxScrollOffset()));
+        scrollHandler.updateScrollOffset(getMaxScrollOffset());
 
         drawScrollbar(drawContext);
 
@@ -281,19 +282,16 @@ public class ModernSkin extends Skin implements GroupableSkin {
         return contextMenu.getHeight() - height + 23;
     }
 
-private void applyMomentum() {
-    long currentTime = System.currentTimeMillis();
-    double timeDelta = (currentTime - lastScrollTime) / 1000.0;
-    scrollOffset += (int) (scrollVelocity * timeDelta);
-    scrollVelocity *= 0.9; // Decay factor
-    scrollOffset = MathHelper.clamp(scrollOffset, 0, getMaxScrollOffset());
-}
-
     @Override
     public void mouseScrolled(ContextMenu menu, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        scrollVelocity -= verticalAmount * 10;
-        lastScrollTime = System.currentTimeMillis();
         super.mouseScrolled(menu, mouseX, mouseY, horizontalAmount, verticalAmount);
+        scrollHandler.mouseScrolled(verticalAmount);
+    }
+
+    @Override
+    public boolean mouseReleased(ContextMenu menu, double mouseX, double mouseY, int button) {
+        scrollHandler.stopDragging();
+        return super.mouseReleased(menu, mouseX, mouseY, button);
     }
 
     @Override
@@ -301,9 +299,13 @@ private void applyMomentum() {
         mouseX = mc.mouse.getX()/SCALE_FACTOR;
         mouseY = mc.mouse.getY()/SCALE_FACTOR;
 
+        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX,mouseY, contextMenuX + width - 5,contextMenuY,7,height)) {
+            scrollHandler.startDragging(mouseY);
+        }
+
         if(button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
             int optionStartX = contextMenuX + (int) (width * 0.2f) + 10;
-            int yOffset = contextMenuY + 22;
+            int yOffset =contextMenu.y + 22 - scrollHandler.getScrollOffset();
             for (Option<?> option : getOptions(contextMenu)) {
                 if (!option.shouldRender()) continue;
 
@@ -312,6 +314,7 @@ private void applyMomentum() {
                             mc.textRenderer.getWidth(group.name + " " + (group.isExpanded() ? "-" : "+")) + 6,
                             16)) {
                         group.setExpanded(!group.isExpanded());
+                        break;
                     }
                 }
 
@@ -330,11 +333,8 @@ private void applyMomentum() {
         mouseX = mc.mouse.getX()/SCALE_FACTOR;
         mouseY = mc.mouse.getY()/SCALE_FACTOR;
 
-        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX,mouseY, contextMenuX + width - 5,contextMenuY,15,height)) {
-            float scrollPercentage = (float) (mouseY - contextMenuY - 19) / (height - 23);
-            scrollOffset = (int) (getMaxScrollOffset() * scrollPercentage);
-            scrollOffset = MathHelper.clamp(scrollOffset, 0, getMaxScrollOffset());
-            lastScrollTime = System.currentTimeMillis();
+        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX,mouseY, contextMenuX + width - 5,contextMenuY,7,height)) {
+            scrollHandler.updateScrollPosition(mouseY);
         }
         return super.mouseDragged(menu, mouseX, mouseY, button, deltaX, deltaY);
     }
@@ -422,7 +422,7 @@ private void applyMomentum() {
         private boolean display = false;
 
         public void update(ColorOption option){
-            if(option.getColorGradient().isDisplay() && display){
+            if(option.getColorGradient().shouldDisplay() && display){
                 scale += ANIMATION_SPEED;
             }
             if(!display){
@@ -450,7 +450,6 @@ private void applyMomentum() {
                     false
             );
 
-            option.setHeight(14);
             option.setWidth(20);
             option.setPosition(x, y);
 
@@ -474,7 +473,7 @@ private void applyMomentum() {
             //The letter above the shape behind the preview
             drawContext.drawText(
                     mc.textRenderer,
-                    option.getColorGradient().isDisplay() ? "^" : "v",
+                    option.getColorGradient().shouldDisplay() ? "^" : "v",
                     x + backgroundWidth - 21,
                     y + 4,
                     -1,
@@ -493,15 +492,21 @@ private void applyMomentum() {
                     1,
                     1);
 
-            int targetHeight = option.getColorGradient().isDisplay() ? (int) (option.getColorGradient().getBoxSize() + option.getColorGradient().getGradientBox().getSize() * scale) : 25;
-            option.setHeight(targetHeight);
+            int targetHeight = (int) (option.getColorGradient().getBoxSize() + option.getColorGradient().getGradientBox().getSize() * scale);
+            option.setHeight(option.getColorGradient().shouldDisplay() ?  targetHeight : 20);
             option.setWidth(width);
 
-            RenderSystem.disableScissor(); //Disable scissor so the color picker preview works
+            if(option.getColorGradient().getColorPickerButton().isPicking()) {
+                RenderSystem.disableScissor(); //Disable scissor so the color picker preview works
+            }
+
             DrawHelper.scaleAndPosition(drawContext.getMatrices(),x + backgroundWidth/2.0f,y, scale);
             option.getColorGradient().render(drawContext, x + backgroundWidth/2 - 50, y + 6,mouseX,mouseY);
             DrawHelper.stopScaling(drawContext.getMatrices());
-            enableSkinScissor(); // re-enable the scissor
+
+            if(option.getColorGradient().getColorPickerButton().isPicking()) {
+                enableSkinScissor(); // re-enable the scissor
+            }
         }
 
         @Override
