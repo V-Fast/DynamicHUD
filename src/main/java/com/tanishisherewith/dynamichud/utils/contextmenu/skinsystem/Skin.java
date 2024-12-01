@@ -24,8 +24,7 @@ public abstract class Skin {
         this.contextMenu = menu;
     }
 
-    public Skin() {
-    }
+    public Skin() {}
 
     public <T extends Option<?>> void addRenderer(Class<T> optionClass, Supplier<SkinRenderer<?>> renderer) {
         renderers.put(optionClass, renderer);

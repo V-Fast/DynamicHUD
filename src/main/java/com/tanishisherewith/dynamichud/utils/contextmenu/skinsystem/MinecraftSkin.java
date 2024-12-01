@@ -134,8 +134,8 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
         //Up and down arrows near the group panel
         int size = (int) (groupPanelWidth * 0.5f);
-        drawSingularButton(drawContext,"^",mouseX,mouseY,groupPanelX.getAsInt() + groupPanelWidth/2 - size/2,imageY - 14,size,14);
-        drawSingularButton(drawContext,"v",mouseX,mouseY,groupPanelX.getAsInt() + groupPanelWidth/2 -  size/2,imageY + panelHeight - 2,size,14);
+        drawSingularButton(drawContext,"^",mouseX,mouseY,groupPanelX.getAsInt() + groupPanelWidth/2 - size/2,imageY - 14,size,14, groupScrollHandler.isOffsetWithinBounds(-10));
+        drawSingularButton(drawContext,"v",mouseX,mouseY,groupPanelX.getAsInt() + groupPanelWidth/2 -  size/2,imageY + panelHeight - 2,size,14, groupScrollHandler.isOffsetWithinBounds(10));
 
 //        drawContext.drawGuiTexture(TEXTURES.get(true, isMouseOver(mouseX, mouseY, imageX + 3, imageY + 3, 14, 14)), imageX + 3, imageY + 3, 14, 14);
   //      drawContext.drawText(mc.textRenderer, "X", imageX + 10 - mc.textRenderer.getWidth("X") / 2, imageY + 6, -1, true);
@@ -162,10 +162,13 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         DrawHelper.disableScissor();
     }
 
-    public void drawSingularButton(DrawContext drawContext, String text, int mouseX, int mouseY, int x, int y, int width, int height){
+    public void drawSingularButton(DrawContext drawContext, String text, int mouseX, int mouseY, int x, int y, int width, int height, boolean enabled){
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        drawContext.drawGuiTexture(TEXTURES.get(true, isMouseOver(mouseX, mouseY, x, y, width, height)), x, y, width, height);
+        drawContext.drawGuiTexture(TEXTURES.get(enabled, isMouseOver(mouseX, mouseY, x, y, width, height)), x, y, width, height);
         drawContext.drawText(mc.textRenderer, text, x + width/2 - mc.textRenderer.getWidth(text) / 2, y + mc.textRenderer.fontHeight/2 - 1, -1, true);
+    }
+    public void drawSingularButton(DrawContext drawContext, String text, int mouseX, int mouseY, int x, int y, int width, int height){
+       this.drawSingularButton(drawContext,text,mouseX,mouseY,x,y,width,height,true);
     }
 
     private void renderOptionGroups(DrawContext drawContext, int mouseX, int mouseY) {
@@ -255,12 +258,13 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
                 return true;
             }
             int size = (int)(groupPanelWidth * 0.5f);
-            if(isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() + (double) groupPanelWidth /2 - size/2,imageY - 14,size,14)) {
+            //Up and down button
+            if(groupScrollHandler.isOffsetWithinBounds(-10) && isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() + (double) groupPanelWidth /2 - size/2,imageY - 14,size,14)) {
                 mc.getSoundManager().play(PositionedSoundInstance.master(
                         SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 groupScrollHandler.addOffset(-10);
             }
-            if(isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() + (double) groupPanelWidth /2 - size/2,imageY + panelHeight - 2,size,14)) {
+            if(groupScrollHandler.isOffsetWithinBounds(10) && isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() + (double) groupPanelWidth /2 - size/2,imageY + panelHeight - 2,size,14)) {
                 mc.getSoundManager().play(PositionedSoundInstance.master(
                         SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 groupScrollHandler.addOffset(10);

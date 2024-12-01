@@ -39,6 +39,8 @@ public final class GlobalConfig {
 
     @SerialEntry
     private boolean showColorPickerPreview = true;
+    @SerialEntry
+    private boolean forceSameContextMenuSkin = true;
 
     @SerialEntry
     private int snapSize = 100;

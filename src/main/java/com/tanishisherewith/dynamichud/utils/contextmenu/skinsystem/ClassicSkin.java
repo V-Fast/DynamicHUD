@@ -70,7 +70,6 @@ public class ClassicSkin extends Skin {
     }
 
     private void drawBackground(MatrixStack matrices, ContextMenu contextMenu, ContextMenuProperties properties, int yOffset, int width, int height, int color, boolean shadow) {
-        // Wow so good code.
         if (properties.roundedCorners()) {
             if (shadow) {
                 DrawHelper.drawRoundedRectangleWithShadowBadWay(matrices.peek().getPositionMatrix(),

@@ -70,8 +70,8 @@ public class ColorGradient {
             Framebuffer framebuffer = client.getFramebuffer();
             if (framebuffer != null) {
                 //Translate cursor screen position to minecraft's scaled windo
-                int x = (int) (mouseX * framebuffer.textureWidth / client.getWindow().getScaledWidth());
-                int y = (int) ((client.getWindow().getScaledHeight() - mouseY) * framebuffer.textureHeight / client.getWindow().getScaledHeight());
+                int x = mouseX * framebuffer.textureWidth / client.getWindow().getScaledWidth();
+                int y = (client.getWindow().getScaledHeight() - mouseY) * framebuffer.textureHeight / client.getWindow().getScaledHeight();
 
                 try {
                     int bufferSize = framebuffer.textureWidth * framebuffer.textureHeight * 4;
@@ -88,8 +88,8 @@ public class ColorGradient {
 
                         drawContext.getMatrices().push();
                         drawContext.getMatrices().translate(0, 0, 500);
-                        drawContext.fill((int) mouseX + 10, (int) mouseY, (int) mouseX + 26, (int) mouseY + 16, -1);
-                        drawContext.fill((int) mouseX + 11, (int) mouseY + 1, (int) mouseX + 25, (int) mouseY + 15, (red << 16) | (green << 8) | blue | 0xFF000000);
+                        drawContext.fill(mouseX + 10, mouseY, mouseX + 26, mouseY + 16, -1);
+                        drawContext.fill(mouseX + 11, mouseY + 1, mouseX + 25, mouseY + 15, (red << 16) | (green << 8) | blue | 0xFF000000);
                         drawContext.getMatrices().pop();
                     }
                 } catch (Exception e) {

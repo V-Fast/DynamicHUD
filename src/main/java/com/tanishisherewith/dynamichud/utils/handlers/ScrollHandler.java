@@ -68,4 +68,7 @@ public class ScrollHandler {
     public int getScrollOffset() {
         return Math.max(scrollOffset, 0);
     }
+    public boolean isOffsetWithinBounds(int offset){
+        return scrollOffset + offset >= 0 && scrollOffset + offset <= maxScrollOffset;
+    }
 }

@@ -71,7 +71,7 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     }
 
     public void createMenu() {
-        ContextMenuProperties properties = ContextMenuProperties.builder().skin(new ModernSkin()).build();
+        ContextMenuProperties properties = ContextMenuProperties.builder().skin(new MinecraftSkin(MinecraftSkin.PanelColor.MIDNIGHT_PURPLE)).build();
 
         menu = new ContextMenu(getX(), getY(), properties);
         menu.addOption(new BooleanOption("Shadow",
@@ -94,9 +94,7 @@ public class TextWidget extends Widget implements ContextMenuProvider {
                 .setShouldRender(() -> this.rainbow)
         );
 
-        /* TEST
-
-
+        /*
         OptionGroup group = new OptionGroup("Color");
         group.addOption(new ColorOption("TextColor", menu,
                 () -> this.textColor, value -> this.textColor = value)
@@ -108,7 +106,6 @@ public class TextWidget extends Widget implements ContextMenuProvider {
                 () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue(), menu)
                 .setShouldRender(() -> this.rainbow)
         );
-        menu.addOption(group);
         AtomicReference<String> option = new AtomicReference<>("Enum1");
         List<String> options = Arrays.asList("List1", "LONGER LIST 2", "List3");
         AtomicBoolean running = new AtomicBoolean(false);
@@ -120,8 +117,7 @@ public class TextWidget extends Widget implements ContextMenuProvider {
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows3", () -> this.shadow, value -> this.shadow = value));
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows4", () -> this.shadow, value -> this.shadow = value));
         menu.addOption(subMenuOption);
-
-       //  */
+       // */
     }
 
     @Override
