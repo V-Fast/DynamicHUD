@@ -2,6 +2,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.layout;
 
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
 
+//This was supposed to be used for something bigger but that got scraped.
 public class LayoutContext {
     private final Offset indent;
     private final Option<?> parentOption;

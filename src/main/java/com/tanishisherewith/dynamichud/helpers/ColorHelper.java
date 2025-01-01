@@ -112,6 +112,38 @@ public class ColorHelper {
     }
 
     /**
+     * @param color Target color.
+     * @return Alpha of the color.
+     */
+    public static float getAlpha(int color) {
+        return (float) (color >> 24 & 255) / 255.0F;
+    }
+
+    /**
+     * @param color Target color.
+     * @return Red value of the color.
+     */
+    public static float getRed(int color) {
+        return (float) (color >> 16 & 255) / 255.0F;
+    }
+
+    /**
+     * @param color Target color.
+     * @return Green value of the color.
+     */
+    public static float getGreen(int color) {
+        return (float) (color >> 8 & 255) / 255.0F;
+    }
+
+    /**
+     * @param color Target color.
+     * @return Blue value of the color.
+     */
+    public static float getBlue(int color) {
+        return (float) (color & 255) / 255.0F;
+    }
+
+    /**
      * Rainbow color with custom speed.
      *
      * @param speed

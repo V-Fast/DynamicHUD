@@ -1,7 +1,6 @@
 package com.tanishisherewith.dynamichud.widget;
 
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
-import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.UID;
 import net.minecraft.client.MinecraftClient;
@@ -11,7 +10,6 @@ import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 public abstract class Widget {
-    private final Anchor anchor;         // The chosen anchor point
     public WidgetData<?> DATA;
     /**
      * This is the UID of the widget used to identify during loading and saving.
@@ -42,12 +40,9 @@ public abstract class Widget {
     protected int x, y;
     protected boolean shouldScale = true;
     protected MinecraftClient mc = MinecraftClient.getInstance();
-    /**
-     * Scale of the current widget.
-     *
-     * @see GlobalConfig#getScale()
-     */
-    protected float scale = 1.0f;
+
+    private final Anchor anchor;         // The chosen anchor point
+
     //Dimensions of the widget
     protected WidgetBox widgetBox;
     int startX, startY;
@@ -175,7 +170,7 @@ public abstract class Widget {
     public final void renderInEditor(DrawContext drawContext, int mouseX, int mouseY) {
         if (!isInEditor) return;
 
-        displayBg(drawContext);
+        drawWidgetBackground(drawContext);
 
         if (shouldScale) {
             DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().getScale());
@@ -194,7 +189,7 @@ public abstract class Widget {
      * The mouse position values are only passed when in a {@link com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen} screen.
      * </p>
      *
-     * @param context
+     * @param context DrawContext Object
      * @param mouseX  X position of mouse.
      * @param mouseY  Y position of mouse
      */
@@ -206,7 +201,7 @@ public abstract class Widget {
      * Could also be used to display placeholder values.
      */
     private void renderWidgetInEditor(DrawContext context, int mouseX, int mouseY) {
-        //displayBg(context);
+        //drawWidgetBackground(context);
 
         renderWidget(context, mouseX, mouseY);
     }
@@ -224,7 +219,7 @@ public abstract class Widget {
         return false;
     }
 
-    /* Input related methods. Override with super call to add your own input-based code like contextMenu */
+    /* Input related methods. Override with **super call** to add your own input-based code like contextMenu */
 
     public void clampPosition() {
         this.x = (int) MathHelper.clamp(this.x, 0, mc.getWindow().getScaledWidth() - getWidth());
@@ -285,9 +280,10 @@ public abstract class Widget {
      * Displays a faint grayish background if enabled or faint reddish background if disabled.
      * Drawn with 2 pixel offset to all sides
      */
-    protected void displayBg(DrawContext context) {
+    protected void drawWidgetBackground(DrawContext context) {
         int backgroundColor = this.shouldDisplay() ? GlobalConfig.get().getHudActiveColor().getRGB() : GlobalConfig.get().getHudInactiveColor().getRGB();
         WidgetBox box = this.getWidgetBox();
+
         DrawHelper.drawRectangle(context.getMatrices().peek().getPositionMatrix(),
                 box.x,
                 box.y,

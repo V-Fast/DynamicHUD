@@ -21,7 +21,7 @@ public class SubMenuOption extends Option<Boolean> {
 
     public SubMenuOption(String name, ContextMenu parentMenu, Supplier<Boolean> getter, Consumer<Boolean> setter, ContextMenuProperties properties) {
         super(name,getter, setter);
-        Objects.requireNonNull(parentMenu, "Parent Menu cannot be null");
+        Objects.requireNonNull(parentMenu, "Parent Context Menu cannot be null in " + name + " SubMenu option");
         this.parentMenu = parentMenu;
         this.subMenu = new ContextMenu(parentMenu.x + parentMenu.getWidth(), this.y, properties);
         this.subMenu.getProperties().setHeightOffset(0);

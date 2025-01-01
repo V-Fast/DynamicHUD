@@ -20,7 +20,7 @@ import java.util.Objects;
 import static com.tanishisherewith.dynamichud.helpers.TextureHelper.mc;
 
 /**
- * Credits: <a href="https://github.com/HeliosMinecraft/HeliosClient/blob/main/src/main/java/dev/heliosclient/util/ColorUtils.java">HeliosClient</a>
+ * Credits: <a href="https://github.com/HeliosMinecraft/HeliosClient/blob/main/src/main/java/dev/heliosclient/util/render/Renderer2D.java">HeliosClient</a>
  */
 public class DrawHelper {
     public static VertexSorter vertexSorter;
@@ -249,7 +249,7 @@ public class DrawHelper {
     }
 
 
-    public static void drawRainbowGradient(Matrix4f matrix, float x, float y, float width, float height) {
+    public static void drawRainbowGradient(float x, float y, float width, float height) {
         Matrix4f matrix4f = RenderSystem.getModelViewMatrix();
 
         RenderSystem.enableBlend();
