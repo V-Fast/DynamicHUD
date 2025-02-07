@@ -9,16 +9,20 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
-public class ContextMenu implements Input {
+public class ContextMenu<T extends ContextMenuProperties> implements Input {
     public final Color darkerBackgroundColor;
     //The properties of a context menu
-    protected final ContextMenuProperties properties;
+    @NotNull
+    protected final T properties;
     protected final List<Option<?>> options = new ArrayList<>(); // The list of options in the context menu
     protected final ContextMenuScreenFactory screenFactory;
     public int x, y;
@@ -31,16 +35,26 @@ public class ContextMenu implements Input {
     protected Screen parentScreen = null;
     protected boolean newScreenFlag = false;
 
-    public ContextMenu(int x, int y, ContextMenuProperties properties) {
+    @Nullable
+    private final ContextMenu<?> parentMenu;
+
+    public ContextMenu(int x, int y, T properties) {
         this(x, y, properties, new DefaultContextMenuScreenFactory());
     }
 
-    public ContextMenu(int x, int y, ContextMenuProperties properties, ContextMenuScreenFactory screenFactory) {
+    public ContextMenu(int x, int y, T properties, ContextMenuScreenFactory screenFactory) {
+        this(x, y, properties, screenFactory,null);
+    }
+    public ContextMenu(int x, int y, @NotNull T properties, ContextMenuScreenFactory screenFactory, @Nullable ContextMenu<?> parentMenu) {
+        Objects.requireNonNull(screenFactory, "ContextMenuScreenFactory cannot be null!");
+        Objects.requireNonNull(properties, "ContextMenu Properties cannot be null!");
+
         this.x = x;
         this.y = y + properties.getHeightOffset();
         this.properties = properties;
         this.screenFactory = screenFactory;
         this.darkerBackgroundColor = properties.getBackgroundColor().darker().darker().darker().darker().darker().darker();
+        this.parentMenu = parentMenu;
         this.properties.getSkin().setContextMenu(this);
     }
 
@@ -161,6 +175,7 @@ public class ContextMenu implements Input {
 
     @Override
     public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        if (!shouldDisplay) return;
         for (Option option : options) {
             option.getRenderer().mouseScrolled(option,mouseX, mouseY, horizontalAmount, verticalAmount);
         }
@@ -169,6 +184,7 @@ public class ContextMenu implements Input {
 
     @Override
     public void charTyped(char c) {
+        if (!shouldDisplay) return;
         for (Option<?> option : options) {
             option.charTyped(c);
         }
@@ -208,12 +224,21 @@ public class ContextMenu implements Input {
         this.width = width;
     }
 
-    public ContextMenuProperties getProperties() {
+    public @NotNull T getProperties() {
         return properties;
     }
 
     public void setWidgetHeight(int widgetHeight) {
         this.widgetHeight = widgetHeight;
+    }
+
+    @Nullable
+    public ContextMenu<?> getParentMenu() {
+        return parentMenu;
+    }
+
+    public <K extends ContextMenuProperties> ContextMenu<K> createSubMenu(int x, int y, K properties){
+        return new ContextMenu<>(x,y,properties, screenFactory,this);
     }
 
     public float getScale() {

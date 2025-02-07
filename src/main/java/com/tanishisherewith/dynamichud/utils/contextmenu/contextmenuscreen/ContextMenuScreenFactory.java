@@ -10,5 +10,5 @@ import net.minecraft.client.gui.screen.Screen;
  * This can also be used for developers to provide a new custom screen by them or for a custom skin.
  */
 public interface ContextMenuScreenFactory {
-    Screen create(ContextMenu contextMenu, ContextMenuProperties properties);
+    Screen create(ContextMenu<?> contextMenu, ContextMenuProperties properties);
 }

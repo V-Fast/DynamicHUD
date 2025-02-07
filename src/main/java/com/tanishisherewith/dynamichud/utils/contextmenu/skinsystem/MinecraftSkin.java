@@ -105,7 +105,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
 
     @Override
-    public void renderContextMenu(DrawContext drawContext, ContextMenu contextMenu, int mouseX, int mouseY) {
+    public void renderContextMenu(DrawContext drawContext, ContextMenu<?> contextMenu, int mouseX, int mouseY) {
         this.contextMenu = contextMenu;
 
         initOptionGroups();
@@ -237,7 +237,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     }
 
     @Override
-    public void mouseScrolled(ContextMenu menu, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+    public void mouseScrolled(ContextMenu<?> menu, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         if (isMouseOver(mouseX, mouseY, imageX, imageY, panelWidth, panelHeight)) {
             scrollHandler.mouseScrolled(verticalAmount);
         }
@@ -247,7 +247,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     }
 
     @Override
-    public boolean mouseClicked(ContextMenu menu, double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(ContextMenu<?> menu, double mouseX, double mouseY, int button) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             if(isMouseOver(mouseX, mouseY, imageX + 3, imageY + 3, 14, 14)) {
                 mc.getSoundManager().play(PositionedSoundInstance.master(
@@ -296,7 +296,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     }
 
     @Override
-    public boolean mouseReleased(ContextMenu menu, double mouseX, double mouseY, int button) {
+    public boolean mouseReleased(ContextMenu<?> menu, double mouseX, double mouseY, int button) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             scrollHandler.stopDragging();
             groupScrollHandler.stopDragging();
@@ -305,7 +305,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     }
 
     @Override
-    public boolean mouseDragged(ContextMenu menu,double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+    public boolean mouseDragged(ContextMenu<?> menu,double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             if(isMouseOver(mouseX,mouseY,imageX + panelWidth + 5,imageY - 5,DEFAULT_SCROLLBAR_WIDTH + 5,panelHeight + 10)) {
                 scrollHandler.updateScrollPosition(mouseY);

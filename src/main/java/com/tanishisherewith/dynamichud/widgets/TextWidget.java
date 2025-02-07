@@ -33,7 +33,7 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     Supplier<String> textSupplier;
     String dynamicRegistryKey;
     DynamicValueRegistry dynamicValueRegistry = null;
-    private ContextMenu menu;
+    private ContextMenu<?> menu;
 
     public TextWidget() {
         this(null, null, false, false, Color.WHITE, "unknown");
@@ -73,7 +73,7 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     public void createMenu() {
         ContextMenuProperties properties = ContextMenuProperties.builder().skin(new MinecraftSkin(MinecraftSkin.PanelColor.MIDNIGHT_PURPLE)).build();
 
-        menu = new ContextMenu(getX(), getY(), properties);
+        menu = new ContextMenu<>(getX(), getY(), properties);
         menu.addOption(new BooleanOption("Shadow",
                         () -> this.shadow, value -> this.shadow = value,
                         BooleanOption.BooleanType.ON_OFF
@@ -194,7 +194,7 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     }
 
     @Override
-    public ContextMenu getContextMenu() {
+    public ContextMenu<?> getContextMenu() {
         return menu;
     }
 

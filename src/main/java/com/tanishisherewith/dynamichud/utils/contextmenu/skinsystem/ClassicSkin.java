@@ -33,7 +33,7 @@ public class ClassicSkin extends Skin {
     }
 
     @Override
-    public void renderContextMenu(DrawContext drawContext, ContextMenu contextMenu, int mouseX, int mouseY) {
+    public void renderContextMenu(DrawContext drawContext, ContextMenu<?> contextMenu, int mouseX, int mouseY) {
         this.contextMenu = contextMenu;
 
         MatrixStack matrices = drawContext.getMatrices();
@@ -65,12 +65,13 @@ public class ClassicSkin extends Skin {
         }
     }
 
-    private void drawBackground(MatrixStack matrices, ContextMenu contextMenu, ContextMenuProperties properties) {
+    private void drawBackground(MatrixStack matrices, ContextMenu<?> contextMenu, ContextMenuProperties properties) {
         drawBackground(matrices, contextMenu, properties, contextMenu.y, contextMenu.getWidth(), contextMenu.getHeight(), properties.getBackgroundColor().getRGB(), properties.shadow());
     }
 
-    private void drawBackground(MatrixStack matrices, ContextMenu contextMenu, ContextMenuProperties properties, int yOffset, int width, int height, int color, boolean shadow) {
+    private void drawBackground(MatrixStack matrices, ContextMenu<?> contextMenu, ContextMenuProperties properties, int yOffset, int width, int height, int color, boolean shadow) {
         if (properties.roundedCorners()) {
+            // Rounded
             if (shadow) {
                 DrawHelper.drawRoundedRectangleWithShadowBadWay(matrices.peek().getPositionMatrix(),
                         contextMenu.x,
@@ -94,6 +95,7 @@ public class ClassicSkin extends Skin {
                 );
             }
         } else {
+            // Normal
             if (shadow) {
                 DrawHelper.drawRectangleWithShadowBadWay(matrices.peek().getPositionMatrix(),
                         contextMenu.x,
@@ -117,7 +119,7 @@ public class ClassicSkin extends Skin {
         }
     }
 
-    private void drawBorder(MatrixStack matrices, ContextMenu contextMenu, ContextMenuProperties properties) {
+    private void drawBorder(MatrixStack matrices, ContextMenu<?> contextMenu, ContextMenuProperties properties) {
         if (properties.roundedCorners()) {
             DrawHelper.drawOutlineRoundedBox(matrices.peek().getPositionMatrix(),
                     contextMenu.x,

@@ -9,7 +9,7 @@ import net.minecraft.client.gui.screen.Screen;
  */
 public class DefaultContextMenuScreenFactory implements ContextMenuScreenFactory {
     @Override
-    public Screen create(ContextMenu contextMenu, ContextMenuProperties properties) {
+    public Screen create(ContextMenu<?> contextMenu, ContextMenuProperties properties) {
         return new ContextMenuScreen(contextMenu, properties);
     }
 }

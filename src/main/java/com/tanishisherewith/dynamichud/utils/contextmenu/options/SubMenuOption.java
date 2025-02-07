@@ -16,29 +16,27 @@ import java.util.function.Supplier;
  * The {@link #setter} returns a boolean value depending on if the subMenu is visible or not
  */
 public class SubMenuOption extends Option<Boolean> {
-    private final ContextMenu subMenu;
-    private final ContextMenu parentMenu;
+    private final ContextMenu<?> subMenu;
 
-    public SubMenuOption(String name, ContextMenu parentMenu, Supplier<Boolean> getter, Consumer<Boolean> setter, ContextMenuProperties properties) {
+    public <T extends ContextMenuProperties> SubMenuOption(String name, ContextMenu<?> parentMenu, Supplier<Boolean> getter, Consumer<Boolean> setter, T properties) {
         super(name,getter, setter);
-        Objects.requireNonNull(parentMenu, "Parent Context Menu cannot be null in " + name + " SubMenu option");
-        this.parentMenu = parentMenu;
-        this.subMenu = new ContextMenu(parentMenu.x + parentMenu.getWidth(), this.y, properties);
+        Objects.requireNonNull(parentMenu, "Parent Context Menu cannot be null in [" + name + "] SubMenu option");
+        this.subMenu = parentMenu.createSubMenu(parentMenu.x + parentMenu.getWidth(), this.y, properties);
         this.subMenu.getProperties().setHeightOffset(0);
         this.subMenu.setVisible(get());
         this.renderer.init(this);
     }
 
-    public SubMenuOption(String name, ContextMenu parentMenu, ContextMenuProperties properties) {
+    public <T extends ContextMenuProperties> SubMenuOption(String name, ContextMenu<?> parentMenu, T properties) {
         this(name, parentMenu, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value), properties);
     }
 
-    public SubMenuOption(String name, ContextMenu parentMenu, Supplier<Boolean> getter, Consumer<Boolean> setter) {
-        this(name, parentMenu, getter, setter, parentMenu.getProperties().copyNewSkin());
+    public <T extends ContextMenuProperties> SubMenuOption(String name, ContextMenu<?> parentMenu, Supplier<Boolean> getter, Consumer<Boolean> setter) {
+        this(name, parentMenu, getter, setter, parentMenu.getProperties().cloneWithSkin());
     }
 
-    public SubMenuOption(String name, ContextMenu parentMenu) {
-        this(name, parentMenu, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value), parentMenu.getProperties().copyNewSkin());
+    public <T extends ContextMenuProperties> SubMenuOption(String name, ContextMenu<?> parentMenu) {
+        this(name, parentMenu, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value), parentMenu.getProperties().cloneWithSkin());
     }
 
     @Override
@@ -68,11 +66,11 @@ public class SubMenuOption extends Option<Boolean> {
         return this;
     }
 
-    public ContextMenu getSubMenu() {
+    public ContextMenu<?> getSubMenu() {
         return subMenu;
     }
 
-    public ContextMenu getParentMenu() {
-        return parentMenu;
+    public ContextMenu<?> getParentMenu() {
+        return subMenu.getParentMenu();
     }
 }

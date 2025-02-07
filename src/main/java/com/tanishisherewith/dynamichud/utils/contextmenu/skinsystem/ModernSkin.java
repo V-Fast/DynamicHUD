@@ -124,7 +124,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
     }
 
     @Override
-    public void renderContextMenu(DrawContext drawContext, ContextMenu contextMenu, int mouseX, int mouseY) {
+    public void renderContextMenu(DrawContext drawContext, ContextMenu<?> contextMenu, int mouseX, int mouseY) {
         //This is equivalent to "Auto" GUI scale in minecraft options
         SCALE_FACTOR = mc.getWindow().calculateScaleFactor(0, mc.forcesUnicodeFont());
 
@@ -283,19 +283,19 @@ public class ModernSkin extends Skin implements GroupableSkin {
     }
 
     @Override
-    public void mouseScrolled(ContextMenu menu, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+    public void mouseScrolled(ContextMenu<?> menu, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         super.mouseScrolled(menu, mouseX, mouseY, horizontalAmount, verticalAmount);
         scrollHandler.mouseScrolled(verticalAmount);
     }
 
     @Override
-    public boolean mouseReleased(ContextMenu menu, double mouseX, double mouseY, int button) {
+    public boolean mouseReleased(ContextMenu<?> menu, double mouseX, double mouseY, int button) {
         scrollHandler.stopDragging();
         return super.mouseReleased(menu, mouseX, mouseY, button);
     }
 
     @Override
-    public boolean mouseClicked(ContextMenu menu, double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(ContextMenu<?> menu, double mouseX, double mouseY, int button) {
         mouseX = mc.mouse.getX()/SCALE_FACTOR;
         mouseY = mc.mouse.getY()/SCALE_FACTOR;
 
@@ -305,7 +305,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
         if(button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
             int optionStartX = contextMenuX + (int) (width * 0.2f) + 10;
-            int yOffset =contextMenu.y + 22 - scrollHandler.getScrollOffset();
+            int yOffset = contextMenu.y + 22 - scrollHandler.getScrollOffset();
             for (Option<?> option : getOptions(contextMenu)) {
                 if (!option.shouldRender()) continue;
 
@@ -329,7 +329,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         return super.mouseClicked(menu, mouseX, mouseY, button);
     }
     @Override
-    public boolean mouseDragged(ContextMenu menu, double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+    public boolean mouseDragged(ContextMenu<?> menu, double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         mouseX = mc.mouse.getX()/SCALE_FACTOR;
         mouseY = mc.mouse.getY()/SCALE_FACTOR;
 

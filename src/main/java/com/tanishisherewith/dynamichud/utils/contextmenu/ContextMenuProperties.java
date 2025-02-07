@@ -4,29 +4,29 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.ClassicSkin;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.Skin;
 
 import java.awt.*;
-import java.lang.reflect.InvocationTargetException;
 
+/**
+ * Note: Not all of these properties are used in all skins or all places.
+ */
 public class ContextMenuProperties {
-    //Note: Not all of these properties are used in all skins or all places.
+    protected Color backgroundColor = new Color(107, 112, 126, 124);
+    protected Color borderColor = Color.BLACK;
+    protected float borderWidth = 1f;
+    protected int padding = 5;  // The amount of padding around the rectangle
+    protected int heightOffset = 4; // Height offset from the widget
+    protected boolean drawBorder = true;
+    protected boolean shadow = true;
+    protected boolean roundedCorners = true;
+    protected int cornerRadius = 3;
+    protected boolean hoverEffect = true;
+    protected Color hoverColor = new Color(42, 42, 42, 150);
+    protected boolean enableAnimations = true;
+    protected Skin skin = new ClassicSkin();
 
-    private Color backgroundColor = new Color(107, 112, 126, 124);
-    private Color borderColor = Color.BLACK;
-    private float borderWidth = 1f;
-    private int padding = 5;  // The amount of padding around the rectangle
-    private int heightOffset = 4; // Height offset from the widget
-    private boolean drawBorder = true;
-    private boolean shadow = true;
-    private boolean roundedCorners = true;
-    private int cornerRadius = 3;
-    private boolean hoverEffect = true;
-    private Color hoverColor = new Color(42, 42, 42, 150);
-    private boolean enableAnimations = true;
-    private Skin skin = new ClassicSkin();
+    protected ContextMenuProperties() {}
 
-    private ContextMenuProperties() {}
-
-    public static Builder builder() {
-        return new ContextMenuProperties().new Builder();
+    public static Builder<?> builder() {
+        return new Builder<>(new ContextMenuProperties());
     }
 
     public static ContextMenuProperties createGenericSimplified() {
@@ -90,24 +90,10 @@ public class ContextMenuProperties {
         return skin;
     }
 
-    public ContextMenuProperties copy() {
-        return ContextMenuProperties.builder()
-                .backgroundColor(backgroundColor)
-                .borderColor(borderColor)
-                .borderWidth(borderWidth)
-                .padding(padding)
-                .heightOffset(heightOffset)
-                .drawBorder(drawBorder)
-                .shadow(shadow)
-                .roundedCorners(roundedCorners)
-                .cornerRadius(cornerRadius)
-                .hoverEffect(hoverEffect)
-                .hoverColor(hoverColor)
-                .skin(skin)
-                .enableAnimations(enableAnimations)
-                .build();
+    public ContextMenuProperties clone() {
+        return cloneToBuilder().build();
     }
-    public Builder copyAsBuilder() {
+    public Builder<?> cloneToBuilder() {
         return ContextMenuProperties.builder()
                 .backgroundColor(backgroundColor)
                 .borderColor(borderColor)
@@ -120,86 +106,88 @@ public class ContextMenuProperties {
                 .cornerRadius(cornerRadius)
                 .hoverEffect(hoverEffect)
                 .hoverColor(hoverColor)
-                .skin(skin)
                 .enableAnimations(enableAnimations);
     }
-    public ContextMenuProperties copyNewSkin() {
-            return this.copyAsBuilder()
+    public ContextMenuProperties cloneWithSkin() {
+            return this.cloneToBuilder()
                     .skin(skin)
                     .build();
     }
 
-    public class Builder {
-        private Builder() {
+    public static class Builder<T extends ContextMenuProperties> {
+        protected final T properties;
+
+        protected Builder(T properties) {
+            this.properties = properties;
         }
 
-        public Builder backgroundColor(Color backgroundColor) {
-            ContextMenuProperties.this.backgroundColor = backgroundColor;
+        public Builder<T> backgroundColor(Color backgroundColor) {
+            properties.backgroundColor = backgroundColor;
             return this;
         }
 
-        public Builder borderColor(Color borderColor) {
-            ContextMenuProperties.this.borderColor = borderColor;
+        public Builder<T> borderColor(Color borderColor) {
+            properties.borderColor = borderColor;
             return this;
         }
 
-        public Builder skin(Skin skin) {
-            ContextMenuProperties.this.skin = skin;
+        public Builder<T> skin(Skin skin) {
+            properties.skin = skin;
             return this;
         }
 
-        public Builder borderWidth(float borderWidth) {
-            ContextMenuProperties.this.borderWidth = borderWidth;
+        public Builder<T> borderWidth(float borderWidth) {
+            properties.borderWidth = borderWidth;
             return this;
         }
 
-        public Builder padding(int padding) {
-            ContextMenuProperties.this.padding = padding;
+        public Builder<T> padding(int padding) {
+            properties.padding = padding;
             return this;
         }
 
-        public Builder heightOffset(int heightOffset) {
-            ContextMenuProperties.this.heightOffset = heightOffset;
+        public Builder<T> heightOffset(int heightOffset) {
+            properties.heightOffset = heightOffset;
             return this;
         }
 
-        public Builder drawBorder(boolean drawBorder) {
-            ContextMenuProperties.this.drawBorder = drawBorder;
+        public Builder<T> drawBorder(boolean drawBorder) {
+            properties.drawBorder = drawBorder;
             return this;
         }
 
-        public Builder shadow(boolean shadow) {
-            ContextMenuProperties.this.shadow = shadow;
+        public Builder<T> shadow(boolean shadow) {
+            properties.shadow = shadow;
             return this;
         }
 
-        public Builder roundedCorners(boolean roundedCorners) {
-            ContextMenuProperties.this.roundedCorners = roundedCorners;
+        public Builder<T> roundedCorners(boolean roundedCorners) {
+            properties.roundedCorners = roundedCorners;
             return this;
         }
 
-        public Builder cornerRadius(int cornerRadius) {
-            ContextMenuProperties.this.cornerRadius = cornerRadius;
+        public Builder<T> cornerRadius(int cornerRadius) {
+            properties.cornerRadius = cornerRadius;
             return this;
         }
 
-        public Builder hoverEffect(boolean hoverEffect) {
-            ContextMenuProperties.this.hoverEffect = hoverEffect;
+        public Builder<T> hoverEffect(boolean hoverEffect) {
+            properties.hoverEffect = hoverEffect;
             return this;
         }
 
-        public Builder hoverColor(Color hoverColor) {
-            ContextMenuProperties.this.hoverColor = hoverColor;
+        public Builder<T> hoverColor(Color hoverColor) {
+            properties.hoverColor = hoverColor;
             return this;
         }
 
-        public Builder enableAnimations(boolean enableAnimations) {
-            ContextMenuProperties.this.enableAnimations = enableAnimations;
+        public Builder<T> enableAnimations(boolean enableAnimations) {
+            properties.enableAnimations = enableAnimations;
             return this;
         }
 
-        public ContextMenuProperties build() {
-            return ContextMenuProperties.this;
+        public T build() {
+            return properties;
         }
     }
 }

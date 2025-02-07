@@ -8,10 +8,10 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
 public class ContextMenuScreen extends Screen {
-    ContextMenu contextMenu;
+    ContextMenu<?> contextMenu;
     ContextMenuProperties properties;
 
-    protected ContextMenuScreen(ContextMenu menu, ContextMenuProperties properties) {
+    protected ContextMenuScreen(ContextMenu<?> menu, ContextMenuProperties properties) {
         super(Text.of("ContextMenu screen"));
         this.contextMenu = menu;
         this.properties = properties;

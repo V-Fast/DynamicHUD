@@ -22,7 +22,7 @@ public class ContextMenuManager implements Input {
 
     public void renderAll(DrawContext drawContext, int mouseX, int mouseY) {
         for (ContextMenuProvider provider : providers) {
-            ContextMenu contextMenu = provider.getContextMenu();
+            ContextMenu<?> contextMenu = provider.getContextMenu();
             if (contextMenu != null) {
                 contextMenu.render(drawContext, contextMenu.getX(), contextMenu.getY(), mouseX, mouseY);
             }
@@ -38,7 +38,7 @@ public class ContextMenuManager implements Input {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         for (ContextMenuProvider provider : providers) {
-            ContextMenu contextMenu = provider.getContextMenu();
+            ContextMenu<?> contextMenu = provider.getContextMenu();
             if (contextMenu != null) {
                 contextMenu.mouseClicked(mouseX, mouseY, button);
             }
@@ -49,7 +49,7 @@ public class ContextMenuManager implements Input {
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         for (ContextMenuProvider provider : providers) {
-            ContextMenu contextMenu = provider.getContextMenu();
+            ContextMenu<?> contextMenu = provider.getContextMenu();
             if (contextMenu != null) {
                 contextMenu.mouseReleased(mouseX, mouseY, button);
             }
@@ -60,7 +60,7 @@ public class ContextMenuManager implements Input {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         for (ContextMenuProvider provider : providers) {
-            ContextMenu contextMenu = provider.getContextMenu();
+            ContextMenu<?> contextMenu = provider.getContextMenu();
             if (contextMenu != null) {
                 contextMenu.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
             }
@@ -71,7 +71,7 @@ public class ContextMenuManager implements Input {
     @Override
     public void keyPressed(int key, int scanCode, int modifiers) {
         for (ContextMenuProvider provider : providers) {
-            ContextMenu contextMenu = provider.getContextMenu();
+            ContextMenu<?> contextMenu = provider.getContextMenu();
             if (contextMenu != null) {
                 contextMenu.keyPressed(key, scanCode, modifiers);
             }
@@ -81,7 +81,7 @@ public class ContextMenuManager implements Input {
     @Override
     public void keyReleased(int key, int scanCode, int modifiers) {
         for (ContextMenuProvider provider : providers) {
-            ContextMenu contextMenu = provider.getContextMenu();
+            ContextMenu<?> contextMenu = provider.getContextMenu();
             if (contextMenu != null) {
                 contextMenu.keyReleased(key, scanCode, modifiers);
             }
@@ -91,7 +91,7 @@ public class ContextMenuManager implements Input {
     @Override
     public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         for (ContextMenuProvider provider : providers) {
-            ContextMenu contextMenu = provider.getContextMenu();
+            ContextMenu<?> contextMenu = provider.getContextMenu();
             if (contextMenu != null) {
                 contextMenu.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
             }
@@ -101,7 +101,7 @@ public class ContextMenuManager implements Input {
     @Override
     public void charTyped(char c) {
         for (ContextMenuProvider provider : providers) {
-            ContextMenu contextMenu = provider.getContextMenu();
+            ContextMenu<?> contextMenu = provider.getContextMenu();
             if (contextMenu != null) {
                 contextMenu.charTyped(c);
             }

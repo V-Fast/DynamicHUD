@@ -3,13 +3,13 @@ package com.tanishisherewith.dynamichud.utils.handlers;
 import net.minecraft.util.math.MathHelper;
 
 public class ScrollHandler {
-    private int scrollOffset;
-    private double scrollVelocity;
-    private long lastScrollTime;
-    private boolean isDragging;
-    private int maxScrollOffset;
-    private static final double SCROLL_SPEED = 1;
-    private double lastMouseY;
+    protected int scrollOffset;
+    protected double scrollVelocity;
+    protected long lastScrollTime;
+    protected boolean isDragging;
+    protected int maxScrollOffset;
+    protected double SCROLL_SPEED = 1;
+    protected double lastMouseY;
 
     public ScrollHandler() {
         this.scrollOffset = 0;
@@ -70,5 +70,10 @@ public class ScrollHandler {
     }
     public boolean isOffsetWithinBounds(int offset){
         return scrollOffset + offset >= 0 && scrollOffset + offset <= maxScrollOffset;
+    }
+
+    public ScrollHandler setScrollSpeed(double scrollSpeed) {
+        this.SCROLL_SPEED = scrollSpeed;
+        return this;
     }
 }

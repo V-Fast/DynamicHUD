@@ -16,11 +16,11 @@ import java.util.function.Supplier;
 
 public abstract class Skin {
     protected static final MinecraftClient mc = MinecraftClient.getInstance();
-    protected ContextMenu contextMenu;
+    protected ContextMenu<?> contextMenu;
     protected Map<Class<? extends Option<?>>, Supplier<SkinRenderer<? extends Option<?>>>> renderers = new HashMap<>();
     private boolean createNewScreen;
 
-    public Skin(ContextMenu menu) {
+    public Skin(ContextMenu<?> menu) {
         this.contextMenu = menu;
     }
 
@@ -57,7 +57,7 @@ public abstract class Skin {
         for (Option<?> option : options) {
             if (option instanceof OptionGroup group) {
                 // Create a new list with type List<Option<?>>
-                ArrayList groupOptions = new ArrayList<>(group.getGroupOptions());
+                ArrayList<Option<?>> groupOptions = new ArrayList<>(group.getGroupOptions());
                 flattened.addAll(flattenOptions(groupOptions));
             } else {
                 flattened.add(option);
@@ -67,11 +67,11 @@ public abstract class Skin {
         return flattened;
     }
 
-    protected List<Option<?>> getOptions(ContextMenu menu){
+    protected List<Option<?>> getOptions(ContextMenu<?> menu){
         return supportsGroups() ? menu.getOptions() : flattenOptions(menu.getOptions());
     }
 
-    public void setContextMenu(ContextMenu contextMenu) {
+    public void setContextMenu(ContextMenu<?> contextMenu) {
         this.contextMenu = contextMenu;
     }
 
@@ -79,27 +79,27 @@ public abstract class Skin {
         this.renderers = renderers;
     }
 
-    public abstract void renderContextMenu(DrawContext drawContext, ContextMenu contextMenu, int mouseX, int mouseY);
+    public abstract void renderContextMenu(DrawContext drawContext, ContextMenu<?> contextMenu, int mouseX, int mouseY);
 
-    public boolean mouseClicked(ContextMenu menu, double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(ContextMenu<?> menu, double mouseX, double mouseY, int button) {
         return false;
     }
 
-    public boolean mouseReleased(ContextMenu menu, double mouseX, double mouseY, int button) {
+    public boolean mouseReleased(ContextMenu<?> menu, double mouseX, double mouseY, int button) {
         return false;
     }
 
-    public boolean mouseDragged(ContextMenu menu, double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+    public boolean mouseDragged(ContextMenu<?> menu, double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         return false;
     }
 
-    public void keyPressed(ContextMenu menu, int key, int scanCode, int modifiers) {
+    public void keyPressed(ContextMenu<?> menu, int key, int scanCode, int modifiers) {
     }
 
-    public void keyReleased(ContextMenu menu, int key, int scanCode, int modifiers) {
+    public void keyReleased(ContextMenu<?> menu, int key, int scanCode, int modifiers) {
     }
 
-    public void mouseScrolled(ContextMenu menu, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+    public void mouseScrolled(ContextMenu<?> menu, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
     }
 
     public boolean shouldCreateNewScreen() {

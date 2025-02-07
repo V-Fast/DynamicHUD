@@ -14,10 +14,10 @@ public class DoubleOption extends Option<Double> {
     public double minValue = 0.0;
     public double maxValue = 0.0;
     public float step = 0.1f;
-    ContextMenu parentMenu;
+    ContextMenu<?> parentMenu;
     private boolean isDragging = false;
 
-    public DoubleOption(String name, double minValue, double maxValue, float step, Supplier<Double> getter, Consumer<Double> setter, ContextMenu parentMenu) {
+    public DoubleOption(String name, double minValue, double maxValue, float step, Supplier<Double> getter, Consumer<Double> setter, ContextMenu<?> parentMenu) {
         super(name,getter, setter);
         this.value = get();
         this.minValue = minValue;

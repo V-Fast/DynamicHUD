@@ -9,10 +9,10 @@ import java.util.function.Supplier;
 
 public class ColorOption extends Option<Color> {
     public boolean isVisible = false;
-    private ContextMenu parentMenu = null;
+    private ContextMenu<?> parentMenu = null;
     private ColorGradient colorGradient = null;
 
-    public ColorOption(String name, ContextMenu parentMenu, Supplier<Color> getter, Consumer<Color> setter) {
+    public ColorOption(String name, ContextMenu<?> parentMenu, Supplier<Color> getter, Consumer<Color> setter) {
         super(name,getter, setter);
         this.parentMenu = parentMenu;
         colorGradient = new ColorGradient(x + this.parentMenu.getWidth(), y - 10, get(), this::set, 50, 100);
@@ -56,7 +56,7 @@ public class ColorOption extends Option<Color> {
         colorGradient.close();
     }
 
-    public ContextMenu getParentMenu() {
+    public ContextMenu<?> getParentMenu() {
         return parentMenu;
     }
 }

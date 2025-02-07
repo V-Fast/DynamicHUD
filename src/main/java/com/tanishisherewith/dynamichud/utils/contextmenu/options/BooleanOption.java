@@ -34,7 +34,7 @@ public class BooleanOption extends Option<Boolean> {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (isMouseOver(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            value = !value;
+            this.value = !this.value;
             set(value);
             return true;
         }
