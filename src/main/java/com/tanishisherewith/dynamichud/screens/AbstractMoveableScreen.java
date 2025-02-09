@@ -98,10 +98,10 @@ public abstract class AbstractMoveableScreen extends Screen {
 
         if (GlobalConfig.get().shouldDisplayDescriptions()) {
             for (Widget widget : widgetRenderer.getWidgets()) {
-                if (widget == null || widget.shiftDown) continue;
+                if (widget == null || widget.isShiftDown) continue;
 
                 if (widget.getWidgetBox().isMouseOver(mouseX, mouseY)) {
-                    drawContext.drawTooltip(client.textRenderer, Text.of(widget.DATA.description()), mouseX, mouseY);
+                    drawContext.drawTooltip(client.textRenderer, widget.tooltipText, mouseX, mouseY);
                     break;
                 }
             }

@@ -6,10 +6,12 @@ import com.tanishisherewith.dynamichud.utils.UID;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 public abstract class Widget {
+    public static MinecraftClient mc = MinecraftClient.getInstance();
     public WidgetData<?> DATA;
     /**
      * This is the UID of the widget used to identify during loading and saving.
@@ -20,12 +22,12 @@ public abstract class Widget {
      */
     public UID uid = UID.generate();
     // Whether the widget is enabled and should be displayed.
-    public boolean display = true;
-    public boolean isDraggable = true;
+    protected boolean isVisible = true;
+    protected boolean isDraggable = true;
     //Boolean to check if the widget is being dragged
     public boolean dragging;
     //To enable/disable snapping
-    public boolean shiftDown = false;
+    public boolean isShiftDown = false;
     /**
      * An identifier for widgets to group them under one ID.
      * <p>
@@ -35,18 +37,23 @@ public abstract class Widget {
      * @see #uid
      */
     public String modId = "unknown";
+
+    public Text tooltipText;
+    // Boolean to know if the widget is currently being displayed in an instance of AbstractMoveableScreen
     protected boolean isInEditor = false;
     // Absolute position of the widget on screen in pixels.
     protected int x, y;
+
     protected boolean shouldScale = true;
-    protected MinecraftClient mc = MinecraftClient.getInstance();
 
     private final Anchor anchor;         // The chosen anchor point
 
     //Dimensions of the widget
     protected WidgetBox widgetBox;
+
     int startX, startY;
     private int offsetX, offsetY;  // Offset from the anchor point
+
     public Widget(WidgetData<?> DATA, String modId) {
         this(DATA, modId, Anchor.CENTER);
     }
@@ -56,6 +63,7 @@ public abstract class Widget {
         widgetBox = new WidgetBox(0, 0, 0, 0);
         this.modId = modId;
         this.anchor = anchor;
+        this.tooltipText = Text.of(DATA.description());
         init();
     }
 
@@ -151,7 +159,7 @@ public abstract class Widget {
      * Renders the widget on the screen.
      */
     public final void render(DrawContext drawContext, int mouseX, int mouseY) {
-        if (!shouldDisplay()) return;
+        if (!isVisible()) return;
 
         if (shouldScale) {
             DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().getScale());
@@ -234,7 +242,7 @@ public abstract class Widget {
 
             // Divides the screen into several "grid boxes" which the elements snap to.
             // Higher the snapSize, more the grid boxes
-            if (this.shiftDown) {
+            if (this.isShiftDown) {
                 // Calculate the size of each snap box
                 int snapBoxWidth = mc.getWindow().getScaledWidth() / snapSize;
                 int snapBoxHeight = mc.getWindow().getScaledHeight() / snapSize;
@@ -269,11 +277,11 @@ public abstract class Widget {
     }
 
     public boolean toggle() {
-        return this.display = !this.display;
+        return this.isVisible = !this.isVisible;
     }
 
     public void onClose() {
-        this.shiftDown = false;
+        this.isShiftDown = false;
     }
 
     /**
@@ -281,7 +289,7 @@ public abstract class Widget {
      * Drawn with 2 pixel offset to all sides
      */
     protected void drawWidgetBackground(DrawContext context) {
-        int backgroundColor = this.shouldDisplay() ? GlobalConfig.get().getHudActiveColor().getRGB() : GlobalConfig.get().getHudInactiveColor().getRGB();
+        int backgroundColor = this.isVisible() ? GlobalConfig.get().getHudActiveColor().getRGB() : GlobalConfig.get().getHudInactiveColor().getRGB();
         WidgetBox box = this.getWidgetBox();
 
         DrawHelper.drawRectangle(context.getMatrices().peek().getPositionMatrix(),
@@ -292,12 +300,19 @@ public abstract class Widget {
                 backgroundColor);
     }
 
+    /**
+     * Set the tooltip text of the widget
+     */
+    protected void setTooltipText(Text text){
+        this.tooltipText = text;
+    }
+
     public void readFromTag(NbtCompound tag) {
         modId = tag.getString("modId");
         uid = new UID(tag.getString("UID"));
         x = tag.getInt("x");
         y = tag.getInt("y");
-        display = tag.getBoolean("Display");
+        isVisible = tag.getBoolean("isVisible");
         isDraggable = tag.getBoolean("isDraggable");
         shouldScale = tag.getBoolean("shouldScale");
     }
@@ -315,12 +330,12 @@ public abstract class Widget {
         tag.putBoolean("shouldScale", shouldScale);
         tag.putInt("x", x);
         tag.putInt("y", y);
-        tag.putBoolean("Display", display);
+        tag.putBoolean("Display", isVisible);
 
     }
 
-    public boolean shouldDisplay() {
-        return display;
+    public boolean isVisible() {
+        return isVisible;
     }
 
     public WidgetBox getWidgetBox() {
@@ -345,9 +360,9 @@ public abstract class Widget {
                 "uniqueId='" + uid.getUniqueID() + '\'' +
                 ", x=" + x +
                 ", y=" + y +
-                ", display=" + display +
+                ", isVisible=" + isVisible +
                 ", isDraggable=" + isDraggable +
-                ", shiftDown=" + shiftDown +
+                ", shiftDown=" + isShiftDown +
                 ", shouldScale=" + shouldScale +
                 '}';
     }
