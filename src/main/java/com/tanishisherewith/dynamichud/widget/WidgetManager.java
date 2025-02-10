@@ -4,6 +4,7 @@ import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.mixins.ScreenMixin;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
 
@@ -191,7 +192,7 @@ public class WidgetManager {
             printWarn("RootTag is null. File is either empty or corrupted: " + file);
             return;
         }
-        NbtList widgetList = rootTag.getList("widgets", NbtType.COMPOUND);
+        NbtList widgetList = rootTag.getList("widgets", NbtElement.COMPOUND_TYPE);
         if (widgetList == null) {
             printWarn("WidgetList is null. File is empty: " + file);
             return;

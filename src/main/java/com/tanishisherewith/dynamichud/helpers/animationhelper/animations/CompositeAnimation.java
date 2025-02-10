@@ -28,7 +28,7 @@ public class CompositeAnimation extends Animation {
         } else {
             // Calculate total duration as sum of children's durations
             this.duration = children.stream().mapToLong(a -> a.duration).sum();
-            childStartTimes = new long[children.size()];
+            this.childStartTimes = new long[children.size()];
             long accumulated = 0;
             for (int i = 0; i < children.size(); i++) {
                 childStartTimes[i] = accumulated;

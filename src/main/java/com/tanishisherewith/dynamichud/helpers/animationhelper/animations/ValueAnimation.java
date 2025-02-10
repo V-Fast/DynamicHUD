@@ -18,13 +18,14 @@ public class ValueAnimation extends Animation {
         this.endValue = end;
         this.easing = easingType;
     }
+
     public ValueAnimation(AnimationProperty<Float> property, float start, float end) {
         this(property,start,end,EasingType.LINEAR);
     }
 
     @Override
     protected void applyAnimation(float progress) {
-        value = startValue + (endValue - startValue) * Easing.apply(easing,progress);
+        this.value = startValue + (endValue - startValue) * Easing.apply(easing,progress);
         property.set(value);
     }
 

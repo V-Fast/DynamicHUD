@@ -70,7 +70,7 @@ public class HueSlider {
             if (mouseX >= handleX && mouseX <= handleX + handleWidth && mouseY >= handleY && mouseY <= handleY + handleHeight) {
                 this.isDragging = true;
             } else if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height) {
-                hue = (float) (mouseX - x) / width;
+                this.hue = (float) (mouseX - x) / this.width;
                 this.isDragging = true;
             }
         }
@@ -88,9 +88,8 @@ public class HueSlider {
 
     public void onDrag(double mouseX, double mouseY, int button) {
         if (isDragging) {
-            hue = (float) (mouseX - x) / width;
-            hue = Math.max(0, hue);
-            hue = Math.min(1, hue);
+            this.hue = (float) (mouseX - x) / this.width;
+            this.hue = Math.clamp(this.hue, 0.0f, 1.0f);
         }
     }
 

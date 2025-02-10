@@ -1,8 +1,14 @@
 package com.tanishisherewith.dynamichud.helpers;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.util.math.MathHelper;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import java.awt.*;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
 
 /**
  * This class provides helper methods for working with colors.
@@ -166,6 +172,41 @@ public class ColorHelper {
             return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
         else
             return new Color(0);
+    }
+
+    public static int[] getMousePixelColor(double mouseX, double mouseY){
+        Framebuffer framebuffer = MinecraftClient.getInstance().getFramebuffer();
+        if (framebuffer != null) {
+            int x = (int) (mouseX * framebuffer.textureWidth / MinecraftClient.getInstance().getWindow().getScaledWidth());
+            int y = (int) ((MinecraftClient.getInstance().getWindow().getScaledHeight() - mouseY) * framebuffer.textureHeight / MinecraftClient.getInstance().getWindow().getScaledHeight());
+
+            try {
+                // Calculate the size of the buffer needed to store the texture data
+                int bufferSize = framebuffer.textureWidth * framebuffer.textureHeight * 4;
+                ByteBuffer buffer = ByteBuffer.allocateDirect(bufferSize);
+                // Bind the texture from the framebuffer
+                GL11.glBindTexture(GL11.GL_TEXTURE_2D, framebuffer.getColorAttachment());
+                // Read the texture data into the buffer
+                GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE, buffer);
+
+                // Calculate the index of the pixel in the buffer
+                int index = (x + y * framebuffer.textureWidth) * 4;
+
+                // Check if the index is within the bounds of the buffer
+                if (index >= 0 && index + 3 < bufferSize) {
+                    int blue = buffer.get(index) & 0xFF;
+                    int green = buffer.get(index + 1) & 0xFF;
+                    int red = buffer.get(index + 2) & 0xFF;
+
+                    return new int[]{red,green,blue};
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.err.println("Framebuffer is null");
+        }
+        return null;
     }
 
     public static int fromRGBA(int r, int g, int b, int a) {

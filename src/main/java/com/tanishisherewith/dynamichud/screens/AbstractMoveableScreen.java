@@ -85,7 +85,6 @@ public abstract class AbstractMoveableScreen extends Screen {
      */
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        assert this.client != null;
         if (this.client.world == null) {
             renderInGameBackground(drawContext);
         }
@@ -108,9 +107,7 @@ public abstract class AbstractMoveableScreen extends Screen {
         }
     }
 
-    public void handleClickOnWidget(Widget widget, double mouseX, double mouseY, int button) {
-
-    }
+    public void handleClickOnWidget(Widget widget, double mouseX, double mouseY, int button) {}
 
     @Override
     public void close() {

@@ -33,9 +33,11 @@ public class ColorPickerButton {
     public int getHeight() {
         return height;
     }
+
     public int getWidth() {
         return width;
     }
+
     public boolean onClick(double mouseX, double mouseY, int button) {
         if (button == 0) {
             if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height) {

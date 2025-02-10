@@ -126,6 +126,12 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
         }
     }
 
+    public void resetAllOptions(){
+        for(Option<?> option: options){
+            option.reset();
+        }
+    }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (!shouldDisplay) return false;

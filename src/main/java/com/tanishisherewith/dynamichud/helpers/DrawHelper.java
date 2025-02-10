@@ -11,6 +11,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL40C;
 
@@ -246,6 +247,35 @@ public class DrawHelper {
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 
         RenderSystem.disableBlend();
+    }
+
+    /**
+     * Draw chroma text (text with a nice rainbow effect)
+     * @param drawContext A drawContext object
+     * @param text The text to display
+     * @param x X pos of text
+     * @param y Y pos of text
+     * @param speed Speed of rainbow
+     * @param saturation Saturation of the rainbow colors
+     * @param brightness Brightness of the rainbow colors
+     * @param spread How much the color difference should be between each character (ideally between 0.001 to 0.2)
+     * @param shadow Whether to render the text as shadow.
+     */
+    public static void drawChromaText(@NotNull DrawContext drawContext, String text, int x, int y, float speed, float saturation, float brightness, float spread, boolean shadow) {
+        long time = System.currentTimeMillis(); // Get the current time for animation
+        int length = text.length();
+
+        for (int i = 0; i < length; i++) {
+            // Calculate the hue for the current character
+            float hue = (time % (int) (5000 / speed)) / (5000f / speed) + (i * spread); // Adjust the hue based on time and character position
+            hue = MathHelper.floorMod(hue, 1.0f); // Ensure the hue stays within the range [0, 1]
+
+            // Convert the hue to an RGB color
+            int color = Color.HSBtoRGB(hue, saturation, brightness);
+
+            // Draw the character with the calculated color
+            drawContext.drawText(mc.textRenderer, String.valueOf(text.charAt(i)), x + mc.textRenderer.getWidth(text.substring(0, i)), y, color, shadow);
+        }
     }
 
 

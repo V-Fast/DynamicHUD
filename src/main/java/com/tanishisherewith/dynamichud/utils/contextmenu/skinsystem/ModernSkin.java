@@ -102,6 +102,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             int yOffset = groupY + 16 + getGroupIndent().top;
             for (Option<?> option : group.getGroupOptions()) {
                 if (!option.shouldRender()) continue;
+
                 option.render(drawContext, groupX + getGroupIndent().left, yOffset, mouseX, mouseY);
                 yOffset += option.getHeight() + 1;
             }

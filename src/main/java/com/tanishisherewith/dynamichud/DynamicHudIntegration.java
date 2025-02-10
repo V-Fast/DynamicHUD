@@ -17,26 +17,6 @@ import java.io.File;
  */
 public interface DynamicHudIntegration {
     /**
-     * The category for the key binding.
-     */
-    String KEYBIND_CATEGORY = "DynamicHud";
-
-    /**
-     * The translation key for the editor screen.
-     */
-    String TRANSLATION_KEY = "DynamicHud Editor Screen";
-
-    /**
-     * The input type for the key binding.
-     */
-    InputUtil.Type INPUT_TYPE = InputUtil.Type.KEYSYM;
-
-    /**
-     * The key code for the key binding.
-     */
-    int KEY = GLFW.GLFW_KEY_RIGHT_SHIFT;
-
-    /**
      * The key binding for opening the editor screen.
      */
     KeyBinding EDITOR_SCREEN_KEY_BINDING = KeyBindingHelper.registerKeyBinding(new KeyBinding(

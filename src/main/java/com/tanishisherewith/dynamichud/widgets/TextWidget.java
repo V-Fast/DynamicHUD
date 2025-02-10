@@ -2,6 +2,7 @@ package com.tanishisherewith.dynamichud.widgets;
 
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
+import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
@@ -30,6 +31,7 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     protected boolean shadow; // Whether to draw a shadow behind the text
     protected boolean rainbow; // Whether to apply a rainbow effect to the text
     protected int rainbowSpeed = 2; //Speed of the rainbow effect
+    protected float rainbowSpread = 0.01f, rainbowSat = 1.0f, rainbowBrightness = 1.0f;
     Supplier<String> textSupplier;
     String dynamicRegistryKey;
     DynamicValueRegistry dynamicValueRegistry = null;
@@ -93,6 +95,27 @@ public class TextWidget extends Widget implements ContextMenuProvider {
                 () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue(), menu)
                 .setShouldRender(() -> this.rainbow)
         );
+        menu.addOption(new DoubleOption(
+                "Rainbow Spread",
+                0.001f, 0.15f, 0.001f,
+                () -> (double) this.rainbowSpread, value -> this.rainbowSpread = value.floatValue(), menu)
+                .setShouldRender(() -> this.rainbow)
+                .withComplexity(Option.Complexity.Enhanced)
+        );
+        menu.addOption(new DoubleOption(
+                "Rainbow Saturation",
+                0, 1.0f, 0.1f,
+                () -> (double) this.rainbowSat, value -> this.rainbowSat = value.floatValue(), menu)
+                .setShouldRender(() -> this.rainbow)
+                .withComplexity(Option.Complexity.Pro)
+        );
+        menu.addOption(new DoubleOption(
+                "Rainbow Brightness",
+                0, 1.0f, 0.01f,
+                () -> (double) this.rainbowBrightness, value -> this.rainbowBrightness = value.floatValue(), menu)
+                .setShouldRender(() -> this.rainbow)
+                .withComplexity(Option.Complexity.Pro)
+        );
 
         /*
         OptionGroup group = new OptionGroup("Color");
@@ -122,10 +145,14 @@ public class TextWidget extends Widget implements ContextMenuProvider {
 
     @Override
     public void renderWidget(DrawContext drawContext, int mouseX, int mouseY) {
-        int color = rainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % (5000 * rainbowSpeed) / (5000f * rainbowSpeed))) : textColor.getRGB();
+        int color = /*rainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % (5000 * rainbowSpeed) / (5000f * rainbowSpeed))) :*/ textColor.getRGB();
         if (textSupplier != null) {
             String text = textSupplier.get();
-            drawContext.drawText(mc.textRenderer, text, getX() + 2, getY() + 2, color, shadow);
+            if(rainbow){
+                DrawHelper.drawChromaText(drawContext,text,getX() + 2, getY() + 2, rainbowSpeed/2f,rainbowSat,rainbowBrightness,rainbowSpread,shadow);
+            } else {
+                drawContext.drawText(mc.textRenderer, text, getX() + 2, getY() + 2, color, shadow);
+            }
             widgetBox.setSizeAndPosition(getX(), getY(), mc.textRenderer.getWidth(text) + 3, mc.textRenderer.fontHeight + 2, this.shouldScale, GlobalConfig.get().getScale());
         }
         menu.set(getX(), getY(), (int) Math.ceil(getHeight()));
@@ -163,6 +190,10 @@ public class TextWidget extends Widget implements ContextMenuProvider {
         tag.putBoolean("Rainbow", rainbow);
         tag.putInt("TextColor", textColor.getRGB());
         tag.putInt("RainbowSpeed", rainbowSpeed);
+        tag.putFloat("RainbowSpread", rainbowSpread);
+        tag.putFloat("RainbowSaturation", rainbowSat);
+        tag.putFloat("RainbowBrightness", rainbowBrightness);
+
         // If true then it means that we should use local registry and if false (i.e. null) then use global registry
         tag.putBoolean("DynamicValueRegistry", dynamicValueRegistry != null);
     }
@@ -173,6 +204,9 @@ public class TextWidget extends Widget implements ContextMenuProvider {
         this.shadow = tag.getBoolean("Shadow");
         this.rainbow = tag.getBoolean("Rainbow");
         this.rainbowSpeed = tag.getInt("RainbowSpeed");
+        this.rainbowSpread = tag.getInt("RainbowSpread");
+        this.rainbowSat = tag.getInt("RainbowSaturation");
+        this.rainbowBrightness = tag.getInt("RainbowBrightness");
         this.textColor = new Color(tag.getInt("TextColor"));
         this.dynamicRegistryKey = tag.getString("DynamicRegistryKey");
 

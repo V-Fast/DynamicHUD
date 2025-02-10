@@ -330,7 +330,7 @@ public abstract class Widget {
         tag.putBoolean("shouldScale", shouldScale);
         tag.putInt("x", x);
         tag.putInt("y", y);
-        tag.putBoolean("Display", isVisible);
+        tag.putBoolean("isVisible", isVisible);
 
     }
 

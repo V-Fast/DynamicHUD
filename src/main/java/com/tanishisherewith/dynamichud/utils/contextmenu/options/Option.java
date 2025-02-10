@@ -1,6 +1,7 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
+import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.utils.Input;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
@@ -23,6 +24,7 @@ public abstract class Option<T> implements Input {
     protected MinecraftClient mc = MinecraftClient.getInstance();
     protected ContextMenuProperties properties;
     protected SkinRenderer<Option<T>> renderer;
+    protected Complexity complexity = Complexity.Simple;
 
     public Option(String name,Supplier<T> getter, Consumer<T> setter) {
         this(name,getter, setter, () -> true);
@@ -33,8 +35,8 @@ public abstract class Option<T> implements Input {
         this.getter = getter;
         this.setter = setter;
         this.shouldRender = shouldRender;
-        value = get();
-        defaultValue = get();
+        this.value = get();
+        this.defaultValue = get();
         updateProperties(properties);
     }
 
@@ -107,7 +109,10 @@ public abstract class Option<T> implements Input {
     }
 
     public boolean shouldRender() {
-        return shouldRender.get();
+        return shouldRender.get() && GlobalConfig.get().complexity().ordinal() >= complexity.ordinal();
+    }
+    public void reset(){
+        this.value = get();
     }
 
     public ContextMenuProperties getProperties() {
@@ -154,6 +159,10 @@ public abstract class Option<T> implements Input {
         this.description = description;
         return this;
     }
+    public Option<T> withComplexity(Complexity complexity){
+        this.complexity = complexity;
+        return this;
+    }
 
     public SkinRenderer<Option<T>> getRenderer() {
         return renderer;
@@ -165,5 +174,15 @@ public abstract class Option<T> implements Input {
 
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * How complex do you think this option is for a daily normal user.
+     * For example, some options may be advanced and not needed for casual players but are helpful in customisation
+     */
+    public enum Complexity {
+        Simple,
+        Enhanced,
+        Pro
     }
 }

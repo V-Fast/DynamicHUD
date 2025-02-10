@@ -11,7 +11,7 @@ import java.util.List;
 // A group is just another type of Option that contains other options
 public class OptionGroup extends Option<OptionGroup> {
     private final List<Option<?>> groupOptions = new ArrayList<>();
-    protected boolean expanded = false; // Skins can choose to use this or ignore it
+    protected boolean expanded; // Skins can choose to use this or ignore it
 
     public OptionGroup(String name) {
         super(name, () -> null, (v) -> {}, () -> true);

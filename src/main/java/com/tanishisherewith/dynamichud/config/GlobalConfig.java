@@ -1,22 +1,16 @@
 package com.tanishisherewith.dynamichud.config;
 
-import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import dev.isxander.yacl3.api.*;
-import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
-import dev.isxander.yacl3.api.controller.ColorControllerBuilder;
-import dev.isxander.yacl3.api.controller.FloatSliderControllerBuilder;
-import dev.isxander.yacl3.api.controller.IntegerFieldControllerBuilder;
+import dev.isxander.yacl3.api.controller.*;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
-import dev.isxander.yacl3.config.v2.impl.autogen.ColorFieldImpl;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.awt.*;
-import java.util.LinkedList;
 
 public final class GlobalConfig {
     public static final ConfigClassHandler<GlobalConfig> HANDLER = ConfigClassHandler.createBuilder(GlobalConfig.class)
@@ -39,8 +33,13 @@ public final class GlobalConfig {
 
     @SerialEntry
     private boolean showColorPickerPreview = true;
+
     @SerialEntry
     private boolean forceSameContextMenuSkin = true;
+
+    //These package names are getting seriously long
+    @SerialEntry
+    private com.tanishisherewith.dynamichud.utils.contextmenu.options.Option.Complexity complexity = com.tanishisherewith.dynamichud.utils.contextmenu.options.Option.Complexity.Simple;
 
     @SerialEntry
     private int snapSize = 100;
@@ -101,6 +100,15 @@ public final class GlobalConfig {
                                         .binding(new Color(255, 0, 0, 128), () -> this.hudInactiveColor, newVal -> this.hudInactiveColor = newVal)
                                         .controller(ColorControllerBuilder::create)
                                 .build())
+                               .option(Option.<com.tanishisherewith.dynamichud.utils.contextmenu.options.Option.Complexity>createBuilder()
+                                        .name(Text.literal("Settings Complexity"))
+                                        .description(OptionDescription.of(Text.literal("The level of options to display. Options equal to or below this level will be displayed")))
+                                        .binding(com.tanishisherewith.dynamichud.utils.contextmenu.options.Option.Complexity.Simple, () -> this.complexity, newVal -> this.complexity = newVal)
+                                        .controller((option) -> EnumControllerBuilder.create(option)
+                                                        .enumClass(com.tanishisherewith.dynamichud.utils.contextmenu.options.Option.Complexity.class)
+                                                        .formatValue(value -> Text.of(value.name()))
+                                        )
+                                .build())
                         .build())
                 .save(HANDLER::save)
                 .build()
@@ -129,5 +137,9 @@ public final class GlobalConfig {
 
     public Color getHudActiveColor() {
         return hudActiveColor;
+    }
+
+    public com.tanishisherewith.dynamichud.utils.contextmenu.options.Option.Complexity complexity(){
+        return complexity;
     }
 }

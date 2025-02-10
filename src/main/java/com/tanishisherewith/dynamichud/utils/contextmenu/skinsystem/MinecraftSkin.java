@@ -18,6 +18,8 @@ import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntSupplier;
@@ -188,7 +190,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
                 DrawHelper.drawScrollableText(drawContext,mc.textRenderer,Text.literal(group.getName()),groupX + groupPanelWidth/2,groupX + 2,yOffset,groupX + groupPanelWidth - 2, yOffset + 20,-1);
 
-                //Scrollable text uses scissor so we need to enable the context menu scissor again
+                //Scrollable text uses scissor, so we need to enable the context menu scissor again
                 this.enableContextMenuScissor();
 
                 yOffset += 20; // Space for the header
@@ -206,7 +208,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     private int renderSelectedGroupOptions(DrawContext drawContext, int mouseX, int mouseY) {
         int yOffset = imageY + 12 - scrollHandler.getScrollOffset();
         for (Option<?> option : selectedGroup.getGroupOptions()) {
-            if (yOffset >= imageY - option.getHeight() && yOffset <= imageY + option.getHeight() + panelHeight) {
+            if (yOffset >= imageY - option.getHeight() && yOffset <= imageY + option.getHeight() + panelHeight && option.shouldRender()) {
                 option.render(drawContext, imageX + 4, yOffset, mouseX, mouseY);
             }
             yOffset += option.getHeight() + 1;
@@ -470,7 +472,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             option.setHeight(25);
             option.setPosition(x + panelWidth - 122, y);
 
-            double sliderX = option.getX() + (option.value - option.minValue) / (option.maxValue - option.minValue) * (option.getWidth() - 8);
+            double sliderX = option.getX()  + ((option.value - option.minValue) / (option.maxValue - option.minValue)) * (option.getWidth() - 8);
             boolean isMouseOverHandle = isMouseOver(mouseX, mouseY, sliderX, y, 10, 20);
 
             RenderSystem.enableBlend();
@@ -483,8 +485,12 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.disableBlend();
             RenderSystem.disableDepthTest();
+            // Determine the number of decimal places in option.step
+            int decimalPlaces = String.valueOf(option.step).split("\\.")[1].length();
 
-            drawContext.drawText(mc.textRenderer, String.valueOf(option.value), option.getX() + option.getWidth() / 2 - mc.textRenderer.getWidth(option.value.toString()) / 2, y + 5, 16777215, false);
+            // Format option.value to the determined number of decimal places
+            String formattedValue = String.format("%." + decimalPlaces + "f", option.value);
+            drawContext.drawText(mc.textRenderer, formattedValue, option.getX() + option.getWidth() / 2 - mc.textRenderer.getWidth(formattedValue) / 2, y + 5, 16777215, false);
         }
 
         @Override

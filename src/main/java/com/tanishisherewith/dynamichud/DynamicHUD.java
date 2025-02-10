@@ -140,7 +140,7 @@ public class DynamicHUD implements ClientModInitializer {
                 DHIntegration.initAfter();
 
                 // Get the instance of AbstractMoveableScreen
-                screen = Objects.requireNonNull(DHIntegration.getMovableScreen());
+                screen = Objects.requireNonNull(DHIntegration.getMovableScreen(), "AbstractMovableScreen instance should not be null!");
 
                 // Get the keybind to open the screen instance
                 binding = DHIntegration.getKeyBind();

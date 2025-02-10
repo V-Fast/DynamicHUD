@@ -131,7 +131,7 @@ public class WidgetRenderer {
         Screen currentScreen = DynamicHUD.MC.currentScreen;
         if (currentScreen instanceof AbstractMoveableScreen && (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT || keyCode == GLFW.GLFW_KEY_RIGHT_SHIFT)) {
             for (Widget widget : widgets) {
-                widget.shiftDown = true;
+                widget.isShiftDown = true;
             }
         }
     }
@@ -140,7 +140,7 @@ public class WidgetRenderer {
         Screen currentScreen = DynamicHUD.MC.currentScreen;
         if (currentScreen instanceof AbstractMoveableScreen && (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT || keyCode == GLFW.GLFW_KEY_RIGHT_SHIFT)) {
             for (Widget widget : widgets) {
-                widget.shiftDown = false;
+                widget.isShiftDown = false;
             }
         }
     }

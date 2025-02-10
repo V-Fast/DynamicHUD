@@ -1,6 +1,8 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption;
 
+import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
+import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.DrawContext;
@@ -30,14 +32,13 @@ public class ColorGradient {
         this.gradientBox = new SaturationHueBox(x, y + 20, boxSize);
         this.alphaSlider = new AlphaSlider(x, y, 10, boxSize, initialColor);
 
-        float[] hsv = new float[3];
-        Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
+        float[] hsv = Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), null);
 
         this.boxSize = boxSize;
-        this.gradientSlider.setHue(hsv[0]);
         this.gradientBox.setHue(hsv[0]);
         this.gradientBox.setSaturation(hsv[1]);
         this.gradientBox.setValue(hsv[2]);
+        this.gradientSlider.setHue(hsv[0]);
 
         this.colorPickerButton = new ColorPickerButton(x + boxSize + 8, y + 20, 30, 18);
     }
@@ -66,37 +67,18 @@ public class ColorGradient {
         alphaSlider.render(drawContext, x + 10 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
 
         if (colorPickerButton.isPicking() && GlobalConfig.get().showColorPickerPreview()) {
-            // Draw the preview box near cursor
-            Framebuffer framebuffer = client.getFramebuffer();
-            if (framebuffer != null) {
-                //Translate cursor screen position to minecraft's scaled windo
-                int x = mouseX * framebuffer.textureWidth / client.getWindow().getScaledWidth();
-                int y = (client.getWindow().getScaledHeight() - mouseY) * framebuffer.textureHeight / client.getWindow().getScaledHeight();
+            int[] colors = ColorHelper.getMousePixelColor(mouseX,mouseY);
+            if(colors != null) {
+                int red = colors[0];
+                int green = colors[1];
+                int blue = colors[2];
 
-                try {
-                    int bufferSize = framebuffer.textureWidth * framebuffer.textureHeight * 4;
-
-                    ByteBuffer buffer = ByteBuffer.allocateDirect(bufferSize);
-                    GL11.glBindTexture(GL11.GL_TEXTURE_2D, framebuffer.getColorAttachment());
-                    GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE, buffer);
-
-                    int index = (x + y * framebuffer.textureWidth) * 4;
-                    if (index >= 0 && index + 3 < bufferSize) {
-                        int blue = buffer.get(index) & 0xFF;
-                        int green = buffer.get(index + 1) & 0xFF;
-                        int red = buffer.get(index + 2) & 0xFF;
-
-                        drawContext.getMatrices().push();
-                        drawContext.getMatrices().translate(0, 0, 500);
-                        drawContext.fill(mouseX + 10, mouseY, mouseX + 26, mouseY + 16, -1);
-                        drawContext.fill(mouseX + 11, mouseY + 1, mouseX + 25, mouseY + 15, (red << 16) | (green << 8) | blue | 0xFF000000);
-                        drawContext.getMatrices().pop();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else {
-                System.err.println("Framebuffer is null");
+                //Draw the preview box near the mouse pointer
+                drawContext.getMatrices().push();
+                drawContext.getMatrices().translate(0, 0, 2500);
+                drawContext.fill(mouseX + 10, mouseY, mouseX + 26, mouseY + 16, -1);
+                drawContext.fill(mouseX + 11, mouseY + 1, mouseX + 25, mouseY + 15, (red << 16) | (green << 8) | blue | 0xFF000000);
+                drawContext.getMatrices().pop();
             }
         }
     }
@@ -113,43 +95,17 @@ public class ColorGradient {
         } else if (gradientBox.isMouseOver(mouseX, mouseY)) {
             gradientBox.onClick(mouseX, mouseY, button);
         } else if (colorPickerButton.isPicking()) {
-            Framebuffer framebuffer = client.getFramebuffer();
-            if (framebuffer != null) {
-                int x = (int) (mouseX * framebuffer.textureWidth / client.getWindow().getScaledWidth());
-                int y = (int) ((client.getWindow().getScaledHeight() - mouseY) * framebuffer.textureHeight / client.getWindow().getScaledHeight());
+            int[] colors = ColorHelper.getMousePixelColor(mouseX,mouseY);
+            if(colors != null) {
+                float[] hsv = Color.RGBtoHSB(colors[0], colors[1], colors[2], null);
+                gradientSlider.setHue(hsv[0]);
+                gradientBox.setHue(hsv[0]);
+                gradientBox.setSaturation(hsv[1]);
+                gradientBox.setValue(hsv[2]);
 
-                try {
-                    // Calculate the size of the buffer needed to store the texture data
-                    int bufferSize = framebuffer.textureWidth * framebuffer.textureHeight * 4;
-
-                    ByteBuffer buffer = ByteBuffer.allocateDirect(bufferSize);
-                    // Bind the texture from the framebuffer
-                    GL11.glBindTexture(GL11.GL_TEXTURE_2D, framebuffer.getColorAttachment());
-                    // Read the texture data into the buffer
-                    GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE, buffer);
-
-                    // Calculate the index of the pixel in the buffer
-                    int index = (x + y * framebuffer.textureWidth) * 4;
-
-                    // Check if the index is within the bounds of the buffer
-                    if (index >= 0 && index + 3 < bufferSize) {
-                        int blue = buffer.get(index) & 0xFF;
-                        int green = buffer.get(index + 1) & 0xFF;
-                        int red = buffer.get(index + 2) & 0xFF;
-
-                        float[] hsv = Color.RGBtoHSB(red, green, blue, null);
-                        gradientSlider.setHue(hsv[0]);
-                        gradientBox.setHue(hsv[0]);
-                        gradientBox.setSaturation(hsv[1]);
-                        gradientBox.setValue(hsv[2]);
-
-                        colorPickerButton.setPicking(false);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                colorPickerButton.setPicking(false);
             } else {
-                System.err.println("Framebuffer is null");
+                DynamicHUD.logger.error("Invalid RGB pixel color at mouse pointer");
             }
         }
         alphaSlider.setColor(new Color(gradientBox.getColor()));

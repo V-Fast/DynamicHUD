@@ -272,6 +272,4 @@ public class TextureHelper {
 
         return (redAverage << 16) | (greenAverage << 8) | blueAverage;
     }
-
-
 }
