@@ -29,17 +29,17 @@ public class ValueAnimation extends Animation {
         property.set(value);
     }
 
-    public ValueAnimation setEasing(EasingType easing) {
+    public ValueAnimation easing(EasingType easing) {
         this.easing = easing;
         return this;
     }
 
-    public ValueAnimation setStartValue(float startValue) {
+    public ValueAnimation startValue(float startValue) {
         this.startValue = startValue;
         return this;
     }
 
-    public ValueAnimation setEndValue(float endValue) {
+    public ValueAnimation endValue(float endValue) {
         this.endValue = endValue;
         return this;
     }

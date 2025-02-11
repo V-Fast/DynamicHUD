@@ -1,5 +1,7 @@
 package com.tanishisherewith.dynamichud.helpers.animationhelper.animations;
 
+import com.tanishisherewith.dynamichud.helpers.animationhelper.Easing;
+import com.tanishisherewith.dynamichud.helpers.animationhelper.EasingType;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.random.Random;
 
@@ -81,9 +83,12 @@ public class MathAnimations {
 
     // Linear interpolation between values over time
     public static float lerp(float start, float end, long startTime, float duration) {
+       return lerp(start,end,startTime,duration,EasingType.LINEAR);
+    }
+    public static float lerp(float start, float end, long startTime, float duration, EasingType easing) {
         float progress = (System.currentTimeMillis() - startTime) / duration;
         progress = Math.min(1, Math.max(0, progress)); // Clamp 0-1
-        return start + (end - start) * progress;
+        return start + (end - start) * Easing.apply(easing,progress);
     }
 
     // Bouncing animation using quadratic ease-out
@@ -102,10 +107,5 @@ public class MathAnimations {
     public static float elasticWobble(float speed, float magnitude) {
         return (float) (Math.sin(System.currentTimeMillis() * speed) *
                 Math.exp(-0.001 * System.currentTimeMillis()) * magnitude);
-    }
-
-    // Infinite rotation
-    public static float infiniteRotation(float speed) {
-        return (System.currentTimeMillis() % (360_000 / speed)) * (speed / 1000);
     }
 }

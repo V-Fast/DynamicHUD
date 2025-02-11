@@ -73,7 +73,7 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     }
 
     public void createMenu() {
-        ContextMenuProperties properties = ContextMenuProperties.builder().skin(new MinecraftSkin(MinecraftSkin.PanelColor.MIDNIGHT_PURPLE)).build();
+        ContextMenuProperties properties = ContextMenuProperties.builder().skin(new ModernSkin()).build();
 
         menu = new ContextMenu<>(getX(), getY(), properties);
         menu.addOption(new BooleanOption("Shadow",

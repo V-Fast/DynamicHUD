@@ -3,6 +3,8 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
+import com.tanishisherewith.dynamichud.helpers.animationhelper.EasingType;
+import com.tanishisherewith.dynamichud.helpers.animationhelper.animations.MathAnimations;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.layout.LayoutContext;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
@@ -345,33 +347,24 @@ public class ModernSkin extends Skin implements GroupableSkin {
     }
 
     public class ModernBooleanRenderer implements SkinRenderer<BooleanOption> {
-        private float animationProgress = 0f;
-        private boolean animating = false;
+        private long animationStartTime;
 
         @Override
         public void render(DrawContext drawContext, BooleanOption option, int x, int y, int mouseX, int mouseY) {
             int backgroundWidth = (int) (width * 0.8f - 14);
 
             option.setHeight(14);
-            option.setPosition(x,y);
+            option.setPosition(x, y);
             option.setWidth(backgroundWidth);
 
             MatrixStack matrices = drawContext.getMatrices();
 
-            // Animate the toggle
-            if (animating) {
-                animationProgress += 0.1f; // Adjust speed as needed
-                if (animationProgress >= 1f) {
-                    animationProgress = 0f;
-                    animating = false;
-                }
-            }
-
+            // Calculate the current progress of the animation
             int toggleBgX = x + backgroundWidth - 30;
             // Background
             boolean active = option.get();
             Color backgroundColor = active ? getThemeColor() : DARKER_GRAY;
-            Color hoveredColor = isMouseOver(mouseX,mouseY,toggleBgX,y + 2,14,7) ? backgroundColor.darker() : backgroundColor;
+            Color hoveredColor = isMouseOver(mouseX, mouseY, toggleBgX, y + 2, 14, 7) ? backgroundColor.darker() : backgroundColor;
 
             DrawHelper.drawRoundedRectangleWithShadowBadWay(
                     matrices.peek().getPositionMatrix(),
@@ -382,10 +375,10 @@ public class ModernSkin extends Skin implements GroupableSkin {
             );
 
             // Draw toggle circle
-            float toggleX = active ? toggleBgX + 10 : toggleBgX + 4;
-            if (animating) {
-                toggleX = MathHelper.lerp(animationProgress, active ? toggleBgX + 4 : toggleBgX + 10, toggleX);
-            }
+            float startX = active ? toggleBgX + 4 : toggleBgX + 10;
+            float endX = active ? toggleBgX + 10 : toggleBgX + 4;
+            EasingType easingType = active ? EasingType.EASE_IN_CUBIC : EasingType.EASE_OUT_QUAD;
+            float toggleX = MathAnimations.lerp(startX, endX, animationStartTime, 200f, easingType);
 
             DrawHelper.drawFilledCircle(matrices.peek().getPositionMatrix(), toggleX, y + 2 + 3.3f, 2.8f, Color.WHITE.getRGB());
 
@@ -402,20 +395,21 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
         @Override
         public boolean mouseClicked(BooleanOption option, double mouseX, double mouseY, int button) {
-            mouseX = mc.mouse.getX()/SCALE_FACTOR;
-            mouseY = mc.mouse.getY()/SCALE_FACTOR;
+            mouseX = mc.mouse.getX() / SCALE_FACTOR;
+            mouseY = mc.mouse.getY() / SCALE_FACTOR;
 
             int backgroundWidth = (int) (width * 0.8f - 14);
             int toggleBgX = option.getX() + backgroundWidth - 30;
 
-            if(isMouseOver(mouseX,mouseY,toggleBgX,option.getY(),14,option.getHeight())){
+            if (isMouseOver(mouseX, mouseY, toggleBgX, option.getY(), 14, option.getHeight())) {
                 option.set(!option.get());
-                animating = true;
+                animationStartTime = System.currentTimeMillis();
                 return true;
             }
             return false;
         }
     }
+
 
     public class ModernColorOptionRenderer implements SkinRenderer<ColorOption> {
         private static final float ANIMATION_SPEED = 0.1f;

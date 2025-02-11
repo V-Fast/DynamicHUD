@@ -2,9 +2,11 @@ package com.tanishisherewith.dynamichud.helpers;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
+import net.minecraft.client.util.Window;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL30;
 
 import java.awt.*;
 import java.math.BigInteger;
@@ -174,39 +176,47 @@ public class ColorHelper {
             return new Color(0);
     }
 
-    public static int[] getMousePixelColor(double mouseX, double mouseY){
-        Framebuffer framebuffer = MinecraftClient.getInstance().getFramebuffer();
-        if (framebuffer != null) {
-            int x = (int) (mouseX * framebuffer.textureWidth / MinecraftClient.getInstance().getWindow().getScaledWidth());
-            int y = (int) ((MinecraftClient.getInstance().getWindow().getScaledHeight() - mouseY) * framebuffer.textureHeight / MinecraftClient.getInstance().getWindow().getScaledHeight());
+    public static int[] getMousePixelColor(double mouseX, double mouseY) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        Framebuffer framebuffer = client.getFramebuffer();
+        Window window = client.getWindow();
 
-            try {
-                // Calculate the size of the buffer needed to store the texture data
-                int bufferSize = framebuffer.textureWidth * framebuffer.textureHeight * 4;
-                ByteBuffer buffer = ByteBuffer.allocateDirect(bufferSize);
-                // Bind the texture from the framebuffer
-                GL11.glBindTexture(GL11.GL_TEXTURE_2D, framebuffer.getColorAttachment());
-                // Read the texture data into the buffer
-                GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE, buffer);
+        // Get the window and framebuffer dimensions
+        int windowWidth = window.getWidth();
+        int windowHeight = window.getHeight();
+        int framebufferWidth = framebuffer.textureWidth;
+        int framebufferHeight = framebuffer.textureHeight;
 
-                // Calculate the index of the pixel in the buffer
-                int index = (x + y * framebuffer.textureWidth) * 4;
+        // Calculate scaling factors
+        double scaleX = (double) framebufferWidth / windowWidth;
+        double scaleY = (double) framebufferHeight / windowHeight;
 
-                // Check if the index is within the bounds of the buffer
-                if (index >= 0 && index + 3 < bufferSize) {
-                    int blue = buffer.get(index) & 0xFF;
-                    int green = buffer.get(index + 1) & 0xFF;
-                    int red = buffer.get(index + 2) & 0xFF;
+        // Convert mouse coordinates to framebuffer coordinates
+        int x = (int) (mouseX * scaleX);
+        int y = (int) ((windowHeight - mouseY) * scaleY);
 
-                    return new int[]{red,green,blue};
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.err.println("Framebuffer is null");
+        // Ensure the coordinates are within the framebuffer bounds
+        if (x < 0 || x >= framebufferWidth || y < 0 || y >= framebufferHeight) {
+            System.err.println("Mouse coordinates are out of bounds");
+            return null;
         }
-        return null;
+
+        // Allocate a buffer to store the pixel data
+        ByteBuffer buffer = ByteBuffer.allocateDirect(4); // 4 bytes for RGBA
+
+        // Bind the framebuffer for reading
+        GL30.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, framebuffer.fbo);
+
+        // Read the pixel at the mouse position
+        GL11.glReadPixels(x, y, 1, 1, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+
+        // Extract the color components from the buffer
+        int red = buffer.get(0) & 0xFF;
+        int green = buffer.get(1) & 0xFF;
+        int blue = buffer.get(2) & 0xFF;
+        int alpha = buffer.get(3) & 0xFF;
+
+        return new int[]{red, green, blue, alpha};
     }
 
     public static int fromRGBA(int r, int g, int b, int a) {

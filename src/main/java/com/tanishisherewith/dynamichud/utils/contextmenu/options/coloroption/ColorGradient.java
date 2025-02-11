@@ -63,7 +63,7 @@ public class ColorGradient {
         }
         gradientSlider.render(drawContext, x, y + client.textRenderer.fontHeight + 4);
         gradientBox.render(drawContext, x, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
-        colorPickerButton.render(drawContext, x + 24 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 8);
+       // colorPickerButton.render(drawContext, x + 24 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 8);
         alphaSlider.render(drawContext, x + 10 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
 
         if (colorPickerButton.isPicking() && GlobalConfig.get().showColorPickerPreview()) {
@@ -87,14 +87,14 @@ public class ColorGradient {
         if (!display) {
             return false;
         }
-        if (colorPickerButton.onClick(mouseX, mouseY, button)) {
+        /*if (colorPickerButton.onClick(mouseX, mouseY, button)) {
             return true;
-        } else if (gradientSlider.isMouseOver(mouseX, mouseY)) {
+        } else*/ if (gradientSlider.isMouseOver(mouseX, mouseY)) {
             gradientSlider.onClick(mouseX, mouseY, button);
             gradientBox.setHue(gradientSlider.getHue());
         } else if (gradientBox.isMouseOver(mouseX, mouseY)) {
             gradientBox.onClick(mouseX, mouseY, button);
-        } else if (colorPickerButton.isPicking()) {
+        } /* else if (colorPickerButton.isPicking()) {
             int[] colors = ColorHelper.getMousePixelColor(mouseX,mouseY);
             if(colors != null) {
                 float[] hsv = Color.RGBtoHSB(colors[0], colors[1], colors[2], null);
@@ -108,6 +108,7 @@ public class ColorGradient {
                 DynamicHUD.logger.error("Invalid RGB pixel color at mouse pointer");
             }
         }
+        */
         alphaSlider.setColor(new Color(gradientBox.getColor()));
         alphaSlider.onClick(mouseX, mouseY, button);
         onColorSelected.accept(alphaSlider.getColor());
