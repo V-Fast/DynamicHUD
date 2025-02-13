@@ -6,6 +6,8 @@ import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetManager;
 import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
 import com.tanishisherewith.dynamichud.widgets.TextWidget;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.text.Text;
 
@@ -29,7 +31,7 @@ public class DynamicHudTest implements DynamicHudIntegration {
         registry.registerLocal("DynamicHUD", () -> "DynamicHUD");
 
         FPSWidget = new TextWidget.Builder()
-                .setX(250)
+                .setX(MinecraftClient.getInstance().getWindow().getScaledWidth()/2)
                 .setY(100)
                 .setDraggable(true)
                 .rainbow(false)

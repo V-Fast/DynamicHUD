@@ -1,4 +1,6 @@
-package com.tanishisherewith.dynamichud.utils;
+package com.tanishisherewith.dynamichud.internal;
+
+import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
 
 import java.util.List;
 import java.util.Map;

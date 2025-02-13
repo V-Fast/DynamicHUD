@@ -1,4 +1,4 @@
-package com.tanishisherewith.dynamichud.utils;
+package com.tanishisherewith.dynamichud.internal;
 
 import java.util.Random;
 

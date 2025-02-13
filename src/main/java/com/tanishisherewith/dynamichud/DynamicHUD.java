@@ -1,7 +1,10 @@
 package com.tanishisherewith.dynamichud;
 
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
+import com.tanishisherewith.dynamichud.internal.ModError;
+import com.tanishisherewith.dynamichud.internal.WarningScreen;
 import com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen;
+import com.tanishisherewith.dynamichud.utils.BooleanPool;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetManager;
 import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
@@ -20,6 +23,7 @@ import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.option.KeyBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,6 +114,8 @@ public class DynamicHUD implements ClientModInitializer {
             }
         }
 
+        List<ModError> invalid_implementations = new ArrayList<>();
+
         for (EntrypointContainer<DynamicHudIntegration> entrypoint : integrations) {
             ModMetadata metadata = entrypoint.getProvider().getMetadata();
             String modId = metadata.getId();
@@ -186,13 +192,27 @@ public class DynamicHUD implements ClientModInitializer {
                 } else {
                     logger.error("Mod {} has improper implementation of DynamicHUD", modId, e);
                 }
+                invalid_implementations.add(new ModError(modId, e.getLocalizedMessage().trim()));
             }
         }
         printInfo("(DynamicHUD) Integration of supported mods was successful");
 
         //In game screen render.
         HudRenderCallback.EVENT.register(new HudRender());
+
+        if(!invalid_implementations.isEmpty()){
+            BooleanPool.put("WarningScreen", false);
+            ClientTickEvents.START_CLIENT_TICK.register((client)->{
+                if(BooleanPool.get("WarningScreen")) return;
+
+                if(MC.currentScreen instanceof TitleScreen) {
+                    MC.executeTask(()->MC.setScreen(new WarningScreen(invalid_implementations)));
+                    BooleanPool.put("WarningScreen", true);
+                }
+            });
+        }
     }
+
 
     private void saveWidgetsSafely(File widgetsFile, List<Widget> widgets) {
         try {

@@ -1,5 +1,7 @@
 package com.tanishisherewith.dynamichud.utils;
 
+import com.tanishisherewith.dynamichud.internal.System;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;

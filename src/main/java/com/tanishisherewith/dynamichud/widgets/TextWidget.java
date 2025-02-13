@@ -27,6 +27,8 @@ import java.util.function.Supplier;
 public class TextWidget extends Widget implements ContextMenuProvider {
     public static WidgetData<TextWidget> DATA = new WidgetData<>("TextWidget", "Display Text on screen", TextWidget::new);
 
+    private ContextMenu<?> menu;
+
     public Color textColor;
     protected boolean shadow; // Whether to draw a shadow behind the text
     protected boolean rainbow; // Whether to apply a rainbow effect to the text
@@ -35,7 +37,6 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     Supplier<String> textSupplier;
     String dynamicRegistryKey;
     DynamicValueRegistry dynamicValueRegistry = null;
-    private ContextMenu<?> menu;
 
     public TextWidget() {
         this(null, null, false, false, Color.WHITE, "unknown");
@@ -47,7 +48,7 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     public TextWidget(String dynamicRegistryKey, boolean shadow, boolean rainbow, Color color, String modID) {
         super(DATA, modID);
         this.dynamicRegistryKey = dynamicRegistryKey;
-        textSupplier = (Supplier<String>) DynamicValueRegistry.getGlobal(dynamicRegistryKey);
+        this.textSupplier = (Supplier<String>) DynamicValueRegistry.getGlobal(dynamicRegistryKey);
         this.shadow = shadow;
         this.rainbow = rainbow;
         this.textColor = color;
@@ -140,11 +141,15 @@ public class TextWidget extends Widget implements ContextMenuProvider {
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows3", () -> this.shadow, value -> this.shadow = value));
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows4", () -> this.shadow, value -> this.shadow = value));
         menu.addOption(subMenuOption);
-       // */
+
+         */
+
     }
 
     @Override
     public void renderWidget(DrawContext drawContext, int mouseX, int mouseY) {
+        if(menu == null) return;
+
         int color = /*rainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % (5000 * rainbowSpeed) / (5000f * rainbowSpeed))) :*/ textColor.getRGB();
         if (textSupplier != null) {
             String text = textSupplier.get();

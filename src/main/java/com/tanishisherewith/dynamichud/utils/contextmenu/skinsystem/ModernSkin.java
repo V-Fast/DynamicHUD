@@ -18,6 +18,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec2f;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -708,7 +709,9 @@ public class ModernSkin extends Skin implements GroupableSkin {
             int leftX = x + contextMenuWidth - 30;
             boolean hoveredOverLeft = isMouseOver(mouseX,mouseY,leftX,y,mc.textRenderer.getWidth("<") + 5,mc.textRenderer.fontHeight);
             boolean hoveredOverRight = isMouseOver(mouseX,mouseY,leftX + mc.textRenderer.getWidth("<") + 6,y,mc.textRenderer.getWidth(">") + 5,mc.textRenderer.fontHeight);
-            if (hoveredOverLeft || hoveredOverRight || isMouseOver(mouseX,mouseY,x + 4 + mc.textRenderer.getWidth(mainLabel), y,mc.textRenderer.getWidth(selectedOption) + 5, mc.textRenderer.fontHeight + 2)) {
+            boolean hoveredOverMainLabel = isMouseOver(mouseX,mouseY,x + 4 + mc.textRenderer.getWidth(mainLabel), y,mc.textRenderer.getWidth(selectedOption) + 5, mc.textRenderer.fontHeight + 2);
+
+            if (hoveredOverLeft || hoveredOverRight || hoveredOverMainLabel) {
                 E[] values = option.getValues();
                 int index = Arrays.asList(values).indexOf(option.value);
 
@@ -730,8 +733,10 @@ public class ModernSkin extends Skin implements GroupableSkin {
     }
 
     public class ModernListRenderer<E> implements SkinRenderer<ListOption<E>> {
+
         @Override
         public void render(DrawContext drawContext, ListOption<E> option, int x, int y, int mouseX, int mouseY) {
+
             // Set dimensions for the main label and dropdown area
             option.setHeight(mc.textRenderer.fontHeight + 2);
 
@@ -788,35 +793,41 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
         @Override
         public boolean mouseClicked(ListOption<E> option, double mouseX, double mouseY, int button) {
-            if(option.getValues().isEmpty()) return false;
+            if (option.getValues().isEmpty()) return false;
 
-            mouseX = mc.mouse.getX() / SCALE_FACTOR;
-            mouseY = mc.mouse.getY() / SCALE_FACTOR;
+            mouseX /= SCALE_FACTOR;
+            mouseY /= SCALE_FACTOR;
 
             int x = option.getX();
             int y = option.getY();
             String mainLabel = option.name + ": ";
             String selectedOption = option.get().toString();
 
-            // Check if the main label is clicked to cycle
-            // "<" and ">" buttons
-            int contextMenuWidth = (int)(width * 0.8f - 14);
+            // Calculate positions
+            int contextMenuWidth = (int) (width * 0.8f - 14);
             int leftX = x + contextMenuWidth - 30;
-            boolean hoveredOverLeft = isMouseOver(mouseX,mouseY,leftX,y,mc.textRenderer.getWidth("<") + 5,mc.textRenderer.fontHeight);
-            boolean hoveredOverRight = isMouseOver(mouseX,mouseY,leftX + mc.textRenderer.getWidth("<") + 6,y,mc.textRenderer.getWidth(">") + 5,mc.textRenderer.fontHeight);
-            if (hoveredOverLeft || hoveredOverRight || isMouseOver(mouseX,mouseY,x + 4 + mc.textRenderer.getWidth(mainLabel), y,mc.textRenderer.getWidth(selectedOption) + 5, mc.textRenderer.fontHeight + 2)) {
+
+            // Check hover states
+            boolean hoveredOverLeft = isMouseOver(mouseX, mouseY, leftX, y, mc.textRenderer.getWidth("<") + 5, mc.textRenderer.fontHeight);
+            boolean hoveredOverRight = isMouseOver(mouseX, mouseY, leftX + mc.textRenderer.getWidth("<") + 6, y, mc.textRenderer.getWidth(">") + 5, mc.textRenderer.fontHeight);
+            boolean hoveredOverMainLabel = isMouseOver(mouseX,mouseY,x + 4 + mc.textRenderer.getWidth(mainLabel), y,mc.textRenderer.getWidth(selectedOption) + 5, mc.textRenderer.fontHeight + 2);
+
+            // Check if any area is clicked
+            if (hoveredOverLeft || hoveredOverRight || hoveredOverMainLabel) {
                 List<E> values = option.getValues();
                 int currentIndex = values.indexOf(option.value);
+                int nextIndex;
 
+                // Determine the next index based on the button clicked
                 if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT || hoveredOverLeft) {
-                    // Cycle forward (left-click)
-                    int nextIndex = (currentIndex + 1) % values.size();
-                    option.set(values.get(nextIndex));
+                    nextIndex = (currentIndex + 1) % values.size(); // Cycle forward
                 } else if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT || hoveredOverRight) {
-                    // Cycle backward (right-click)
-                    int nextIndex = (currentIndex - 1 + values.size()) % values.size();
-                    option.set(values.get(nextIndex));
+                    nextIndex = (currentIndex - 1 + values.size()) % values.size(); // Cycle backward
+                } else {
+                    return false; // No valid click
                 }
+
+                option.set(values.get(nextIndex));
                 return true;
             }
 
