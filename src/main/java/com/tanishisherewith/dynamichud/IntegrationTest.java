@@ -1,24 +1,19 @@
 package com.tanishisherewith.dynamichud;
 
+import com.tanishisherewith.dynamichud.integration.DynamicHudConfigurator;
+import com.tanishisherewith.dynamichud.integration.DynamicHudIntegration;
 import com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
-import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetManager;
-import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
 import com.tanishisherewith.dynamichud.widgets.TextWidget;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.text.Text;
 
-import java.util.List;
-
-public class DynamicHudTest implements DynamicHudIntegration {
+public class IntegrationTest implements DynamicHudIntegration {
     TextWidget FPSWidget;
     TextWidget HelloWidget;
     TextWidget DynamicHUDWidget;
     DynamicValueRegistry registry;
-    WidgetRenderer renderer;
 
     @Override
     public void init() {
@@ -31,8 +26,8 @@ public class DynamicHudTest implements DynamicHudIntegration {
         registry.registerLocal("DynamicHUD", () -> "DynamicHUD");
 
         FPSWidget = new TextWidget.Builder()
-                .setX(MinecraftClient.getInstance().getWindow().getScaledWidth()/2)
-                .setY(100)
+                .setX(250)
+                .setY(150)
                 .setDraggable(true)
                 .rainbow(false)
                 .setDRKey("FPS")
@@ -49,6 +44,7 @@ public class DynamicHudTest implements DynamicHudIntegration {
                 .setDVR(registry)
                 .setModID(DynamicHUD.MOD_ID)
                 .shouldScale(true)
+                .shadow(true)
                 .build();
 
         DynamicHUDWidget = new TextWidget.Builder()
@@ -65,35 +61,22 @@ public class DynamicHudTest implements DynamicHudIntegration {
     }
 
     @Override
-    public void addWidgets() {
-        WidgetManager.addWidget(FPSWidget);
-        WidgetManager.addWidget(HelloWidget);
-        WidgetManager.addWidget(DynamicHUDWidget);
+    public DynamicHudConfigurator configure(DynamicHudConfigurator configurator) {
+        configurator.addWidget(FPSWidget)
+                .addWidget(HelloWidget)
+                .addWidget(DynamicHUDWidget)
+                .configureRenderer(renderer -> {
+                    renderer.shouldRenderInGameHud(true);
+                    renderer.addScreen(TitleScreen.class);
+                })
+                .withMoveableScreen(config -> new AbstractMoveableScreen(Text.literal("Editor Screen"), config.getRenderer()) {});
+
+        return configurator;
     }
 
     @Override
     public void registerCustomWidgets() {
         //WidgetManager.addWidgetData(MyWidget.DATA);
-    }
-
-    public void initAfter() {
-        List<Widget> widgets = WidgetManager.getWidgetsForMod(DynamicHUD.MOD_ID);
-
-        renderer = new WidgetRenderer(widgets);
-        renderer.shouldRenderInGameHud(true);
-
-        //This will make widgets render in the titlescreen as well.
-        renderer.addScreen(TitleScreen.class);
-    }
-
-    @Override
-    public AbstractMoveableScreen getMovableScreen() {
-        return new AbstractMoveableScreen(Text.literal("Editor Screen"), renderer) {};
-    }
-
-    @Override
-    public WidgetRenderer getWidgetRenderer() {
-        return renderer;
     }
 
 }

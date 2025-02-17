@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud;
 
+import com.tanishisherewith.dynamichud.integration.IntegrationManager;
 import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.gui.DrawContext;
@@ -13,7 +14,7 @@ public class HudRender implements HudRenderCallback {
 
     @Override
     public void onHudRender(DrawContext drawContext, RenderTickCounter tickCounter) {
-        for (WidgetRenderer widgetRenderer : DynamicHUD.getWidgetRenderers()) {
+        for (WidgetRenderer widgetRenderer : IntegrationManager.getWidgetRenderers()) {
             widgetRenderer.renderWidgets(drawContext, -120, -120);
         }
     }

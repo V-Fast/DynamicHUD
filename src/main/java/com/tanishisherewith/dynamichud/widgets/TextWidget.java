@@ -1,7 +1,7 @@
 package com.tanishisherewith.dynamichud.widgets;
 
+import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
-import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
@@ -18,10 +18,6 @@ import net.minecraft.nbt.NbtCompound;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public class TextWidget extends Widget implements ContextMenuProvider {
@@ -74,7 +70,8 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     }
 
     public void createMenu() {
-        ContextMenuProperties properties = ContextMenuProperties.builder().skin(new ModernSkin()).build();
+        boolean dark_mode = false;
+        ContextMenuProperties properties = ContextMenuProperties.builder().skin(new MinecraftSkin(dark_mode ? MinecraftSkin.PanelColor.DARK_PANEL : MinecraftSkin.PanelColor.CREAMY)).build();
 
         menu = new ContextMenu<>(getX(), getY(), properties);
         menu.addOption(new BooleanOption("Shadow",

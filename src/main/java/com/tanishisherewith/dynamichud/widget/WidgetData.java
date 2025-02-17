@@ -16,5 +16,4 @@ public record WidgetData<T extends Widget>(String name, String description, Supp
     public Widget createWidget() {
         return widgetFactory.get();
     }
-
 }

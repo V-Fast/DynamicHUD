@@ -29,7 +29,7 @@ public abstract class AbstractMoveableScreen extends Screen {
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         widgetRenderer.mouseDragged(mouseX, mouseY, button, GlobalConfig.get().getSnapSize());
         ContextMenuManager.getInstance().mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-        return false;
+        return super.mouseDragged(mouseX, mouseY, button,deltaX,deltaY);
     }
 
     @Override
@@ -38,7 +38,7 @@ public abstract class AbstractMoveableScreen extends Screen {
             handleClickOnWidget(widgetRenderer.selectedWidget, mouseX, mouseY, button);
         }
         ContextMenuManager.getInstance().mouseClicked(mouseX, mouseY, button);
-        return false;
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
@@ -51,7 +51,7 @@ public abstract class AbstractMoveableScreen extends Screen {
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         widgetRenderer.mouseReleased(mouseX, mouseY, button);
         ContextMenuManager.getInstance().mouseReleased(mouseX, mouseY, button);
-        return false;
+        return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override

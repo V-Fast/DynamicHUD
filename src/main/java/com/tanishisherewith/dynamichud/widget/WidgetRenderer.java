@@ -17,6 +17,7 @@ public class WidgetRenderer {
     public Widget selectedWidget = null;
     List<Widget> widgets;
     private boolean renderInGameHud = true;
+    private int Z_Index = 10;
 
     /**
      * Add the list of widgets the widgetRenderer should render
@@ -52,6 +53,9 @@ public class WidgetRenderer {
 
         Screen currentScreen = DynamicHUD.MC.currentScreen;
 
+        context.getMatrices().push();
+        context.getMatrices().translate(0,0, Z_Index);
+
         //Render in game hud
         if (currentScreen == null && renderInGameHud) {
             for (Widget widget : widgets) {
@@ -76,6 +80,7 @@ public class WidgetRenderer {
                 widget.render(context, 0, 0);
             }
         }
+        context.getMatrices().pop();
     }
 
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
@@ -167,5 +172,9 @@ public class WidgetRenderer {
                 widget.mouseReleased(mouseX, mouseY, button);
             }
         }
+    }
+    public WidgetRenderer withZIndex(int z_Index){
+        this.Z_Index = z_Index;
+        return this;
     }
 }

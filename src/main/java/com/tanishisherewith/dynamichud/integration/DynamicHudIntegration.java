@@ -1,4 +1,4 @@
-package com.tanishisherewith.dynamichud;
+package com.tanishisherewith.dynamichud.integration;
 
 import com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
@@ -41,6 +41,13 @@ public interface DynamicHudIntegration {
      */
     File WIDGETS_FILE = new File(FILE_DIRECTORY, FILENAME);
 
+
+    /**
+     * Entry point for configuring DynamicHUD integration.
+     * @param configurator Configuration context
+     */
+    DynamicHudConfigurator configure(DynamicHudConfigurator configurator);
+
     /**
      * Initializes the DynamicHud integration.
      * <p>
@@ -48,11 +55,6 @@ public interface DynamicHudIntegration {
      * </p>
      */
     void init();
-
-    /**
-     * To be used to add widgets using {@link WidgetManager}.
-     */
-    void addWidgets();
 
     /**
      * To register custom widgets. This method can be overridden by implementations.
@@ -72,15 +74,6 @@ public interface DynamicHudIntegration {
     }
 
     /**
-     * Performs any necessary initialization after the widgets have been added. This method can be overridden by implementations.
-     * <p>
-     * Suggested to be used to initialize a {@link WidgetRenderer} object with the added widgets.
-     * </p>
-     */
-    default void initAfter() {
-    }
-
-    /**
      * Returns the file where widgets are to be saved and loaded from.
      *
      * @return The widgets file.
@@ -96,27 +89,5 @@ public interface DynamicHudIntegration {
      */
     default KeyBinding getKeyBind() {
         return EDITOR_SCREEN_KEY_BINDING;
-    }
-
-    /**
-     * Returns the movable screen for the DynamicHud.
-     * <p>
-     * <h3>
-     * !! Should never be null !!
-     * </h3>
-     * </p>
-     *
-     * @return The movable screen.
-     */
-    AbstractMoveableScreen getMovableScreen();
-
-    /**
-     * To return a {@link WidgetRenderer} object.
-     * By default, it returns a widget renderer consisting of all widgets in the {@link WidgetManager}
-     *
-     * @return The widget renderer.
-     */
-    default WidgetRenderer getWidgetRenderer() {
-        return new WidgetRenderer(WidgetManager.getWidgets());
     }
 }

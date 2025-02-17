@@ -18,6 +18,10 @@
   "license": "MIT",
   "environment": "client",
   "entrypoints": {
+    "dynamicHud": [
+      "com.tanishisherewith.dynamichud.integration.DefaultIntegrationImpl"
+    ],
+
     "client": [
       "com.tanishisherewith.dynamichud.DynamicHUD"
     ]
