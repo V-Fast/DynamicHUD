@@ -2,6 +2,7 @@ package com.tanishisherewith.dynamichud.internal;
 
 import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,6 +14,7 @@ public abstract class System {
 
     public System(String modId) {
         this.modId = modId;
+        instances.computeIfAbsent(modId, k -> new ArrayList<>()).add((DynamicValueRegistry) this);
     }
 
     public static List<DynamicValueRegistry> getInstances(String modId) {

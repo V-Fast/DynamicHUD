@@ -2,9 +2,7 @@ package com.tanishisherewith.dynamichud.utils;
 
 import com.tanishisherewith.dynamichud.internal.System;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -27,12 +25,12 @@ public class DynamicValueRegistry extends System {
      *
      * @see #localRegistry
      */
-    private static final Map<String, Supplier<?>> globalRegistry = new HashMap<>();
+    private static final Map<String, Supplier<?>> GLOBAL_REGISTRY = new HashMap<>();
 
     /**
      * A map that holds the local registry of suppliers.
      *
-     * @see #globalRegistry
+     * @see #GLOBAL_REGISTRY
      */
     private final Map<String, Supplier<?>> localRegistry = new HashMap<>();
 
@@ -43,7 +41,6 @@ public class DynamicValueRegistry extends System {
      */
     public DynamicValueRegistry(String modId) {
         super(modId);
-        instances.computeIfAbsent(modId, k -> new ArrayList<>()).add(this);
     }
 
     /**
@@ -53,7 +50,7 @@ public class DynamicValueRegistry extends System {
      * @param supplier The supplier to be registered.
      */
     public static void registerGlobal(String key, Supplier<?> supplier) {
-        globalRegistry.put(key, supplier);
+        GLOBAL_REGISTRY.put(key, supplier);
     }
 
     /**
@@ -63,7 +60,7 @@ public class DynamicValueRegistry extends System {
      * @return The supplier registered under the given key, or null if no such supplier exists.
      */
     public static Supplier<?> getGlobal(String key) {
-        return globalRegistry.get(key);
+        return GLOBAL_REGISTRY.get(key);
     }
 
     /**
@@ -83,15 +80,7 @@ public class DynamicValueRegistry extends System {
      * @return The supplier registered under the given key, or null if no such supplier exists.
      */
     public Supplier<?> get(String key) {
-        // First, try to get the supplier from the local registry
-        Supplier<?> supplier = localRegistry.get(key);
-
-        // If the supplier is not in the local registry, try the global registry
-        if (supplier == null) {
-            supplier = globalRegistry.get(key);
-        }
-
-        return supplier;
+        return localRegistry.getOrDefault(key, GLOBAL_REGISTRY.get(key));
     }
 
     /**
@@ -100,6 +89,34 @@ public class DynamicValueRegistry extends System {
      * @param map The map to be set as the local registry.
      */
     public void setLocalRegistry(Map<String, Supplier<?>> map) {
+        localRegistry.clear();
         localRegistry.putAll(map);
+    }
+    /**
+     * Retrieves all instances of DynamicValueRegistry for a specific mod ID.
+     *
+     * @param modId The mod ID to search for.
+     * @return A list of DynamicValueRegistry instances, or an empty list if none exist.
+     */
+    public static List<DynamicValueRegistry> getInstances(String modId) {
+        return instances.getOrDefault(modId, Collections.emptyList());
+    }
+
+    /**
+     * Removes a supplier from the global registry.
+     *
+     * @param key The key of the supplier to remove.
+     */
+    public static void removeGlobal(String key) {
+        GLOBAL_REGISTRY.remove(key);
+    }
+
+    /**
+     * Removes a supplier from the local registry.
+     *
+     * @param key The key of the supplier to remove.
+     */
+    public void removeLocal(String key) {
+        localRegistry.remove(key);
     }
 }
