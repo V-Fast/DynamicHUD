@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.widgets;
 
+import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.internal.RegistrySource;
@@ -32,7 +33,7 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     Supplier<String> textSupplier;
     private String registryKey;
     private RegistrySource registrySource;
-    private final DynamicValueRegistry valueRegistry;
+    private DynamicValueRegistry valueRegistry;
 
     public TextWidget() {
         this(null, null, false, false, Color.WHITE, "unknown");
@@ -219,7 +220,20 @@ public class TextWidget extends Widget implements ContextMenuProvider {
         rainbowBrightness = tag.getFloat("RainbowBrightness");
         textColor = new Color(tag.getInt("TextColor"));
         registryKey = tag.getString("RegistryKey");
-        registrySource = RegistrySource.valueOf(tag.getString("RegistrySource"));
+        registrySource = tag.contains("RegistrySource") ? RegistrySource.valueOf(tag.getString("RegistrySource")) : RegistrySource.LOCAL;
+
+        if(registrySource == RegistrySource.LOCAL){
+            //Search all instance of DVR to find if a value for the key is valid.
+            for(DynamicValueRegistry dvr: DynamicValueRegistry.getInstances(modId)) {
+                if (dvr.get(registryKey) != null) {
+                    valueRegistry = dvr;
+                }
+            }
+        }
+
+        if(valueRegistry == null){
+            throw new RuntimeException("Local DynamicValueRegistry not found for: " + registryKey);
+        }
 
         initializeTextSupplier();
         createMenu();
