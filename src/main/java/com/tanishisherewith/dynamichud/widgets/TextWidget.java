@@ -1,6 +1,5 @@
 package com.tanishisherewith.dynamichud.widgets;
 
-import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.internal.RegistrySource;
@@ -229,10 +228,9 @@ public class TextWidget extends Widget implements ContextMenuProvider {
                     valueRegistry = dvr;
                 }
             }
-        }
-
-        if(valueRegistry == null){
-            throw new RuntimeException("Local DynamicValueRegistry not found for: " + registryKey);
+            if(valueRegistry == null){
+                throw new RuntimeException("Local DynamicValueRegistry not found for: " + registryKey);
+            }
         }
 
         initializeTextSupplier();
