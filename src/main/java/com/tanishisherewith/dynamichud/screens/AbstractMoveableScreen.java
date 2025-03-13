@@ -11,23 +11,32 @@ import net.minecraft.text.Text;
 public abstract class AbstractMoveableScreen extends Screen {
     public final WidgetRenderer widgetRenderer;
 
+    //TrayWidget trayWidget;
     /**
      * Constructs a AbstractMoveableScreen object.
      */
     public AbstractMoveableScreen(Text title, WidgetRenderer renderer) {
         super(title);
         this.widgetRenderer = renderer;
+       // this.trayWidget = new TrayWidget(width - 210,height - 10);
+    }
+
+    @Override
+    protected void init() {
+        super.init();
     }
 
     @Override
     public void onDisplayed() {
         super.onDisplayed();
+      //  this.trayWidget.updatePosition(width, height);
+      //  trayWidget.setFocused(true);
         widgetRenderer.isInEditor = true;
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        widgetRenderer.mouseDragged(mouseX, mouseY, button, GlobalConfig.get().getSnapSize());
+        widgetRenderer.mouseDragged(mouseX, mouseY, button,deltaX,deltaY, GlobalConfig.get().getSnapSize());
         ContextMenuManager.getInstance().mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
         return super.mouseDragged(mouseX, mouseY, button,deltaX,deltaY);
     }
@@ -43,7 +52,8 @@ public abstract class AbstractMoveableScreen extends Screen {
 
     @Override
     public boolean charTyped(char chr, int modifiers) {
-        ContextMenuManager.getInstance().charTyped(chr);
+        widgetRenderer.charTyped(chr,modifiers);
+        ContextMenuManager.getInstance().charTyped(chr,modifiers);
         return super.charTyped(chr, modifiers);
     }
 
@@ -56,14 +66,20 @@ public abstract class AbstractMoveableScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        widgetRenderer.keyPressed(keyCode);
+        widgetRenderer.keyPressed(keyCode, scanCode, modifiers);
         ContextMenuManager.getInstance().keyPressed(keyCode, scanCode, modifiers);
+        /*
+        if(widgetRenderer.selectedWidget != null && (keyCode == GLFW.GLFW_KEY_DELETE || keyCode == GLFW.GLFW_KEY_BACKSPACE)){
+            trayWidget.minimizeWidget(widgetRenderer.selectedWidget);
+        }
+
+         */
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        widgetRenderer.keyReleased(keyCode);
+        widgetRenderer.keyReleased(keyCode, scanCode, modifiers);
         ContextMenuManager.getInstance().keyReleased(keyCode, scanCode, modifiers);
         return super.keyReleased(keyCode, scanCode, modifiers);
     }
@@ -105,6 +121,7 @@ public abstract class AbstractMoveableScreen extends Screen {
                 }
             }
         }
+       // trayWidget.render(drawContext,mouseX,mouseY,delta);
     }
 
     public void handleClickOnWidget(Widget widget, double mouseX, double mouseY, int button) {}

@@ -99,11 +99,11 @@ public class ContextMenuManager implements Input {
     }
 
     @Override
-    public void charTyped(char c) {
+    public void charTyped(char c, int modifiers) {
         for (ContextMenuProvider provider : providers) {
             ContextMenu<?> contextMenu = provider.getContextMenu();
             if (contextMenu != null) {
-                contextMenu.charTyped(c);
+                contextMenu.charTyped(c, modifiers);
             }
         }
     }

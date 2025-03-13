@@ -190,10 +190,10 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
     }
 
     @Override
-    public void charTyped(char c) {
+    public void charTyped(char c, int modifiers) {
         if (!shouldDisplay) return;
         for (Option<?> option : options) {
-            option.charTyped(c);
+            option.charTyped(c, modifiers);
         }
     }
 

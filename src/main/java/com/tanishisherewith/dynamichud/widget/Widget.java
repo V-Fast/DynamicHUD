@@ -3,6 +3,7 @@ package com.tanishisherewith.dynamichud.widget;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.internal.UID;
+import com.tanishisherewith.dynamichud.utils.Input;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
@@ -10,7 +11,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
-public abstract class Widget {
+public abstract class Widget implements Input {
     public static MinecraftClient mc = MinecraftClient.getInstance();
     public WidgetData<?> DATA;
     /**
@@ -161,6 +162,7 @@ public abstract class Widget {
     public final void render(DrawContext drawContext, int mouseX, int mouseY) {
         if (!isVisible()) return;
 
+
         if (shouldScale) {
             DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().getScale());
         }
@@ -214,6 +216,7 @@ public abstract class Widget {
         renderWidget(context, mouseX, mouseY);
     }
 
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (widgetBox.isMouseOver(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             toggle();
@@ -234,7 +237,12 @@ public abstract class Widget {
         this.y = (int) MathHelper.clamp(this.y, 0, mc.getWindow().getScaledHeight() - getHeight());
     }
 
-    public boolean mouseDragged(double mouseX, double mouseY, int button, int snapSize) {
+    @Override
+    public final boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        return false;
+    }
+
+    public boolean mouseDragged(double mouseX, double mouseY, int button,  double deltaX, double deltaY, int snapSize) {
         if (!isDraggable) return false;
         if (dragging && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             int newX = (int) (mouseX - startX);
@@ -263,8 +271,10 @@ public abstract class Widget {
         return false;
     }
 
-    public void mouseReleased(double mouseX, double mouseY, int button) {
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
         dragging = false;
+        return true;
     }
 
     /**
@@ -273,8 +283,17 @@ public abstract class Widget {
      * @param vAmount vertical amount of scrolling
      * @param hAmount horizontal amount of scrolling
      */
-    public void mouseScrolled(double mouseX, double mouseY, double vAmount, double hAmount) {
-    }
+    @Override
+    public void mouseScrolled(double mouseX, double mouseY, double vAmount, double hAmount) {}
+
+    @Override
+    public void keyPressed(int key, int scanCode, int modifiers) {}
+
+    @Override
+    public void keyReleased(int key, int scanCode, int modifiers) {}
+
+    @Override
+    public void charTyped(char c, int modifiers) {}
 
     public boolean toggle() {
         return this.isVisible = !this.isVisible;

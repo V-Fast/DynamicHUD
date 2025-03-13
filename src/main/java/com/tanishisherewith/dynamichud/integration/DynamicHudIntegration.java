@@ -3,7 +3,6 @@ package com.tanishisherewith.dynamichud.integration;
 import com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
 import com.tanishisherewith.dynamichud.widget.WidgetManager;
-import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.option.KeyBinding;

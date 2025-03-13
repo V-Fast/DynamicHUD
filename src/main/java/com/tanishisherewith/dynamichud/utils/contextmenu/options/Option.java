@@ -89,7 +89,7 @@ public abstract class Option<T> implements Input {
     public void keyPressed(int key, int scanCode, int modifiers) {}
 
     @Override
-    public void charTyped(char c) {}
+    public void charTyped(char c, int modifiers) {}
 
     @Override
     public void keyReleased(int key, int scanCode, int modifiers) {}

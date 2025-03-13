@@ -68,14 +68,12 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     @SuppressWarnings("unchecked")
     private void initializeTextSupplier() {
         switch (registrySource) {
-            case GLOBAL:
-                this.textSupplier = (Supplier<String>) DynamicValueRegistry.getGlobal(registryKey);
-                break;
-            case LOCAL:
+            case GLOBAL -> this.textSupplier = (Supplier<String>) DynamicValueRegistry.getGlobal(registryKey);
+            case LOCAL -> {
                 if (valueRegistry != null) {
                     this.textSupplier = (Supplier<String>) valueRegistry.get(registryKey);
                 }
-                break;
+            }
         }
     }
 
@@ -148,7 +146,6 @@ public class TextWidget extends Widget implements ContextMenuProvider {
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows3", () -> this.shadow, value -> this.shadow = value));
         subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows4", () -> this.shadow, value -> this.shadow = value));
         menu.addOption(subMenuOption);
-
          */
 
     }
@@ -156,8 +153,8 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     @Override
     public void renderWidget(DrawContext drawContext, int mouseX, int mouseY) {
         if(menu == null) return;
-
-        int color = /*rainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % (5000 * rainbowSpeed) / (5000f * rainbowSpeed))) :*/ textColor.getRGB();
+        //int color = rainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % (5000 * rainbowSpeed) / (5000f * rainbowSpeed))) : textColor.getRGB();
+        int color = textColor.getRGB();
         if (textSupplier != null) {
             String text = textSupplier.get();
             if(rainbow){
@@ -169,23 +166,12 @@ public class TextWidget extends Widget implements ContextMenuProvider {
         }
         menu.set(getX(), getY(), (int) Math.ceil(getHeight()));
     }
-
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && widgetBox.isMouseOver(mouseX, mouseY)) {
             menu.toggleDisplay();
         }
         return super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    @Override
-    public void mouseReleased(double mouseX, double mouseY, int button) {
-        super.mouseReleased(mouseX, mouseY, button);
-    }
-
-    @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, int snapSize) {
-        return super.mouseDragged(mouseX, mouseY, button, snapSize);
     }
 
     @Override

@@ -35,6 +35,9 @@ public final class GlobalConfig {
     private boolean showColorPickerPreview = true;
 
     @SerialEntry
+    private boolean renderInDebugScreen = false;
+
+    @SerialEntry
     private boolean forceSameContextMenuSkin = true;
 
     //These package names are getting seriously long
@@ -68,6 +71,12 @@ public final class GlobalConfig {
                                         .description(OptionDescription.of(Text.literal("Set scale for all widgets.")))
                                         .binding(1.0f, () -> this.scale, newVal -> this.scale = newVal)
                                         .controller(floatOption -> FloatSliderControllerBuilder.create(floatOption).range(0.1f, 2.5f).step(0.1f))
+                                        .build())
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Text.literal("Render in debug screen"))
+                                        .description(OptionDescription.of(Text.literal("Renders widgets even when the debug screen is on")))
+                                        .binding(true, () -> this.renderInDebugScreen, newVal -> this.renderInDebugScreen = newVal)
+                                        .controller(booleanOption -> BooleanControllerBuilder.create(booleanOption).yesNoFormatter())
                                         .build())
                                 .option(Option.<Boolean>createBuilder()
                                         .name(Text.literal("Show Color picker preview"))
@@ -125,6 +134,10 @@ public final class GlobalConfig {
 
     public boolean shouldDisplayDescriptions() {
         return displayDescriptions;
+    }
+
+    public boolean renderInDebugScreen() {
+        return renderInDebugScreen;
     }
 
     public int getSnapSize() {

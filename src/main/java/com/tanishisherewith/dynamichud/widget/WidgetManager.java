@@ -230,4 +230,8 @@ public class WidgetManager {
                 .filter(widget -> modID.equalsIgnoreCase(widget.getModId()))
                 .toList();
     }
+
+    public static Map<String, WidgetData<?>> getWidgetDataMap() {
+        return widgetDataMap;
+    }
 }

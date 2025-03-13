@@ -18,5 +18,5 @@ public interface Input {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
 
-    void charTyped(char c);
+    void charTyped(char c, int modifiers);
 }

@@ -152,6 +152,7 @@ public final class IntegrationManager {
         printInfo("(DynamicHUD) Integration of supported mods was successful");
 
 
+        // Sheesh
         if(!invalid_implementations.isEmpty()){
             BooleanPool.put("WarningScreen", false);
 
