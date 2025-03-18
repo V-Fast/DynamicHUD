@@ -3,6 +3,7 @@ package com.tanishisherewith.dynamichud.integration;
 import com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
 import com.tanishisherewith.dynamichud.widget.WidgetManager;
+import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.option.KeyBinding;
@@ -54,6 +55,11 @@ public interface DynamicHudIntegration {
      * </p>
      */
     void init();
+
+    /**
+     * This method is called after widgets from the widget file have been loaded successfully and added to the renderer.
+     */
+    default void postWidgetLoading(WidgetRenderer renderer) {}
 
     /**
      * To register custom widgets. This method can be overridden by implementations.

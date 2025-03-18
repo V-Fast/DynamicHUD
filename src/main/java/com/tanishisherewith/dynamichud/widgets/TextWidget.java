@@ -14,6 +14,7 @@ import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -80,57 +81,55 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     public void createMenu() {
         boolean dark_mode = false;
         ContextMenuProperties properties = ContextMenuProperties.builder().skin(new MinecraftSkin(dark_mode ? MinecraftSkin.PanelColor.DARK_PANEL : MinecraftSkin.PanelColor.CREAMY)).build();
-
         menu = new ContextMenu<>(getX(), getY(), properties);
-        menu.addOption(new BooleanOption("Shadow",
+
+        menu.addOption(new BooleanOption(Text.of("Shadow"),
                         () -> this.shadow, value -> this.shadow = value,
-                        BooleanOption.BooleanType.ON_OFF
-                ).description("Adds shadow to your text")
+                        BooleanOption.BooleanType.ON_OFF)
+                .description(Text.of("Adds shadow to your text"))
         );
-        menu.addOption(new BooleanOption("Rainbow",
-                () -> this.rainbow, value -> this.rainbow = value, BooleanOption.BooleanType.ON_OFF)
-                .description("Adds rainbow effect to your text")
+        menu.addOption(new BooleanOption(Text.of("Rainbow"),
+                        () -> this.rainbow, value -> this.rainbow = value,
+                        BooleanOption.BooleanType.ON_OFF)
+                .description(Text.of("Adds rainbow effect to your text"))
         );
-        menu.addOption(new ColorOption("TextColor", menu,
+        menu.addOption(new ColorOption(Text.of("Text Color"), menu,
                 () -> this.textColor, value -> this.textColor = value)
-                .description("Specify the color you want to add to your text")
+                .description(Text.of("Specify the color you want to add to your text"))
+                .renderWhen(()-> !this.rainbow)
         );
-        menu.addOption(new DoubleOption(
-                "RainbowSpeed",
+        menu.addOption(new DoubleOption(Text.of("Rainbow Speed"),
                 1, 5.0f, 1,
                 () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue(), menu)
-                .setShouldRender(() -> this.rainbow)
+                .renderWhen(() -> this.rainbow)
         );
-        menu.addOption(new DoubleOption(
-                "Rainbow Spread",
+        menu.addOption(new DoubleOption(Text.of("Rainbow Spread"),
                 0.001f, 0.15f, 0.001f,
                 () -> (double) this.rainbowSpread, value -> this.rainbowSpread = value.floatValue(), menu)
-                .setShouldRender(() -> this.rainbow)
+                .renderWhen(() -> this.rainbow)
                 .withComplexity(Option.Complexity.Enhanced)
         );
-        menu.addOption(new DoubleOption(
-                "Rainbow Saturation",
+        menu.addOption(new DoubleOption(Text.of("Rainbow Saturation"),
                 0, 1.0f, 0.1f,
                 () -> (double) this.rainbowSaturation, value -> this.rainbowSaturation = value.floatValue(), menu)
-                .setShouldRender(() -> this.rainbow)
+                .renderWhen(() -> this.rainbow)
                 .withComplexity(Option.Complexity.Pro)
         );
-        menu.addOption(new DoubleOption(
-                "Rainbow Brightness",
+        menu.addOption(new DoubleOption(Text.of("Rainbow Brightness"),
                 0, 1.0f, 0.01f,
                 () -> (double) this.rainbowBrightness, value -> this.rainbowBrightness = value.floatValue(), menu)
-                .setShouldRender(() -> this.rainbow)
+                .renderWhen(() -> this.rainbow)
                 .withComplexity(Option.Complexity.Pro)
         );
 
         /*
         OptionGroup group = new OptionGroup("Color");
-        group.addOption(new ColorOption("TextColor", menu,
+        group.addOption(new ColorOption(Text.of("TextColor"), menu,
                 () -> this.textColor, value -> this.textColor = value)
-                .description("Specify the color you want to add to your text")
+                .description(Text.of("Specify the color you want to add to your text"))
         );
         group.addOption(new DoubleOption(
-                "RainbowSpeed",
+                Text.of("RainbowSpeed"),
                 1, 5.0f, 1,
                 () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue(), menu)
                 .setShouldRender(() -> this.rainbow)
@@ -139,12 +138,12 @@ public class TextWidget extends Widget implements ContextMenuProvider {
         List<String> options = Arrays.asList("List1", "LONGER LIST 2", "List3");
         AtomicBoolean running = new AtomicBoolean(false);
         AtomicBoolean subMenu = new AtomicBoolean(false);
-        menu.addOption(new ListOption<>("List??? ", option::get, option::set, options));
-        menu.addOption(new RunnableOption("Runnable Test", running::get, running::set, () -> System.out.println("Runnable ran")));
-        SubMenuOption subMenuOption = new SubMenuOption("SubMenu", menu, subMenu::get, subMenu::set);
-        subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows2", () -> this.shadow, value -> this.shadow = value));
-        subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows3", () -> this.shadow, value -> this.shadow = value));
-        subMenuOption.getSubMenu().addOption(new BooleanOption("Shadows4", () -> this.shadow, value -> this.shadow = value));
+        menu.addOption(new ListOption<>(Text.of("List??? "), option::get, option::set, options));
+        menu.addOption(new RunnableOption(Text.of("Runnable Test"), running::get, running::set, () -> System.out.println("Runnable ran")));
+        SubMenuOption subMenuOption = new SubMenuOption(Text.of("SubMenu"), menu, subMenu::get, subMenu::set);
+        subMenuOption.getSubMenu().addOption(new BooleanOption(Text.of("Shadows2"), () -> this.shadow, value -> this.shadow = value));
+        subMenuOption.getSubMenu().addOption(new BooleanOption(Text.of("Shadows3"), () -> this.shadow, value -> this.shadow = value));
+        subMenuOption.getSubMenu().addOption(new BooleanOption(Text.of("Shadows4"), () -> this.shadow, value -> this.shadow = value));
         menu.addOption(subMenuOption);
          */
 

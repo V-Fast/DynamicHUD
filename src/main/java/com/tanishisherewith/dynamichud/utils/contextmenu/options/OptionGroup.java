@@ -3,6 +3,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +14,7 @@ public class OptionGroup extends Option<OptionGroup> {
     private final List<Option<?>> groupOptions = new ArrayList<>();
     protected boolean expanded; // Skins can choose to use this or ignore it
 
-    public OptionGroup(String name) {
+    public OptionGroup(Text name) {
         super(name, () -> null, (v) -> {}, () -> true);
         this.expanded = false;
     }

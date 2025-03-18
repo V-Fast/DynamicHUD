@@ -2,6 +2,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.utils.BooleanPool;
+import net.minecraft.text.Text;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -18,16 +19,16 @@ public class RunnableOption extends Option<Boolean> {
      * @param setter Return a boolean based on if the task is running or not.
      * @param task   The task to run
      */
-    public RunnableOption(String name, Supplier<Boolean> getter, Consumer<Boolean> setter, Runnable task) {
+    public RunnableOption(Text name, Supplier<Boolean> getter, Consumer<Boolean> setter, Runnable task) {
         super(name,getter, setter);
         this.name = name;
         this.task = task;
         this.renderer.init(this);
     }
 
-    public RunnableOption(String name, boolean defaultValue, Runnable task) {
-        this(name, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value), task);
-        BooleanPool.put(name, defaultValue);
+    public RunnableOption(Text name, boolean defaultValue, Runnable task) {
+        this(name, () -> BooleanPool.get(name.getString()), value -> BooleanPool.put(name.getString(), value), task);
+        BooleanPool.put(name.getString(), defaultValue);
     }
 
     @Override

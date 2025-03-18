@@ -17,8 +17,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.StringVisitable;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -29,21 +29,21 @@ import java.util.List;
 public class ModernSkin extends Skin implements GroupableSkin {
     private final Color themeColor;
     private final float radius;
-    private final String defaultToolTipHeader;
-    private final String defaultToolTipText;
+    private final Text defaultToolTipHeader;
+    private final Text defaultToolTipText;
     Color DARK_GRAY = new Color(20, 20, 20, 229);
     Color DARKER_GRAY_2 = new Color(12,12,12,246);
     Color DARKER_GRAY = new Color(10, 10, 10, 243);
     private int contextMenuX = 0, contextMenuY = 0;
     private int width = 0, height = 0;
     private float scaledWidth = 0, scaledHeight = 0;
-    private String TOOLTIP_TEXT;
-    private String TOOLTIP_HEAD;
+    private Text TOOLTIP_TEXT;
+    private Text TOOLTIP_HEAD;
     private static int SCALE_FACTOR = 4;
     private final ScrollHandler scrollHandler;
 
 
-    public ModernSkin(Color themeColor, float radius, String defaultToolTipHeader, String defaultToolTipText) {
+    public ModernSkin(Color themeColor, float radius, Text defaultToolTipHeader, Text defaultToolTipText) {
         this.themeColor = themeColor;
         this.radius = radius;
         TOOLTIP_TEXT = defaultToolTipText;
@@ -65,7 +65,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
     }
 
     public ModernSkin(Color themeColor, float radius) {
-        this(themeColor, radius, "Example Tip", "Hover over a setting to see its tool-tip (if present) here!");
+        this(themeColor, radius, Text.of("Example Tip"), Text.of("Hover over a setting to see its tool-tip (if present) here!"));
     }
 
     public ModernSkin(Color themeColor) {
@@ -213,7 +213,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         int toolTipWidth = (int) (width * 0.2f) + 4;
         int toolTipHeight = (int) (height * 0.16f);
 
-        if (!TOOLTIP_TEXT.isEmpty()) {
+        if (!TOOLTIP_TEXT.getString().isEmpty()) {
             toolTipHeight = Math.max(toolTipHeight, mc.textRenderer.getWrappedLinesHeight(TOOLTIP_TEXT, toolTipWidth)) + 18;
             toolTipHeight = Math.min(height - 23, toolTipHeight);
         }
@@ -239,7 +239,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                 ColorHelper.changeAlpha(Color.WHITE, 175).getRGB()
         );
 
-        if (TOOLTIP_TEXT.isEmpty() || TOOLTIP_HEAD.isEmpty()) {
+        if (TOOLTIP_TEXT.getString().isEmpty() || TOOLTIP_HEAD.getString().isEmpty()) {
             setTooltipText(defaultToolTipHeader, defaultToolTipText);
             return;
         }
@@ -254,7 +254,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                 true
         );
 
-        List<OrderedText> wrappedText = mc.textRenderer.wrapLines(StringVisitable.plain(TOOLTIP_TEXT), toolTipWidth);
+        List<OrderedText> wrappedText = mc.textRenderer.wrapLines(StringVisitable.styled(TOOLTIP_TEXT.getString(),TOOLTIP_TEXT.getStyle()), toolTipWidth);
 
         DrawHelper.scaleAndPosition(drawContext.getMatrices(), contextMenuX + 4, tooltipY + 19, textScale);
 
@@ -277,7 +277,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         setTooltipText(defaultToolTipHeader, defaultToolTipText);
     }
 
-    public void setTooltipText(String head_text, String tooltip_text) {
+    public void setTooltipText(Text head_text, Text tooltip_text) {
         TOOLTIP_TEXT = tooltip_text;
         TOOLTIP_HEAD = head_text;
     }

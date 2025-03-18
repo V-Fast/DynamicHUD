@@ -32,8 +32,15 @@ public class DynamicHudConfigurator {
         return this;
     }
 
+    /**
+     * Configure the existing renderer object with this method
+     */
     public DynamicHudConfigurator configureRenderer(Consumer<WidgetRenderer> wrConsumer) {
-        return configureRenderer(wrConsumer, widgets);
+        if(renderer == null){
+            this.renderer = new WidgetRenderer(widgets);
+        }
+        wrConsumer.accept(renderer);
+        return this;
     }
 
     public DynamicHudConfigurator configureRenderer(Consumer<WidgetRenderer> wrConsumer, List<Widget> widgets) {
@@ -41,6 +48,15 @@ public class DynamicHudConfigurator {
         wrConsumer.accept(renderer);
         return this;
     }
+
+    /**
+     * Override the present widget renderer with your own instance
+     */
+    public DynamicHudConfigurator overrideRenderer(WidgetRenderer renderer) {
+        this.renderer = renderer;
+        return this;
+    }
+
     /**
      * Called before saving these widgets
      */

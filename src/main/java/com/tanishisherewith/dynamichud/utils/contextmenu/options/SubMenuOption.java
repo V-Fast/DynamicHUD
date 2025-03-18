@@ -3,6 +3,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 import com.tanishisherewith.dynamichud.utils.BooleanPool;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
+import net.minecraft.text.Text;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -18,7 +19,7 @@ import java.util.function.Supplier;
 public class SubMenuOption extends Option<Boolean> {
     private final ContextMenu<?> subMenu;
 
-    public <T extends ContextMenuProperties> SubMenuOption(String name, ContextMenu<?> parentMenu, Supplier<Boolean> getter, Consumer<Boolean> setter, T properties) {
+    public <T extends ContextMenuProperties> SubMenuOption(Text name, ContextMenu<?> parentMenu, Supplier<Boolean> getter, Consumer<Boolean> setter, T properties) {
         super(name,getter, setter);
         Objects.requireNonNull(parentMenu, "Parent Context Menu cannot be null in [" + name + "] SubMenu option");
         this.subMenu = parentMenu.createSubMenu(parentMenu.x + parentMenu.getWidth(), this.y, properties);
@@ -27,16 +28,16 @@ public class SubMenuOption extends Option<Boolean> {
         this.renderer.init(this);
     }
 
-    public <T extends ContextMenuProperties> SubMenuOption(String name, ContextMenu<?> parentMenu, T properties) {
-        this(name, parentMenu, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value), properties);
+    public <T extends ContextMenuProperties> SubMenuOption(Text name, ContextMenu<?> parentMenu, T properties) {
+        this(name, parentMenu, () -> BooleanPool.get(name.getString()), value -> BooleanPool.put(name.getString(), value), properties);
     }
 
-    public <T extends ContextMenuProperties> SubMenuOption(String name, ContextMenu<?> parentMenu, Supplier<Boolean> getter, Consumer<Boolean> setter) {
+    public <T extends ContextMenuProperties> SubMenuOption(Text name, ContextMenu<?> parentMenu, Supplier<Boolean> getter, Consumer<Boolean> setter) {
         this(name, parentMenu, getter, setter, parentMenu.getProperties().cloneWithSkin());
     }
 
-    public <T extends ContextMenuProperties> SubMenuOption(String name, ContextMenu<?> parentMenu) {
-        this(name, parentMenu, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value), parentMenu.getProperties().cloneWithSkin());
+    public <T extends ContextMenuProperties> SubMenuOption(Text name, ContextMenu<?> parentMenu) {
+        this(name, parentMenu, () -> BooleanPool.get(name.getString()), value -> BooleanPool.put(name.getString(), value), parentMenu.getProperties().cloneWithSkin());
     }
 
     @Override

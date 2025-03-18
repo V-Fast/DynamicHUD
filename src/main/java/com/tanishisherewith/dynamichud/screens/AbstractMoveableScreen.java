@@ -7,18 +7,17 @@ import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
 
 public abstract class AbstractMoveableScreen extends Screen {
     public final WidgetRenderer widgetRenderer;
 
-    //TrayWidget trayWidget;
     /**
      * Constructs a AbstractMoveableScreen object.
      */
     public AbstractMoveableScreen(Text title, WidgetRenderer renderer) {
         super(title);
         this.widgetRenderer = renderer;
-       // this.trayWidget = new TrayWidget(width - 210,height - 10);
     }
 
     @Override
@@ -29,8 +28,6 @@ public abstract class AbstractMoveableScreen extends Screen {
     @Override
     public void onDisplayed() {
         super.onDisplayed();
-      //  this.trayWidget.updatePosition(width, height);
-      //  trayWidget.setFocused(true);
         widgetRenderer.isInEditor = true;
     }
 
@@ -68,12 +65,10 @@ public abstract class AbstractMoveableScreen extends Screen {
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         widgetRenderer.keyPressed(keyCode, scanCode, modifiers);
         ContextMenuManager.getInstance().keyPressed(keyCode, scanCode, modifiers);
-        /*
         if(widgetRenderer.selectedWidget != null && (keyCode == GLFW.GLFW_KEY_DELETE || keyCode == GLFW.GLFW_KEY_BACKSPACE)){
-            trayWidget.minimizeWidget(widgetRenderer.selectedWidget);
+     //       trayWidget.minimizeWidget(widgetRenderer.selectedWidget);
         }
 
-         */
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
@@ -121,7 +116,6 @@ public abstract class AbstractMoveableScreen extends Screen {
                 }
             }
         }
-       // trayWidget.render(drawContext,mouseX,mouseY,delta);
     }
 
     public void handleClickOnWidget(Widget widget, double mouseX, double mouseY, int button) {}

@@ -40,20 +40,22 @@ public abstract class Widget implements Input {
     public String modId = "unknown";
 
     public Text tooltipText;
+
     // Boolean to know if the widget is currently being displayed in an instance of AbstractMoveableScreen
     protected boolean isInEditor = false;
+
     // Absolute position of the widget on screen in pixels.
     protected int x, y;
 
     protected boolean shouldScale = true;
 
-    private final Anchor anchor;         // The chosen anchor point
+    protected Anchor anchor;         // The chosen anchor point
 
     //Dimensions of the widget
     protected WidgetBox widgetBox;
 
-    int startX, startY;
-    private int offsetX, offsetY;  // Offset from the anchor point
+    private int startX, startY;
+    protected int offsetX, offsetY;  // Offset from the anchor point
 
     public Widget(WidgetData<?> DATA, String modId) {
         this(DATA, modId, Anchor.CENTER);
@@ -111,7 +113,7 @@ public abstract class Widget implements Input {
         return switch (anchor) {
             case TOP_RIGHT, BOTTOM_RIGHT -> screenWidth;
             case CENTER -> screenWidth / 2;
-            default -> 0;  // TOP_LEFT and BOTTOM_LEFT
+            default -> 0; // TOP_LEFT and BOTTOM_LEFT
         };
     }
 
@@ -119,21 +121,20 @@ public abstract class Widget implements Input {
         return switch (anchor) {
             case BOTTOM_LEFT, BOTTOM_RIGHT -> screenHeight;
             case CENTER -> screenHeight / 2;
-            default -> 0;  // TOP_LEFT and TOP_RIGHT
+            default -> 0; // TOP_LEFT and TOP_RIGHT
         };
     }
 
     // Update position based on anchor and offset
     void updatePosition(int screenWidth, int screenHeight) {
-        if (offsetX == 0 || offsetY == 0) {
-            calculateOffset(x, y, screenWidth, screenHeight);
+        if(offsetX == 0 || offsetY == 0){
+            calculateOffset(x, y, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());
         }
 
         int anchorX = getAnchorX(screenWidth);
         int anchorY = getAnchorY(screenHeight);
         this.x = anchorX + offsetX;
         this.y = anchorY + offsetY;
-
         clampPosition();
     }
 
@@ -141,9 +142,8 @@ public abstract class Widget implements Input {
         this.x = x;
         this.y = y;
         if (mc.getWindow() != null) {
-            //updatePercentages();
-            calculateOffset(x, y, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());  // Set initial offset
-            updatePosition(mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());  // Initial placement
+            calculateOffset(x, y, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());
+            updatePosition(mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());
         }
     }
 
@@ -329,8 +329,11 @@ public abstract class Widget implements Input {
     public void readFromTag(NbtCompound tag) {
         modId = tag.getString("modId");
         uid = new UID(tag.getString("UID"));
-        x = tag.getInt("x");
-        y = tag.getInt("y");
+   //     x = tag.getInt("x");
+   //     y = tag.getInt("y");
+        anchor = Anchor.valueOf(tag.getString("anchor"));
+        offsetX = tag.getInt("offsetX");
+        offsetY = tag.getInt("offsetY");
         isVisible = tag.getBoolean("isVisible");
         isDraggable = tag.getBoolean("isDraggable");
         shouldScale = tag.getBoolean("shouldScale");
@@ -347,10 +350,12 @@ public abstract class Widget implements Input {
         tag.putString("UID", uid.getUniqueID());
         tag.putBoolean("isDraggable", isDraggable);
         tag.putBoolean("shouldScale", shouldScale);
-        tag.putInt("x", x);
-        tag.putInt("y", y);
+    //    tag.putInt("x", x);
+   //     tag.putInt("y", y);
+        tag.putString("anchor", anchor.name());
+        tag.putInt("offsetX", offsetX);
+        tag.putInt("offsetY", offsetY);
         tag.putBoolean("isVisible", isVisible);
-
     }
 
     public boolean isVisible() {
@@ -379,6 +384,8 @@ public abstract class Widget implements Input {
                 "uniqueId='" + uid.getUniqueID() + '\'' +
                 ", x=" + x +
                 ", y=" + y +
+                ", offsetX=" + offsetX +
+                ", offsetY=" + offsetY +
                 ", isVisible=" + isVisible +
                 ", isDraggable=" + isDraggable +
                 ", shiftDown=" + isShiftDown +

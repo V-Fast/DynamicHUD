@@ -19,7 +19,7 @@ import java.util.function.Supplier;
  * </pre>
  * </p>
  */
-public class DynamicValueRegistry extends System {
+public class DynamicValueRegistry {
     /**
      * A map that holds the global registry of suppliers.
      *
@@ -40,7 +40,7 @@ public class DynamicValueRegistry extends System {
      * @param modId The ID of the mod for which this registry is being created. Doesn't need to be modId, it can simply be used as a standard unique identifier string.
      */
     public DynamicValueRegistry(String modId) {
-        super(modId);
+        System.registerInstance(this,modId);
     }
 
     /**
@@ -99,7 +99,7 @@ public class DynamicValueRegistry extends System {
      * @return A list of DynamicValueRegistry instances, or an empty list if none exist.
      */
     public static List<DynamicValueRegistry> getInstances(String modId) {
-        return instances.getOrDefault(modId, Collections.emptyList());
+        return System.getInstances(DynamicValueRegistry.class, modId);
     }
 
     /**

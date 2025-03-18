@@ -2,19 +2,20 @@ package com.tanishisherewith.dynamichud.widget;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
+import com.tanishisherewith.dynamichud.internal.System;
 import com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.utils.Input;
-import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.ContextMenuScreen;
+import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.ContextMenuScreenRegistry;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
 
 public class WidgetRenderer implements Input {
-    public final List<Class<? extends Screen>> allowedScreens = new CopyOnWriteArrayList<>();
+    private Predicate<Screen> allowedScreens;
     public boolean isInEditor = false;
     public Widget selectedWidget = null;
     List<Widget> widgets;
@@ -30,8 +31,9 @@ public class WidgetRenderer implements Input {
      */
     public WidgetRenderer(List<Widget> widgets) {
         this.widgets = widgets;
-        addScreen(GameMenuScreen.class);
-        addScreen(ContextMenuScreen.class);
+        // Render in GameMenuScreen
+        this.allowedScreens = screen -> screen.getClass() == GameMenuScreen.class ||
+                System.getInstances(ContextMenuScreenRegistry.class, DynamicHUD.MOD_ID).stream().anyMatch(registry -> registry.screenKlass == screen.getClass());
     }
 
     public WidgetRenderer(String modID) {
@@ -39,11 +41,41 @@ public class WidgetRenderer implements Input {
     }
 
     public void addWidget(Widget widget) {
-        widgets.add(widget);
+        this.widgets.add(widget);
+    }
+    public void removeWidget(Widget widget){
+        this.widgets.remove(widget);
     }
 
+    public void clearAndAdd(List<Widget> widgets) {
+        this.widgets.clear();
+        this.widgets.addAll(widgets);
+    }
+
+    /**
+     * Use this when you want to simply add more screens
+     */
     public void addScreen(Class<? extends Screen> screen) {
-        allowedScreens.add(screen);
+       this.allowedScreens = allowedScreens.or(screen1 -> screen1.getClass() == screen);
+    }
+
+    /**
+     * Use this when you want a more complex approach to rendering your widgets
+     */
+    public Predicate<Screen> getAllowedScreens() {
+        return this.allowedScreens;
+    }
+
+    public void updateAllowedScreens(Predicate<Screen> newAllowedScreens) {
+        this.allowedScreens = newAllowedScreens;
+    }
+
+    public void negateAllowedScreens() {
+        allowedScreens = allowedScreens.negate();
+    }
+
+    public boolean isScreenAllowed(Screen screen) {
+        return allowedScreens.test(screen);
     }
 
     public void shouldRenderInGameHud(boolean renderInGameHud) {
@@ -65,15 +97,6 @@ public class WidgetRenderer implements Input {
         context.getMatrices().push();
         context.getMatrices().translate(0,0, Z_Index);
 
-        //Render in game hud
-        if (currentScreen == null && renderInGameHud) {
-            for (Widget widget : widgets) {
-                widget.isInEditor = false;
-                widget.render(context, 0, 0);
-            }
-            return;
-        }
-
         //Render in editing screen
         if (currentScreen instanceof AbstractMoveableScreen) {
             for (Widget widget : widgets) {
@@ -82,8 +105,8 @@ public class WidgetRenderer implements Input {
             }
             return;
         }
-        //Render in any other screen
-        if (currentScreen != null && allowedScreens.contains(DynamicHUD.MC.currentScreen.getClass())) {
+        //Render in any other screen and the inGameHud
+        if ((currentScreen == null && renderInGameHud) || allowedScreens.test(currentScreen)) {
             for (Widget widget : widgets) {
                 widget.isInEditor = false;
                 widget.render(context, 0, 0);
@@ -202,4 +225,5 @@ public class WidgetRenderer implements Input {
         this.Z_Index = z_Index;
         return this;
     }
+
 }

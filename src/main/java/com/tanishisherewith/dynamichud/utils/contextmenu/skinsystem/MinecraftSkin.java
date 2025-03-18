@@ -18,8 +18,6 @@ import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntSupplier;
@@ -54,8 +52,8 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     private List<OptionGroup> optionGroups;
     private OptionGroup selectedGroup;
     private final ScrollHandler groupScrollHandler;
-    private int groupPanelWidth = 60; // Width for the group panel
-    private IntSupplier groupPanelX = ()-> imageX - groupPanelWidth - 15;
+    private final int groupPanelWidth = 60; // Width for the group panel
+    private final IntSupplier groupPanelX = () -> imageX - groupPanelWidth - 15;
 
     public MinecraftSkin(PanelColor color) {
         super();
@@ -78,11 +76,11 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     }
 
     private void enableContextMenuScissor() {
-        DrawHelper.enableScissor(0, imageY + 3, mc.getWindow().getScaledWidth(), panelHeight - 6);
+        DrawHelper.enableScissor(0, imageY + 3, mc.getWindow().getScaledWidth(), panelHeight - 8);
     }
 
     private void createGroups() {
-        OptionGroup generalGroup = new OptionGroup("General");
+        OptionGroup generalGroup = new OptionGroup(Text.of("General"));
         for(Option<?> option: getOptions(contextMenu)){
             if(option instanceof OptionGroup og){
                 optionGroups.add(og);
@@ -103,8 +101,6 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             scrollHandler.updateScrollPosition(0);
         }
     }
-
-
 
     @Override
     public void renderContextMenu(DrawContext drawContext, ContextMenu<?> contextMenu, int mouseX, int mouseY) {
@@ -188,7 +184,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             if (yOffset >= groupY + 12 && yOffset <= groupY + panelHeight - 15) {
                 drawContext.drawGuiTexture(TEXTURES.get(!group.isExpanded(), isMouseOver(mouseX, mouseY, groupX, yOffset, groupPanelWidth, 20)), groupX, yOffset, groupPanelWidth, 20);
 
-                DrawHelper.drawScrollableText(drawContext,mc.textRenderer,Text.literal(group.getName()),groupX + groupPanelWidth/2,groupX + 2,yOffset,groupX + groupPanelWidth - 2, yOffset + 20,-1);
+                DrawHelper.drawScrollableText(drawContext,mc.textRenderer, group.getName(),groupX + groupPanelWidth/2,groupX + 2,yOffset,groupX + groupPanelWidth - 2, yOffset + 20,-1);
 
                 //Scrollable text uses scissor, so we need to enable the context menu scissor again
                 this.enableContextMenuScissor();
@@ -208,7 +204,9 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     private int renderSelectedGroupOptions(DrawContext drawContext, int mouseX, int mouseY) {
         int yOffset = imageY + 12 - scrollHandler.getScrollOffset();
         for (Option<?> option : selectedGroup.getGroupOptions()) {
-            if (yOffset >= imageY - option.getHeight() && yOffset <= imageY + option.getHeight() + panelHeight && option.shouldRender()) {
+            if(!option.shouldRender()) continue;
+
+            if (yOffset >= imageY - option.getHeight() && yOffset <= imageY + option.getHeight() + panelHeight) {
                 option.render(drawContext, imageX + 4, yOffset, mouseX, mouseY);
             }
             yOffset += option.getHeight() + 1;

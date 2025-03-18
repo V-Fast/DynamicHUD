@@ -12,23 +12,23 @@ import java.util.function.Supplier;
 public class BooleanOption extends Option<Boolean> {
     private final BooleanType booleanType;
 
-    public BooleanOption(String name, Supplier<Boolean> getter, Consumer<Boolean> setter, BooleanType booleanType) {
+    public BooleanOption(Text name, Supplier<Boolean> getter, Consumer<Boolean> setter, BooleanType booleanType) {
         super(name,getter, setter);
         this.booleanType = booleanType;
         this.renderer.init(this);
     }
 
-    public BooleanOption(String name, Supplier<Boolean> getter, Consumer<Boolean> setter) {
+    public BooleanOption(Text name, Supplier<Boolean> getter, Consumer<Boolean> setter) {
         this(name, getter, setter, BooleanType.TRUE_FALSE);
     }
 
-    public BooleanOption(String name, boolean defaultValue) {
+    public BooleanOption(Text name, boolean defaultValue) {
         this(name, defaultValue, BooleanType.TRUE_FALSE);
     }
 
-    public BooleanOption(String name, boolean defaultValue, BooleanType type) {
-        this(name, () -> BooleanPool.get(name), value -> BooleanPool.put(name, value), type);
-        BooleanPool.put(name, defaultValue);
+    public BooleanOption(Text name, boolean defaultValue, BooleanType type) {
+        this(name, () -> BooleanPool.get(name.getString()), value -> BooleanPool.put(name.getString(), value), type);
+        BooleanPool.put(name.getString(), defaultValue);
     }
 
     @Override

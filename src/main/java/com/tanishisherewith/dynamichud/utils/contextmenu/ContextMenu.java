@@ -2,9 +2,10 @@ package com.tanishisherewith.dynamichud.utils.contextmenu;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
-import com.tanishisherewith.dynamichud.helpers.animationhelper.animations.MathAnimations;
+import com.tanishisherewith.dynamichud.internal.System;
 import com.tanishisherewith.dynamichud.utils.Input;
 import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.ContextMenuScreenFactory;
+import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.ContextMenuScreenRegistry;
 import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.DefaultContextMenuScreenFactory;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
 import net.minecraft.client.gui.DrawContext;
@@ -19,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ContextMenu<T extends ContextMenuProperties> implements Input {
     public final Color darkerBackgroundColor;
     //The properties of a context menu
@@ -57,6 +59,9 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
         this.darkerBackgroundColor = properties.getBackgroundColor().darker().darker().darker().darker().darker().darker();
         this.parentMenu = parentMenu;
         this.properties.getSkin().setContextMenu(this);
+
+        Screen dummy = screenFactory.create(this, properties);
+        System.registerInstance(new ContextMenuScreenRegistry(dummy.getClass()), DynamicHUD.MOD_ID);
     }
 
     public void addOption(Option<?> option) {

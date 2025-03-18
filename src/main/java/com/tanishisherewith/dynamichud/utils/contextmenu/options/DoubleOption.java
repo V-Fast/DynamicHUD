@@ -3,6 +3,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import org.apache.commons.lang3.Validate;
 import org.lwjgl.glfw.GLFW;
@@ -19,7 +20,7 @@ public class DoubleOption extends Option<Double> {
     ContextMenu<?> parentMenu;
     private boolean isDragging = false;
 
-    public DoubleOption(String name, double minValue, double maxValue, float step, Supplier<Double> getter, Consumer<Double> setter, ContextMenu<?> parentMenu) {
+    public DoubleOption(Text name, double minValue, double maxValue, float step, Supplier<Double> getter, Consumer<Double> setter, ContextMenu<?> parentMenu) {
         super(name,getter, setter);
         this.value = get();
         this.minValue = minValue;

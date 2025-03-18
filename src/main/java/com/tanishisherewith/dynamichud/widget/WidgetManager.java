@@ -178,9 +178,7 @@ public class WidgetManager {
      *
      * @param file The file to load from
      */
-    public static void loadWidgets(File file) throws IOException {
-        widgets.clear();
-
+    public static List<Widget> loadWidgets(File file) throws IOException {
         if (!file.exists()) {
             DynamicHUD.logger.warn("Main file {} was not found... Loading from a found backup file", file.getAbsolutePath());
             file = new File(file.getAbsolutePath() + ".backup");
@@ -190,21 +188,24 @@ public class WidgetManager {
 
         if (rootTag == null) {
             printWarn("RootTag is null. File is either empty or corrupted: " + file);
-            return;
+            return Collections.emptyList();
         }
         NbtList widgetList = rootTag.getList("widgets", NbtElement.COMPOUND_TYPE);
         if (widgetList == null) {
             printWarn("WidgetList is null. File is empty: " + file);
-            return;
+            return Collections.emptyList();
         }
+        List<Widget> widgetsToAdd = new ArrayList<>();
         for (int i = 0; i < widgetList.size(); i++) {
             NbtCompound widgetTag = widgetList.getCompound(i);
             WidgetData<?> widgetData = widgetDataMap.get(widgetTag.getString("name"));
             Widget widget = widgetData.createWidget();
             widget.readFromTag(widgetTag);
             printInfo("Loaded Widget: " + widget);
+            widgetsToAdd.add(widget);
             widgets.add(widget);
         }
+        return widgetsToAdd;
     }
 
     public static boolean doesWidgetFileExist(File file) {

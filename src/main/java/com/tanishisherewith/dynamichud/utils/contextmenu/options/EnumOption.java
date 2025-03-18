@@ -1,5 +1,7 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
+import net.minecraft.text.Text;
+
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -7,7 +9,7 @@ public class EnumOption<E extends Enum<E>> extends Option<E> {
     private final E[] values;
     private int currentIndex = 0;
 
-    public EnumOption(String name, Supplier<E> getter, Consumer<E> setter, E[] values) {
+    public EnumOption(Text name, Supplier<E> getter, Consumer<E> setter, E[] values) {
         super(name,getter, setter);
         this.values = values;
         this.value = get();

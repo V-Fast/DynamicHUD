@@ -110,19 +110,21 @@ public final class IntegrationManager {
 
                 printInfo(String.format("Supported mod with id %s was found!", modId));
 
-
                 //Gets the widget file to save and load the widgets from
                 widgetsFile = DHIntegration.getWidgetsFile();
 
-                // Get the instance of AbstractMoveableScreen
-                screen = Objects.requireNonNull(configurator.getMovableScreen(), "AbstractMovableScreen instance should not be null!");
-
                 // Adds / loads widgets from file
                 if (WidgetManager.doesWidgetFileExist(widgetsFile)) {
-                    WidgetManager.loadWidgets(widgetsFile);
+                    List<Widget> widgets = WidgetManager.loadWidgets(widgetsFile);
+                    configurator.configureRenderer(renderer -> renderer.clearAndAdd(widgets));
+                    DHIntegration.postWidgetLoading(configurator.getRenderer());
                 } else {
                     configurator.registerWidgets();
                 }
+
+
+                // Get the instance of AbstractMoveableScreen
+                screen = Objects.requireNonNull(configurator.getMovableScreen(), "AbstractMovableScreen instance should not be null!");
 
                 // Get the keybind to open the screen instance
                 binding = DHIntegration.getKeyBind();

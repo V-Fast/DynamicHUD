@@ -66,7 +66,8 @@ public class IntegrationTest implements DynamicHudIntegration {
                 .addWidget(HelloWidget)
                 .addWidget(DynamicHUDWidget)
                 .configureRenderer(renderer -> {
-                    renderer.shouldRenderInGameHud(true);
+                    //Already true by default
+                    //renderer.shouldRenderInGameHud(true);
                     renderer.addScreen(TitleScreen.class);
                 })
                 .withMoveableScreen(config -> new AbstractMoveableScreen(Text.literal("Editor Screen"), config.getRenderer()) {});

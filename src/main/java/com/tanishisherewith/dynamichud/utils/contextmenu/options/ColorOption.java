@@ -2,6 +2,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption.ColorGradient;
+import net.minecraft.text.Text;
 
 import java.awt.*;
 import java.util.function.Consumer;
@@ -12,7 +13,7 @@ public class ColorOption extends Option<Color> {
     private ContextMenu<?> parentMenu = null;
     private ColorGradient colorGradient = null;
 
-    public ColorOption(String name, ContextMenu<?> parentMenu, Supplier<Color> getter, Consumer<Color> setter) {
+    public ColorOption(Text name, ContextMenu<?> parentMenu, Supplier<Color> getter, Consumer<Color> setter) {
         super(name,getter, setter);
         this.parentMenu = parentMenu;
         this.colorGradient = new ColorGradient(x + this.parentMenu.getWidth(), y - 10, get(), this::set, 50, 100);
