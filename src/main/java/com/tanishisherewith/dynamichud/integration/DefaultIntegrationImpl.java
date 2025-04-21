@@ -1,6 +1,7 @@
 package com.tanishisherewith.dynamichud.integration;
 
 import com.tanishisherewith.dynamichud.widget.WidgetManager;
+import com.tanishisherewith.dynamichud.widgets.GraphWidget;
 import com.tanishisherewith.dynamichud.widgets.ItemWidget;
 import com.tanishisherewith.dynamichud.widgets.TextWidget;
 
@@ -21,7 +22,8 @@ public class DefaultIntegrationImpl implements DynamicHudIntegration {
     public void registerCustomWidgets() {
         WidgetManager.registerCustomWidgets(
                 TextWidget.DATA,
-                ItemWidget.DATA
+                ItemWidget.DATA,
+                GraphWidget.DATA
         );
     }
 }

@@ -146,7 +146,7 @@ public class ClassicSkin extends Skin {
         @Override
         public void render(DrawContext drawContext, BooleanOption option, int x, int y, int mouseX, int mouseY) {
             int color = option.value ? Color.GREEN.getRGB() : Color.RED.getRGB();
-            drawContext.drawText(mc.textRenderer, Text.of(option.name), x, y, color, false);
+            drawContext.drawText(mc.textRenderer, option.name, x, y, color, false);
             option.setHeight(mc.textRenderer.fontHeight);
             option.setWidth(mc.textRenderer.getWidth(option.name) + 1);
         }
@@ -156,13 +156,13 @@ public class ClassicSkin extends Skin {
         @Override
         public void render(DrawContext drawContext, ColorOption option, int x, int y, int mouseX, int mouseY) {
             int color = option.isVisible ? Color.GREEN.getRGB() : Color.RED.getRGB();
-            drawContext.drawText(mc.textRenderer, Text.of(option.name), x, y, color, false);
+            drawContext.drawText(mc.textRenderer, option.name, x, y, color, false);
             option.setHeight(mc.textRenderer.fontHeight);
-            option.setWidth(mc.textRenderer.getWidth(option.name) + 1);
+            option.setWidth(mc.textRenderer.getWidth(option.name) + 10);
 
             int shadowOpacity = Math.min(option.value.getAlpha(), 90);
             DrawHelper.drawRoundedRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(),
-                    x + option.getWidth(),
+                    x + option.getWidth() - 10 + 1,
                     y - 1,
                     8,
                     8,
@@ -182,8 +182,8 @@ public class ClassicSkin extends Skin {
             option.setHeight(mc.textRenderer.fontHeight + 1);
             option.setWidth(mc.textRenderer.getWidth(option.name + ": " + option.value.name()) + 1);
 
-            drawContext.drawText(mc.textRenderer, Text.of(option.name + ": "), x, y, Color.WHITE.getRGB(), false);
-            drawContext.drawText(mc.textRenderer, Text.of(option.value.name()), x + mc.textRenderer.getWidth(option.name + ": ") + 1, y, Color.CYAN.getRGB(), false);
+            drawContext.drawText(mc.textRenderer, option.name.copy().append( ": "), x, y, Color.WHITE.getRGB(), false);
+            drawContext.drawText(mc.textRenderer, option.value.name(), x + mc.textRenderer.getWidth(option.name + ": ") + 1, y, Color.CYAN.getRGB(), false);
         }
     }
 
@@ -191,7 +191,7 @@ public class ClassicSkin extends Skin {
         @Override
         public void render(DrawContext drawContext, SubMenuOption option, int x, int y, int mouseX, int mouseY) {
             int color = option.value ? Color.GREEN.getRGB() : Color.RED.getRGB();
-            drawContext.drawText(mc.textRenderer, Text.of(option.name), x, y, color, false);
+            drawContext.drawText(mc.textRenderer, option.name, x, y, color, false);
             option.setHeight(mc.textRenderer.fontHeight);
             option.setWidth(mc.textRenderer.getWidth(option.name) + 1);
 
@@ -208,7 +208,7 @@ public class ClassicSkin extends Skin {
             option.setHeight(mc.textRenderer.fontHeight);
             option.setWidth(mc.textRenderer.getWidth("Run: " + option.name));
             int color = option.value ? DARK_GREEN.getRGB() : DARK_RED.getRGB();
-            drawContext.drawText(mc.textRenderer, Text.of("Run: " + option.name), x, y, color, false);
+            drawContext.drawText(mc.textRenderer, Text.literal("Run: ").append(option.name), x, y, color, false);
         }
     }
 
@@ -221,7 +221,7 @@ public class ClassicSkin extends Skin {
             // Draw the label
             TextRenderer textRenderer = mc.textRenderer;
             DrawHelper.scaleAndPosition(drawContext.getMatrices(), x, y, 0.7f);
-            String labelText = option.name + ": " + String.format("%.1f", option.value);
+            Text labelText = option.name.copy().append(": " + String.format("%.1f", option.value));
             int labelWidth = textRenderer.getWidth(labelText);
 
             option.setWidth(Math.max(option.getWidth(), labelWidth));
@@ -258,8 +258,8 @@ public class ClassicSkin extends Skin {
             option.setHeight(mc.textRenderer.fontHeight + 1);
             option.setWidth(mc.textRenderer.getWidth(option.name + ": " + option.value.toString()) + 1);
 
-            drawContext.drawText(mc.textRenderer, Text.of(option.name + ": "), x, y + 1, Color.WHITE.getRGB(), false);
-            drawContext.drawText(mc.textRenderer, Text.of(option.value.toString()), x + mc.textRenderer.getWidth(option.name + ": ") + 1, y + 1, Color.CYAN.getRGB(), false);
+            drawContext.drawText(mc.textRenderer, option.name.copy().append( ": "), x, y + 1, Color.WHITE.getRGB(), false);
+            drawContext.drawText(mc.textRenderer, option.value.toString(), x + mc.textRenderer.getWidth(option.name + ": ") + 1, y + 1, Color.CYAN.getRGB(), false);
         }
     }
 }

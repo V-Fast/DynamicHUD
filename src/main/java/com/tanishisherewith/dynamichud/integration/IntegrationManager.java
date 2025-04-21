@@ -80,7 +80,7 @@ public final class IntegrationManager {
             }
         }
 
-        List<ModError> invalid_implementations = new ArrayList<>();
+        List<ModError> bad_implementations = new ArrayList<>();
 
         integrations.forEach(container -> {
             //Register custom widget data's by WidgetManager.registerCustomWidgets() first for every entrypoint
@@ -148,22 +148,22 @@ public final class IntegrationManager {
                 } else {
                     DynamicHUD.logger.error("Mod {} has improper implementation of DynamicHUD", modId, e);
                 }
-                invalid_implementations.add(new ModError(modId, e.getLocalizedMessage().trim()));
+                bad_implementations.add(new ModError(modId, e.getLocalizedMessage().trim()));
             }
         }
         printInfo("(DynamicHUD) Integration of supported mods was successful");
 
 
         // Sheesh
-        if(!invalid_implementations.isEmpty()){
-            BooleanPool.put("WarningScreen", false);
+        if(!bad_implementations.isEmpty()){
+            BooleanPool.put("WarningScreenFlag", false);
 
             ClientTickEvents.START_CLIENT_TICK.register((client)->{
-                if(BooleanPool.get("WarningScreen")) return;
+                if(BooleanPool.get("WarningScreenFlag")) return;
 
                 if(DynamicHUD.MC.currentScreen instanceof TitleScreen) {
-                    DynamicHUD.MC.setScreen(new WarningScreen(invalid_implementations));
-                    BooleanPool.put("WarningScreen", true);
+                    DynamicHUD.MC.setScreen(new WarningScreen(bad_implementations));
+                    BooleanPool.put("WarningScreenFlag", true);
                 }
             });
         }

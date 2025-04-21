@@ -50,7 +50,7 @@ public class WarningScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
 
        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
-       context.drawCenteredTextWithShadow(this.textRenderer, "Mods with invalid implementation of DynamicHUD found!", this.width / 2, 35, Color.ORANGE.getRGB());
+       context.drawCenteredTextWithShadow(this.textRenderer, "Mods with bad implementation of DynamicHUD found!", this.width / 2, 35, Color.ORANGE.getRGB());
 
         int y = 60;
         for (ModError error : modErrors) {

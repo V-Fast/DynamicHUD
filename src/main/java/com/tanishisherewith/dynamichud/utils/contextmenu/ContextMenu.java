@@ -8,11 +8,13 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.Conte
 import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.ContextMenuScreenRegistry;
 import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.DefaultContextMenuScreenFactory;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
+import com.tanishisherewith.dynamichud.widget.WidgetBox;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -129,6 +131,12 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
             close();
         } else {
             open();
+        }
+    }
+
+    public void toggleDisplay(WidgetBox widgetBox,double mouseX, double mouseY, int button){
+        if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && widgetBox.isMouseOver(mouseX, mouseY)) {
+            toggleDisplay();
         }
     }
 

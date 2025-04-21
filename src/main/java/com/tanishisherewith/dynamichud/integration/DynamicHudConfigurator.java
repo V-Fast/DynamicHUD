@@ -97,7 +97,7 @@ public class DynamicHudConfigurator {
     }
 
     /**
-     * Internal method to save these widgets using fabric API events.
+     * Internal method to save these widgets using fabric API events. Should not be called anywhere else except when loading the DHIntegration on startup.
      */
     @ApiStatus.Internal
     public void setupSaveEvents(File widgetsFile){
@@ -131,5 +131,4 @@ public class DynamicHudConfigurator {
             throw new RuntimeException(e);
         }
     }
-
 }

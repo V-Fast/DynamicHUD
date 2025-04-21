@@ -24,7 +24,6 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     public static WidgetData<TextWidget> DATA = new WidgetData<>("TextWidget", "Display Text on screen", TextWidget::new);
 
     private ContextMenu<?> menu;
-
     public Color textColor;
     protected boolean shadow; // Whether to draw a shadow behind the text
     protected boolean rainbow; // Whether to apply a rainbow effect to the text
@@ -68,14 +67,16 @@ public class TextWidget extends Widget implements ContextMenuProvider {
 
     @SuppressWarnings("unchecked")
     private void initializeTextSupplier() {
-        switch (registrySource) {
-            case GLOBAL -> this.textSupplier = (Supplier<String>) DynamicValueRegistry.getGlobal(registryKey);
+        this.textSupplier = switch (registrySource) {
+            case GLOBAL -> (Supplier<String>) DynamicValueRegistry.getGlobal(registryKey);
             case LOCAL -> {
                 if (valueRegistry != null) {
-                    this.textSupplier = (Supplier<String>) valueRegistry.get(registryKey);
+                    yield (Supplier<String>) valueRegistry.get(registryKey);
                 }
+                throw new IllegalStateException("ValueRegistry is null while initialising text supplier");
             }
-        }
+            case null -> throw new IllegalStateException("RegistrySource is null while initialising text supplier");
+        };
     }
 
     public void createMenu() {
@@ -93,8 +94,8 @@ public class TextWidget extends Widget implements ContextMenuProvider {
                         BooleanOption.BooleanType.ON_OFF)
                 .description(Text.of("Adds rainbow effect to your text"))
         );
-        menu.addOption(new ColorOption(Text.of("Text Color"), menu,
-                () -> this.textColor, value -> this.textColor = value)
+        menu.addOption(new ColorOption(Text.of("Text Color"),
+                () -> this.textColor, value -> this.textColor = value, menu)
                 .description(Text.of("Specify the color you want to add to your text"))
                 .renderWhen(()-> !this.rainbow)
         );
@@ -167,9 +168,7 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     }
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && widgetBox.isMouseOver(mouseX, mouseY)) {
-            menu.toggleDisplay();
-        }
+        menu.toggleDisplay(widgetBox,mouseX,mouseY,button);
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
@@ -182,6 +181,7 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     @Override
     public void writeToTag(NbtCompound tag) {
         super.writeToTag(tag);
+        tag.putString("RegistryID", registrySource == RegistrySource.LOCAL ? valueRegistry.getId() : "global");
         tag.putString("RegistryKey", registryKey);
         tag.putBoolean("Shadow", shadow);
         tag.putBoolean("Rainbow", rainbow);
@@ -207,12 +207,13 @@ public class TextWidget extends Widget implements ContextMenuProvider {
         registrySource = tag.contains("RegistrySource") ? RegistrySource.valueOf(tag.getString("RegistrySource")) : RegistrySource.LOCAL;
 
         if(registrySource == RegistrySource.LOCAL){
-            //Search all instance of DVR to find if a value for the key is valid.
-            for(DynamicValueRegistry dvr: DynamicValueRegistry.getInstances(modId)) {
-                if (dvr.get(registryKey) != null) {
-                    valueRegistry = dvr;
-                }
-            }
+            String registryID = tag.getString("RegistryID");
+
+            if(registryID.equalsIgnoreCase("global"))
+                throw new IllegalStateException("Registry ID found to be global for LOCAL registry source");
+
+            valueRegistry = DynamicValueRegistry.getById(registryID);
+
             if(valueRegistry == null){
                 throw new RuntimeException("Local DynamicValueRegistry not found for: " + registryKey);
             }

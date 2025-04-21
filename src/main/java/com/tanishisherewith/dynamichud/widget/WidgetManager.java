@@ -199,6 +199,9 @@ public class WidgetManager {
         for (int i = 0; i < widgetList.size(); i++) {
             NbtCompound widgetTag = widgetList.getCompound(i);
             WidgetData<?> widgetData = widgetDataMap.get(widgetTag.getString("name"));
+            if(widgetData == null){
+                throw new IllegalStateException("Widget Data for: " + widgetTag.getString("name") +" could not be found");
+            }
             Widget widget = widgetData.createWidget();
             widget.readFromTag(widgetTag);
             printInfo("Loaded Widget: " + widget);
