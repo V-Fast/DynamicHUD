@@ -11,6 +11,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.S
 import com.tanishisherewith.dynamichud.utils.handlers.ScrollHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ButtonTextures;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -124,7 +125,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         RenderSystem.enableDepthTest();
         panelColor.applyColor();
 
-        drawContext.drawTexture(BACKGROUND_PANEL, imageX, imageY, 0, 0, panelWidth, panelHeight, 256, 254);
+        drawContext.drawTexture(RenderLayer::getGuiTextured, BACKGROUND_PANEL, imageX, imageY, 0, 0, panelWidth, panelHeight, 256, 254);
 
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -135,7 +136,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         drawSingularButton(drawContext,"^",mouseX,mouseY,groupPanelX.getAsInt() + groupPanelWidth/2 - size/2,imageY - 14,size,14, groupScrollHandler.isOffsetWithinBounds(-10));
         drawSingularButton(drawContext,"v",mouseX,mouseY,groupPanelX.getAsInt() + groupPanelWidth/2 -  size/2,imageY + panelHeight - 2,size,14, groupScrollHandler.isOffsetWithinBounds(10));
 
-//        drawContext.drawGuiTexture(TEXTURES.get(true, isMouseOver(mouseX, mouseY, imageX + 3, imageY + 3, 14, 14)), imageX + 3, imageY + 3, 14, 14);
+//        drawContext.drawGuiTexture(RenderLayer::getGuiTextured, TEXTURES.get(true, isMouseOver(mouseX, mouseY, imageX + 3, imageY + 3, 14, 14)), imageX + 3, imageY + 3, 14, 14);
   //      drawContext.drawText(mc.textRenderer, "X", imageX + 10 - mc.textRenderer.getWidth("X") / 2, imageY + 6, -1, true);
 
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -162,7 +163,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
     public void drawSingularButton(DrawContext drawContext, String text, int mouseX, int mouseY, int x, int y, int width, int height, boolean enabled){
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        drawContext.drawGuiTexture(TEXTURES.get(enabled, isMouseOver(mouseX, mouseY, x, y, width, height)), x, y, width, height);
+        drawContext.drawGuiTexture(RenderLayer::getGuiTextured, TEXTURES.get(enabled, isMouseOver(mouseX, mouseY, x, y, width, height)), x, y, width, height);
         drawContext.drawText(mc.textRenderer, text, x + width/2 - mc.textRenderer.getWidth(text) / 2, y + mc.textRenderer.fontHeight/2 - 1, -1, true);
     }
     public void drawSingularButton(DrawContext drawContext, String text, int mouseX, int mouseY, int x, int y, int width, int height){
@@ -176,13 +177,13 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        drawContext.drawTexture(GROUP_BACKGROUND, groupX - 10, groupY + 2,groupPanelWidth + 20, panelHeight,0,0, 147,165,147,165);
+        drawContext.drawTexture(RenderLayer::getGuiTextured,GROUP_BACKGROUND, groupX - 10, groupY + 2,groupPanelWidth + 20, panelHeight,0,0, 147,165,147,165);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         int yOffset = groupY + 12 - groupScrollHandler.getScrollOffset();
         for (OptionGroup group : optionGroups) {
             if (yOffset >= groupY + 12 && yOffset <= groupY + panelHeight - 15) {
-                drawContext.drawGuiTexture(TEXTURES.get(!group.isExpanded(), isMouseOver(mouseX, mouseY, groupX, yOffset, groupPanelWidth, 20)), groupX, yOffset, groupPanelWidth, 20);
+                drawContext.drawGuiTexture(RenderLayer::getGuiTextured, TEXTURES.get(!group.isExpanded(), isMouseOver(mouseX, mouseY, groupX, yOffset, groupPanelWidth, 20)), groupX, yOffset, groupPanelWidth, 20);
 
                 DrawHelper.drawScrollableText(drawContext,mc.textRenderer, group.getName(),groupX + groupPanelWidth/2,groupX + 2,yOffset,groupX + groupPanelWidth - 2, yOffset + 20,-1);
 
@@ -223,8 +224,8 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             int handleY = (int) (scrollbarY + (panelHeight - handleHeight) * ((double) scrollHandler.getScrollOffset() / getMaxScrollOffset()));
 
             RenderSystem.enableBlend();
-            drawContext.drawGuiTexture(SCROLL_BAR_BACKGROUND, scrollbarX, scrollbarY,DEFAULT_SCROLLBAR_WIDTH, panelHeight);
-            drawContext.drawGuiTexture(SCROLLER_TEXTURE, scrollbarX, handleY,DEFAULT_SCROLLBAR_WIDTH, (int) handleHeight);
+            drawContext.drawGuiTexture(RenderLayer::getGuiTextured, SCROLL_BAR_BACKGROUND, scrollbarX, scrollbarY,DEFAULT_SCROLLBAR_WIDTH, panelHeight);
+            drawContext.drawGuiTexture(RenderLayer::getGuiTextured, SCROLLER_TEXTURE, scrollbarX, handleY,DEFAULT_SCROLLBAR_WIDTH, (int) handleHeight);
             RenderSystem.disableBlend();
         }
     }
@@ -378,14 +379,14 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             option.setPosition(x + panelWidth - 75, y);
 
             int width = 50;
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.enableBlend();
             RenderSystem.enableDepthTest();
-            drawContext.drawGuiTexture(TEXTURES.get(true, option.isMouseOver(mouseX, mouseY)), option.getX(), y, width, 20);
+            drawContext.drawGuiTexture(RenderLayer::getGuiTextured, TEXTURES.get(true, option.isMouseOver(mouseX, mouseY)), option.getX(), y, width, 20);
             RenderSystem.disableBlend();
             RenderSystem.disableDepthTest();
 
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             Text text = option.getBooleanType().getText(option.value);
             int color = option.value ? Color.GREEN.getRGB() : Color.RED.getRGB();
             drawContext.drawText(mc.textRenderer, text, (int) (option.getX() + (width / 2.0f) - (mc.textRenderer.getWidth(text) / 2.0f)), y + 5, color, true);
@@ -410,10 +411,10 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             option.setPosition(x + panelWidth - 45, y);
 
             int width = 20;
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.enableBlend();
             RenderSystem.enableDepthTest();
-            drawContext.drawGuiTexture(TEXTURES.get(!option.isVisible, option.isMouseOver(mouseX, mouseY)), option.getX(), y, width, 20);
+            drawContext.drawGuiTexture(RenderLayer::getGuiTextured, TEXTURES.get(!option.isVisible, option.isMouseOver(mouseX, mouseY)), option.getX(), y, width, 20);
             RenderSystem.disableBlend();
             RenderSystem.disableDepthTest();
 
@@ -427,7 +428,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
                     shadowOpacity,
                     1,
                     1);
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
 
             option.setHeight(25);
@@ -477,10 +478,10 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             RenderSystem.defaultBlendFunc();
             RenderSystem.enableDepthTest();
 
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            drawContext.drawGuiTexture(option.isMouseOver(mouseX, mouseY) ? HIGHLIGHTED_TEXTURE : TEXTURE, option.getX(), y, option.getWidth(), 20);
-            drawContext.drawGuiTexture(isMouseOverHandle ? HANDLE_HIGHLIGHTED_TEXTURE : HANDLE_TEXTURE, (int) Math.round(sliderX), y, 8, 20);
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            drawContext.drawGuiTexture(RenderLayer::getGuiTextured, option.isMouseOver(mouseX, mouseY) ? HIGHLIGHTED_TEXTURE : TEXTURE, option.getX(), y, option.getWidth(), 20);
+            drawContext.drawGuiTexture(RenderLayer::getGuiTextured, isMouseOverHandle ? HANDLE_HIGHLIGHTED_TEXTURE : HANDLE_TEXTURE, (int) Math.round(sliderX), y, 8, 20);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.disableBlend();
             RenderSystem.disableDepthTest();
             // Determine the number of decimal places in option.step
@@ -519,11 +520,11 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
             option.setPosition(x + panelWidth - maxWidth - 25, y);
 
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.enableBlend();
             RenderSystem.enableDepthTest();
-            drawContext.drawGuiTexture(TEXTURES.get(true, option.isMouseOver(mouseX, mouseY)), option.getX(), y, maxWidth, 20);
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            drawContext.drawGuiTexture(RenderLayer::getGuiTextured, TEXTURES.get(true, option.isMouseOver(mouseX, mouseY)), option.getX(), y, maxWidth, 20);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             String text = option.get().toString();
             RenderSystem.disableBlend();
             RenderSystem.disableDepthTest();
@@ -553,11 +554,11 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
             option.setPosition(x + panelWidth - maxWidth - 25, y);
 
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.enableBlend();
             RenderSystem.enableDepthTest();
-            drawContext.drawGuiTexture(TEXTURES.get(true, option.isMouseOver(mouseX, mouseY)), option.getX(), y, maxWidth, 20);
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            drawContext.drawGuiTexture(RenderLayer::getGuiTextured, TEXTURES.get(true, option.isMouseOver(mouseX, mouseY)), option.getX(), y, maxWidth, 20);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             String text = option.get().toString();
             RenderSystem.disableBlend();
             RenderSystem.disableDepthTest();
@@ -575,10 +576,10 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
             option.setPosition(x + panelWidth - 55, y);
 
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.enableBlend();
-            drawContext.drawGuiTexture(TEXTURES.get(true, option.isMouseOver(mouseX, mouseY)), option.getX(), y, option.getWidth(), 20);
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            drawContext.drawGuiTexture(RenderLayer::getGuiTextured, TEXTURES.get(true, option.isMouseOver(mouseX, mouseY)), option.getX(), y, option.getWidth(), 20);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             String text = "Open";
             drawContext.drawText(mc.textRenderer, text, option.getX() + option.getWidth() / 2 - mc.textRenderer.getWidth(text) / 2, y + 5, Color.YELLOW.getRGB(), true);
             RenderSystem.disableBlend();
@@ -600,12 +601,12 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
             option.setPosition(x + panelWidth - 51, y);
 
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.enableBlend();
             RenderSystem.enableDepthTest();
-            drawContext.drawGuiTexture(TEXTURES.get(!option.value, option.isMouseOver(mouseX, mouseY)), option.getX(), y, option.getWidth(), 20);
+            drawContext.drawGuiTexture(RenderLayer::getGuiTextured, TEXTURES.get(!option.value, option.isMouseOver(mouseX, mouseY)), option.getX(), y, option.getWidth(), 20);
             drawContext.drawText(mc.textRenderer, "Run", option.getX() + option.getWidth() / 2 - mc.textRenderer.getWidth("Run") / 2, y + 5, option.value ? DARK_GREEN.getRGB() : DARK_RED.getRGB(), true);
-            drawContext.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.disableBlend();
             RenderSystem.disableDepthTest();
         }

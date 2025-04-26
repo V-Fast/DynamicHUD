@@ -35,7 +35,7 @@ public class TextWidget extends Widget implements ContextMenuProvider {
     private DynamicValueRegistry valueRegistry;
 
     public TextWidget() {
-        this(null, null, false, false, Color.WHITE, "unknown");
+        this("null", false, false, Color.WHITE, "unknown");
     }
 
     public TextWidget(String registryKey, boolean shadow, boolean rainbow, Color color, String modID) {

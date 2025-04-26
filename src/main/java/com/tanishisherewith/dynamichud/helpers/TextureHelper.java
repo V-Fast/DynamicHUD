@@ -35,7 +35,7 @@ public class TextureHelper {
                 int srcX = x * oldWidth / newWidth;
                 int srcY = y * oldHeight / newHeight;
 
-                result.setColor(x, y, image.getColor(srcX, srcY));
+                result.setColorArgb(x, y, image.getColorArgb(srcX, srcY));
             }
         }
 
@@ -58,10 +58,10 @@ public class TextureHelper {
                 y_diff = (y_ratio * i) - y;
 
                 // Indexes of the 4 surrounding pixels
-                a = image.getColor(x, y);
-                b = image.getColor(x + 1, y);
-                c = image.getColor(x, y + 1);
-                d = image.getColor(x + 1, y + 1);
+                a = image.getColorArgb(x, y);
+                b = image.getColorArgb(x + 1, y);
+                c = image.getColorArgb(x, y + 1);
+                d = image.getColorArgb(x + 1, y + 1);
 
                 // Blue element
                 blue = (a & 0xff) * (1 - x_diff) * (1 - y_diff) + (b & 0xff) * (x_diff) * (1 - y_diff) +
@@ -75,7 +75,7 @@ public class TextureHelper {
                 red = ((a >> 16) & 0xff) * (1 - x_diff) * (1 - y_diff) + ((b >> 16) & 0xff) * (x_diff) * (1 - y_diff) +
                         ((c >> 16) & 0xff) * (y_diff) * (1 - x_diff) + ((d >> 16) & 0xff) * (x_diff * y_diff);
 
-                result.setColor(j, i,
+                result.setColorArgb(j, i,
                         ((((int) red) << 16) & 0xff0000) |
                                 ((((int) green) << 8) & 0xff00) |
                                 ((int) blue) & 0xff);
@@ -92,7 +92,7 @@ public class TextureHelper {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int argb = image.getColor(x, y);
+                int argb = image.getColorArgb(x, y);
 
                 int alpha = (argb >> 24) & 0xFF;
                 int red = 255 - ((argb >> 16) & 0xFF);
@@ -101,7 +101,7 @@ public class TextureHelper {
 
                 int newArgb = (alpha << 24) | (red << 16) | (green << 8) | blue;
 
-                result.setColor(x, y, newArgb);
+                result.setColorArgb(x, y, newArgb);
             }
         }
 
@@ -123,7 +123,7 @@ public class TextureHelper {
                 int newY = (int) ((x - centerX) * Math.sin(angle) + (y - centerY) * Math.cos(angle) + centerY);
 
                 if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
-                    result.setColor(newY, newX, image.getColor(x, y));
+                    result.setColorArgb(newY, newX, image.getColorArgb(x, y));
                 }
             }
         }
@@ -138,7 +138,7 @@ public class TextureHelper {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                result.setColor(width - x - 1, y, image.getColor(x, y));
+                result.setColorArgb(width - x - 1, y, image.getColorArgb(x, y));
             }
         }
 
@@ -152,7 +152,7 @@ public class TextureHelper {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                result.setColor(x, height - y - 1, image.getColor(x, y));
+                result.setColorArgb(x, height - y - 1, image.getColorArgb(x, y));
             }
         }
 
@@ -174,7 +174,7 @@ public class TextureHelper {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int argb = image.getColor(x, y);
+                int argb = image.getColorArgb(x, y);
 
                 int alpha = (argb >> 24) & 0xFF;
                 int red = (argb >> 16) & 0xFF;
@@ -184,7 +184,7 @@ public class TextureHelper {
                 int gray = (red + green + blue) / 3;
                 int newArgb = (alpha << 24) | (gray << 16) | (gray << 8) | gray;
 
-                result.setColor(x, y, newArgb);
+                result.setColorArgb(x, y, newArgb);
             }
         }
 
@@ -196,7 +196,7 @@ public class TextureHelper {
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                result.setColor(j, i, image.getColor(x + j, y + i));
+                result.setColorArgb(j, i, image.getColorArgb(x + j, y + i));
             }
         }
 
@@ -210,7 +210,7 @@ public class TextureHelper {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int argb = image.getColor(x, y);
+                int argb = image.getColorArgb(x, y);
 
                 int alpha = (argb >> 24) & 0xFF;
                 int red = ((argb >> 16) & 0xFF) * ((color >> 16) & 0xFF) / 255;
@@ -219,7 +219,7 @@ public class TextureHelper {
 
                 int newArgb = (alpha << 24) | (red << 16) | (green << 8) | blue;
 
-                result.setColor(x, y, newArgb);
+                result.setColorArgb(x, y, newArgb);
             }
         }
 
@@ -233,8 +233,8 @@ public class TextureHelper {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int argb1 = image.getColor(x, y);
-                int argb2 = overlay.getColor(x, y);
+                int argb1 = image.getColorArgb(x, y);
+                int argb2 = overlay.getColorArgb(x, y);
 
                 int alpha = Math.max((argb1 >> 24) & 0xFF, (argb2 >> 24) & 0xFF);
                 int red = Math.min(255, ((argb1 >> 16) & 0xFF) + ((argb2 >> 16) & 0xFF));
@@ -243,7 +243,7 @@ public class TextureHelper {
 
                 int newArgb = (alpha << 24) | (red << 16) | (green << 8) | blue;
 
-                result.setColor(x, y, newArgb);
+                result.setColorArgb(x, y, newArgb);
             }
         }
 
@@ -258,7 +258,7 @@ public class TextureHelper {
 
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
-                int argb = image.getColor(x, y);
+                int argb = image.getColorArgb(x, y);
 
                 redTotal += (argb >> 16) & 0xFF;
                 greenTotal += (argb >> 8) & 0xFF;

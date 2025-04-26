@@ -14,6 +14,10 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.options.DoubleOption;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
+import com.twelvemonkeys.lang.Validate;
+import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.gl.ShaderProgramKey;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
@@ -23,16 +27,17 @@ import org.joml.Matrix4f;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import net.minecraft.client.render.*;
 
+import javax.xml.validation.Validator;
+
 public class GraphWidget extends Widget implements ContextMenuProvider{
     public static WidgetData<GraphWidget> DATA = new WidgetData<>("GraphWidget","Show graph",GraphWidget::new);
-    //private final List<Float> dataPoints;
 
     private ContextMenu<?> menu;
-
     private final float[] dataPoints;
     private int head = 0;
     private int maxDataPoints;
@@ -50,8 +55,8 @@ public class GraphWidget extends Widget implements ContextMenuProvider{
 
     public GraphWidget(String modId, Anchor anchor, float width, float height, int maxDataPoints, float minValue, float maxValue, Color graphColor, Color backgroundColor, float lineThickness, boolean showGrid, int gridLines, String label) {
         super(DATA, modId, anchor);
-        dataPoints = new float[maxDataPoints];
-        //this.dataPoints = new ArrayList<>();
+        Validate.isTrue(maxDataPoints > 2, "MaxDataPoints should be more than 2.");
+        this.dataPoints = new float[maxDataPoints];
         this.width = width;
         this.height = height;
         this.maxDataPoints = maxDataPoints;
@@ -65,13 +70,12 @@ public class GraphWidget extends Widget implements ContextMenuProvider{
         this.label = label.trim();
         this.widgetBox = new WidgetBox(x, y, (int) width, (int) height);
         setTooltipText(Text.of("Graph displaying: " + label));
-
         createMenu();
         ContextMenuManager.getInstance().registerProvider(this);
     }
 
     public GraphWidget(){
-        this("null",Anchor.CENTER,0,0,0,0,0,Color.RED,Color.GREEN,0,false,0,"empty");
+        this("null",Anchor.CENTER,0,0,10,0,10,Color.RED,Color.GREEN,0,false,0,"empty");
     }
 
     @Override
@@ -93,19 +97,19 @@ public class GraphWidget extends Widget implements ContextMenuProvider{
 
     private List<float[]> getInterpolatedPoints() {
         List<float[]> points = new ArrayList<>();
-        if (maxDataPoints < 2) return points;
+        if (dataPoints.length < 2) return points;
 
-        float xStep = width / (maxDataPoints - 1);
-        for (int i = 0; i < maxDataPoints - 1; i++) {
-            int index1 = (head + i) % maxDataPoints;
-            int index2 = (head + i + 1) % maxDataPoints;
+        float xStep = width / (dataPoints.length - 1);
+        for (int i = 0; i < dataPoints.length - 1; i++) {
+            int index1 = (head + i) % dataPoints.length;
+            int index2 = (head + i + 1) % dataPoints.length;
 
             float x1 = x + i * xStep;
             float y1 = y + height - ((dataPoints[index1] - minValue) / (maxValue - minValue) * height);
             float x2 = x + (i + 1) * xStep;
             float y2 = y + height - ((dataPoints[index2] - minValue) / (maxValue - minValue) * height);
 
-            // Add interpolated points using cubic spline (simplified)
+            // Add interpolated points using hermite spline (simplified)
             for (float t = 0; t <= 1; t += 0.03f) {
                 float t2 = t * t;
                 float t3 = t2 * t;
@@ -127,10 +131,6 @@ public class GraphWidget extends Widget implements ContextMenuProvider{
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
-        float red = (float) (color >> 16 & 255) / 255.0F;
-        float green = (float) (color >> 8 & 255) / 255.0F;
-        float blue = (float) (color & 255) / 255.0F;
-        float alpha = (float) (color >> 24 & 255) / 255.0F;
 
         for (int i = 0; i < points.size(); i++) {
             float[] point = points.get(i);
@@ -146,12 +146,12 @@ public class GraphWidget extends Widget implements ContextMenuProvider{
             float offsetX = (thickness * 0.5f * dy) / length;
             float offsetY = (thickness * 0.5f * -dx) / length;
 
-            bufferBuilder.vertex(matrix, x + offsetX, y + offsetY, 0).color(red, green, blue, alpha);
-            bufferBuilder.vertex(matrix, x - offsetX, y - offsetY, 0).color(red, green, blue, alpha);
+            bufferBuilder.vertex(matrix, x + offsetX, y + offsetY, 0).color(color);
+            bufferBuilder.vertex(matrix, x - offsetX, y - offsetY, 0).color(color);
         }
 
         RenderSystem.enableBlend();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         RenderSystem.disableBlend();
     }
@@ -172,7 +172,7 @@ public class GraphWidget extends Widget implements ContextMenuProvider{
         }
 
         RenderSystem.enableBlend();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         RenderSystem.disableBlend();
     }
@@ -211,7 +211,7 @@ public class GraphWidget extends Widget implements ContextMenuProvider{
             float valueStep = (maxValue - minValue) / (gridLines + 1);
 
             //TODO: The scale is too small for grid lines for than 21 (20 is the barely visible threshold)
-            float scale = (float) MathHelper.clamp((stepY/9.5),0.0f,1.0f); //~ sqrt of 95
+            float scale = (float) MathHelper.clamp((stepY/9.5),0.0f,1.0f);
 
             for (int i = 1; i <= gridLines; i++) {
                 float yPos = y + stepY * i;
