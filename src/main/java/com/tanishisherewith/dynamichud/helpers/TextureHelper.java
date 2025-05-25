@@ -48,7 +48,7 @@ public class TextureHelper {
         float x_ratio = ((float) (image.getWidth() - 1)) / newWidth;
         float y_ratio = ((float) (image.getHeight() - 1)) / newHeight;
         float x_diff, y_diff, blue, red, green;
-        int offset, a, b, c, d, index;
+        int a, b, c, d;
 
         for (int i = 0; i < newHeight; i++) {
             for (int j = 0; j < newWidth; j++) {

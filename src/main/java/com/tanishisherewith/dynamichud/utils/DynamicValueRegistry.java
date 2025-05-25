@@ -22,6 +22,7 @@ import java.util.function.Supplier;
 public class DynamicValueRegistry {
     private static final Map<String, DynamicValueRegistry> REGISTRY_BY_ID = new HashMap<>();
     private static final Map<String, Supplier<?>> GLOBAL_REGISTRY = new HashMap<>();
+    public static final String GLOBAL_ID = "global";
 
     private final String id; // Unique identifier for this registry instance
     private final Map<String, Supplier<?>> localRegistry = new HashMap<>();
@@ -32,9 +33,9 @@ public class DynamicValueRegistry {
      * @param registryId A unique ID for this registry instance.
      */
     public DynamicValueRegistry(String modId, String registryId) {
-        this.id = registryId;
+        this.id = registryId.trim();
         System.registerInstance(this, modId);
-        REGISTRY_BY_ID.put(registryId, this);
+        REGISTRY_BY_ID.put(this.id, this);
     }
     /**
      * Constructor for a local registry using with registryId as modID.
@@ -87,8 +88,44 @@ public class DynamicValueRegistry {
      * @param registryId The unique ID of the registry.
      * @return The registry instance, or null if not found.
      */
-    public static  DynamicValueRegistry getById(String registryId) {
+    public static DynamicValueRegistry getById(String registryId) {
         return REGISTRY_BY_ID.get(registryId);
+    }
+
+    /**
+     * Gets the registry instance by its unique ID but throws an error if the instance is not present
+     * @param registryId The unique ID of the registry.
+     * @return The registry instance, or null if not found.
+     * @throws IllegalStateException If a registry for the id was not found
+     */
+    public static DynamicValueRegistry getByIdSafe(String registryId) {
+        if(!REGISTRY_BY_ID.containsKey(registryId)){
+            throw new IllegalStateException("DynamicValueRegistry for id: " + registryId + " not found");
+        }
+        return REGISTRY_BY_ID.get(registryId);
+    }
+
+    /**
+     * @param registryID the registry id
+     * @return whether the given id matches the global registry id or not
+     */
+    public static boolean isGlobal(String registryID){
+        return registryID.equals(GLOBAL_ID);
+    }
+
+    /**
+     * Directly get the supplier for a given key and registry id
+     * @param registryID The registry ID
+     * @param key the registry key
+     * @return supplier as returned by the registry with the given key
+     */
+    public static Supplier<?> getValue(String registryID, String key){
+        if(registryID.isEmpty() || key.isEmpty()) throw new IllegalArgumentException();
+
+        if(registryID.equals(GLOBAL_ID)){
+            return getGlobal(key);
+        }
+        return getByIdSafe(registryID).get(key);
     }
 
     /**

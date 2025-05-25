@@ -30,13 +30,14 @@ public class IntegrationTest implements DynamicHudIntegration {
         registry = new DynamicValueRegistry(DynamicHUD.MOD_ID);
         registry.registerLocal("Hello", () -> "Hello " + DynamicHUD.MC.getSession().getUsername() + "!");
         registry.registerLocal("DynamicHUD", () -> "DynamicHUD");
+        registry.registerLocal("FPS", () -> DynamicHUD.MC.getCurrentFps());
 
         FPSWidget = new TextWidget.Builder()
                 .setX(250)
                 .setY(150)
                 .setDraggable(true)
                 .rainbow(false)
-                .withRegistryKey("dynamichud:FPS")
+                .registryKey("dynamichud:FPS")
                 .setModID(DynamicHUD.MOD_ID)
                 .shouldScale(false)
                 .build();
@@ -46,8 +47,8 @@ public class IntegrationTest implements DynamicHudIntegration {
                 .setY(100)
                 .setDraggable(true)
                 .rainbow(false)
-                .withRegistryKey("Hello")
-                .withValueRegistry(registry)
+                .registryKey("Hello")
+                .registryID(registry.getId())
                 .setModID(DynamicHUD.MOD_ID)
                 .shouldScale(true)
                 .shadow(true)
@@ -58,8 +59,8 @@ public class IntegrationTest implements DynamicHudIntegration {
                 .setY(0)
                 .setDraggable(false)
                 .rainbow(true)
-                .withRegistryKey("DynamicHUD")
-                .withValueRegistry(registry)
+                .registryKey("DynamicHUD")
+                .registryID(registry.getId())
                 .setModID(DynamicHUD.MOD_ID)
                 .shouldScale(true)
                 .build();
@@ -67,25 +68,25 @@ public class IntegrationTest implements DynamicHudIntegration {
         graphWidget = new GraphWidget.GraphWidgetBuilder()
                 .setX(250)
                 .setY(100)
-                .setGraphColor(Color.CYAN)
-                .setAnchor(Widget.Anchor.CENTER)
-                .setHeight(100)
-                .setWidth(150)
-                .setGridLines(10)
-                .setBackgroundColor(Color.DARK_GRAY)
-                .setLineThickness(1f)
-                .setMaxDataPoints(100)
-                .setMaxValue(120)
-                .setMinValue(30)
+                .label("FPS Chart")
+                .graphColor(Color.CYAN)
+                .anchor(Widget.Anchor.CENTER)
+                .height(100)
+                .width(150)
+                .gridLines(10)
+                .backgroundColor(Color.DARK_GRAY)
+                .lineThickness(1f)
+                .maxDataPoints(100)
+                .maxValue(120)
+                .minValue(30)
                 .setModID(DynamicHUD.MOD_ID)
                 .setDraggable(true)
                 .setDisplay(true)
-                .setShowGrid(true)
-                .setLabel("FPS Chart")
-                .build();
-
-
-        graphWidget.addDataPointEveryTick(()-> (float) MinecraftClient.getInstance().getCurrentFps());
+                .showGrid(true)
+                .registryKey("FPS")
+                .registryID(registry.getId())
+                .build()
+                .autoUpdateRange();
     }
 
     @Override

@@ -264,13 +264,12 @@ public class DrawHelper {
      * @param shadow Whether to render the text as shadow.
      */
     public static void drawChromaText(@NotNull DrawContext drawContext, String text, int x, int y, float speed, float saturation, float brightness, float spread, boolean shadow) {
-        long time = System.currentTimeMillis(); // Get the current time for animation
+        long time = System.currentTimeMillis();
         int length = text.length();
 
         for (int i = 0; i < length; i++) {
-            // Calculate the hue for the current character
             float hue = (time % (int) (5000 / speed)) / (5000f / speed) + (i * spread); // Adjust the hue based on time and character position
-            hue = MathHelper.floorMod(hue, 1.0f); // Ensure the hue stays within the range [0, 1]
+            hue = MathHelper.floorMod(hue, 1.0f); //  hue should stay within the range [0, 1]
 
             // Convert the hue to an RGB color
             int color = Color.HSBtoRGB(hue, saturation, brightness);

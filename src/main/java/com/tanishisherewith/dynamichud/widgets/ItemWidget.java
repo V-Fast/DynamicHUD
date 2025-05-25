@@ -49,7 +49,7 @@ public class ItemWidget extends Widget {
     public static class Builder extends WidgetBuilder<Builder, ItemWidget> {
         ItemStack itemStack;
 
-        public Builder setItemStack(ItemStack itemStack) {
+        public Builder itemStack(ItemStack itemStack) {
             this.itemStack = itemStack;
             return self();
         }

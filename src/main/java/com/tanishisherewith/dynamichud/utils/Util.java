@@ -25,4 +25,14 @@ public class Util {
     public enum Quadrant {
         UPPER_LEFT, UPPER_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT
     }
+
+    public static boolean errorIfTrue(boolean expression, String message, Object... objects){
+        if(!expression) DynamicHUD.logger.error(message, objects);
+        return expression;
+    }
+
+    public static boolean warnIfTrue(boolean expression, String message, Object... objects){
+        if(expression) DynamicHUD.logger.warn(message, objects);
+        return expression;
+    }
 }

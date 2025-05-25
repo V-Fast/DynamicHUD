@@ -1,9 +1,11 @@
 package com.tanishisherewith.dynamichud.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.animations.MathAnimations;
+import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
@@ -11,12 +13,10 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProvider;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.BooleanOption;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.ColorOption;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.DoubleOption;
-import com.tanishisherewith.dynamichud.widget.Widget;
+import com.tanishisherewith.dynamichud.widget.DynamicValueWidget;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
 import com.twelvemonkeys.lang.Validate;
-import net.minecraft.client.gl.ShaderProgram;
-import net.minecraft.client.gl.ShaderProgramKey;
 import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
@@ -27,22 +27,23 @@ import org.joml.Matrix4f;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Supplier;
 
 import net.minecraft.client.render.*;
 
-import javax.xml.validation.Validator;
-
-public class GraphWidget extends Widget implements ContextMenuProvider{
+/**
+ * Graph widget to draw a simple but detailed graph.
+ * You need to use DynamicValueRegistry to pass a value to the graph.
+ * You can use null values to signify the graph should update with a new value yet.
+ */
+public class GraphWidget extends DynamicValueWidget implements ContextMenuProvider{
     public static WidgetData<GraphWidget> DATA = new WidgetData<>("GraphWidget","Show graph",GraphWidget::new);
 
     private ContextMenu<?> menu;
     private final float[] dataPoints;
     private int head = 0;
     private int maxDataPoints;
-    private float minValue;
-    private float maxValue;
+    private float minValue, prevMinValue;
+    private float maxValue, prevMaxValue;
     private Color graphColor;
     private Color backgroundColor;
     private float lineThickness;
@@ -51,17 +52,18 @@ public class GraphWidget extends Widget implements ContextMenuProvider{
     private float width;
     private float height;
     private String label;
-    private Supplier<Float> valueSupplier = null;
+    /// Automatically update the min and max of the graph
+    private boolean autoUpdateRange = false;
 
-    public GraphWidget(String modId, Anchor anchor, float width, float height, int maxDataPoints, float minValue, float maxValue, Color graphColor, Color backgroundColor, float lineThickness, boolean showGrid, int gridLines, String label) {
-        super(DATA, modId, anchor);
+    public GraphWidget(String registryID, String registryKey, String modId, Anchor anchor, float width, float height, int maxDataPoints, float minValue, float maxValue, Color graphColor, Color backgroundColor, float lineThickness, boolean showGrid, int gridLines, String label) {
+        super(DATA, modId, anchor,registryID, registryKey);
         Validate.isTrue(maxDataPoints > 2, "MaxDataPoints should be more than 2.");
         this.dataPoints = new float[maxDataPoints];
         this.width = width;
         this.height = height;
         this.maxDataPoints = maxDataPoints;
-        this.minValue = minValue;
-        this.maxValue = maxValue;
+        this.setMinValue(minValue);
+        this.setMaxValue(maxValue);
         this.graphColor = graphColor;
         this.backgroundColor = backgroundColor;
         this.lineThickness = lineThickness;
@@ -75,7 +77,7 @@ public class GraphWidget extends Widget implements ContextMenuProvider{
     }
 
     public GraphWidget(){
-        this("null",Anchor.CENTER,0,0,10,0,10,Color.RED,Color.GREEN,0,false,0,"empty");
+        this(DynamicValueRegistry.GLOBAL_ID,"unknown","unknown",Anchor.CENTER,0,0,10,0,10,Color.RED,Color.GREEN,0,false,0,"empty");
     }
 
     @Override
@@ -86,13 +88,30 @@ public class GraphWidget extends Widget implements ContextMenuProvider{
         }
     }
 
-    public void addDataPoint(float value) {
+    /// Automatically update the min and max of the graph
+    public GraphWidget autoUpdateRange(){
+        this.autoUpdateRange = true;
+        return this;
+    }
+
+    public void addDataPoint(Float value) {
+        if(value == null) return;
+        if(autoUpdateRange) {
+            if (getMaxValue() < value) {
+                setMaxValue(value + 10);
+                float diff = getMaxValue() - getPrevMaxValue();
+                setMinValue(getMinValue() + diff);
+            }
+            if (getMinValue() > value) {
+                setMinValue(value - 10);
+                float diff = getPrevMinValue() - getMinValue();
+                setMaxValue(getMaxValue() - diff);
+            }
+        }
+
         int index = (head) % maxDataPoints;
         dataPoints[index] = MathHelper.clamp(value, minValue, maxValue);
         head = (head + 1) % maxDataPoints; // Buffer full, overwrite oldest and move head
-    }
-    public void addDataPointEveryTick(Supplier<Float> valueSupplier) {
-        this.valueSupplier = valueSupplier;
     }
 
     private List<float[]> getInterpolatedPoints() {
@@ -182,7 +201,7 @@ public class GraphWidget extends Widget implements ContextMenuProvider{
         Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
 
         if(valueSupplier != null){
-            addDataPoint(valueSupplier.get());
+            addDataPoint(getValue());
         }
 
         // Apply pulse1 animation to background alpha
@@ -275,7 +294,7 @@ public class GraphWidget extends Widget implements ContextMenuProvider{
         if(menu != null) menu.set(getX(), getY(), (int) Math.ceil(getHeight()));
     }
 
-    // format large values (e.g., 1000 -> "1K", 1000000 -> "1M")
+    // format large values (like: 1000 -> 1K, 1000000 -> 1M)
     private String formatValue(float value) {
         if (Math.abs(value) >= 1_000_000) {
             return String.format("%.1fM", value / 1_000_000);
@@ -339,6 +358,106 @@ public class GraphWidget extends Widget implements ContextMenuProvider{
         createMenu();
     }
 
+    public float getMinValue() {
+        return minValue;
+    }
+
+    public void setMinValue(float minValue) {
+        this.prevMinValue = this.minValue;
+        this.minValue = minValue;
+    }
+
+    public float getPrevMinValue() {
+        return prevMinValue;
+    }
+
+    public float getMaxValue() {
+        return maxValue;
+    }
+
+    public void setMaxValue(float maxValue) {
+        this.prevMaxValue = this.maxValue;
+        this.maxValue = maxValue;
+    }
+
+    public float getPrevMaxValue() {
+        return prevMaxValue;
+    }
+
+    public float getLineThickness() {
+        return lineThickness;
+    }
+
+    public void setLineThickness(float lineThickness) {
+        this.lineThickness = lineThickness;
+    }
+
+    public Color getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public void setBackgroundColor(Color backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    @Override
+    public float getHeight() {
+        return height;
+    }
+
+    public void setHeight(float height) {
+        this.height = height;
+    }
+
+    @Override
+    public float getWidth() {
+        return width;
+    }
+
+    public void setWidth(float width) {
+        this.width = width;
+    }
+
+    public int getGridLines() {
+        return gridLines;
+    }
+
+    public void setGridLines(int gridLines) {
+        this.gridLines = gridLines;
+    }
+
+    public boolean isShowGrid() {
+        return showGrid;
+    }
+
+    public void setShowGrid(boolean showGrid) {
+        this.showGrid = showGrid;
+    }
+
+    public Color getGraphColor() {
+        return graphColor;
+    }
+
+    public void setGraphColor(Color graphColor) {
+        this.graphColor = graphColor;
+    }
+
+    @Override
+    public Float getValue() {
+        if (valueSupplier.get() instanceof Number number) {
+            return number.floatValue();
+        }
+        return null;
+    }
+
     @Override
     public void onClose() {
         super.onClose();
@@ -366,7 +485,7 @@ public class GraphWidget extends Widget implements ContextMenuProvider{
         return menu;
     }
 
-    public static class GraphWidgetBuilder extends WidgetBuilder<GraphWidgetBuilder, GraphWidget> {
+    public static class GraphWidgetBuilder extends DynamicValueWidgetBuilder<GraphWidgetBuilder, GraphWidget> {
         private Anchor anchor = Anchor.CENTER;
         private float width = 100;
         private float height = 50;
@@ -380,66 +499,65 @@ public class GraphWidget extends Widget implements ContextMenuProvider{
         private int gridLines = 4;
         private String label = "Graph";
 
-        public GraphWidgetBuilder() {
+        public GraphWidgetBuilder() {}
+
+        public GraphWidgetBuilder label(String label) {
+            this.label = label;
+            return this;
         }
 
-        public GraphWidgetBuilder setAnchor(Anchor anchor) {
+        public GraphWidgetBuilder anchor(Anchor anchor) {
             this.anchor = anchor;
             return this;
         }
 
-        public GraphWidgetBuilder setWidth(float width) {
+        public GraphWidgetBuilder width(float width) {
             this.width = width;
             return this;
         }
 
-        public GraphWidgetBuilder setHeight(float height) {
+        public GraphWidgetBuilder height(float height) {
             this.height = height;
             return this;
         }
 
-        public GraphWidgetBuilder setMaxDataPoints(int maxDataPoints) {
+        public GraphWidgetBuilder maxDataPoints(int maxDataPoints) {
             this.maxDataPoints = maxDataPoints;
             return this;
         }
 
-        public GraphWidgetBuilder setMinValue(float minValue) {
+        public GraphWidgetBuilder minValue(float minValue) {
             this.minValue = minValue;
             return this;
         }
 
-        public GraphWidgetBuilder setMaxValue(float maxValue) {
+        public GraphWidgetBuilder maxValue(float maxValue) {
             this.maxValue = maxValue;
             return this;
         }
 
-        public GraphWidgetBuilder setGraphColor(Color graphColor) {
+        public GraphWidgetBuilder graphColor(Color graphColor) {
             this.graphColor = graphColor;
             return this;
         }
 
-        public GraphWidgetBuilder setBackgroundColor(Color backgroundColor) {
+        public GraphWidgetBuilder backgroundColor(Color backgroundColor) {
             this.backgroundColor = backgroundColor;
             return this;
         }
 
-        public GraphWidgetBuilder setLineThickness(float lineThickness) {
+        public GraphWidgetBuilder lineThickness(float lineThickness) {
             this.lineThickness = lineThickness;
             return this;
         }
 
-        public GraphWidgetBuilder setShowGrid(boolean showGrid) {
+        public GraphWidgetBuilder showGrid(boolean showGrid) {
             this.showGrid = showGrid;
             return this;
         }
 
-        public GraphWidgetBuilder setGridLines(int gridLines) {
-            this.gridLines = gridLines;
-            return this;
-        }
-
-        public GraphWidgetBuilder setLabel(String label) {
-            this.label = label;
+        public GraphWidgetBuilder gridLines(int no_of_gridLines) {
+            this.gridLines = no_of_gridLines;
             return this;
         }
 
@@ -450,7 +568,7 @@ public class GraphWidget extends Widget implements ContextMenuProvider{
 
         @Override
         public GraphWidget build() {
-            GraphWidget widget = new GraphWidget(modID, anchor, width, height, maxDataPoints, minValue, maxValue, graphColor, backgroundColor, lineThickness, showGrid, gridLines, label);
+            GraphWidget widget = new GraphWidget(registryID,registryKey,modID, anchor, width, height, maxDataPoints, minValue, maxValue, graphColor, backgroundColor, lineThickness, showGrid, gridLines, label);
             widget.setPosition(x, y);
             widget.setDraggable(isDraggable);
             widget.setShouldScale(shouldScale);
