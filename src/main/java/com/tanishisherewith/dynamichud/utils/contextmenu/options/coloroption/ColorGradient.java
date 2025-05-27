@@ -1,16 +1,11 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption;
 
-import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.DrawContext;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import java.awt.*;
-import java.nio.ByteBuffer;
 import java.util.function.Consumer;
 
 public class ColorGradient {
@@ -63,12 +58,12 @@ public class ColorGradient {
         }
         gradientSlider.render(drawContext, x, y + client.textRenderer.fontHeight + 4);
         gradientBox.render(drawContext, x, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
-       // colorPickerButton.render(drawContext, x + 24 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 8);
+        // colorPickerButton.render(drawContext, x + 24 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 8);
         alphaSlider.render(drawContext, x + 10 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
 
         if (colorPickerButton.isPicking() && GlobalConfig.get().showColorPickerPreview()) {
-            int[] colors = ColorHelper.getMousePixelColor(mouseX,mouseY);
-            if(colors != null) {
+            int[] colors = ColorHelper.getMousePixelColor(mouseX, mouseY);
+            if (colors != null) {
                 int red = colors[0];
                 int green = colors[1];
                 int blue = colors[2];
@@ -89,7 +84,8 @@ public class ColorGradient {
         }
         /*if (colorPickerButton.onClick(mouseX, mouseY, button)) {
             return true;
-        } else*/ if (gradientSlider.isMouseOver(mouseX, mouseY)) {
+        } else*/
+        if (gradientSlider.isMouseOver(mouseX, mouseY)) {
             gradientSlider.onClick(mouseX, mouseY, button);
             gradientBox.setHue(gradientSlider.getHue());
         } else if (gradientBox.isMouseOver(mouseX, mouseY)) {

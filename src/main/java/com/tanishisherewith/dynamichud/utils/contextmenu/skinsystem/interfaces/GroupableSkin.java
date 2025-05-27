@@ -6,6 +6,7 @@ import net.minecraft.client.gui.DrawContext;
 
 public interface GroupableSkin {
     LayoutContext.Offset getGroupIndent();
-    void renderGroup(DrawContext drawContext, OptionGroup group,int groupX, int groupY, int mouseX, int mouseY);
+
+    void renderGroup(DrawContext drawContext, OptionGroup group, int groupX, int groupY, int mouseX, int mouseY);
 }
 

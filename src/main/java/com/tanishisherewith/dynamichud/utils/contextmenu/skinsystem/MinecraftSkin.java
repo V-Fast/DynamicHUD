@@ -40,7 +40,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     private static final Identifier DEFAULT_BACKGROUND_PANEL = Identifier.ofVanilla("textures/gui/demo_background.png");
     private static final Identifier SCROLLER_TEXTURE = Identifier.ofVanilla("widget/scroller");
     private static final Identifier SCROLL_BAR_BACKGROUND = Identifier.ofVanilla("widget/scroller_background");
-    private static final Identifier GROUP_BACKGROUND = Identifier.of(DynamicHUD.MOD_ID,"textures/minecraftskin/group_panel.png");
+    private static final Identifier GROUP_BACKGROUND = Identifier.of(DynamicHUD.MOD_ID, "textures/minecraftskin/group_panel.png");
 
     private final Identifier BACKGROUND_PANEL;
     private final int panelWidth;
@@ -82,19 +82,19 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
     private void createGroups() {
         OptionGroup generalGroup = new OptionGroup(Text.of("General"));
-        for(Option<?> option: getOptions(contextMenu)){
-            if(option instanceof OptionGroup og){
+        for (Option<?> option : getOptions(contextMenu)) {
+            if (option instanceof OptionGroup og) {
                 optionGroups.add(og);
                 og.setExpanded(false);
-            } else{
+            } else {
                 generalGroup.addOption(option);
             }
         }
         optionGroups.addFirst(generalGroup);
     }
 
-    private void initOptionGroups(){
-        if(this.optionGroups == null) {
+    private void initOptionGroups() {
+        if (this.optionGroups == null) {
             this.optionGroups = new ArrayList<>();
             createGroups();
             selectedGroup = optionGroups.getFirst(); // Default to the first group
@@ -129,15 +129,15 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-        drawSingularButton(drawContext,"X",mouseX,mouseY,imageX + 3,imageY + 3, 14,14);
+        drawSingularButton(drawContext, "X", mouseX, mouseY, imageX + 3, imageY + 3, 14, 14);
 
         //Up and down arrows near the group panel
         int size = (int) (groupPanelWidth * 0.5f);
-        drawSingularButton(drawContext,"^",mouseX,mouseY,groupPanelX.getAsInt() + groupPanelWidth/2 - size/2,imageY - 14,size,14, groupScrollHandler.isOffsetWithinBounds(-10));
-        drawSingularButton(drawContext,"v",mouseX,mouseY,groupPanelX.getAsInt() + groupPanelWidth/2 -  size/2,imageY + panelHeight - 2,size,14, groupScrollHandler.isOffsetWithinBounds(10));
+        drawSingularButton(drawContext, "^", mouseX, mouseY, groupPanelX.getAsInt() + groupPanelWidth / 2 - size / 2, imageY - 14, size, 14, groupScrollHandler.isOffsetWithinBounds(-10));
+        drawSingularButton(drawContext, "v", mouseX, mouseY, groupPanelX.getAsInt() + groupPanelWidth / 2 - size / 2, imageY + panelHeight - 2, size, 14, groupScrollHandler.isOffsetWithinBounds(10));
 
 //        drawContext.drawGuiTexture(RenderLayer::getGuiTextured, TEXTURES.get(true, isMouseOver(mouseX, mouseY, imageX + 3, imageY + 3, 14, 14)), imageX + 3, imageY + 3, 14, 14);
-  //      drawContext.drawText(mc.textRenderer, "X", imageX + 10 - mc.textRenderer.getWidth("X") / 2, imageY + 6, -1, true);
+        //      drawContext.drawText(mc.textRenderer, "X", imageX + 10 - mc.textRenderer.getWidth("X") / 2, imageY + 6, -1, true);
 
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.disableBlend();
@@ -148,8 +148,8 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         contextMenu.setWidth(panelWidth - 4);
         contextMenu.y = imageY;
 
-        renderOptionGroups(drawContext,mouseX,mouseY);
-        renderSelectedGroupOptions(drawContext,mouseX,mouseY);
+        renderOptionGroups(drawContext, mouseX, mouseY);
+        renderSelectedGroupOptions(drawContext, mouseX, mouseY);
 
         contextMenu.setHeight(getContentHeight() + 15);
 
@@ -161,13 +161,14 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         DrawHelper.disableScissor();
     }
 
-    public void drawSingularButton(DrawContext drawContext, String text, int mouseX, int mouseY, int x, int y, int width, int height, boolean enabled){
+    public void drawSingularButton(DrawContext drawContext, String text, int mouseX, int mouseY, int x, int y, int width, int height, boolean enabled) {
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         drawContext.drawGuiTexture(RenderLayer::getGuiTextured, TEXTURES.get(enabled, isMouseOver(mouseX, mouseY, x, y, width, height)), x, y, width, height);
-        drawContext.drawText(mc.textRenderer, text, x + width/2 - mc.textRenderer.getWidth(text) / 2, y + mc.textRenderer.fontHeight/2 - 1, -1, true);
+        drawContext.drawText(mc.textRenderer, text, x + width / 2 - mc.textRenderer.getWidth(text) / 2, y + mc.textRenderer.fontHeight / 2 - 1, -1, true);
     }
-    public void drawSingularButton(DrawContext drawContext, String text, int mouseX, int mouseY, int x, int y, int width, int height){
-       this.drawSingularButton(drawContext,text,mouseX,mouseY,x,y,width,height,true);
+
+    public void drawSingularButton(DrawContext drawContext, String text, int mouseX, int mouseY, int x, int y, int width, int height) {
+        this.drawSingularButton(drawContext, text, mouseX, mouseY, x, y, width, height, true);
     }
 
     private void renderOptionGroups(DrawContext drawContext, int mouseX, int mouseY) {
@@ -177,7 +178,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        drawContext.drawTexture(RenderLayer::getGuiTextured,GROUP_BACKGROUND, groupX - 10, groupY + 2,groupPanelWidth + 20, panelHeight,0,0, 147,165,147,165);
+        drawContext.drawTexture(RenderLayer::getGuiTextured, GROUP_BACKGROUND, groupX - 10, groupY + 2, groupPanelWidth + 20, panelHeight, 0, 0, 147, 165, 147, 165);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         int yOffset = groupY + 12 - groupScrollHandler.getScrollOffset();
@@ -185,7 +186,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             if (yOffset >= groupY + 12 && yOffset <= groupY + panelHeight - 15) {
                 drawContext.drawGuiTexture(RenderLayer::getGuiTextured, TEXTURES.get(!group.isExpanded(), isMouseOver(mouseX, mouseY, groupX, yOffset, groupPanelWidth, 20)), groupX, yOffset, groupPanelWidth, 20);
 
-                DrawHelper.drawScrollableText(drawContext,mc.textRenderer, group.getName(),groupX + groupPanelWidth/2,groupX + 2,yOffset,groupX + groupPanelWidth - 2, yOffset + 20,-1);
+                DrawHelper.drawScrollableText(drawContext, mc.textRenderer, group.getName(), groupX + groupPanelWidth / 2, groupX + 2, yOffset, groupX + groupPanelWidth - 2, yOffset + 20, -1);
 
                 //Scrollable text uses scissor, so we need to enable the context menu scissor again
                 this.enableContextMenuScissor();
@@ -205,7 +206,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     private int renderSelectedGroupOptions(DrawContext drawContext, int mouseX, int mouseY) {
         int yOffset = imageY + 12 - scrollHandler.getScrollOffset();
         for (Option<?> option : selectedGroup.getGroupOptions()) {
-            if(!option.shouldRender()) continue;
+            if (!option.shouldRender()) continue;
 
             if (yOffset >= imageY - option.getHeight() && yOffset <= imageY + option.getHeight() + panelHeight) {
                 option.render(drawContext, imageX + 4, yOffset, mouseX, mouseY);
@@ -224,11 +225,12 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             int handleY = (int) (scrollbarY + (panelHeight - handleHeight) * ((double) scrollHandler.getScrollOffset() / getMaxScrollOffset()));
 
             RenderSystem.enableBlend();
-            drawContext.drawGuiTexture(RenderLayer::getGuiTextured, SCROLL_BAR_BACKGROUND, scrollbarX, scrollbarY,DEFAULT_SCROLLBAR_WIDTH, panelHeight);
-            drawContext.drawGuiTexture(RenderLayer::getGuiTextured, SCROLLER_TEXTURE, scrollbarX, handleY,DEFAULT_SCROLLBAR_WIDTH, (int) handleHeight);
+            drawContext.drawGuiTexture(RenderLayer::getGuiTextured, SCROLL_BAR_BACKGROUND, scrollbarX, scrollbarY, DEFAULT_SCROLLBAR_WIDTH, panelHeight);
+            drawContext.drawGuiTexture(RenderLayer::getGuiTextured, SCROLLER_TEXTURE, scrollbarX, handleY, DEFAULT_SCROLLBAR_WIDTH, (int) handleHeight);
             RenderSystem.disableBlend();
         }
     }
+
     private int getMaxScrollOffset() {
         return getContentHeight() - panelHeight + 10;
     }
@@ -242,7 +244,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         if (isMouseOver(mouseX, mouseY, imageX, imageY, panelWidth, panelHeight)) {
             scrollHandler.mouseScrolled(verticalAmount);
         }
-        if (isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() - 10, imageY,groupPanelWidth + 10, panelHeight)) {
+        if (isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() - 10, imageY, groupPanelWidth + 10, panelHeight)) {
             groupScrollHandler.mouseScrolled(verticalAmount);
         }
     }
@@ -250,7 +252,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     @Override
     public boolean mouseClicked(ContextMenu<?> menu, double mouseX, double mouseY, int button) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            if(isMouseOver(mouseX, mouseY, imageX + 3, imageY + 3, 14, 14)) {
+            if (isMouseOver(mouseX, mouseY, imageX + 3, imageY + 3, 14, 14)) {
                 mc.getSoundManager().play(PositionedSoundInstance.master(
                         SoundEvents.UI_BUTTON_CLICK, 1.0F));
 
@@ -258,14 +260,14 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
                 scrollHandler.stopDragging();
                 return true;
             }
-            int size = (int)(groupPanelWidth * 0.5f);
+            int size = (int) (groupPanelWidth * 0.5f);
             //Up and down button
-            if(groupScrollHandler.isOffsetWithinBounds(-10) && isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() + (double) groupPanelWidth /2 - size/2,imageY - 14,size,14)) {
+            if (groupScrollHandler.isOffsetWithinBounds(-10) && isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() + (double) groupPanelWidth / 2 - size / 2, imageY - 14, size, 14)) {
                 mc.getSoundManager().play(PositionedSoundInstance.master(
                         SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 groupScrollHandler.addOffset(-10);
             }
-            if(groupScrollHandler.isOffsetWithinBounds(10) && isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() + (double) groupPanelWidth /2 - size/2,imageY + panelHeight - 2,size,14)) {
+            if (groupScrollHandler.isOffsetWithinBounds(10) && isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() + (double) groupPanelWidth / 2 - size / 2, imageY + panelHeight - 2, size, 14)) {
                 mc.getSoundManager().play(PositionedSoundInstance.master(
                         SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 groupScrollHandler.addOffset(10);
@@ -306,14 +308,14 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     }
 
     @Override
-    public boolean mouseDragged(ContextMenu<?> menu,double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+    public boolean mouseDragged(ContextMenu<?> menu, double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            if(isMouseOver(mouseX,mouseY,imageX + panelWidth + 5,imageY - 5,DEFAULT_SCROLLBAR_WIDTH + 5,panelHeight + 10)) {
+            if (isMouseOver(mouseX, mouseY, imageX + panelWidth + 5, imageY - 5, DEFAULT_SCROLLBAR_WIDTH + 5, panelHeight + 10)) {
                 scrollHandler.updateScrollPosition(mouseY);
             }
             return true;
         }
-        return super.mouseDragged(menu,mouseX, mouseY, button, deltaX, deltaY);
+        return super.mouseDragged(menu, mouseX, mouseY, button, deltaX, deltaY);
     }
 
     @Override
@@ -325,7 +327,8 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
      * Group rendering handled already
      */
     @Override
-    public void renderGroup(DrawContext drawContext, OptionGroup group, int groupX, int groupY, int mouseX, int mouseY) {}
+    public void renderGroup(DrawContext drawContext, OptionGroup group, int groupX, int groupY, int mouseX, int mouseY) {
+    }
 
     public enum PanelColor {
         COFFEE_BROWN(0.6f, 0.3f, 0.1f, 0.9f),
@@ -434,19 +437,19 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             option.setHeight(25);
             option.setWidth(width);
 
-            if(option.getColorGradient().getColorPickerButton().isPicking()) {
+            if (option.getColorGradient().getColorPickerButton().isPicking()) {
                 DrawHelper.disableScissor(); // Disable scissor test for the colorpicker
             }
             //TODO: WHAT IS THISSSSS
             int colorGradientWidth = option.getColorGradient().getBoxSize() + option.getColorGradient().getAlphaSlider().getWidth() + option.getColorGradient().getColorPickerButton().getWidth();
-            option.getColorGradient().render(drawContext, x + panelWidth/2 - colorGradientWidth/2, y + 12,mouseX,mouseY);
+            option.getColorGradient().render(drawContext, x + panelWidth / 2 - colorGradientWidth / 2, y + 12, mouseX, mouseY);
 
-            if(option.getColorGradient().shouldDisplay()) {
+            if (option.getColorGradient().shouldDisplay()) {
                 int colorGradientHeight = option.getColorGradient().getBoxSize() + 10 + option.getColorGradient().getGradientSlider().getHeight();
                 option.setHeight(option.getHeight() + colorGradientHeight);
             }
 
-            if(option.getColorGradient().getColorPickerButton().isPicking()) {
+            if (option.getColorGradient().getColorPickerButton().isPicking()) {
                 DrawHelper.enableScissor(imageX, imageY + 2, panelWidth, panelHeight - 4);
             }
         }
@@ -471,7 +474,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             option.setHeight(25);
             option.setPosition(x + panelWidth - 122, y);
 
-            double sliderX = option.getX()  + ((option.value - option.minValue) / (option.maxValue - option.minValue)) * (option.getWidth() - 8);
+            double sliderX = option.getX() + ((option.value - option.minValue) / (option.maxValue - option.minValue)) * (option.getWidth() - 8);
             boolean isMouseOverHandle = isMouseOver(mouseX, mouseY, sliderX, y, 10, 20);
 
             RenderSystem.enableBlend();

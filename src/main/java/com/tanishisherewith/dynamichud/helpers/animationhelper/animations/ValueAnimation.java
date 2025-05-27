@@ -20,12 +20,12 @@ public class ValueAnimation extends Animation {
     }
 
     public ValueAnimation(AnimationProperty<Float> property, float start, float end) {
-        this(property,start,end,EasingType.LINEAR);
+        this(property, start, end, EasingType.LINEAR);
     }
 
     @Override
     protected void applyAnimation(float progress) {
-        this.value = startValue + (endValue - startValue) * Easing.apply(easing,progress);
+        this.value = startValue + (endValue - startValue) * Easing.apply(easing, progress);
         property.set(value);
     }
 

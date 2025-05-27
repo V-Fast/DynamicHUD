@@ -127,7 +127,7 @@ public abstract class Widget implements Input {
 
     // Update position based on anchor and offset
     void updatePosition(int screenWidth, int screenHeight) {
-        if(offsetX == 0 || offsetY == 0){
+        if (offsetX == 0 || offsetY == 0) {
             calculateOffset(x, y, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());
         }
 
@@ -242,7 +242,7 @@ public abstract class Widget implements Input {
         return false;
     }
 
-    public boolean mouseDragged(double mouseX, double mouseY, int button,  double deltaX, double deltaY, int snapSize) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY, int snapSize) {
         if (!isDraggable) return false;
         if (dragging && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             int newX = (int) (mouseX - startX);
@@ -284,16 +284,20 @@ public abstract class Widget implements Input {
      * @param hAmount horizontal amount of scrolling
      */
     @Override
-    public void mouseScrolled(double mouseX, double mouseY, double vAmount, double hAmount) {}
+    public void mouseScrolled(double mouseX, double mouseY, double vAmount, double hAmount) {
+    }
 
     @Override
-    public void keyPressed(int key, int scanCode, int modifiers) {}
+    public void keyPressed(int key, int scanCode, int modifiers) {
+    }
 
     @Override
-    public void keyReleased(int key, int scanCode, int modifiers) {}
+    public void keyReleased(int key, int scanCode, int modifiers) {
+    }
 
     @Override
-    public void charTyped(char c, int modifiers) {}
+    public void charTyped(char c, int modifiers) {
+    }
 
     public boolean toggle() {
         return this.isVisible = !this.isVisible;
@@ -322,15 +326,15 @@ public abstract class Widget implements Input {
     /**
      * Set the tooltip text of the widget
      */
-    protected void setTooltipText(Text text){
+    protected void setTooltipText(Text text) {
         this.tooltipText = text;
     }
 
     public void readFromTag(NbtCompound tag) {
         modId = tag.getString("modId");
         uid = new UID(tag.getString("UID"));
-   //     x = tag.getInt("x");
-   //     y = tag.getInt("y");
+        //     x = tag.getInt("x");
+        //     y = tag.getInt("y");
         anchor = Anchor.valueOf(tag.getString("anchor"));
         offsetX = tag.getInt("offsetX");
         offsetY = tag.getInt("offsetY");
@@ -350,8 +354,8 @@ public abstract class Widget implements Input {
         tag.putString("UID", uid.getUniqueID());
         tag.putBoolean("isDraggable", isDraggable);
         tag.putBoolean("shouldScale", shouldScale);
-    //    tag.putInt("x", x);
-   //     tag.putInt("y", y);
+        //    tag.putInt("x", x);
+        //     tag.putInt("y", y);
         tag.putString("anchor", anchor.name());
         tag.putInt("offsetX", offsetX);
         tag.putInt("offsetY", offsetY);

@@ -1,7 +1,7 @@
 package com.tanishisherewith.dynamichud.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.tanishisherewith.dynamichud.DynamicHUD;
+import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.animations.MathAnimations;
@@ -19,6 +19,7 @@ import com.tanishisherewith.dynamichud.widget.WidgetData;
 import com.twelvemonkeys.lang.Validate;
 import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
@@ -28,15 +29,13 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.render.*;
-
 /**
  * Graph widget to draw a simple but detailed graph.
  * You need to use DynamicValueRegistry to pass a value to the graph.
  * You can use null values to signify the graph should update with a new value yet.
  */
-public class GraphWidget extends DynamicValueWidget implements ContextMenuProvider{
-    public static WidgetData<GraphWidget> DATA = new WidgetData<>("GraphWidget","Show graph",GraphWidget::new);
+public class GraphWidget extends DynamicValueWidget implements ContextMenuProvider {
+    public static WidgetData<GraphWidget> DATA = new WidgetData<>("GraphWidget", "Show graph", GraphWidget::new);
 
     private ContextMenu<?> menu;
     private final float[] dataPoints;
@@ -56,7 +55,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     private boolean autoUpdateRange = false;
 
     public GraphWidget(String registryID, String registryKey, String modId, Anchor anchor, float width, float height, int maxDataPoints, float minValue, float maxValue, Color graphColor, Color backgroundColor, float lineThickness, boolean showGrid, int gridLines, String label) {
-        super(DATA, modId, anchor,registryID, registryKey);
+        super(DATA, modId, anchor, registryID, registryKey);
         Validate.isTrue(maxDataPoints > 2, "MaxDataPoints should be more than 2.");
         this.dataPoints = new float[maxDataPoints];
         this.width = width;
@@ -76,8 +75,8 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         ContextMenuManager.getInstance().registerProvider(this);
     }
 
-    public GraphWidget(){
-        this(DynamicValueRegistry.GLOBAL_ID,"unknown","unknown",Anchor.CENTER,0,0,10,0,10,Color.RED,Color.GREEN,0,false,0,"empty");
+    public GraphWidget() {
+        this(DynamicValueRegistry.GLOBAL_ID, "unknown", "unknown", Anchor.CENTER, 0, 0, 10, 0, 10, Color.RED, Color.GREEN, 0, false, 0, "empty");
     }
 
     @Override
@@ -89,14 +88,14 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     }
 
     /// Automatically update the min and max of the graph
-    public GraphWidget autoUpdateRange(){
+    public GraphWidget autoUpdateRange() {
         this.autoUpdateRange = true;
         return this;
     }
 
     public void addDataPoint(Float value) {
-        if(value == null) return;
-        if(autoUpdateRange) {
+        if (value == null) return;
+        if (autoUpdateRange) {
             if (getMaxValue() < value) {
                 setMaxValue(value + 10);
                 float diff = getMaxValue() - getPrevMaxValue();
@@ -200,19 +199,19 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     public void renderWidget(DrawContext context, int mouseX, int mouseY) {
         Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
 
-        if(valueSupplier != null){
+        if (valueSupplier != null) {
             addDataPoint(getValue());
         }
 
         // Apply pulse1 animation to background alpha
-        float animatedAlpha = MathHelper.clamp(MathAnimations.pulse1(backgroundColor.getAlpha() / 255.0f, 0.2f, 0.001f),0f,1.0f);
+        float animatedAlpha = MathHelper.clamp(MathAnimations.pulse1(backgroundColor.getAlpha() / 255.0f, 0.2f, 0.001f), 0f, 1.0f);
         Color animatedBackgroundColor = ColorHelper.changeAlpha(backgroundColor, (int) (animatedAlpha * 255));
         Color gradientColor = ColorHelper.changeAlpha(backgroundColor, (int) (animatedAlpha * 255 * 0.7f));
 
-        DrawHelper.enableScissor(x - 50, y, (int) width + 2 + 50, (int) height + 2);
+        DrawHelper.enableScissor(widgetBox);
 
         // Draw gradient background with rounded corners
-        if(!isInEditor) {
+        if (!isInEditor) {
             DrawHelper.drawRoundedGradientRectangle(
                     matrix,
                     animatedBackgroundColor,
@@ -230,7 +229,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
             float valueStep = (maxValue - minValue) / (gridLines + 1);
 
             //TODO: The scale is too small for grid lines for than 21 (20 is the barely visible threshold)
-            float scale = (float) MathHelper.clamp((stepY/9.5),0.0f,1.0f);
+            float scale = (float) MathHelper.clamp((stepY / 9.5), 0.0f, 1.0f);
 
             for (int i = 1; i <= gridLines; i++) {
                 float yPos = y + stepY * i;
@@ -242,7 +241,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
                 //Scale the text to its proper position and size with grid lines
                 DrawHelper.scaleAndPosition(context.getMatrices(), x - 2, yPos, scale);
-                context.drawText(mc.textRenderer, valueText, x - mc.textRenderer.getWidth(valueText), (int) (yPos - (mc.textRenderer.fontHeight * scale)/2.0f), 0xFFFFFFFF, true);
+                context.drawText(mc.textRenderer, valueText, x - mc.textRenderer.getWidth(valueText), (int) (yPos - (mc.textRenderer.fontHeight * scale) / 2.0f), 0xFFFFFFFF, true);
                 DrawHelper.stopScaling(context.getMatrices());
             }
 
@@ -260,7 +259,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         // Draw shadow effect under the graph
         drawGradientShadow(
                 matrix, points, y + height,
-                ColorHelper.changeAlpha(graphColor,50).getRGB(),
+                ColorHelper.changeAlpha(graphColor, 50).getRGB(),
                 0x00000000
         );
 
@@ -283,15 +282,15 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
          */
 
-        DrawHelper.scaleAndPosition(context.getMatrices(),x - 5,y + height,0.5f);
+        DrawHelper.scaleAndPosition(context.getMatrices(), x - 5, y + height, 0.5f);
         String formattedMinVal = formatValue(minValue);
         context.drawText(mc.textRenderer, formattedMinVal, x - mc.textRenderer.getWidth(formattedMinVal), (int) (y + height - 4), 0xFFFFFFFF, true);
         DrawHelper.stopScaling(context.getMatrices());
 
-        this.widgetBox.setSizeAndPositionNoScale(x,y,width,height);
+        this.widgetBox.setDimensions(x, y, width, height,shouldScale, GlobalConfig.get().getScale());
         DrawHelper.disableScissor();
 
-        if(menu != null) menu.set(getX(), getY(), (int) Math.ceil(getHeight()));
+        if (menu != null) menu.set(getX(), getY(), (int) Math.ceil(getHeight()));
     }
 
     // format large values (like: 1000 -> 1K, 1000000 -> 1M)
@@ -307,13 +306,13 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        menu.toggleDisplay(widgetBox,mouseX,mouseY,button);
+        menu.toggleDisplay(widgetBox, mouseX, mouseY, button);
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     public void createMenu() {
         ContextMenuProperties properties = ContextMenuProperties.builder().build();
-        menu = new ContextMenu<>(getX(), (int) (getY() + height), properties);
+        menu = new ContextMenu<>(getX(), (int) (getY() + widgetBox.getHeight()), properties);
 
         menu.addOption(new BooleanOption(Text.of("Show Grid"),
                 () -> this.showGrid, value -> this.showGrid = value,
@@ -323,7 +322,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         menu.addOption(new DoubleOption(Text.of("Number of Grid Lines"),
                 1, 25, 1,
                 () -> (double) this.gridLines, value -> this.gridLines = value.intValue(), menu)
-                .renderWhen(()-> this.showGrid)
+                .renderWhen(() -> this.showGrid)
         );
         menu.addOption(new ColorOption(Text.of("Graph Line Color"),
                 () -> this.graphColor, value -> this.graphColor = value, menu)
@@ -499,7 +498,8 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         private int gridLines = 4;
         private String label = "Graph";
 
-        public GraphWidgetBuilder() {}
+        public GraphWidgetBuilder() {
+        }
 
         public GraphWidgetBuilder label(String label) {
             this.label = label;
@@ -568,7 +568,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
         @Override
         public GraphWidget build() {
-            GraphWidget widget = new GraphWidget(registryID,registryKey,modID, anchor, width, height, maxDataPoints, minValue, maxValue, graphColor, backgroundColor, lineThickness, showGrid, gridLines, label);
+            GraphWidget widget = new GraphWidget(registryID, registryKey, modID, anchor, width, height, maxDataPoints, minValue, maxValue, graphColor, backgroundColor, lineThickness, showGrid, gridLines, label);
             widget.setPosition(x, y);
             widget.setDraggable(isDraggable);
             widget.setShouldScale(shouldScale);

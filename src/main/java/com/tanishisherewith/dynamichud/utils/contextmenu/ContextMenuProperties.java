@@ -23,7 +23,8 @@ public class ContextMenuProperties {
     protected boolean enableAnimations = true;
     protected Skin skin = new ClassicSkin();
 
-    protected ContextMenuProperties() {}
+    protected ContextMenuProperties() {
+    }
 
     public static Builder<?> builder() {
         return new Builder<>(new ContextMenuProperties());
@@ -93,6 +94,7 @@ public class ContextMenuProperties {
     public ContextMenuProperties clone() {
         return cloneToBuilder().build();
     }
+
     public Builder<?> cloneToBuilder() {
         return ContextMenuProperties.builder()
                 .backgroundColor(backgroundColor)
@@ -108,10 +110,11 @@ public class ContextMenuProperties {
                 .hoverColor(hoverColor)
                 .enableAnimations(enableAnimations);
     }
+
     public ContextMenuProperties cloneWithSkin() {
-            return this.cloneToBuilder()
-                    .skin(skin)
-                    .build();
+        return this.cloneToBuilder()
+                .skin(skin)
+                .build();
     }
 
     public static class Builder<T extends ContextMenuProperties> {

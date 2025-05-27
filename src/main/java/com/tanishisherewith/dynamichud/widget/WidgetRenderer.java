@@ -6,6 +6,7 @@ import com.tanishisherewith.dynamichud.internal.System;
 import com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.utils.Input;
 import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.ContextMenuScreenRegistry;
+import dev.isxander.yacl3.gui.YACLScreen;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -32,7 +33,7 @@ public class WidgetRenderer implements Input {
     public WidgetRenderer(List<Widget> widgets) {
         this.widgets = widgets;
         // Render in GameMenuScreen
-        this.allowedScreens = screen -> screen.getClass() == GameMenuScreen.class ||
+        this.allowedScreens = screen -> screen.getClass() == GameMenuScreen.class || screen instanceof YACLScreen ||
                 System.getInstances(ContextMenuScreenRegistry.class, DynamicHUD.MOD_ID).stream().anyMatch(registry -> registry.screenKlass == screen.getClass());
     }
 
@@ -43,7 +44,8 @@ public class WidgetRenderer implements Input {
     public void addWidget(Widget widget) {
         this.widgets.add(widget);
     }
-    public void removeWidget(Widget widget){
+
+    public void removeWidget(Widget widget) {
         this.widgets.remove(widget);
     }
 
@@ -56,7 +58,7 @@ public class WidgetRenderer implements Input {
      * Use this when you want to simply add more screens
      */
     public void addScreen(Class<? extends Screen> screen) {
-       this.allowedScreens = allowedScreens.or(screen1 -> screen1.getClass() == screen);
+        this.allowedScreens = allowedScreens.or(screen1 -> screen1.getClass() == screen);
     }
 
     /**
@@ -82,8 +84,8 @@ public class WidgetRenderer implements Input {
         this.renderInGameHud = renderInGameHud;
     }
 
-    private boolean renderInDebugScreen(){
-        if(GlobalConfig.get().renderInDebugScreen()){
+    private boolean renderInDebugScreen() {
+        if (GlobalConfig.get().renderInDebugScreen()) {
             return true;
         }
         return !DynamicHUD.MC.getDebugHud().shouldShowDebugHud();
@@ -95,7 +97,7 @@ public class WidgetRenderer implements Input {
         Screen currentScreen = DynamicHUD.MC.currentScreen;
 
         context.getMatrices().push();
-        context.getMatrices().translate(0,0, Z_Index);
+        context.getMatrices().translate(0, 0, Z_Index);
 
         //Render in editing screen
         if (currentScreen instanceof AbstractMoveableScreen) {
@@ -149,7 +151,8 @@ public class WidgetRenderer implements Input {
     }
 
     @Override
-    public void charTyped(char c, int modifiers) {}
+    public void charTyped(char c, int modifiers) {
+    }
 
     public void onCloseScreen() {
         if (DynamicHUD.MC.currentScreen instanceof AbstractMoveableScreen) {
@@ -221,9 +224,8 @@ public class WidgetRenderer implements Input {
         }
     }
 
-    public WidgetRenderer withZIndex(int z_Index){
+    public WidgetRenderer withZIndex(int z_Index) {
         this.Z_Index = z_Index;
         return this;
     }
-
 }

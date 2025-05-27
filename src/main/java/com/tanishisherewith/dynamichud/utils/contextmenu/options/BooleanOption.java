@@ -13,7 +13,7 @@ public class BooleanOption extends Option<Boolean> {
     private final BooleanType booleanType;
 
     public BooleanOption(Text name, Supplier<Boolean> getter, Consumer<Boolean> setter, BooleanType booleanType) {
-        super(name,getter, setter);
+        super(name, getter, setter);
         this.booleanType = booleanType;
         this.renderer.init(this);
     }

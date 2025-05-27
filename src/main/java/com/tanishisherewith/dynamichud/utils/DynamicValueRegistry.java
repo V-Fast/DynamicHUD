@@ -2,7 +2,9 @@ package com.tanishisherewith.dynamichud.utils;
 
 import com.tanishisherewith.dynamichud.internal.System;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -12,7 +14,7 @@ import java.util.function.Supplier;
  * To use a local registry, simple create an object of the class.
  * <pre>
  *     {@code
- *     DynamicValueRegistry dvr = new DynamicValueRegistry("mod_id");
+ *     DynamicValueRegistry dvr = new DynamicValueRegistry("mod_id", "my_registry_id");
  *     dvr.registerLocal("ABC",//YourSupplier);
  *     Supplier<?> result = dvr.get("ABC");
  *     }
@@ -29,7 +31,8 @@ public class DynamicValueRegistry {
 
     /**
      * Constructor for a local registry with a unique ID.
-     * @param modId The mod ID or unique identifier for grouping registries.
+     *
+     * @param modId      The mod ID or unique identifier for grouping registries.
      * @param registryId A unique ID for this registry instance.
      */
     public DynamicValueRegistry(String modId, String registryId) {
@@ -37,8 +40,10 @@ public class DynamicValueRegistry {
         System.registerInstance(this, modId);
         REGISTRY_BY_ID.put(this.id, this);
     }
+
     /**
      * Constructor for a local registry using with registryId as modID.
+     *
      * @param modId The mod ID or unique identifier for grouping registries.
      */
     public DynamicValueRegistry(String modId) {
@@ -49,7 +54,8 @@ public class DynamicValueRegistry {
 
     /**
      * Registers a supplier in the global registry.
-     * @param key The key for the supplier.
+     *
+     * @param key      The key for the supplier.
      * @param supplier The supplier providing values of type T.
      */
     public static <T> void registerGlobal(String key, Supplier<T> supplier) {
@@ -58,6 +64,7 @@ public class DynamicValueRegistry {
 
     /**
      * Retrieves a supplier from the global registry.
+     *
      * @param key The key of the supplier.
      * @return The supplier, or null if not found.
      */
@@ -67,7 +74,8 @@ public class DynamicValueRegistry {
 
     /**
      * Registers a supplier in the local registry.
-     * @param key The key for the supplier.
+     *
+     * @param key      The key for the supplier.
      * @param supplier The supplier providing values of type T.
      */
     public void registerLocal(String key, Supplier<?> supplier) {
@@ -76,6 +84,7 @@ public class DynamicValueRegistry {
 
     /**
      * Retrieves a supplier from the local or global registry.
+     *
      * @param key The key of the supplier.
      * @return The supplier, or null if not found.
      */
@@ -85,6 +94,7 @@ public class DynamicValueRegistry {
 
     /**
      * Gets the registry instance by its unique ID.
+     *
      * @param registryId The unique ID of the registry.
      * @return The registry instance, or null if not found.
      */
@@ -94,12 +104,13 @@ public class DynamicValueRegistry {
 
     /**
      * Gets the registry instance by its unique ID but throws an error if the instance is not present
+     *
      * @param registryId The unique ID of the registry.
      * @return The registry instance, or null if not found.
      * @throws IllegalStateException If a registry for the id was not found
      */
     public static DynamicValueRegistry getByIdSafe(String registryId) {
-        if(!REGISTRY_BY_ID.containsKey(registryId)){
+        if (!REGISTRY_BY_ID.containsKey(registryId)) {
             throw new IllegalStateException("DynamicValueRegistry for id: " + registryId + " not found");
         }
         return REGISTRY_BY_ID.get(registryId);
@@ -109,20 +120,21 @@ public class DynamicValueRegistry {
      * @param registryID the registry id
      * @return whether the given id matches the global registry id or not
      */
-    public static boolean isGlobal(String registryID){
+    public static boolean isGlobal(String registryID) {
         return registryID.equals(GLOBAL_ID);
     }
 
     /**
      * Directly get the supplier for a given key and registry id
+     *
      * @param registryID The registry ID
-     * @param key the registry key
+     * @param key        the registry key
      * @return supplier as returned by the registry with the given key
      */
-    public static Supplier<?> getValue(String registryID, String key){
-        if(registryID.isEmpty() || key.isEmpty()) throw new IllegalArgumentException();
+    public static Supplier<?> getValue(String registryID, String key) {
+        if (registryID.isEmpty() || key.isEmpty()) throw new IllegalArgumentException();
 
-        if(registryID.equals(GLOBAL_ID)){
+        if (registryID.equals(GLOBAL_ID)) {
             return getGlobal(key);
         }
         return getByIdSafe(registryID).get(key);
@@ -130,6 +142,7 @@ public class DynamicValueRegistry {
 
     /**
      * Retrieves all registry instances for a mod ID.
+     *
      * @param modId The mod ID.
      * @return A list of registries for the mod.
      */
@@ -139,6 +152,7 @@ public class DynamicValueRegistry {
 
     /**
      * Removes a supplier from the global registry.
+     *
      * @param key The key of the supplier.
      */
     public static void removeGlobal(String key) {
@@ -147,6 +161,7 @@ public class DynamicValueRegistry {
 
     /**
      * Removes a supplier from the local registry.
+     *
      * @param key The key of the supplier.
      */
     public void removeLocal(String key) {
@@ -155,6 +170,7 @@ public class DynamicValueRegistry {
 
     /**
      * Gets the unique ID of this registry.
+     *
      * @return The registry ID.
      */
     public String getId() {

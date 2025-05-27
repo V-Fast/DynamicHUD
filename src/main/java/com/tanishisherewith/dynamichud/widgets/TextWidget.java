@@ -7,7 +7,10 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProvider;
-import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
+import com.tanishisherewith.dynamichud.utils.contextmenu.options.BooleanOption;
+import com.tanishisherewith.dynamichud.utils.contextmenu.options.ColorOption;
+import com.tanishisherewith.dynamichud.utils.contextmenu.options.DoubleOption;
+import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.MinecraftSkin;
 import com.tanishisherewith.dynamichud.widget.DynamicValueWidget;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
@@ -31,15 +34,15 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
     private String registryID;
 
     public TextWidget() {
-        this(DynamicValueRegistry.GLOBAL_ID,"unknown", false, false, Color.WHITE, "unknown");
+        this(DynamicValueRegistry.GLOBAL_ID, "unknown", false, false, Color.WHITE, "unknown");
     }
 
     public TextWidget(DynamicValueRegistry valueRegistry, String registryKey, boolean shadow, boolean rainbow, Color color, String modID) {
-        this(valueRegistry.getId(),registryKey,shadow,rainbow,color,modID);
+        this(valueRegistry.getId(), registryKey, shadow, rainbow, color, modID);
     }
 
     public TextWidget(String registryID, String registryKey, boolean shadow, boolean rainbow, Color color, String modID) {
-        super(DATA, modID,registryID,registryKey);
+        super(DATA, modID, registryID, registryKey);
         this.shadow = shadow;
         this.rainbow = rainbow;
         this.textColor = color;
@@ -53,19 +56,19 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
         menu = new ContextMenu<>(getX(), getY(), properties);
 
         menu.addOption(new BooleanOption(Text.of("Shadow"),
-                        () -> this.shadow, value -> this.shadow = value,
-                        BooleanOption.BooleanType.ON_OFF)
+                () -> this.shadow, value -> this.shadow = value,
+                BooleanOption.BooleanType.ON_OFF)
                 .description(Text.of("Adds shadow to your text"))
         );
         menu.addOption(new BooleanOption(Text.of("Rainbow"),
-                        () -> this.rainbow, value -> this.rainbow = value,
-                        BooleanOption.BooleanType.ON_OFF)
+                () -> this.rainbow, value -> this.rainbow = value,
+                BooleanOption.BooleanType.ON_OFF)
                 .description(Text.of("Adds rainbow effect to your text"))
         );
         menu.addOption(new ColorOption(Text.of("Text Color"),
                 () -> this.textColor, value -> this.textColor = value, menu)
                 .description(Text.of("Specify the color you want to add to your text"))
-                .renderWhen(()-> !this.rainbow)
+                .renderWhen(() -> !this.rainbow)
         );
         menu.addOption(new DoubleOption(Text.of("Rainbow Speed"),
                 1, 5.0f, 1,
@@ -120,23 +123,24 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
 
     @Override
     public void renderWidget(DrawContext drawContext, int mouseX, int mouseY) {
-        if(menu == null) return;
+        if (menu == null) return;
         //int color = rainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % (5000 * rainbowSpeed) / (5000f * rainbowSpeed))) : textColor.getRGB();
         int color = textColor.getRGB();
         if (valueSupplier != null) {
             String text = getValue();
-            if(rainbow){
-                DrawHelper.drawChromaText(drawContext,text,getX() + 2, getY() + 2, rainbowSpeed/2f,rainbowSaturation,rainbowBrightness,rainbowSpread,shadow);
+            if (rainbow) {
+                DrawHelper.drawChromaText(drawContext, text, getX() + 2, getY() + 2, rainbowSpeed / 2f, rainbowSaturation, rainbowBrightness, rainbowSpread, shadow);
             } else {
                 drawContext.drawText(mc.textRenderer, text, getX() + 2, getY() + 2, color, shadow);
             }
-            widgetBox.setSizeAndPosition(getX(), getY(), mc.textRenderer.getWidth(text) + 3, mc.textRenderer.fontHeight + 2, this.shouldScale, GlobalConfig.get().getScale());
+            widgetBox.setDimensions(getX(), getY(), mc.textRenderer.getWidth(text) + 3, mc.textRenderer.fontHeight + 2, this.shouldScale, GlobalConfig.get().getScale());
         }
         menu.set(getX(), getY(), (int) Math.ceil(getHeight()));
     }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        menu.toggleDisplay(widgetBox,mouseX,mouseY,button);
+        menu.toggleDisplay(widgetBox, mouseX, mouseY, button);
         return super.mouseClicked(mouseX, mouseY, button);
     }
 

@@ -9,16 +9,20 @@ public class Easing {
             case EASE_IN_OUT_SINE -> (float) (-(Math.cos(Math.PI * progress) - 1) / 2);
             case EASE_IN_QUAD -> progress * progress;
             case EASE_OUT_QUAD -> 1 - (1 - progress) * (1 - progress);
-            case EASE_IN_OUT_QUAD -> progress < 0.5 ? 2 * progress * progress : (float) (1 - Math.pow(-2 * progress + 2, 2) / 2);
+            case EASE_IN_OUT_QUAD ->
+                    progress < 0.5 ? 2 * progress * progress : (float) (1 - Math.pow(-2 * progress + 2, 2) / 2);
             case EASE_IN_CUBIC -> progress * progress * progress;
             case EASE_OUT_CUBIC -> (float) (1 - Math.pow(1 - progress, 3));
-            case EASE_IN_OUT_CUBIC -> progress < 0.5 ? 4 * progress * progress * progress : (float) (1 - Math.pow(-2 * progress + 2, 3) / 2);
+            case EASE_IN_OUT_CUBIC ->
+                    progress < 0.5 ? 4 * progress * progress * progress : (float) (1 - Math.pow(-2 * progress + 2, 3) / 2);
             case EASE_IN_QUART -> progress * progress * progress * progress;
             case EASE_OUT_QUART -> (float) (1 - Math.pow(1 - progress, 4));
-            case EASE_IN_OUT_QUART -> progress < 0.5 ? 8 * progress * progress * progress * progress : (float) (1 - Math.pow(-2 * progress + 2, 4) / 2);
+            case EASE_IN_OUT_QUART ->
+                    progress < 0.5 ? 8 * progress * progress * progress * progress : (float) (1 - Math.pow(-2 * progress + 2, 4) / 2);
             case EASE_IN_QUINT -> progress * progress * progress * progress * progress;
             case EASE_OUT_QUINT -> (float) (1 - Math.pow(1 - progress, 5));
-            case EASE_IN_OUT_QUINT -> progress < 0.5 ? 16 * progress * progress * progress * progress * progress : (float) (1 - Math.pow(-2 * progress + 2, 5) / 2);
+            case EASE_IN_OUT_QUINT ->
+                    progress < 0.5 ? 16 * progress * progress * progress * progress * progress : (float) (1 - Math.pow(-2 * progress + 2, 5) / 2);
             case EASE_IN_EXPO -> (float) (progress == 0 ? 0 : Math.pow(2, 10 * progress - 10));
             case EASE_OUT_EXPO -> (float) (progress == 1 ? 1 : 1 - Math.pow(2, -10 * progress));
             case EASE_IN_OUT_EXPO -> {

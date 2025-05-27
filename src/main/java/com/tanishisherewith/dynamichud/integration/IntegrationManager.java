@@ -55,7 +55,7 @@ public final class IntegrationManager {
         }
     }
 
-    private static void checkToEnableTestIntegration(){
+    private static void checkToEnableTestIntegration() {
         String[] args = FabricLoader.getInstance().getLaunchArguments(true);
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("--dynamicHudTest") && i + 1 < args.length) {
@@ -65,7 +65,7 @@ public final class IntegrationManager {
         }
     }
 
-    public static void integrate(){
+    public static void integrate() {
         checkToEnableTestIntegration();
 
         printInfo("Integrating mods...");
@@ -103,7 +103,7 @@ public final class IntegrationManager {
 
                 DynamicHudConfigurator configurator = DHIntegration.configure(new DynamicHudConfigurator());
 
-                if(configurator.markAsUtility) {
+                if (configurator.markAsUtility) {
                     printInfo(String.format("Supported utility mod with id %s was found!", modId));
                     continue;
                 }
@@ -155,13 +155,13 @@ public final class IntegrationManager {
 
 
         // Sheesh
-        if(!bad_implementations.isEmpty()){
+        if (!bad_implementations.isEmpty()) {
             BooleanPool.put("WarningScreenFlag", false);
 
-            ClientTickEvents.START_CLIENT_TICK.register((client)->{
-                if(BooleanPool.get("WarningScreenFlag")) return;
+            ClientTickEvents.START_CLIENT_TICK.register((client) -> {
+                if (BooleanPool.get("WarningScreenFlag")) return;
 
-                if(DynamicHUD.MC.currentScreen instanceof TitleScreen) {
+                if (DynamicHUD.MC.currentScreen instanceof TitleScreen) {
                     DynamicHUD.MC.setScreen(new WarningScreen(bad_implementations));
                     BooleanPool.put("WarningScreenFlag", true);
                 }

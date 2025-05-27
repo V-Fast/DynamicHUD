@@ -13,8 +13,8 @@ public class ColorOption extends Option<Color> {
     private ContextMenu<?> parentMenu = null;
     private ColorGradient colorGradient = null;
 
-    public ColorOption(Text name, Supplier<Color> getter, Consumer<Color> setter,ContextMenu<?> parentMenu) {
-        super(name,getter, setter);
+    public ColorOption(Text name, Supplier<Color> getter, Consumer<Color> setter, ContextMenu<?> parentMenu) {
+        super(name, getter, setter);
         this.parentMenu = parentMenu;
         this.colorGradient = new ColorGradient(x + this.parentMenu.getWidth(), y - 10, get(), this::set, 50, 100);
         this.renderer.init(this);

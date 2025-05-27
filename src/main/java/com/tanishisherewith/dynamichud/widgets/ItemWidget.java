@@ -27,7 +27,7 @@ public class ItemWidget extends Widget {
     @Override
     public void renderWidget(DrawContext context, int mouseX, int mouseY) {
         context.drawItem(item, x, y);
-        widgetBox.setSizeAndPosition(getX(), getY(), 16, 16, this.shouldScale, GlobalConfig.get().getScale());
+        widgetBox.setDimensions(getX(), getY(), 16, 16, this.shouldScale, GlobalConfig.get().getScale());
     }
 
     @Override

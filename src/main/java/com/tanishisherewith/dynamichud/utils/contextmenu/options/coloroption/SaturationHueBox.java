@@ -61,10 +61,10 @@ public class SaturationHueBox {
                 this.isDragging = true;
             } else if (mouseX >= x && mouseX <= x + size && mouseY >= y && mouseY <= y + size) {
                 this.saturation = (float) (mouseX - x) / size;
-                this.value= 1.0f - (float) (mouseY - y) / size;
+                this.value = 1.0f - (float) (mouseY - y) / size;
 
-                this.saturation = Math.clamp(saturation,0.0f,1.0f);
-                this.value = Math.clamp(value,0.0f,1.0f);
+                this.saturation = Math.clamp(saturation, 0.0f, 1.0f);
+                this.value = Math.clamp(value, 0.0f, 1.0f);
                 this.isDragging = true;
             }
         }
@@ -83,10 +83,10 @@ public class SaturationHueBox {
     public void onDrag(double mouseX, double mouseY, int button) {
         if (isDragging) {
             this.saturation = (float) (mouseX - x) / size;
-            this.value= 1.0f - (float) (mouseY - y) / size;
+            this.value = 1.0f - (float) (mouseY - y) / size;
 
-            this.saturation = Math.clamp(saturation,0.0f,1.0f);
-            this.value = Math.clamp(value,0.0f,1.0f);
+            this.saturation = Math.clamp(saturation, 0.0f, 1.0f);
+            this.value = Math.clamp(value, 0.0f, 1.0f);
         }
     }
 

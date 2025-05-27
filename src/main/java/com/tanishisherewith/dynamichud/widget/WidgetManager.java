@@ -2,7 +2,6 @@ package com.tanishisherewith.dynamichud.widget;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.mixins.ScreenMixin;
-import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIo;
@@ -180,6 +179,7 @@ public class WidgetManager {
      */
     public static List<Widget> loadWidgets(File file) throws IOException {
         if (!file.exists()) {
+            // The backup file check is done in the doesWidgetFileExist() function below this
             DynamicHUD.logger.warn("Main file {} was not found... Loading from a found backup file", file.getAbsolutePath());
             file = new File(file.getAbsolutePath() + ".backup");
         }
@@ -199,8 +199,8 @@ public class WidgetManager {
         for (int i = 0; i < widgetList.size(); i++) {
             NbtCompound widgetTag = widgetList.getCompound(i);
             WidgetData<?> widgetData = widgetDataMap.get(widgetTag.getString("name"));
-            if(widgetData == null){
-                throw new IllegalStateException("Widget Data for: " + widgetTag.getString("name") +" could not be found");
+            if (widgetData == null) {
+                throw new IllegalStateException("A Widget named '" + widgetTag.getString("name") + "' was found in the save file, but no matching WidgetData for its class could be located. This may indicate that the mod responsible for saving this widget has been removed or its implementation is incorrect.");
             }
             Widget widget = widgetData.createWidget();
             widget.readFromTag(widgetTag);
@@ -211,6 +211,9 @@ public class WidgetManager {
         return widgetsToAdd;
     }
 
+    /**
+     * Checks if the given file exists, or if a backup file exists.
+     */
     public static boolean doesWidgetFileExist(File file) {
         return file.exists() || new File(file.getAbsolutePath() + ".backup").exists();
     }

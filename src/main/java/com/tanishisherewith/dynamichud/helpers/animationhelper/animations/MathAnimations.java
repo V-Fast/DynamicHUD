@@ -83,12 +83,13 @@ public class MathAnimations {
 
     // Linear interpolation between values over time
     public static float lerp(float start, float end, long startTime, float duration) {
-       return lerp(start,end,startTime,duration,EasingType.LINEAR);
+        return lerp(start, end, startTime, duration, EasingType.LINEAR);
     }
+
     public static float lerp(float start, float end, long startTime, float duration, EasingType easing) {
         float progress = (System.currentTimeMillis() - startTime) / duration;
         progress = Math.min(1, Math.max(0, progress)); // Clamp 0-1
-        return start + (end - start) * Easing.apply(easing,progress);
+        return start + (end - start) * Easing.apply(easing, progress);
     }
 
     // Bouncing animation using quadratic ease-out

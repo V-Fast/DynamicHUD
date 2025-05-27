@@ -7,7 +7,6 @@ import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widgets.GraphWidget;
 import com.tanishisherewith.dynamichud.widgets.TextWidget;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.text.Text;
 
@@ -100,7 +99,8 @@ public class IntegrationTest implements DynamicHudIntegration {
                     //renderer.shouldRenderInGameHud(true);
                     renderer.addScreen(TitleScreen.class);
                 })
-                .withMoveableScreen(config -> new AbstractMoveableScreen(Text.literal("Editor Screen"), config.getRenderer()) {});
+                .withMoveableScreen(config -> new AbstractMoveableScreen(Text.literal("Editor Screen"), config.getRenderer()) {}
+                );
 
         return configurator;
     }

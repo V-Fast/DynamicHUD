@@ -21,7 +21,6 @@
     "dynamicHud": [
       "com.tanishisherewith.dynamichud.integration.DefaultIntegrationImpl"
     ],
-
     "client": [
       "com.tanishisherewith.dynamichud.DynamicHUD"
     ]
@@ -37,7 +36,9 @@
   },
   "custom": {
     "modmenu": {
-      "badges": ["library"]
+      "badges": [
+        "library"
+      ]
     }
   },
   "suggests": {

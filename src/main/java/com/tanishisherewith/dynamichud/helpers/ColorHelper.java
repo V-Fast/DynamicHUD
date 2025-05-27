@@ -5,11 +5,9 @@ import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL30;
 
 import java.awt.*;
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
 /**

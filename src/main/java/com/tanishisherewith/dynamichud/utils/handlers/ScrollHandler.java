@@ -19,7 +19,7 @@ public class ScrollHandler {
     }
 
     public void updateScrollOffset(int maxYOffset) {
-        if(maxYOffset < 0) maxYOffset = 0;
+        if (maxYOffset < 0) maxYOffset = 0;
 
         this.maxScrollOffset = maxYOffset;
         applyMomentum();
@@ -40,7 +40,7 @@ public class ScrollHandler {
         isDragging = false;
     }
 
-    public void addOffset(int offset){
+    public void addOffset(int offset) {
         this.scrollOffset = MathHelper.clamp(scrollOffset + offset, 0, maxScrollOffset);
     }
 
@@ -50,7 +50,7 @@ public class ScrollHandler {
             double deltaY = lastMouseY - mouseY;
 
             // Update the scroll offset based on the mouse movement
-            scrollOffset = MathHelper.clamp(scrollOffset - (int)(deltaY * SCROLL_SPEED), 0, maxScrollOffset);
+            scrollOffset = MathHelper.clamp(scrollOffset - (int) (deltaY * SCROLL_SPEED), 0, maxScrollOffset);
 
             // Update the last mouse position
             lastMouseY = mouseY;
@@ -68,7 +68,8 @@ public class ScrollHandler {
     public int getScrollOffset() {
         return Math.max(scrollOffset, 0);
     }
-    public boolean isOffsetWithinBounds(int offset){
+
+    public boolean isOffsetWithinBounds(int offset) {
         return scrollOffset + offset >= 0 && scrollOffset + offset <= maxScrollOffset;
     }
 

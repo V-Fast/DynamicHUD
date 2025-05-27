@@ -3,8 +3,8 @@ package com.tanishisherewith.dynamichud.helpers;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.systems.VertexSorter;
 import com.tanishisherewith.dynamichud.DynamicHUD;
+import com.tanishisherewith.dynamichud.widget.WidgetBox;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
@@ -15,6 +15,7 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL40;
 import org.lwjgl.opengl.GL40C;
 
 import java.awt.*;
@@ -26,7 +27,7 @@ import static com.tanishisherewith.dynamichud.helpers.TextureHelper.mc;
  * Credits: <a href="https://github.com/HeliosMinecraft/HeliosClient/blob/main/src/main/java/dev/heliosclient/util/render/Renderer2D.java">HeliosClient</a>
  */
 public class DrawHelper {
-    public static ProjectionType  projectionType;
+    public static ProjectionType projectionType;
 
     /**
      * Draws a singular gradient rectangle  on screen with the given parameters
@@ -92,8 +93,13 @@ public class DrawHelper {
     }
 
     public static void enableScissor(int x, int y, int width, int height) {
-      enableScissor(x,y,width,height,mc.getWindow().getScaleFactor());
+        enableScissor(x, y, width, height, mc.getWindow().getScaleFactor());
     }
+
+    public static void enableScissor(WidgetBox box) {
+        enableScissor((int) box.x, (int) box.y, (int) box.getWidth(), (int) box.getHeight(), mc.getWindow().getScaleFactor());
+    }
+
     public static void enableScissor(int x, int y, int width, int height, double scaleFactor) {
         int scissorX = (int) (x * scaleFactor);
         int scissorY = (int) (DynamicHUD.MC.getWindow().getHeight() - ((y + height) * scaleFactor));
@@ -253,15 +259,16 @@ public class DrawHelper {
 
     /**
      * Draw chroma text (text with a nice rainbow effect)
+     *
      * @param drawContext A drawContext object
-     * @param text The text to display
-     * @param x X pos of text
-     * @param y Y pos of text
-     * @param speed Speed of rainbow
-     * @param saturation Saturation of the rainbow colors
-     * @param brightness Brightness of the rainbow colors
-     * @param spread How much the color difference should be between each character (ideally between 0.001 to 0.2)
-     * @param shadow Whether to render the text as shadow.
+     * @param text        The text to display
+     * @param x           X pos of text
+     * @param y           Y pos of text
+     * @param speed       Speed of rainbow
+     * @param saturation  Saturation of the rainbow colors
+     * @param brightness  Brightness of the rainbow colors
+     * @param spread      How much the color difference should be between each character (ideally between 0.001 to 0.2)
+     * @param shadow      Whether to render the text as shadow.
      */
     public static void drawChromaText(@NotNull DrawContext drawContext, String text, int x, int y, float speed, float saturation, float brightness, float spread, boolean shadow) {
         long time = System.currentTimeMillis();
@@ -843,7 +850,7 @@ public class DrawHelper {
 
     public static void customScaledProjection(float scale) {
         projectionType = RenderSystem.getProjectionType();
-        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getFramebufferWidth() / scale, mc.getWindow().getFramebufferHeight() / scale, 0, 1000, 21000),  ProjectionType.ORTHOGRAPHIC);
+        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getFramebufferWidth() / scale, mc.getWindow().getFramebufferHeight() / scale, 0, 1000, 21000), ProjectionType.ORTHOGRAPHIC);
     }
 
     /**
@@ -903,11 +910,11 @@ public class DrawHelper {
         if (i > k) {
             l = i - k;
             double d = (double) Util.getMeasuringTimeMs() / 1000.0;
-            double e = Math.max((double)l * 0.5, 3.0);
+            double e = Math.max((double) l * 0.5, 3.0);
             double f = Math.sin(1.5707963267948966 * Math.cos(6.283185307179586 * d / e)) / 2.0 + 0.5;
-            double g = MathHelper.lerp(f, 0.0, (double)l);
+            double g = MathHelper.lerp(f, 0.0, l);
             context.enableScissor(startX, startY, endX, endY);
-            context.drawTextWithShadow(textRenderer, text, startX - (int)g, j, color);
+            context.drawTextWithShadow(textRenderer, text, startX - (int) g, j, color);
             context.disableScissor();
         } else {
             l = MathHelper.clamp(centerX, startX + i / 2, endX - i / 2);

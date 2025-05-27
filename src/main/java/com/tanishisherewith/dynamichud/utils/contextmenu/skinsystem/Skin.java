@@ -24,7 +24,8 @@ public abstract class Skin {
         this.contextMenu = menu;
     }
 
-    public Skin() {}
+    public Skin() {
+    }
 
     public <T extends Option<?>> void addRenderer(Class<T> optionClass, Supplier<SkinRenderer<?>> renderer) {
         renderers.put(optionClass, renderer);
@@ -67,7 +68,7 @@ public abstract class Skin {
         return flattened;
     }
 
-    protected List<Option<?>> getOptions(ContextMenu<?> menu){
+    protected List<Option<?>> getOptions(ContextMenu<?> menu) {
         return supportsGroups() ? menu.getOptions() : flattenOptions(menu.getOptions());
     }
 

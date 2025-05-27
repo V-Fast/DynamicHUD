@@ -6,6 +6,7 @@ import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -38,7 +39,7 @@ public final class GlobalConfig {
     private boolean renderInDebugScreen = false;
 
     @SerialEntry
-    private boolean forceSameContextMenuSkin = true;
+    private final boolean forceSameContextMenuSkin = true;
 
     //These package names are getting seriously long
     @SerialEntry
@@ -97,31 +98,31 @@ public final class GlobalConfig {
                                         .controller(integerOption -> IntegerFieldControllerBuilder.create(integerOption).range(10, 500))
                                         .build())
                                 .build())
-                                .option(Option.<Color>createBuilder()
-                                        .name(Text.literal("Widget HUD Active Background Color"))
-                                        .description(OptionDescription.of(Text.literal("Color of the background of the widget when it will be rendered")))
-                                        .binding(new Color(0, 0, 0, 128), () -> this.hudActiveColor, newVal -> this.hudActiveColor = newVal)
-                                        .controller(ColorControllerBuilder::create)
+                        .option(Option.<Color>createBuilder()
+                                .name(Text.literal("Widget HUD Active Background Color"))
+                                .description(OptionDescription.of(Text.literal("Color of the background of the widget when it will be rendered")))
+                                .binding(new Color(0, 0, 0, 128), () -> this.hudActiveColor, newVal -> this.hudActiveColor = newVal)
+                                .controller(ColorControllerBuilder::create)
                                 .build())
-                                .option(Option.<Color>createBuilder()
-                                        .name(Text.literal("Widget HUD Inactive Background Color"))
-                                        .description(OptionDescription.of(Text.literal("Color of the background of the widget when it will NOT be rendered")))
-                                        .binding(new Color(255, 0, 0, 128), () -> this.hudInactiveColor, newVal -> this.hudInactiveColor = newVal)
-                                        .controller(ColorControllerBuilder::create)
+                        .option(Option.<Color>createBuilder()
+                                .name(Text.literal("Widget HUD Inactive Background Color"))
+                                .description(OptionDescription.of(Text.literal("Color of the background of the widget when it will NOT be rendered")))
+                                .binding(new Color(255, 0, 0, 128), () -> this.hudInactiveColor, newVal -> this.hudInactiveColor = newVal)
+                                .controller(ColorControllerBuilder::create)
                                 .build())
-                               .option(Option.<com.tanishisherewith.dynamichud.utils.contextmenu.options.Option.Complexity>createBuilder()
-                                        .name(Text.literal("Settings Complexity"))
-                                        .description(OptionDescription.of(Text.literal("The level of options to display. Options equal to or below this level will be displayed")))
-                                        .binding(com.tanishisherewith.dynamichud.utils.contextmenu.options.Option.Complexity.Simple, () -> this.complexity, newVal -> this.complexity = newVal)
-                                        .controller((option) -> EnumControllerBuilder.create(option)
-                                                        .enumClass(com.tanishisherewith.dynamichud.utils.contextmenu.options.Option.Complexity.class)
-                                                        .formatValue(value -> Text.of(value.name()))
-                                        )
+                        .option(Option.<com.tanishisherewith.dynamichud.utils.contextmenu.options.Option.Complexity>createBuilder()
+                                .name(Text.literal("Settings Complexity"))
+                                .description(OptionDescription.of(Text.literal("The level of options to display. Options equal to or below this level will be displayed")))
+                                .binding(com.tanishisherewith.dynamichud.utils.contextmenu.options.Option.Complexity.Simple, () -> this.complexity, newVal -> this.complexity = newVal)
+                                .controller((option) -> EnumControllerBuilder.create(option)
+                                        .enumClass(com.tanishisherewith.dynamichud.utils.contextmenu.options.Option.Complexity.class)
+                                        .formatValue(value -> Text.of(value.name()))
+                                )
                                 .build())
                         .build())
                 .save(HANDLER::save)
                 .build()
-                .generateScreen(null);
+                .generateScreen(MinecraftClient.getInstance().currentScreen);
     }
 
     public float getScale() {
@@ -152,7 +153,7 @@ public final class GlobalConfig {
         return hudActiveColor;
     }
 
-    public com.tanishisherewith.dynamichud.utils.contextmenu.options.Option.Complexity complexity(){
+    public com.tanishisherewith.dynamichud.utils.contextmenu.options.Option.Complexity complexity() {
         return complexity;
     }
 }

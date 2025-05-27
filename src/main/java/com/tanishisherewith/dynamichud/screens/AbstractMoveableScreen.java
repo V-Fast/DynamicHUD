@@ -33,9 +33,9 @@ public abstract class AbstractMoveableScreen extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        widgetRenderer.mouseDragged(mouseX, mouseY, button,deltaX,deltaY, GlobalConfig.get().getSnapSize());
+        widgetRenderer.mouseDragged(mouseX, mouseY, button, deltaX, deltaY, GlobalConfig.get().getSnapSize());
         ContextMenuManager.getInstance().mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-        return super.mouseDragged(mouseX, mouseY, button,deltaX,deltaY);
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
     @Override
@@ -49,8 +49,8 @@ public abstract class AbstractMoveableScreen extends Screen {
 
     @Override
     public boolean charTyped(char chr, int modifiers) {
-        widgetRenderer.charTyped(chr,modifiers);
-        ContextMenuManager.getInstance().charTyped(chr,modifiers);
+        widgetRenderer.charTyped(chr, modifiers);
+        ContextMenuManager.getInstance().charTyped(chr, modifiers);
         return super.charTyped(chr, modifiers);
     }
 
@@ -65,8 +65,8 @@ public abstract class AbstractMoveableScreen extends Screen {
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         widgetRenderer.keyPressed(keyCode, scanCode, modifiers);
         ContextMenuManager.getInstance().keyPressed(keyCode, scanCode, modifiers);
-        if(widgetRenderer.selectedWidget != null && (keyCode == GLFW.GLFW_KEY_DELETE || keyCode == GLFW.GLFW_KEY_BACKSPACE)){
-     //       trayWidget.minimizeWidget(widgetRenderer.selectedWidget);
+        if (widgetRenderer.selectedWidget != null && (keyCode == GLFW.GLFW_KEY_DELETE || keyCode == GLFW.GLFW_KEY_BACKSPACE)) {
+            //       trayWidget.minimizeWidget(widgetRenderer.selectedWidget);
         }
 
         return super.keyPressed(keyCode, scanCode, modifiers);
@@ -118,7 +118,8 @@ public abstract class AbstractMoveableScreen extends Screen {
         }
     }
 
-    public void handleClickOnWidget(Widget widget, double mouseX, double mouseY, int button) {}
+    public void handleClickOnWidget(Widget widget, double mouseX, double mouseY, int button) {
+    }
 
     @Override
     public void close() {

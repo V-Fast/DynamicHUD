@@ -3,7 +3,6 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
-import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
 import net.minecraft.client.font.TextRenderer;
@@ -172,7 +171,7 @@ public class ClassicSkin extends Skin {
                     1,
                     1);
 
-            option.getColorGradient().render(drawContext, x + option.getParentMenu().getWidth() + 7, y - 10,mouseX,mouseY);
+            option.getColorGradient().render(drawContext, x + option.getParentMenu().getWidth() + 7, y - 10, mouseX, mouseY);
         }
     }
 
@@ -182,7 +181,7 @@ public class ClassicSkin extends Skin {
             option.setHeight(mc.textRenderer.fontHeight + 1);
             option.setWidth(mc.textRenderer.getWidth(option.name + ": " + option.value.name()) + 1);
 
-            drawContext.drawText(mc.textRenderer, option.name.copy().append( ": "), x, y, Color.WHITE.getRGB(), false);
+            drawContext.drawText(mc.textRenderer, option.name.copy().append(": "), x, y, Color.WHITE.getRGB(), false);
             drawContext.drawText(mc.textRenderer, option.value.name(), x + mc.textRenderer.getWidth(option.name + ": ") + 1, y, Color.CYAN.getRGB(), false);
         }
     }
@@ -258,7 +257,7 @@ public class ClassicSkin extends Skin {
             option.setHeight(mc.textRenderer.fontHeight + 1);
             option.setWidth(mc.textRenderer.getWidth(option.name + ": " + option.value.toString()) + 1);
 
-            drawContext.drawText(mc.textRenderer, option.name.copy().append( ": "), x, y + 1, Color.WHITE.getRGB(), false);
+            drawContext.drawText(mc.textRenderer, option.name.copy().append(": "), x, y + 1, Color.WHITE.getRGB(), false);
             drawContext.drawText(mc.textRenderer, option.value.toString(), x + mc.textRenderer.getWidth(option.name + ": ") + 1, y + 1, Color.CYAN.getRGB(), false);
         }
     }

@@ -31,5 +31,5 @@ public enum EasingType {
     EASE_IN_OUT_ELASTIC,
     EASE_IN_BOUNCE,
     EASE_OUT_BOUNCE,
-    EASE_IN_OUT_BOUNCE;
+    EASE_IN_OUT_BOUNCE
 }

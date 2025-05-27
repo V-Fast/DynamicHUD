@@ -1,3 +1,4 @@
 package com.tanishisherewith.dynamichud.internal;
 
-public record ModError(String modName,String errorMessage) {}
+public record ModError(String modName, String errorMessage) {
+}

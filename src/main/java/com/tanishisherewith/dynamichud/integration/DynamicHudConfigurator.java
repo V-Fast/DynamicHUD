@@ -27,7 +27,7 @@ public class DynamicHudConfigurator {
     private AbstractMoveableScreen screen = null;
     public boolean markAsUtility = false; // A.k.a we don't want this mod to display a hud.
 
-    public DynamicHudConfigurator addWidget(Widget widget){
+    public DynamicHudConfigurator addWidget(Widget widget) {
         this.widgets.add(widget);
         return this;
     }
@@ -36,7 +36,7 @@ public class DynamicHudConfigurator {
      * Configure the existing renderer object with this method
      */
     public DynamicHudConfigurator configureRenderer(Consumer<WidgetRenderer> wrConsumer) {
-        if(renderer == null){
+        if (renderer == null) {
             this.renderer = new WidgetRenderer(widgets);
         }
         wrConsumer.accept(renderer);
@@ -60,7 +60,7 @@ public class DynamicHudConfigurator {
     /**
      * Called before saving these widgets
      */
-    public DynamicHudConfigurator onSave(Consumer<List<Widget>> saveHandler){
+    public DynamicHudConfigurator onSave(Consumer<List<Widget>> saveHandler) {
         this.saveHandler = saveHandler;
         return this;
     }
@@ -72,7 +72,7 @@ public class DynamicHudConfigurator {
      * !! Should never be null !!
      * </h3>
      * </p>
-     * */
+     */
     public DynamicHudConfigurator withMoveableScreen(Function<DynamicHudConfigurator, AbstractMoveableScreen> screenProvider) {
         this.screen = screenProvider.apply(this);
         return this;
@@ -86,11 +86,17 @@ public class DynamicHudConfigurator {
         return this;
     }
 
-    public List<Widget> getWidgets() { return Collections.unmodifiableList(widgets); }
+    public List<Widget> getWidgets() {
+        return Collections.unmodifiableList(widgets);
+    }
 
-    public WidgetRenderer getRenderer() { return renderer; }
+    public WidgetRenderer getRenderer() {
+        return renderer;
+    }
 
-    public final Consumer<List<Widget>> getSaveHandler() { return saveHandler; }
+    public final Consumer<List<Widget>> getSaveHandler() {
+        return saveHandler;
+    }
 
     public final AbstractMoveableScreen getMovableScreen() {
         return screen;
@@ -100,7 +106,7 @@ public class DynamicHudConfigurator {
      * Internal method to save these widgets using fabric API events. Should not be called anywhere else except when loading the DHIntegration on startup.
      */
     @ApiStatus.Internal
-    public void setupSaveEvents(File widgetsFile){
+    public void setupSaveEvents(File widgetsFile) {
         /* === Saving === */
         // Each mod is hooked to the fabric's event system to save its widget.
 
@@ -118,7 +124,7 @@ public class DynamicHudConfigurator {
     }
 
     @ApiStatus.Internal
-    public final void registerWidgets(){
+    public final void registerWidgets() {
         widgets.forEach(WidgetManager::addWidget);
     }
 

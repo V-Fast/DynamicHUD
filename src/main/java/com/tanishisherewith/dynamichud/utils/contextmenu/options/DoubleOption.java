@@ -4,10 +4,8 @@ import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
 import org.apache.commons.lang3.Validate;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.system.MathUtil;
 
 import java.awt.*;
 import java.util.function.Consumer;
@@ -21,7 +19,7 @@ public class DoubleOption extends Option<Double> {
     private boolean isDragging = false;
 
     public DoubleOption(Text name, double minValue, double maxValue, float step, Supplier<Double> getter, Consumer<Double> setter, ContextMenu<?> parentMenu) {
-        super(name,getter, setter);
+        super(name, getter, setter);
         this.value = get();
         this.minValue = minValue;
         this.maxValue = maxValue;
@@ -56,14 +54,14 @@ public class DoubleOption extends Option<Double> {
     }
 
     private void step(double mouseX) {
-       this.step(mouseX,x);
+        this.step(mouseX, x);
     }
 
     public void step(double mouseX, double x) {
         double newValue = minValue + (float) (mouseX - x) / width * (maxValue - minValue);
         // Round the new value to the nearest step
         newValue = Math.round(newValue / step) * step;
-        newValue = Math.clamp(newValue,minValue,maxValue);
+        newValue = Math.clamp(newValue, minValue, maxValue);
         set(newValue);
     }
 

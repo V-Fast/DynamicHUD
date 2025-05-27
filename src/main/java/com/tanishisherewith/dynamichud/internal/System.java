@@ -1,9 +1,6 @@
 package com.tanishisherewith.dynamichud.internal;
 
-import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
-
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class System {
     // A map to store all instances of DynamicValueRegistry by modId

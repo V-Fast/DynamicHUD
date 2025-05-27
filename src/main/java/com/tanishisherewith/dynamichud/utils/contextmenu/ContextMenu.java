@@ -48,8 +48,9 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
     }
 
     public ContextMenu(int x, int y, T properties, ContextMenuScreenFactory screenFactory) {
-        this(x, y, properties, screenFactory,null);
+        this(x, y, properties, screenFactory, null);
     }
+
     public ContextMenu(int x, int y, @NotNull T properties, ContextMenuScreenFactory screenFactory, @Nullable ContextMenu<?> parentMenu) {
         Objects.requireNonNull(screenFactory, "ContextMenuScreenFactory cannot be null!");
         Objects.requireNonNull(properties, "ContextMenu Properties cannot be null!");
@@ -134,14 +135,14 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
         }
     }
 
-    public void toggleDisplay(WidgetBox widgetBox,double mouseX, double mouseY, int button){
+    public void toggleDisplay(WidgetBox widgetBox, double mouseX, double mouseY, int button) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && widgetBox.isMouseOver(mouseX, mouseY)) {
             toggleDisplay();
         }
     }
 
-    public void resetAllOptions(){
-        for(Option<?> option: options){
+    public void resetAllOptions() {
+        for (Option<?> option : options) {
             option.reset();
         }
     }
@@ -159,7 +160,7 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         if (!shouldDisplay) return false;
         for (Option option : options) {
-            option.getRenderer().mouseReleased(option,mouseX, mouseY, button);
+            option.getRenderer().mouseReleased(option, mouseX, mouseY, button);
         }
         return properties.getSkin().mouseReleased(this, mouseX, mouseY, button);
     }
@@ -168,7 +169,7 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (!shouldDisplay) return false;
         for (Option option : options) {
-            option.getRenderer().mouseDragged(option,mouseX, mouseY, button, deltaX, deltaY);
+            option.getRenderer().mouseDragged(option, mouseX, mouseY, button, deltaX, deltaY);
         }
         return properties.getSkin().mouseDragged(this, mouseX, mouseY, button, deltaX, deltaY);
     }
@@ -177,7 +178,7 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
     public void keyPressed(int key, int scanCode, int modifiers) {
         if (!shouldDisplay) return;
         for (Option option : options) {
-            option.getRenderer().keyPressed(option,key, scanCode, modifiers);
+            option.getRenderer().keyPressed(option, key, scanCode, modifiers);
         }
 
         properties.getSkin().keyPressed(this, key, scanCode, modifiers);
@@ -187,7 +188,7 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
     public void keyReleased(int key, int scanCode, int modifiers) {
         if (!shouldDisplay) return;
         for (Option option : options) {
-            option.getRenderer().keyReleased(option,key, scanCode, modifiers);
+            option.getRenderer().keyReleased(option, key, scanCode, modifiers);
         }
         properties.getSkin().keyReleased(this, key, scanCode, modifiers);
 
@@ -197,7 +198,7 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
     public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         if (!shouldDisplay) return;
         for (Option option : options) {
-            option.getRenderer().mouseScrolled(option,mouseX, mouseY, horizontalAmount, verticalAmount);
+            option.getRenderer().mouseScrolled(option, mouseX, mouseY, horizontalAmount, verticalAmount);
         }
         properties.getSkin().mouseScrolled(this, mouseX, mouseY, horizontalAmount, verticalAmount);
     }
@@ -257,8 +258,8 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
         return parentMenu;
     }
 
-    public <K extends ContextMenuProperties> ContextMenu<K> createSubMenu(int x, int y, K properties){
-        return new ContextMenu<>(x,y,properties, screenFactory,this);
+    public <K extends ContextMenuProperties> ContextMenu<K> createSubMenu(int x, int y, K properties) {
+        return new ContextMenu<>(x, y, properties, screenFactory, this);
     }
 
     public float getScale() {

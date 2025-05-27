@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.integration;
 
+import com.tanishisherewith.dynamichud.IntegrationTest;
 import com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
 import com.tanishisherewith.dynamichud.widget.WidgetManager;
@@ -14,6 +15,8 @@ import java.io.File;
 
 /**
  * This interface provides methods for integrating DynamicHud into a mod.
+ * @see IntegrationTest
+ * @see DefaultIntegrationImpl
  */
 public interface DynamicHudIntegration {
     /**
@@ -44,6 +47,7 @@ public interface DynamicHudIntegration {
 
     /**
      * Entry point for configuring DynamicHUD integration.
+     *
      * @param configurator Configuration context
      */
     DynamicHudConfigurator configure(DynamicHudConfigurator configurator);
@@ -59,7 +63,8 @@ public interface DynamicHudIntegration {
     /**
      * This method is called after widgets from the widget file have been loaded successfully and added to the renderer.
      */
-    default void postWidgetLoading(WidgetRenderer renderer) {}
+    default void postWidgetLoading(WidgetRenderer renderer) {
+    }
 
     /**
      * To register custom widgets. This method can be overridden by implementations.

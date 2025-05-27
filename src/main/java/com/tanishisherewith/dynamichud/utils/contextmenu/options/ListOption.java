@@ -11,7 +11,7 @@ public class ListOption<T> extends Option<T> {
     private int currentIndex = 0;
 
     public ListOption(Text name, Supplier<T> getter, Consumer<T> setter, List<T> values) {
-        super(name,getter, setter);
+        super(name, getter, setter);
         this.values = values;
         this.value = getter.get();
         for (int i = 0; i < values.size(); i++) {

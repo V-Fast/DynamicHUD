@@ -31,15 +31,16 @@ public class OptionGroup extends Option<OptionGroup> {
     public void updateProperties(ContextMenuProperties properties) {
         this.renderer = new OptionGroupRenderer(); // Set renderer as OptionGroupRenderer
 
-        if(groupOptions == null) return;
+        if (groupOptions == null) return;
 
-        for(Option<?> option: groupOptions){
+        for (Option<?> option : groupOptions) {
             option.updateProperties(properties);
         }
     }
 
     @Override
-    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {}
+    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
+    }
 
     public boolean isExpanded() {
         return expanded;
@@ -51,27 +52,29 @@ public class OptionGroup extends Option<OptionGroup> {
 
     public int getHeightOfOptions() {
         int height = 0;
-        for(Option<?> option : getGroupOptions()){
+        for (Option<?> option : getGroupOptions()) {
             height += option.getHeight() + 1;
         }
         return height;
     }
+
     @Override
     public int getHeight() {
-       return super.getHeight();
+        return super.getHeight();
     }
 
     public class OptionGroupRenderer implements SkinRenderer<Option<OptionGroup>> {
 
         @Override
-        public void render(DrawContext drawContext, Option<OptionGroup> option, int x, int y, int mouseX, int mouseY) {}
+        public void render(DrawContext drawContext, Option<OptionGroup> option, int x, int y, int mouseX, int mouseY) {
+        }
 
         @Override
         public boolean mouseClicked(Option<OptionGroup> option2, double mouseX, double mouseY, int button) {
             OptionGroup option = (OptionGroup) option2;
 
             for (Option subOption : option.getGroupOptions()) {
-                subOption.getRenderer().mouseClicked(subOption,mouseX, mouseY, button);
+                subOption.getRenderer().mouseClicked(subOption, mouseX, mouseY, button);
             }
             return SkinRenderer.super.mouseClicked(option, mouseX, mouseY, button);
         }
@@ -81,7 +84,7 @@ public class OptionGroup extends Option<OptionGroup> {
             OptionGroup option = (OptionGroup) option2;
 
             for (Option subOption : option.getGroupOptions()) {
-                subOption.getRenderer().mouseReleased(subOption,mouseX, mouseY, button);
+                subOption.getRenderer().mouseReleased(subOption, mouseX, mouseY, button);
             }
             return SkinRenderer.super.mouseReleased(option, mouseX, mouseY, button);
         }
@@ -91,7 +94,7 @@ public class OptionGroup extends Option<OptionGroup> {
             OptionGroup option = (OptionGroup) option2;
 
             for (Option subOption : option.getGroupOptions()) {
-                subOption.getRenderer().mouseDragged(subOption,mouseX, mouseY, button, deltaX, deltaY);
+                subOption.getRenderer().mouseDragged(subOption, mouseX, mouseY, button, deltaX, deltaY);
             }
             return SkinRenderer.super.mouseDragged(option, mouseX, mouseY, button, deltaX, deltaY);
         }
@@ -101,7 +104,7 @@ public class OptionGroup extends Option<OptionGroup> {
             OptionGroup option = (OptionGroup) option2;
 
             for (Option subOption : option.getGroupOptions()) {
-                subOption.getRenderer().keyPressed(subOption,key, scanCode, modifiers);
+                subOption.getRenderer().keyPressed(subOption, key, scanCode, modifiers);
             }
             SkinRenderer.super.keyPressed(option, key, scanCode, modifiers);
         }
@@ -111,7 +114,7 @@ public class OptionGroup extends Option<OptionGroup> {
             OptionGroup option = (OptionGroup) option2;
 
             for (Option subOption : option.getGroupOptions()) {
-                subOption.getRenderer().keyReleased(subOption,key, scanCode, modifiers);
+                subOption.getRenderer().keyReleased(subOption, key, scanCode, modifiers);
             }
             SkinRenderer.super.keyReleased(option, key, scanCode, modifiers);
         }
@@ -121,7 +124,7 @@ public class OptionGroup extends Option<OptionGroup> {
             OptionGroup option = (OptionGroup) option2;
 
             for (Option subOption : option.getGroupOptions()) {
-                subOption.getRenderer().mouseScrolled(subOption,mouseX, mouseY, horizontalAmount, verticalAmount);
+                subOption.getRenderer().mouseScrolled(subOption, mouseX, mouseY, horizontalAmount, verticalAmount);
             }
             SkinRenderer.super.mouseScrolled(option, mouseX, mouseY, horizontalAmount, verticalAmount);
         }

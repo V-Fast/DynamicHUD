@@ -16,7 +16,8 @@ public class DefaultIntegrationImpl implements DynamicHudIntegration {
     }
 
     @Override
-    public void init() {}
+    public void init() {
+    }
 
     @Override
     public void registerCustomWidgets() {

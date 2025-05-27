@@ -27,11 +27,11 @@ public abstract class Option<T> implements Input {
     protected SkinRenderer<Option<T>> renderer;
     protected Complexity complexity = Complexity.Simple;
 
-    public Option(Text name,Supplier<T> getter, Consumer<T> setter) {
-        this(name,getter, setter, () -> true);
+    public Option(Text name, Supplier<T> getter, Consumer<T> setter) {
+        this(name, getter, setter, () -> true);
     }
 
-    public Option(Text name,Supplier<T> getter, Consumer<T> setter, Supplier<Boolean> shouldRender, ContextMenuProperties properties) {
+    public Option(Text name, Supplier<T> getter, Consumer<T> setter, Supplier<Boolean> shouldRender, ContextMenuProperties properties) {
         this.name = name;
         this.getter = getter;
         this.setter = setter;
@@ -41,8 +41,8 @@ public abstract class Option<T> implements Input {
         updateProperties(properties);
     }
 
-    public Option(Text name,Supplier<T> getter, Consumer<T> setter, Supplier<Boolean> shouldRender) {
-        this(name,getter, setter, shouldRender, ContextMenuProperties.createGenericSimplified());
+    public Option(Text name, Supplier<T> getter, Consumer<T> setter, Supplier<Boolean> shouldRender) {
+        this(name, getter, setter, shouldRender, ContextMenuProperties.createGenericSimplified());
     }
 
     public T get() {
@@ -84,21 +84,26 @@ public abstract class Option<T> implements Input {
         return isMouseOver(mouseX, mouseY);
     }
 
-    public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {}
+    public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+    }
 
     @Override
-    public void keyPressed(int key, int scanCode, int modifiers) {}
+    public void keyPressed(int key, int scanCode, int modifiers) {
+    }
 
     @Override
-    public void charTyped(char c, int modifiers) {}
+    public void charTyped(char c, int modifiers) {
+    }
 
     @Override
-    public void keyReleased(int key, int scanCode, int modifiers) {}
+    public void keyReleased(int key, int scanCode, int modifiers) {
+    }
 
     /**
      * Called when the context menu closes
      */
-    public void onClose() {}
+    public void onClose() {
+    }
 
     public boolean isMouseOver(double mouseX, double mouseY) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
@@ -112,7 +117,8 @@ public abstract class Option<T> implements Input {
     public boolean shouldRender() {
         return shouldRender.get() && GlobalConfig.get().complexity().ordinal() >= complexity.ordinal();
     }
-    public void reset(){
+
+    public void reset() {
         this.value = get();
     }
 
@@ -156,11 +162,13 @@ public abstract class Option<T> implements Input {
         this.x = x;
         this.y = y;
     }
-    public Option<T> description(Text description){
+
+    public Option<T> description(Text description) {
         this.description = description;
         return this;
     }
-    public Option<T> withComplexity(Complexity complexity){
+
+    public Option<T> withComplexity(Complexity complexity) {
         this.complexity = complexity;
         return this;
     }

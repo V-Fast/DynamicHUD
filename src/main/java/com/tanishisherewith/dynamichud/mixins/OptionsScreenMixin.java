@@ -17,11 +17,13 @@ import java.util.function.Supplier;
 
 @Mixin(OptionsScreen.class)
 public abstract class OptionsScreenMixin extends Screen {
-    @Shadow protected abstract ButtonWidget createButton(Text message, Supplier<Screen> screenSupplier);
+    @Shadow
+    protected abstract ButtonWidget createButton(Text message, Supplier<Screen> screenSupplier);
 
     protected OptionsScreenMixin(Text title) {
         super(title);
     }
+
     @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/GridWidget$Adder;add(Lnet/minecraft/client/gui/widget/Widget;)Lnet/minecraft/client/gui/widget/Widget;", ordinal = 0))
     private void init(CallbackInfo ci, @Local(ordinal = 0) DirectionalLayoutWidget directionalLayoutWidget) {
         DirectionalLayoutWidget directionalLayoutWidget2 = directionalLayoutWidget.add(DirectionalLayoutWidget.horizontal());

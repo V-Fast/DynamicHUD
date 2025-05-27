@@ -2,9 +2,6 @@ package com.tanishisherewith.dynamichud;
 
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.integration.IntegrationManager;
-import com.tanishisherewith.dynamichud.widget.WidgetManager;
-import com.tanishisherewith.dynamichud.widgets.ItemWidget;
-import com.tanishisherewith.dynamichud.widgets.TextWidget;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -18,7 +15,6 @@ public class DynamicHUD implements ClientModInitializer {
     public static MinecraftClient MC = MinecraftClient.getInstance();
     public static final Logger logger = LoggerFactory.getLogger("DynamicHud");
     public static String MOD_ID = "dynamichud";
-
 
     public static void printInfo(String msg) {
         logger.info(msg);
@@ -40,5 +36,4 @@ public class DynamicHUD implements ClientModInitializer {
         //In game screen render.
         HudRenderCallback.EVENT.register(new HudRender());
     }
-
 }

@@ -20,7 +20,7 @@ public class SubMenuOption extends Option<Boolean> {
     private final ContextMenu<?> subMenu;
 
     public <T extends ContextMenuProperties> SubMenuOption(Text name, ContextMenu<?> parentMenu, Supplier<Boolean> getter, Consumer<Boolean> setter, T properties) {
-        super(name,getter, setter);
+        super(name, getter, setter);
         Objects.requireNonNull(parentMenu, "Parent Context Menu cannot be null in [" + name + "] SubMenu option");
         this.subMenu = parentMenu.createSubMenu(parentMenu.x + parentMenu.getWidth(), this.y, properties);
         this.subMenu.getProperties().setHeightOffset(0);

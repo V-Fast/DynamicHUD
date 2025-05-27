@@ -59,5 +59,7 @@ public abstract class Animation {
         completionCallbacks.forEach(Runnable::run);
     }
 
-    public boolean isFinished() { return finished; }
+    public boolean isFinished() {
+        return finished;
+    }
 }

@@ -10,7 +10,7 @@ public class EnumOption<E extends Enum<E>> extends Option<E> {
     private int currentIndex = 0;
 
     public EnumOption(Text name, Supplier<E> getter, Consumer<E> setter, E[] values) {
-        super(name,getter, setter);
+        super(name, getter, setter);
         this.values = values;
         this.value = get();
         for (int i = 0; i < values.length; i++) {
