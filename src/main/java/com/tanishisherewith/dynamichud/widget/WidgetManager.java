@@ -141,7 +141,13 @@ public class WidgetManager {
         Set<String> widgetSet = new HashSet<>();
         for (Widget widget : widgets) {
             NbtCompound widgetTag = new NbtCompound();
-            widget.writeToTag(widgetTag);
+            //I faced this exception once and had to spend 10 minutes trying to find it. P.S. It leaves 0 stacktrace message
+            try {
+                widget.writeToTag(widgetTag);
+            } catch (Throwable e){
+                DynamicHUD.logger.error("Widget [{}] occurred an exception while writing to NBT. This may be due to duplicate entries or invalid entry values", widget.toString());
+            }
+
             // Check for duplicates
             if (widgetSet.add(widgetTag.toString())) {
                 printInfo("Saving Widget: " + widget);

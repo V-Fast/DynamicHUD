@@ -184,7 +184,8 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
         renderToolTipText(drawContext, mouseX, mouseY);
 
-        //Reset our scaling so minecraft runs normally
+        //Reset our scaling so minecraft runs normally\
+        drawContext.draw();
         DrawHelper.scaledProjection();
     }
 

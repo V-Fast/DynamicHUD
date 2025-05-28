@@ -52,7 +52,7 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
 
     public void createMenu() {
         boolean dark_mode = false;
-        ContextMenuProperties properties = ContextMenuProperties.builder().skin(new MinecraftSkin(dark_mode ? MinecraftSkin.PanelColor.DARK_PANEL : MinecraftSkin.PanelColor.CREAMY)).build();
+        ContextMenuProperties properties = ContextMenuProperties.builder().build();
         menu = new ContextMenu<>(getX(), getY(), properties);
 
         menu.addOption(new BooleanOption(Text.of("Shadow"),
@@ -153,8 +153,6 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
     @Override
     public void writeToTag(NbtCompound tag) {
         super.writeToTag(tag);
-        tag.putString("RegistryID", registryID);
-        tag.putString("RegistryKey", registryKey);
         tag.putBoolean("Shadow", shadow);
         tag.putBoolean("Rainbow", rainbow);
         tag.putInt("TextColor", textColor.getRGB());
@@ -177,7 +175,7 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
         registryKey = tag.getString("RegistryKey");
         registryID = tag.getString("RegistryID");
 
-        createMenu();
+        //createMenu();
     }
 
     @Override

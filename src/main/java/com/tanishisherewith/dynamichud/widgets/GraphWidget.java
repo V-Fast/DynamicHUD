@@ -38,7 +38,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     public static WidgetData<GraphWidget> DATA = new WidgetData<>("GraphWidget", "Show graph", GraphWidget::new);
 
     private ContextMenu<?> menu;
-    private final float[] dataPoints;
+    private float[] dataPoints;
     private int head = 0;
     private int maxDataPoints;
     private float minValue, prevMinValue;
@@ -56,27 +56,33 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
     public GraphWidget(String registryID, String registryKey, String modId, Anchor anchor, float width, float height, int maxDataPoints, float minValue, float maxValue, Color graphColor, Color backgroundColor, float lineThickness, boolean showGrid, int gridLines, String label) {
         super(DATA, modId, anchor, registryID, registryKey);
-        Validate.isTrue(maxDataPoints > 2, "MaxDataPoints should be more than 2.");
-        this.dataPoints = new float[maxDataPoints];
         this.width = width;
         this.height = height;
         this.maxDataPoints = maxDataPoints;
-        this.setMinValue(minValue);
-        this.setMaxValue(maxValue);
         this.graphColor = graphColor;
         this.backgroundColor = backgroundColor;
         this.lineThickness = lineThickness;
         this.showGrid = showGrid;
         this.gridLines = gridLines;
-        this.label = label.trim();
-        this.widgetBox = new WidgetBox(x, y, (int) width, (int) height);
+        this.label = label;
+
+        internal_init();
+
         setTooltipText(Text.of("Graph displaying: " + label));
         createMenu();
         ContextMenuManager.getInstance().registerProvider(this);
     }
+    private void internal_init(){
+        Validate.isTrue(maxDataPoints > 2, "MaxDataPoints should be more than 2.");
+        this.dataPoints = new float[maxDataPoints];
+        this.setMinValue(minValue);
+        this.setMaxValue(maxValue);
+        this.label = label.trim();
+        this.widgetBox = new WidgetBox(x, y, (int) width, (int) height);
+    }
 
     public GraphWidget() {
-        this(DynamicValueRegistry.GLOBAL_ID, "unknown", "unknown", Anchor.CENTER, 0, 0, 10, 0, 10, Color.RED, Color.GREEN, 0, false, 0, "empty");
+        this(DynamicValueRegistry.GLOBAL_ID, "unknown", "unknown", Anchor.CENTER, 0, 0, 5, 0, 10, Color.RED, Color.GREEN, 0, false, 0, "empty");
     }
 
     @Override
@@ -352,8 +358,8 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         this.showGrid = tag.getBoolean("showGrid");
         this.gridLines = tag.getInt("gridLines");
         this.label = tag.getString("label");
-        this.widgetBox = new WidgetBox(x, y, (int) width, (int) height);
 
+        internal_init();
         createMenu();
     }
 

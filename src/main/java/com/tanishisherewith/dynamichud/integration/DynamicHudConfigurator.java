@@ -6,6 +6,7 @@ import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetManager;
 import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import org.jetbrains.annotations.ApiStatus;
@@ -120,7 +121,7 @@ public class DynamicHudConfigurator {
         ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> saveWidgetsSafely(widgetsFile, FILE_MAP.get(widgetsFile.getName())));
 
         //When minecraft closes
-        ClientLifecycleEvents.CLIENT_STOPPING.register((minecraftClient) -> saveWidgetsSafely(widgetsFile, FILE_MAP.get(widgetsFile.getName())));
+       ClientLifecycleEvents.CLIENT_STOPPING.register((mc)-> saveWidgetsSafely(widgetsFile, FILE_MAP.get(widgetsFile.getName())));
     }
 
     @ApiStatus.Internal
@@ -132,7 +133,7 @@ public class DynamicHudConfigurator {
         try {
             this.saveHandler.accept(widgets);
             WidgetManager.saveWidgets(widgetsFile, widgets);
-        } catch (IOException e) {
+        } catch (Throwable e) {
             DynamicHUD.logger.error("Failed to save widgets. Widgets passed: {}", widgets);
             throw new RuntimeException(e);
         }
