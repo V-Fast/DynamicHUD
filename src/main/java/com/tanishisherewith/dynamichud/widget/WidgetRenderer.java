@@ -33,7 +33,7 @@ public class WidgetRenderer implements Input {
     public WidgetRenderer(List<Widget> widgets) {
         this.widgets = widgets;
         // Render in GameMenuScreen
-        this.allowedScreens = screen -> screen.getClass() == GameMenuScreen.class || screen instanceof YACLScreen ||
+        this.allowedScreens = screen -> screen.getClass() == GameMenuScreen.class ||
                 System.getInstances(ContextMenuScreenRegistry.class, DynamicHUD.MOD_ID).stream().anyMatch(registry -> registry.screenKlass == screen.getClass());
     }
 
