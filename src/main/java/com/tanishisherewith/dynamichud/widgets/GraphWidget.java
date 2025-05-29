@@ -68,7 +68,6 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
         internal_init();
 
-        setTooltipText(Text.of("Graph displaying: " + label));
         createMenu();
         ContextMenuManager.getInstance().registerProvider(this);
     }
@@ -79,6 +78,8 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         this.setMaxValue(maxValue);
         this.label = label.trim();
         this.widgetBox = new WidgetBox(x, y, (int) width, (int) height);
+
+        setTooltipText(Text.of("Graph displaying: " + label));
     }
 
     public GraphWidget() {
