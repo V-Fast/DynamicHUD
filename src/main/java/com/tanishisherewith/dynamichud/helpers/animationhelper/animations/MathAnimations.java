@@ -6,14 +6,14 @@ import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.random.Random;
 
 public class MathAnimations {
-    // SHAKE: Random offset animation with smooth decay
+    /// SHAKE: Random offset animation with smooth decay
     public static float shake(float intensity, float frequency, float decay) {
         long time = System.currentTimeMillis();
         return (float) (Math.sin(time * frequency) *
                 Math.exp(-decay * time) * intensity);
     }
 
-    // 2D Shake with different X/Y frequencies
+    /// 2D Shake with different X/Y frequencies
     public static Vec2f shake2D(float intensity, float freqX, float freqY) {
         return new Vec2f(
                 (float) Math.sin(System.currentTimeMillis() * freqX) * intensity,
@@ -21,7 +21,7 @@ public class MathAnimations {
         );
     }
 
-    // FLICKER: Random flashing effect
+    /// FLICKER: Random flashing effect
     public static float flicker(float min, float max, float chance) {
         Random rand = Random.create();
         return rand.nextFloat() < chance ?
@@ -29,7 +29,7 @@ public class MathAnimations {
                 max;
     }
 
-    // CIRCULAR MOTION: Perfect for rotation/orbital animations
+    /// CIRCULAR MOTION: Perfect for rotation/orbital animations
     public static Vec2f circularMotion(float radius, float speed, float phase) {
         double angle = Math.toRadians((System.currentTimeMillis() * speed) % 360 + phase);
         return new Vec2f(
@@ -38,13 +38,13 @@ public class MathAnimations {
         );
     }
 
-    // SAWTOOTH WAVE: Linear rise with sudden drop
+    /// SAWTOOTH WAVE: Linear rise with sudden drop
     public static float sawtooth(float period, float min, float max) {
         float phase = (System.currentTimeMillis() % period) / period;
         return min + (max - min) * phase;
     }
 
-    // TRIANGULAR WAVE: Linear rise and fall
+    /// TRIANGULAR WAVE: Linear rise and fall
     public static float triangleWave(float period, float min, float max) {
         float halfPeriod = period / 2;
         float phase = (System.currentTimeMillis() % period);
@@ -54,20 +54,20 @@ public class MathAnimations {
         return min + (max - min) * value;
     }
 
-    // BOUNCE: Simulates physical bouncing
+    /// BOUNCE: Simulates physical bouncing
     public static float bounce(float dropHeight, float gravity, float dampening) {
         float t = System.currentTimeMillis() / 1000f;
         return (float) (dropHeight * Math.abs(Math.sin(t * Math.sqrt(gravity))) *
                 Math.exp(-dampening * t));
     }
 
-    // PULSE: Smooth heartbeat-like effect
+    /// PULSE: Smooth heartbeat-like effect
     public static float pulse1(float base, float amplitude, float frequency) {
         return (float) (base + amplitude *
                 (0.5 + 0.5 * Math.sin(System.currentTimeMillis() * frequency)));
     }
 
-    // SPIRAL: Circular motion with expanding radius
+    /// SPIRAL: Circular motion with expanding radius
     public static Vec2f spiral(float baseRadius, float expansionRate, float speed) {
         float t = System.currentTimeMillis() / 1000f;
         return new Vec2f(
@@ -76,35 +76,36 @@ public class MathAnimations {
         );
     }
 
-    // Continuous pulsating effect using sine wave
+    /// Continuous pulsating effect using sine wave
     public static float pulse2(float speed, float min, float max) {
         return (float) ((Math.sin(System.currentTimeMillis() * speed) + 1) / 2 * (max - min) + min);
     }
 
-    // Linear interpolation between values over time
+    /// Linear interpolation between values over time
     public static float lerp(float start, float end, long startTime, float duration) {
         return lerp(start, end, startTime, duration, EasingType.LINEAR);
     }
 
+    /// Linear interpolation between values over time with easing
     public static float lerp(float start, float end, long startTime, float duration, EasingType easing) {
         float progress = (System.currentTimeMillis() - startTime) / duration;
         progress = Math.min(1, Math.max(0, progress)); // Clamp 0-1
         return start + (end - start) * Easing.apply(easing, progress);
     }
 
-    // Bouncing animation using quadratic ease-out
+    /// Bouncing animation using quadratic ease-out
     public static float bounce(float start, float end, long startTime, float duration) {
         float time = System.currentTimeMillis() - startTime;
         time /= duration;
         return end * (1 - (time - 1) * (time - 1)) + start;
     }
 
-    // Continuous rotation using modulo
+    /// Continuous rotation using modulo
     public static float continuousRotation(float speed) {
         return (System.currentTimeMillis() % (360_000 / speed)) * (speed / 1000);
     }
 
-    // Elastic wobble effect
+    /// Elastic wobble effect
     public static float elasticWobble(float speed, float magnitude) {
         return (float) (Math.sin(System.currentTimeMillis() * speed) *
                 Math.exp(-0.001 * System.currentTimeMillis()) * magnitude);
