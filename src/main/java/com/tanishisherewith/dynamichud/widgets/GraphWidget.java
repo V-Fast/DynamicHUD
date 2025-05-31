@@ -65,6 +65,8 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         this.showGrid = showGrid;
         this.gridLines = gridLines;
         this.label = label;
+        this.setMinValue(minValue);
+        this.setMaxValue(maxValue);
 
         internal_init();
 
@@ -74,8 +76,6 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     private void internal_init(){
         Validate.isTrue(maxDataPoints > 2, "MaxDataPoints should be more than 2.");
         this.dataPoints = new float[maxDataPoints];
-        this.setMinValue(minValue);
-        this.setMaxValue(maxValue);
         this.label = label.trim();
         this.widgetBox = new WidgetBox(x, y, (int) width, (int) height);
 
@@ -259,6 +259,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
                 DrawHelper.drawVerticalLine(matrix, xPos, y, height, 0.5f, 0x4DFFFFFF);
             }
         }
+
         // Draw interpolated graph curve
         List<float[]> points = getInterpolatedPoints();
         drawInterpolatedCurve(matrix, points, graphColor.getRGB(), lineThickness);
@@ -276,8 +277,9 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
                 1.0f, 0.8f, 1.0f, 0.05f, true
         );
 
+
         // Draw axes
-        DrawHelper.drawHorizontalLine(matrix, x, width, y + height, 1.0f, 0xFFFFFFFF); // X-axis
+        DrawHelper.drawHorizontalLine(matrix, x, width, y + height - 1, 1.0f, 0xFFFFFFFF); // X-axis
         DrawHelper.drawVerticalLine(matrix, x, y, height, 1.0f, 0xFFFFFFFF); // Y-axis
 
         // Draw min and max value labels with formatted values
@@ -343,25 +345,6 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
                 0.5f, 5.0f, 0.1f,
                 () -> (double) this.lineThickness, value -> this.lineThickness = value.floatValue(), menu)
         );
-    }
-
-    @Override
-    public void readFromTag(NbtCompound tag) {
-        super.readFromTag(tag);
-        this.width = tag.getFloat("width");
-        this.height = tag.getFloat("height");
-        this.maxDataPoints = tag.getInt("maxDataPoints");
-        this.minValue = tag.getFloat("minValue");
-        this.maxValue = tag.getFloat("maxValue");
-        this.graphColor = new Color(tag.getInt("graphColor"));
-        this.backgroundColor = new Color(tag.getInt("backgroundColor"));
-        this.lineThickness = tag.getFloat("lineThickness");
-        this.showGrid = tag.getBoolean("showGrid");
-        this.gridLines = tag.getInt("gridLines");
-        this.label = tag.getString("label");
-
-        internal_init();
-        createMenu();
     }
 
     public float getMinValue() {
@@ -484,6 +467,29 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         tag.putBoolean("showGrid", showGrid);
         tag.putInt("gridLines", gridLines);
         tag.putString("label", label);
+        tag.putBoolean("autoUpdateRange", autoUpdateRange);
+    }
+
+    @Override
+    public void readFromTag(NbtCompound tag) {
+        super.readFromTag(tag);
+        this.width = tag.getFloat("width");
+        this.height = tag.getFloat("height");
+        this.maxDataPoints = tag.getInt("maxDataPoints");
+        this.minValue = tag.getFloat("minValue");
+        this.maxValue = tag.getFloat("maxValue");
+        this.graphColor = new Color(tag.getInt("graphColor"));
+        this.backgroundColor = new Color(tag.getInt("backgroundColor"));
+        this.lineThickness = tag.getFloat("lineThickness");
+        this.showGrid = tag.getBoolean("showGrid");
+        this.gridLines = tag.getInt("gridLines");
+        this.label = tag.getString("label");
+        this.autoUpdateRange = tag.getBoolean("autoUpdateRange");
+        this.setMinValue(minValue);
+        this.setMaxValue(maxValue);
+
+        internal_init();
+        createMenu();
     }
 
     @Override

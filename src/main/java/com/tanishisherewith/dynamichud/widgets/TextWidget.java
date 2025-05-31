@@ -51,7 +51,6 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
     }
 
     public void createMenu() {
-        boolean dark_mode = false;
         ContextMenuProperties properties = ContextMenuProperties.builder().build();
         menu = new ContextMenu<>(getX(), getY(), properties);
 
