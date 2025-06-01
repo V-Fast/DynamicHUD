@@ -1,19 +1,30 @@
 package com.tanishisherewith.dynamichud.helpers;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.tanishisherewith.dynamichud.DynamicHUD;
+import com.tanishisherewith.dynamichud.widget.WidgetBox;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL40;
 import org.lwjgl.opengl.GL40C;
 
 import java.awt.*;
+import java.util.Objects;
+
+import static com.tanishisherewith.dynamichud.helpers.TextureHelper.mc;
 
 /**
- * Credits: <a href="https://github.com/HeliosMinecraft/HeliosClient/blob/main/src/main/java/dev/heliosclient/util/ColorUtils.java">HeliosClient</a>
+ * Credits: <a href="https://github.com/HeliosMinecraft/HeliosClient/blob/main/src/main/java/dev/heliosclient/util/render/Renderer2D.java">HeliosClient</a>
  */
 public class DrawHelper {
 
@@ -46,8 +57,8 @@ public class DrawHelper {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+
         switch (direction) {
             case LEFT_RIGHT:
                 bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha);
@@ -81,8 +92,14 @@ public class DrawHelper {
     }
 
     public static void enableScissor(int x, int y, int width, int height) {
-        double scaleFactor = DynamicHUD.MC.getWindow().getScaleFactor();
+        enableScissor(x, y, width, height, mc.getWindow().getScaleFactor());
+    }
 
+    public static void enableScissor(WidgetBox box) {
+        enableScissor((int) box.x, (int) box.y, (int) box.getWidth(), (int) box.getHeight(), mc.getWindow().getScaleFactor());
+    }
+
+    public static void enableScissor(int x, int y, int width, int height, double scaleFactor) {
         int scissorX = (int) (x * scaleFactor);
         int scissorY = (int) (DynamicHUD.MC.getWindow().getHeight() - ((y + height) * scaleFactor));
         int scissorWidth = (int) (width * scaleFactor);
@@ -117,7 +134,7 @@ public class DrawHelper {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
@@ -204,7 +221,7 @@ public class DrawHelper {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         for (int i = 0; i <= width; i++) {
             float hue = (float) i / width;
@@ -239,14 +256,43 @@ public class DrawHelper {
         RenderSystem.disableBlend();
     }
 
+    /**
+     * Draw chroma text (text with a nice rainbow effect)
+     *
+     * @param drawContext A drawContext object
+     * @param text        The text to display
+     * @param x           X pos of text
+     * @param y           Y pos of text
+     * @param speed       Speed of rainbow
+     * @param saturation  Saturation of the rainbow colors
+     * @param brightness  Brightness of the rainbow colors
+     * @param spread      How much the color difference should be between each character (ideally between 0.001 to 0.2)
+     * @param shadow      Whether to render the text as shadow.
+     */
+    public static void drawChromaText(@NotNull DrawContext drawContext, String text, int x, int y, float speed, float saturation, float brightness, float spread, boolean shadow) {
+        long time = System.currentTimeMillis();
+        int length = text.length();
 
-    public static void drawRainbowGradient(Matrix4f matrix, float x, float y, float width, float height) {
+        for (int i = 0; i < length; i++) {
+            float hue = (time % (int) (5000 / speed)) / (5000f / speed) + (i * spread); // Adjust the hue based on time and character position
+            hue = MathHelper.floorMod(hue, 1.0f); //  hue should stay within the range [0, 1]
+
+            // Convert the hue to an RGB color
+            int color = Color.HSBtoRGB(hue, saturation, brightness);
+
+            // Draw the character with the calculated color
+            drawContext.drawText(mc.textRenderer, String.valueOf(text.charAt(i)), x + mc.textRenderer.getWidth(text.substring(0, i)), y, color, shadow);
+        }
+    }
+
+
+    public static void drawRainbowGradient(float x, float y, float width, float height) {
         Matrix4f matrix4f = RenderSystem.getModelViewMatrix();
 
         RenderSystem.enableBlend();
         RenderSystem.colorMask(false, false, false, true);
         RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
-        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, false);
+        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT);
         RenderSystem.colorMask(true, true, true, true);
 
         drawRectangle(matrix4f, x, y, width, height, Color.BLACK.getRGB());
@@ -294,7 +340,7 @@ public class DrawHelper {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         for (int i = 0; i <= 360; i++) {
             double x = xCenter + Math.sin(Math.toRadians(i)) * radius;
@@ -327,7 +373,7 @@ public class DrawHelper {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
 
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
@@ -387,7 +433,7 @@ public class DrawHelper {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.enableBlend();
 
         for (float angle = startAngle; angle <= endAngle; angle += 1.0F) {
@@ -430,7 +476,7 @@ public class DrawHelper {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
 
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.enableBlend();
 
         bufferBuilder.vertex(matrix4f, xCenter, yCenter, 0).color(startRed, startGreen, startBlue, startAlpha);
@@ -473,7 +519,7 @@ public class DrawHelper {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
 
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.enableBlend();
 
         for (int i = startAngle; i <= endAngle; i++) {
@@ -508,9 +554,9 @@ public class DrawHelper {
         float alpha = (float) (color >> 24 & 255) / 255.0F;
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder =  tessellator.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
+        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
 
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.enableBlend();
 
         bufferBuilder.vertex(matrix4f, xCenter, yCenter, 0).color(red, green, blue, alpha);
@@ -743,7 +789,7 @@ public class DrawHelper {
         RenderSystem.enableBlend();
         RenderSystem.colorMask(false, false, false, true);
         RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
-        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, false);
+        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT);
         RenderSystem.colorMask(true, true, true, true);
 
         drawRoundedRectangle(matrix, x, y, TL, TR, BL, BR, width, height, (int) radius, color1.getRGB());
@@ -792,6 +838,18 @@ public class DrawHelper {
         drawContext.fill(x2 - 1, y1 + 1, x2, y2 - 1, color);
     }
 
+    public static void unscaledProjection() {
+        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight(), 0, 1000, 21000), ProjectionType.ORTHOGRAPHIC);
+    }
+
+    public static void scaledProjection() {
+        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, (float) (mc.getWindow().getFramebufferWidth() / mc.getWindow().getScaleFactor()), (float) (mc.getWindow().getFramebufferHeight() / mc.getWindow().getScaleFactor()), 0, 1000, 21000), ProjectionType.ORTHOGRAPHIC);
+    }
+
+    public static void customScaledProjection(float scale) {
+        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getFramebufferWidth() / scale, mc.getWindow().getFramebufferHeight() / scale, 0, 1000, 21000), ProjectionType.ORTHOGRAPHIC);
+    }
+
     /**
      * This method assumes that the x, y coords are the origin of a widget.
      *
@@ -834,6 +892,32 @@ public class DrawHelper {
 
     public static void stopScaling(MatrixStack matrices) {
         matrices.pop(); // Restore the previous transformation state
+    }
+
+    /**
+     * From minecraft
+     */
+    public static void drawScrollableText(DrawContext context, TextRenderer textRenderer, Text text, int centerX, int startX, int startY, int endX, int endY, int color) {
+        int i = textRenderer.getWidth(text);
+        int var10000 = startY + endY;
+        Objects.requireNonNull(textRenderer);
+        int j = (var10000 - 9) / 2 + 1;
+        int k = endX - startX;
+        int l;
+        if (i > k) {
+            l = i - k;
+            double d = (double) Util.getMeasuringTimeMs() / 1000.0;
+            double e = Math.max((double) l * 0.5, 3.0);
+            double f = Math.sin(1.5707963267948966 * Math.cos(6.283185307179586 * d / e)) / 2.0 + 0.5;
+            double g = MathHelper.lerp(f, 0.0, l);
+            context.enableScissor(startX, startY, endX, endY);
+            context.drawTextWithShadow(textRenderer, text, startX - (int) g, j, color);
+            context.disableScissor();
+        } else {
+            l = MathHelper.clamp(centerX, startX + i / 2, endX - i / 2);
+            context.drawCenteredTextWithShadow(textRenderer, text, l, j, color);
+        }
+
     }
 
     public enum Direction {

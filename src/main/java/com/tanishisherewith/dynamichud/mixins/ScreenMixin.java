@@ -1,6 +1,6 @@
 package com.tanishisherewith.dynamichud.mixins;
 
-import com.tanishisherewith.dynamichud.DynamicHUD;
+import com.tanishisherewith.dynamichud.integration.IntegrationManager;
 import com.tanishisherewith.dynamichud.widget.WidgetManager;
 import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
 import net.minecraft.client.MinecraftClient;
@@ -22,7 +22,7 @@ public abstract class ScreenMixin {
 
     @Inject(at = @At("RETURN"), method = "render")
     private void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        for (WidgetRenderer widgetRenderer : DynamicHUD.getWidgetRenderers()) {
+        for (WidgetRenderer widgetRenderer : IntegrationManager.getWidgetRenderers()) {
             widgetRenderer.renderWidgets(context, mouseX, mouseY);
         }
     }
@@ -35,7 +35,7 @@ public abstract class ScreenMixin {
 
     @Inject(at = @At("HEAD"), method = "close")
     private void onClose(CallbackInfo ci) {
-        for (WidgetRenderer widgetRenderer : DynamicHUD.getWidgetRenderers()) {
+        for (WidgetRenderer widgetRenderer : IntegrationManager.getWidgetRenderers()) {
             widgetRenderer.onCloseScreen();
         }
     }

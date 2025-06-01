@@ -9,6 +9,7 @@ public class BooleanPool {
     public static void put(String key, boolean value) {
         pool.put(key, value);
     }
+
     public static void remove(String key) {
         pool.remove(key);
     }

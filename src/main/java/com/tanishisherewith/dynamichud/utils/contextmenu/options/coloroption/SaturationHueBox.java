@@ -5,7 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 
-public class GradientBox {
+public class SaturationHueBox {
     private final int size;
     private int x;
     private int y;
@@ -15,7 +15,7 @@ public class GradientBox {
     private boolean isDragging = false;
 
 
-    public GradientBox(int x, int y, int size) {
+    public SaturationHueBox(int x, int y, int size) {
         this.x = x;
         this.y = y;
         this.size = size;
@@ -31,11 +31,11 @@ public class GradientBox {
         DrawHelper.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), Color.BLACK, Color.BLACK, Color.getHSBColor(hue, 1.0f, 1.0f), Color.WHITE, x, y, size, size, 2);
 
         // Draw the handle
-        float handleSize = 3;
+        float handleSize = 1f;
         float handleX = x + 2 + saturation * size - handleSize / 2.0f;
         float handleY = y + 2 + (1.0f - value) * size - handleSize / 2.0f;
 
-        DrawHelper.drawFilledCircle(drawContext.getMatrices().peek().getPositionMatrix(), handleX, handleY, 1, -1);
+        DrawHelper.drawFilledCircle(drawContext.getMatrices().peek().getPositionMatrix(), handleX, handleY, handleSize, -1);
         drawContext.getMatrices().pop();
     }
 
@@ -60,8 +60,11 @@ public class GradientBox {
             if (mouseX >= handleX && mouseX <= handleX + handleSize && mouseY >= handleY && mouseY <= handleY + handleSize) {
                 this.isDragging = true;
             } else if (mouseX >= x && mouseX <= x + size && mouseY >= y && mouseY <= y + size) {
-                saturation = (float) (mouseX - x) / size;
-                value = 1.0f - (float) (mouseY - y) / size;
+                this.saturation = (float) (mouseX - x) / size;
+                this.value = 1.0f - (float) (mouseY - y) / size;
+
+                this.saturation = Math.clamp(saturation, 0.0f, 1.0f);
+                this.value = Math.clamp(value, 0.0f, 1.0f);
                 this.isDragging = true;
             }
         }
@@ -79,13 +82,11 @@ public class GradientBox {
 
     public void onDrag(double mouseX, double mouseY, int button) {
         if (isDragging) {
-            saturation = (float) (mouseX - x) / size;
-            saturation = Math.max(0, saturation);
-            saturation = Math.min(1, saturation);
+            this.saturation = (float) (mouseX - x) / size;
+            this.value = 1.0f - (float) (mouseY - y) / size;
 
-            value = 1.0f - (float) (mouseY - y) / size;
-            value = Math.max(0, value);
-            value = Math.min(1, value);
+            this.saturation = Math.clamp(saturation, 0.0f, 1.0f);
+            this.value = Math.clamp(value, 0.0f, 1.0f);
         }
     }
 
@@ -103,5 +104,9 @@ public class GradientBox {
 
     public int getColor() {
         return Color.HSBtoRGB(hue, saturation, value);
+    }
+
+    public int getSize() {
+        return size;
     }
 }

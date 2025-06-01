@@ -1,22 +1,17 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
-import com.tanishisherewith.dynamichud.utils.contextmenu.Option;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
-import java.awt.*;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ListOption<T> extends Option<T> {
     private final List<T> values;
-    public String name = "Empty";
     private int currentIndex = 0;
 
-    public ListOption(String name, Supplier<T> getter, Consumer<T> setter, List<T> values) {
-        super(getter, setter);
-        this.name = name;
+    public ListOption(Text name, Supplier<T> getter, Consumer<T> setter, List<T> values) {
+        super(name, getter, setter);
         this.values = values;
         this.value = getter.get();
         for (int i = 0; i < values.size(); i++) {
@@ -25,25 +20,12 @@ public class ListOption<T> extends Option<T> {
                 break;
             }
         }
-    }
-
-    @Override
-    public void render(DrawContext drawContext, int x, int y) {
-        super.render(drawContext, x, y);
-
-        value = get();
-        this.height = mc.textRenderer.fontHeight + 1;
-        this.width = mc.textRenderer.getWidth(name + ": " + value.toString()) + 1;
-
-        drawContext.drawText(mc.textRenderer, Text.of(name + ": "), x, y, Color.WHITE.getRGB(), false);
-        drawContext.drawText(mc.textRenderer, Text.of(value.toString()), x + mc.textRenderer.getWidth(name + ": ") + 1, y, Color.CYAN.getRGB(), false);
-
+        this.renderer.init(this);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        super.mouseClicked(mouseX, mouseY, button);
-        if (isMouseOver(mouseX, mouseY)) {
+        if (super.mouseClicked(mouseX, mouseY, button)) {
             if (button == 0) {
                 currentIndex = (currentIndex + 1) % values.size();
                 if (currentIndex > values.size() - 1) {
@@ -60,5 +42,9 @@ public class ListOption<T> extends Option<T> {
             set(value);
         }
         return true;
+    }
+
+    public List<T> getValues() {
+        return values;
     }
 }

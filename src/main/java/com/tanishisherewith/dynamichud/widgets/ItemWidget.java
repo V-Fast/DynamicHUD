@@ -12,27 +12,28 @@ import net.minecraft.nbt.NbtCompound;
  * This is just an example widget, not supposed to be used.
  */
 public class ItemWidget extends Widget {
-    public static WidgetData<?> DATA = new WidgetData<>("ItemWidget","Displays item texture", ItemWidget::new);
     public ItemStack item;
+    public static WidgetData<?> DATA = new WidgetData<>("ItemWidget", "Displays item texture", ItemWidget::new);
 
-    public ItemWidget(ItemStack itemStack,String modId) {
+    public ItemWidget(ItemStack itemStack, String modId) {
         super(DATA, modId);
         this.item = itemStack;
     }
+
     public ItemWidget() {
         this(ItemStack.EMPTY, "empty");
     }
 
     @Override
     public void renderWidget(DrawContext context, int mouseX, int mouseY) {
-        context.drawItem(item,x,y);
-        widgetBox.setSizeAndPosition(getX(), getY(), 16, 16, this.shouldScale, GlobalConfig.get().getScale());
+        context.drawItem(item, x, y);
+        widgetBox.setDimensions(getX(), getY(), 16, 16, this.shouldScale, GlobalConfig.get().getScale());
     }
 
     @Override
     public void writeToTag(NbtCompound tag) {
         super.writeToTag(tag);
-        tag.putInt("ItemID",Item.getRawId(item.getItem()));
+        tag.putInt("ItemID", Item.getRawId(item.getItem()));
     }
 
     @Override
@@ -45,9 +46,10 @@ public class ItemWidget extends Widget {
         this.item = item;
     }
 
-    public static class Builder extends WidgetBuilder<Builder,ItemWidget>{
-         ItemStack itemStack;
-        public Builder setItemStack(ItemStack itemStack) {
+    public static class Builder extends WidgetBuilder<Builder, ItemWidget> {
+        ItemStack itemStack;
+
+        public Builder itemStack(ItemStack itemStack) {
             this.itemStack = itemStack;
             return self();
         }
@@ -59,7 +61,7 @@ public class ItemWidget extends Widget {
 
         @Override
         public ItemWidget build() {
-            return new ItemWidget(itemStack,modID);
+            return new ItemWidget(itemStack, modID);
         }
     }
 }

@@ -1,8 +1,14 @@
 package com.tanishisherewith.dynamichud.helpers;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.Framebuffer;
+import net.minecraft.client.util.Window;
 import net.minecraft.util.math.MathHelper;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 
 import java.awt.*;
+import java.nio.ByteBuffer;
 
 /**
  * This class provides helper methods for working with colors.
@@ -112,6 +118,38 @@ public class ColorHelper {
     }
 
     /**
+     * @param color Target color.
+     * @return Alpha of the color.
+     */
+    public static float getAlpha(int color) {
+        return (float) (color >> 24 & 255) / 255.0F;
+    }
+
+    /**
+     * @param color Target color.
+     * @return Red value of the color.
+     */
+    public static float getRed(int color) {
+        return (float) (color >> 16 & 255) / 255.0F;
+    }
+
+    /**
+     * @param color Target color.
+     * @return Green value of the color.
+     */
+    public static float getGreen(int color) {
+        return (float) (color >> 8 & 255) / 255.0F;
+    }
+
+    /**
+     * @param color Target color.
+     * @return Blue value of the color.
+     */
+    public static float getBlue(int color) {
+        return (float) (color & 255) / 255.0F;
+    }
+
+    /**
      * Rainbow color with custom speed.
      *
      * @param speed
@@ -134,6 +172,49 @@ public class ColorHelper {
             return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
         else
             return new Color(0);
+    }
+
+    public static int[] getMousePixelColor(double mouseX, double mouseY) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        Framebuffer framebuffer = client.getFramebuffer();
+        Window window = client.getWindow();
+
+        // Get the window and framebuffer dimensions
+        int windowWidth = window.getWidth();
+        int windowHeight = window.getHeight();
+        int framebufferWidth = framebuffer.textureWidth;
+        int framebufferHeight = framebuffer.textureHeight;
+
+        // Calculate scaling factors
+        double scaleX = (double) framebufferWidth / windowWidth;
+        double scaleY = (double) framebufferHeight / windowHeight;
+
+        // Convert mouse coordinates to framebuffer coordinates
+        int x = (int) (mouseX * scaleX);
+        int y = (int) ((windowHeight - mouseY) * scaleY);
+
+        // Ensure the coordinates are within the framebuffer bounds
+        if (x < 0 || x >= framebufferWidth || y < 0 || y >= framebufferHeight) {
+            System.err.println("Mouse coordinates are out of bounds");
+            return null;
+        }
+
+        // Allocate a buffer to store the pixel data
+        ByteBuffer buffer = ByteBuffer.allocateDirect(4); // 4 bytes for RGBA
+
+        // Bind the framebuffer for reading
+        GL30.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, framebuffer.fbo);
+
+        // Read the pixel at the mouse position
+        GL11.glReadPixels(x, y, 1, 1, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+
+        // Extract the color components from the buffer
+        int red = buffer.get(0) & 0xFF;
+        int green = buffer.get(1) & 0xFF;
+        int blue = buffer.get(2) & 0xFF;
+        int alpha = buffer.get(3) & 0xFF;
+
+        return new int[]{red, green, blue, alpha};
     }
 
     public static int fromRGBA(int r, int g, int b, int a) {

@@ -5,7 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 
-public class GradientSlider {
+public class HueSlider {
     private final int width;
     private final int height;
     private int x;
@@ -13,7 +13,7 @@ public class GradientSlider {
     private float hue = 0.0f;
     private boolean isDragging = false;
 
-    public GradientSlider(int x, int y, int width, int height) {
+    public HueSlider(int x, int y, int width, int height) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -44,6 +44,7 @@ public class GradientSlider {
             color = (color & 0x00FFFFFF) | (255 << 24);
             drawContext.fill(x + i, y, x + i + 1, y + height, color);
         }
+        drawContext.draw();
 
 
         // Draw the handle
@@ -70,7 +71,7 @@ public class GradientSlider {
             if (mouseX >= handleX && mouseX <= handleX + handleWidth && mouseY >= handleY && mouseY <= handleY + handleHeight) {
                 this.isDragging = true;
             } else if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height) {
-                hue = (float) (mouseX - x) / width;
+                this.hue = (float) (mouseX - x) / this.width;
                 this.isDragging = true;
             }
         }
@@ -88,9 +89,8 @@ public class GradientSlider {
 
     public void onDrag(double mouseX, double mouseY, int button) {
         if (isDragging) {
-            hue = (float) (mouseX - x) / width;
-            hue = Math.max(0, hue);
-            hue = Math.min(1, hue);
+            this.hue = (float) (mouseX - x) / this.width;
+            this.hue = Math.clamp(this.hue, 0.0f, 1.0f);
         }
     }
 

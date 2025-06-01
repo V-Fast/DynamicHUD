@@ -15,14 +15,14 @@
     "repo": "https://github.com/V-Fast/DynamicHUD",
     "issues": "https://github.com/V-Fast/DynamicHUD/issues"
   },
-  "license": "All-Rights-Reserved",
+  "license": "MIT",
   "environment": "client",
   "entrypoints": {
+    "dynamicHud": [
+      "com.tanishisherewith.dynamichud.integration.DefaultIntegrationImpl"
+    ],
     "client": [
       "com.tanishisherewith.dynamichud.DynamicHUD"
-    ],
-    "modmenu": [
-      "com.tanishisherewith.dynamichud.ModMenuIntegration"
     ]
   },
   "mixins": [
@@ -31,11 +31,17 @@
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
+    "java": ">=21",
     "minecraft": "~${minecraft_version}"
   },
   "custom": {
     "modmenu": {
-      "badges": ["library"]
+      "badges": [
+        "library"
+      ]
     }
+  },
+  "suggests": {
+    "yet_another_config_lib_v3": ">=3.6.6+1.21.4-fabric"
   }
 }

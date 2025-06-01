@@ -22,7 +22,7 @@ public class AlphaSlider {
         this.color = color;
         this.x = x;
         this.y = y;
-        alpha = color.getAlpha() / 255f;
+        this.alpha = color.getAlpha() / 255f;
     }
 
     public void render(DrawContext drawContext, int x, int y) {
@@ -61,6 +61,14 @@ public class AlphaSlider {
 
     public void setX(int x) {
         this.x = x;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 
     public boolean isMouseOver(double mouseX, double mouseY) {

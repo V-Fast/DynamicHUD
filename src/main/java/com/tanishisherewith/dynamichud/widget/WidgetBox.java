@@ -1,7 +1,7 @@
 package com.tanishisherewith.dynamichud.widget;
 
 public class WidgetBox {
-    public float x = 0, y = 0;
+    public float x, y;
     private float width;
     private float height;
 
@@ -45,14 +45,14 @@ public class WidgetBox {
         return !(this.y + this.height < other.y);
     }
 
-    public void setSizeAndPositionNoScale(float x, float y, float width, float height) {
+    public void setDimensionsNoScale(float x, float y, float width, float height) {
         this.x = x;
         this.y = y;
         this.height = height;
         this.width = width;
     }
 
-    public void setSizeAndPosition(float x, float y, float width, float height, boolean shouldScale, float scale) {
+    public void setDimensions(float x, float y, float width, float height, boolean shouldScale, float scale) {
         this.x = x;
         this.y = y;
         this.height = height * (shouldScale ? scale : 1.0f);
