@@ -21,10 +21,12 @@ public abstract class Skin {
     private boolean createNewScreen;
 
     public Skin(ContextMenu<?> menu) {
+        this();
         this.contextMenu = menu;
     }
 
     public Skin() {
+        addRenderer(OptionGroup.class, OptionGroup.OptionGroupRenderer::new);
     }
 
     public <T extends Option<?>> void addRenderer(Class<T> optionClass, Supplier<SkinRenderer<?>> renderer) {
@@ -114,4 +116,11 @@ public abstract class Skin {
     protected boolean isMouseOver(double mouseX, double mouseY, double x, double y, double width, double height) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
+
+    /**
+     * Create a new Skin object with the same parameters as this current screen. This is must for SubMenu options.
+     * If an object of same skin type is not returned then SubMenu options will not share the same skin with parent menu.
+     * @return new instance of this skin that need to be cloned to sub-menu option.
+     */
+    public abstract Skin clone();
 }

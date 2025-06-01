@@ -2,6 +2,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.tanishisherewith.dynamichud.DynamicHUD;
+import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.layout.LayoutContext;
@@ -35,18 +36,18 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             Identifier.ofVanilla("widget/button_disabled"),
             Identifier.ofVanilla("widget/button_highlighted")
     );
-    private static final int DEFAULT_SCROLLBAR_WIDTH = 8;
-    private static final int DEFAULT_PANEL_WIDTH = 248;
-    private static final int DEFAULT_PANEL_HEIGHT = 165;
-    private static final Identifier DEFAULT_BACKGROUND_PANEL = Identifier.ofVanilla("textures/gui/demo_background.png");
-    private static final Identifier SCROLLER_TEXTURE = Identifier.ofVanilla("widget/scroller");
-    private static final Identifier SCROLL_BAR_BACKGROUND = Identifier.ofVanilla("widget/scroller_background");
-    private static final Identifier GROUP_BACKGROUND = Identifier.of(DynamicHUD.MOD_ID, "textures/minecraftskin/group_panel.png");
+    public static final int DEFAULT_SCROLLBAR_WIDTH = 8;
+    public static final int DEFAULT_PANEL_WIDTH = 248;
+    public static final int DEFAULT_PANEL_HEIGHT = 165;
+    public static final Identifier DEFAULT_BACKGROUND_PANEL = Identifier.ofVanilla("textures/gui/demo_background.png");
+    public static final Identifier SCROLLER_TEXTURE = Identifier.ofVanilla("widget/scroller");
+    public static final Identifier SCROLL_BAR_BACKGROUND = Identifier.ofVanilla("widget/scroller_background");
+    public static final Identifier GROUP_BACKGROUND = Identifier.of(DynamicHUD.MOD_ID, "textures/minecraftskin/group_panel.png");
 
     private final Identifier BACKGROUND_PANEL;
     private final int panelWidth;
     private final int panelHeight;
-    private final PanelColor panelColor;
+    private PanelColor panelColor;
 
     private int imageX, imageY;
     private final ScrollHandler scrollHandler;
@@ -124,16 +125,12 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
-        panelColor.applyColor();
 
-        drawContext.drawTexture(RenderLayer::getGuiTextured, BACKGROUND_PANEL, imageX, imageY, 0, 0, panelWidth, panelHeight, 256, 254);
-
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        drawContext.drawTexture(RenderLayer::getGuiTextured, BACKGROUND_PANEL, imageX, imageY, 0, 0, panelWidth, panelHeight, 256, 254,panelColor.getColor());
 
         drawSingularButton(drawContext, "X", mouseX, mouseY, imageX + 3, imageY + 3, 14, 14);
 
         //Up and down arrows near the group panel
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.disableBlend();
         RenderSystem.disableDepthTest();
 
@@ -324,6 +321,30 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         return LayoutContext.Offset.zero();
     }
 
+    public void setPanelColor(PanelColor panelColor) {
+        this.panelColor = panelColor;
+    }
+
+    public PanelColor getPanelColor() {
+        return panelColor;
+    }
+
+    public int getPanelHeight() {
+        return panelHeight;
+    }
+
+    public int getPanelWidth() {
+        return panelWidth;
+    }
+
+    public int getImageX() {
+        return imageX;
+    }
+
+    public int getImageY() {
+        return imageY;
+    }
+
     /**
      * Group rendering handled already
      */
@@ -332,22 +353,22 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     }
 
     public enum PanelColor {
-        COFFEE_BROWN(0.6f, 0.3f, 0.1f, 0.9f),
-        CREAMY(1.0f, 0.9f, 0.8f, 0.9f),
-        DARK_PANEL(0.2f, 0.2f, 0.2f, 0.9f),
-        FOREST_GREEN(0.0f, 0.6f, 0.2f, 0.9f),
-        GOLDEN_YELLOW(1.0f, 0.8f, 0.0f, 0.9f),
-        LAVENDER(0.8f, 0.6f, 1.0f, 0.9f),
-        LIGHT_BLUE(0.6f, 0.8f, 1.0f, 0.9f),
-        LIME_GREEN(0.7f, 1.0f, 0.3f, 0.9f),
-        MIDNIGHT_PURPLE(0.3f, 0.0f, 0.5f, 0.9f),
-        OCEAN_BLUE(0.0f, 0.5f, 1.0f, 0.9f),
-        ROSE_PINK(1.0f, 0.4f, 0.6f, 0.9f),
-        SKY_BLUE(0.5f, 0.8f, 1.0f, 0.9f),
-        SOFT_GREEN(0.6f, 1.0f, 0.6f, 0.9f),
-        SUNSET_ORANGE(1.0f, 0.5f, 0.0f, 0.9f),
-        WARM_YELLOW(1.0f, 1.0f, 0.6f, 0.9f),
-        CUSTOM(0.0f, 0.0f, 0.0f, 0.0f); // PlaceHolder for custom colors
+        COFFEE_BROWN(0.6f, 0.3f, 0.1f, 1.0f),
+        CREAMY(1.0f, 0.9f, 0.8f, 1.0f),
+        DARK_PANEL(0.2f, 0.2f, 0.2f, 1.0f),
+        FOREST_GREEN(0.0f, 0.6f, 0.2f, 1.0f),
+        GOLDEN_YELLOW(1.0f, 0.8f, 0.0f, 1.0f),
+        LAVENDER(0.8f, 0.6f, 1.0f, 1.0f),
+        LIGHT_BLUE(0.6f, 0.8f, 1.0f, 1.0f),
+        LIME_GREEN(0.7f, 1.0f, 0.3f, 1.0f),
+        MIDNIGHT_PURPLE(0.3f, 0.0f, 0.5f, 1.0f),
+        OCEAN_BLUE(0.0f, 0.5f, 1.0f, 1.0f),
+        ROSE_PINK(1.0f, 0.4f, 0.6f, 1.0f),
+        SKY_BLUE(0.5f, 0.8f, 1.0f, 1.0f),
+        SOFT_GREEN(0.6f, 1.0f, 0.6f, 1.0f),
+        SUNSET_ORANGE(1.0f, 0.5f, 0.0f, 1.0f),
+        WARM_YELLOW(1.0f, 1.0f, 0.6f, 1.0f),
+        CUSTOM(0.0f, 0.0f, 0.0f, 0.0f); /// PlaceHolder for custom colors
 
         private float red;
         private float green;
@@ -372,6 +393,9 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
         public void applyColor() {
             RenderSystem.setShaderColor(red, green, blue, alpha);
+        }
+        public int getColor() {
+            return new Color(red,green,blue,alpha).getRGB();
         }
     }
 
@@ -520,7 +544,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             option.setHeight(25);
             option.setWidth(maxWidth);
 
-            drawContext.drawText(mc.textRenderer, option.name + ": ", x + 15, y + 25 / 2 - 5, -1, true);
+            drawContext.drawText(mc.textRenderer, option.name.copy().append(": "), x + 15, y + 25 / 2 - 5, -1, true);
 
             option.setPosition(x + panelWidth - maxWidth - 25, y);
 
@@ -554,7 +578,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             option.setHeight(25);
             option.setWidth(maxWidth);
 
-            drawContext.drawText(mc.textRenderer, option.name + ": ", x + 15, y + 25 / 2 - 5, -1, true);
+            drawContext.drawText(mc.textRenderer, option.name.copy().append(": "), x + 15, y + 25 / 2 - 5, -1, true);
 
             option.setPosition(x + panelWidth - maxWidth - 25, y);
 
@@ -601,7 +625,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             option.setHeight(25);
             option.setWidth(26);
 
-            drawContext.drawText(mc.textRenderer, option.name + ": ", x + 15, y + 25 / 2 - 5, -1, true);
+            drawContext.drawText(mc.textRenderer, option.name.copy().append(": "), x + 15, y + 25 / 2 - 5, -1, true);
 
             option.setPosition(x + panelWidth - 51, y);
 
@@ -614,5 +638,10 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             RenderSystem.disableBlend();
             RenderSystem.disableDepthTest();
         }
+    }
+
+    @Override
+    public Skin clone() {
+        return new MinecraftSkin(panelColor);
     }
 }

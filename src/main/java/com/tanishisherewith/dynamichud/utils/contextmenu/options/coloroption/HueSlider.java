@@ -44,6 +44,7 @@ public class HueSlider {
             color = (color & 0x00FFFFFF) | (255 << 24);
             drawContext.fill(x + i, y, x + i + 1, y + height, color);
         }
+        drawContext.draw();
 
 
         // Draw the handle

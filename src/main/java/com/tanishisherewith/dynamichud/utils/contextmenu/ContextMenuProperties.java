@@ -91,6 +91,9 @@ public class ContextMenuProperties {
         return skin;
     }
 
+    /**
+     * @return Cloned object of every property except skin
+     */
     public ContextMenuProperties clone() {
         return cloneToBuilder().build();
     }
@@ -111,9 +114,21 @@ public class ContextMenuProperties {
                 .enableAnimations(enableAnimations);
     }
 
+    /**
+     * @return Cloned object with same skin as the current ContextMenuProperties
+     */
     public ContextMenuProperties cloneWithSkin() {
         return this.cloneToBuilder()
                 .skin(skin)
+                .build();
+    }
+
+    /**
+     * @return Cloned object with a clone of the skin as the current ContextMenuProperties
+     */
+    public ContextMenuProperties cloneSkin() {
+        return this.cloneToBuilder()
+                .skin(skin.clone())
                 .build();
     }
 

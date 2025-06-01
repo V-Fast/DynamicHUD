@@ -29,8 +29,7 @@ public class OptionGroup extends Option<OptionGroup> {
 
     @Override
     public void updateProperties(ContextMenuProperties properties) {
-        this.renderer = new OptionGroupRenderer(); // Set renderer as OptionGroupRenderer
-
+        super.updateProperties(properties);
         if (groupOptions == null) return;
 
         for (Option<?> option : groupOptions) {
@@ -40,6 +39,7 @@ public class OptionGroup extends Option<OptionGroup> {
 
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
+        super.render(drawContext,x,y,mouseX,mouseY);
     }
 
     public boolean isExpanded() {
@@ -63,11 +63,9 @@ public class OptionGroup extends Option<OptionGroup> {
         return super.getHeight();
     }
 
-    public class OptionGroupRenderer implements SkinRenderer<Option<OptionGroup>> {
-
+    public static class OptionGroupRenderer implements SkinRenderer<Option<OptionGroup>> {
         @Override
-        public void render(DrawContext drawContext, Option<OptionGroup> option, int x, int y, int mouseX, int mouseY) {
-        }
+        public void render(DrawContext drawContext, Option<OptionGroup> option, int x, int y, int mouseX, int mouseY) {}
 
         @Override
         public boolean mouseClicked(Option<OptionGroup> option2, double mouseX, double mouseY, int button) {

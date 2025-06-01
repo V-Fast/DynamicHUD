@@ -148,7 +148,7 @@ public final class IntegrationManager {
                 } else {
                     DynamicHUD.logger.error("Mod {} has improper implementation of DynamicHUD", modId, e);
                 }
-                bad_implementations.add(new ModError(modId, e.getLocalizedMessage().trim()));
+                bad_implementations.add(new ModError(modId, e.getMessage().trim()));
             }
         }
         printInfo("(DynamicHUD) Integration of supported mods was successful");

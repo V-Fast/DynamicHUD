@@ -25,15 +25,15 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 
-//TODO: Complete this
 public class ModernSkin extends Skin implements GroupableSkin {
+    static Color DARK_GRAY = new Color(20, 20, 20, 229);
+    static Color DARKER_GRAY = new Color(10, 10, 10, 243);
+    static Color DARKER_GRAY_2 = new Color(12, 12, 12, 246);
+
     private final Color themeColor;
     private final float radius;
     private final Text defaultToolTipHeader;
     private final Text defaultToolTipText;
-    Color DARK_GRAY = new Color(20, 20, 20, 229);
-    Color DARKER_GRAY_2 = new Color(12, 12, 12, 246);
-    Color DARKER_GRAY = new Color(10, 10, 10, 243);
     private int contextMenuX = 0, contextMenuY = 0;
     private int width = 0, height = 0;
     private float scaledWidth = 0, scaledHeight = 0;
@@ -95,7 +95,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                     groupX + 1, groupY + 14, width - groupX - 8 + contextMenuX, group.getHeight() - 16, radius, DARKER_GRAY_2.getRGB());
         }
 
-        String groupText = group.name + " " + (group.isExpanded() ? "-" : "+");
+        Text groupText = group.name.copy().append(" " + (group.isExpanded() ? "-" : "+"));
 
         DrawHelper.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(),
                 groupX + 1, groupY + 1, true, true, !group.isExpanded(), !group.isExpanded(), mc.textRenderer.getWidth(groupText) + 6, 16, radius, DARKER_GRAY_2.getRGB());
@@ -173,6 +173,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
             yOffset += option.getHeight() + 1;
         }
+        drawContext.draw();
         RenderSystem.disableScissor();
 
         contextMenu.setWidth(width);
@@ -185,7 +186,6 @@ public class ModernSkin extends Skin implements GroupableSkin {
         renderToolTipText(drawContext, mouseX, mouseY);
 
         //Reset our scaling so minecraft runs normally\
-        drawContext.draw();
         DrawHelper.scaledProjection();
     }
 
@@ -209,6 +209,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                 contextMenuX + 2, contextMenuY + 2, textWidth + 8, 14, radius, color, 125, 2, 2);
 
         drawContext.drawText(mc.textRenderer, backText, contextMenuX + 6, contextMenuY + 5, -1, true);
+        drawContext.draw();
     }
 
     public void renderToolTipText(DrawContext drawContext, int mouseX, int mouseY) {
@@ -275,6 +276,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             textY += mc.textRenderer.fontHeight;
         }
 
+        drawContext.draw();
         DrawHelper.stopScaling(drawContext.getMatrices());
 
         setTooltipText(defaultToolTipHeader, defaultToolTipText);
@@ -646,7 +648,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             option.setHeight(mc.textRenderer.fontHeight + 2);
 
             // Draw main option name and selected option
-            String mainLabel = option.name + ": ";
+            Text mainLabel = option.name.copy().append(": ");
             String selectedOption = option.get().toString();
             drawContext.drawText(mc.textRenderer, mainLabel, x + 4, y + 2, -1, false);
             Color fillColor = isMouseOver(mouseX, mouseY, x + 4 + mc.textRenderer.getWidth(mainLabel), y, mc.textRenderer.getWidth(selectedOption) + 5, mc.textRenderer.fontHeight + 2) ? getThemeColor().darker().darker() : getThemeColor();
@@ -745,7 +747,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             option.setHeight(mc.textRenderer.fontHeight + 2);
 
             // Draw main option name and selected option
-            String mainLabel = option.name + ": ";
+            Text mainLabel = option.name.copy().append(": ");
             String selectedOption = option.get().toString();
             drawContext.drawText(mc.textRenderer, mainLabel, x + 4, y + 2, -1, false);
             Color fillColor = isMouseOver(mouseX, mouseY, x + 4 + mc.textRenderer.getWidth(mainLabel), y, mc.textRenderer.getWidth(selectedOption) + 5, mc.textRenderer.fontHeight + 2) ? getThemeColor().darker().darker() : getThemeColor();
@@ -804,7 +806,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
             int x = option.getX();
             int y = option.getY();
-            String mainLabel = option.name + ": ";
+            Text mainLabel = option.name.copy().append(": ");
             String selectedOption = option.get().toString();
 
             // Calculate positions
@@ -948,5 +950,9 @@ public class ModernSkin extends Skin implements GroupableSkin {
             mouseY = mc.mouse.getY() / SCALE_FACTOR;
             return SkinRenderer.super.mouseClicked(option, mouseX, mouseY, button);
         }
+    }
+    @Override
+    public Skin clone() {
+        return new ModernSkin(themeColor,radius,defaultToolTipHeader,defaultToolTipText);
     }
 }

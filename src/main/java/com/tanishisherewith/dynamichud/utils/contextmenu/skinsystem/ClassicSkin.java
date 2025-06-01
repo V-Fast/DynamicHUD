@@ -141,6 +141,11 @@ public class ClassicSkin extends Skin {
         }
     }
 
+    @Override
+    public Skin clone() {
+        return new ClassicSkin();
+    }
+
     public static class ClassicBooleanRenderer implements SkinRenderer<BooleanOption> {
         @Override
         public void render(DrawContext drawContext, BooleanOption option, int x, int y, int mouseX, int mouseY) {
@@ -191,10 +196,12 @@ public class ClassicSkin extends Skin {
         public void render(DrawContext drawContext, SubMenuOption option, int x, int y, int mouseX, int mouseY) {
             int color = option.value ? Color.GREEN.getRGB() : Color.RED.getRGB();
             drawContext.drawText(mc.textRenderer, option.name, x, y, color, false);
-            option.setHeight(mc.textRenderer.fontHeight);
-            option.setWidth(mc.textRenderer.getWidth(option.name) + 1);
+            drawContext.drawText(mc.textRenderer, option.getSubMenu().isVisible() ? "-" : "+", x + Math.max(option.getParentMenu().getWidth() - 12, mc.textRenderer.getWidth(option.name) + 2), y, color, false);
 
-            option.getSubMenu().render(drawContext, x + option.getParentMenu().getWidth(), y, mouseX, mouseY);
+            option.setHeight(mc.textRenderer.fontHeight);
+            option.setWidth(mc.textRenderer.getWidth(option.name) + 4);
+
+            option.getSubMenu().render(drawContext, x + option.getParentMenu().getWidth(), y - 1, mouseX, mouseY);
         }
     }
 
@@ -237,7 +244,6 @@ public class ClassicSkin extends Skin {
             option.drawSlider(drawContext, x, y + textRenderer.fontHeight + 1, option.getWidth(), handleX);
 
             // Draw the handle
-
             DrawHelper.drawRoundedRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(),
                     (float) handleX,
                     (float) handleY,
@@ -248,6 +254,7 @@ public class ClassicSkin extends Skin {
                     90,
                     0.6f,
                     0.6f);
+
         }
     }
 

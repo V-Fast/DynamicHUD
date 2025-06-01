@@ -185,6 +185,15 @@ public abstract class Option<T> implements Input {
         return description;
     }
 
+    @Override
+    public String toString() {
+        return this.getClass().getName() + "{" +
+                ", name=" + name +
+                ", x=" + x +
+                ", y=" + y +
+                '}';
+    }
+
     /**
      * How complex do you think this option is for a daily normal user.
      * For example, some options may be advanced and not needed for casual players but are helpful in customisation
