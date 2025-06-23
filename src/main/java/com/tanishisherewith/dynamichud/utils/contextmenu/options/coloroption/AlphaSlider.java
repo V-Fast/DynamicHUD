@@ -30,7 +30,7 @@ public class AlphaSlider {
         this.y = y;
 
         DrawHelper.drawOutlinedBox(drawContext, x - 2, y - 2, x + width + 2, y + height + 2, Color.WHITE.getRGB());
-        DrawHelper.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), x, y, width, height, color.getRGB(), ColorHelper.changeAlpha(color, 0).getRGB(), DrawHelper.Direction.TOP_BOTTOM);
+        DrawHelper.drawGradient(drawContext, x, y, width, height, color.getRGB(), ColorHelper.changeAlpha(color, 0).getRGB(), DrawHelper.Direction.TOP_BOTTOM);
         drawContext.fill(x - 2, y + alphaHandleY - 1, x + width + 2, y + alphaHandleY + 1, Color.WHITE.getRGB());
     }
 

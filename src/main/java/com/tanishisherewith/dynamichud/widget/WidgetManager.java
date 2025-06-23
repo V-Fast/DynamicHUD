@@ -196,15 +196,16 @@ public class WidgetManager {
             printWarn("RootTag is null. File is either empty or corrupted: " + file);
             return Collections.emptyList();
         }
-        NbtList widgetList = rootTag.getList("widgets", NbtElement.COMPOUND_TYPE);
+        NbtList widgetList = rootTag.getList("widgets").orElse(null);
         if (widgetList == null) {
             printWarn("WidgetList is null. File is empty: " + file);
             return Collections.emptyList();
         }
         List<Widget> widgetsToAdd = new ArrayList<>();
         for (int i = 0; i < widgetList.size(); i++) {
-            NbtCompound widgetTag = widgetList.getCompound(i);
-            WidgetData<?> widgetData = widgetDataMap.get(widgetTag.getString("name"));
+            NbtCompound widgetTag = widgetList.getCompound(i).orElse(null);
+            if(widgetTag == null) continue;
+            WidgetData<?> widgetData = widgetDataMap.get(widgetTag.getString("name").orElse("unknown"));
             if (widgetData == null) {
                 throw new IllegalStateException("A Widget named '" + widgetTag.getString("name") + "' was found in the save file, but no matching WidgetData for its class could be located. This may indicate that the mod responsible for saving this widget has been removed or its implementation is incorrect.");
             }

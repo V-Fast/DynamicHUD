@@ -32,9 +32,9 @@ public class DoubleOption extends Option<Double> {
     }
 
     public void drawSlider(DrawContext drawContext, int sliderX, int sliderY, int sliderWidth, double handleX) {
-        DrawHelper.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), sliderX, sliderY, sliderWidth, 2, 0xFFFFFFFF);
+        DrawHelper.drawRectangle(drawContext, sliderX, sliderY, sliderWidth, 2, 0xFFFFFFFF);
         if (handleX - sliderX > 0) {
-            DrawHelper.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), (float) sliderX, (float) sliderY, (float) ((value - minValue) / (maxValue - minValue) * (width - 3)), 2, Color.ORANGE.getRGB());
+            DrawHelper.drawRectangle(drawContext, (float) sliderX, (float) sliderY, (float) ((value - minValue) / (maxValue - minValue) * (width - 3)), 2, Color.ORANGE.getRGB());
         }
     }
 

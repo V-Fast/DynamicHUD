@@ -1,11 +1,14 @@
 package com.tanishisherewith.dynamichud;
 
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
+import com.tanishisherewith.dynamichud.helpers.MouseColorQuery;
 import com.tanishisherewith.dynamichud.integration.IntegrationManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import org.slf4j.Logger;
@@ -35,6 +38,7 @@ public class DynamicHUD implements ClientModInitializer {
         IntegrationManager.integrate();
 
         //In game screen render.
-        HudRenderCallback.EVENT.register(new HudRender());
+        HudLayerRegistrationCallback.EVENT.register(new HudRender());
+        ClientTickEvents.END_CLIENT_TICK.register(mc-> MouseColorQuery.processIfPending());
     }
 }

@@ -45,8 +45,8 @@ public abstract class DynamicValueWidget extends Widget {
     @Override
     public void readFromTag(NbtCompound tag) {
         super.readFromTag(tag);
-        registryID = tag.getString("RegistryID");
-        registryKey = tag.getString("RegistryKey");
+        registryID = tag.getString("RegistryID").orElse(DynamicValueRegistry.GLOBAL_ID);
+        registryKey = tag.getString("RegistryKey").orElse("null");
 
         initializeValueSupplier();
 

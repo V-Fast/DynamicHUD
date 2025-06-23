@@ -39,7 +39,7 @@ public class ItemWidget extends Widget {
     @Override
     public void readFromTag(NbtCompound tag) {
         super.readFromTag(tag);
-        item = Item.byRawId(tag.getInt("ItemID")).getDefaultStack();
+        item = Item.byRawId(tag.getInt("ItemID").orElse(0)).getDefaultStack();
     }
 
     public void setItemStack(ItemStack item) {

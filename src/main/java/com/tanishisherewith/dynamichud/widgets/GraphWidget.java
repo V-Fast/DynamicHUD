@@ -1,10 +1,10 @@
 package com.tanishisherewith.dynamichud.widgets;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.animations.MathAnimations;
+import com.tanishisherewith.dynamichud.utils.CustomRenderLayers;
 import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
@@ -17,9 +17,8 @@ import com.tanishisherewith.dynamichud.widget.DynamicValueWidget;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
 import com.twelvemonkeys.lang.Validate;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
@@ -73,7 +72,8 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         createMenu();
         ContextMenuManager.getInstance().registerProvider(this);
     }
-    private void internal_init(){
+
+    private void internal_init() {
         Validate.isTrue(maxDataPoints > 2, "MaxDataPoints should be more than 2.");
         this.dataPoints = new float[maxDataPoints];
         this.label = label.trim();
@@ -151,82 +151,75 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     }
 
     // draw a continuous interpolated curve
-    private void drawInterpolatedCurve(Matrix4f matrix, List<float[]> points, int color, float thickness) {
+    private void drawInterpolatedCurve(DrawContext drawContext, List<float[]> points, int color, float thickness) {
         if (points.size() < 2) return;
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+        drawContext.draw(vcp -> {
+            Matrix4f matrix = drawContext.getMatrices().peek().getPositionMatrix();
+            VertexConsumer consumer = vcp.getBuffer(CustomRenderLayers.TRIANGLE_STRIP);
 
-        for (int i = 0; i < points.size(); i++) {
-            float[] point = points.get(i);
-            float x = point[0];
-            float y = point[1];
+            for (int i = 0; i < points.size(); i++) {
+                float[] point = points.get(i);
+                float x = point[0];
+                float y = point[1];
 
-            // Create a thick line by offsetting vertices perpendicular to the curve
-            float dx = (i < points.size() - 1) ? points.get(i + 1)[0] - x : x - points.get(i - 1)[0];
-            float dy = (i < points.size() - 1) ? points.get(i + 1)[1] - y : y - points.get(i - 1)[1];
-            float length = (float) Math.sqrt(dx * dx + dy * dy);
-            if (length == 0) continue;
+                // Create a thick line by offsetting vertices perpendicular to the curve
+                float dx = (i < points.size() - 1) ? points.get(i + 1)[0] - x : x - points.get(i - 1)[0];
+                float dy = (i < points.size() - 1) ? points.get(i + 1)[1] - y : y - points.get(i - 1)[1];
+                float length = (float) Math.sqrt(dx * dx + dy * dy);
+                if (length == 0) continue;
 
-            float offsetX = (thickness * 0.5f * dy) / length;
-            float offsetY = (thickness * 0.5f * -dx) / length;
+                float offsetX = (thickness * 0.5f * dy) / length;
+                float offsetY = (thickness * 0.5f * -dx) / length;
 
-            bufferBuilder.vertex(matrix, x + offsetX, y + offsetY, 0).color(color);
-            bufferBuilder.vertex(matrix, x - offsetX, y - offsetY, 0).color(color);
-        }
-
-        RenderSystem.enableBlend();
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-        RenderSystem.disableBlend();
+                consumer.vertex(matrix, x + offsetX, y + offsetY, 0).color(color);
+                consumer.vertex(matrix, x - offsetX, y - offsetY, 0).color(color);
+            }
+        });
     }
 
     // draw a gradient shadow under the curve
-    private void drawGradientShadow(Matrix4f matrix, List<float[]> points, float bottomY, int startColor, int endColor) {
+    private void drawGradientShadow(DrawContext context, List<float[]> points, float bottomY, int startColor, int endColor) {
         if (points.size() < 2) return;
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+        context.draw(vcp -> {
+            Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
+            VertexConsumer consumer = vcp.getBuffer(CustomRenderLayers.TRIANGLE_STRIP);
 
-        for (float[] point : points) {
-            float x = point[0];
-            float y = point[1];
+            for (float[] point : points) {
+                float x = point[0];
+                float y = point[1];
 
-            bufferBuilder.vertex(matrix, x, y, 0).color(startColor);
-            bufferBuilder.vertex(matrix, x, bottomY, 0).color(endColor);
-        }
-
-        RenderSystem.enableBlend();
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-        RenderSystem.disableBlend();
+                consumer.vertex(matrix, x, y, 0).color(startColor);
+                consumer.vertex(matrix, x, bottomY, 0).color(endColor);
+            }
+        });
     }
+    int offset = 0;
 
     @Override
     public void renderWidget(DrawContext context, int mouseX, int mouseY) {
-        Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-
         if (valueSupplier != null) {
             addDataPoint(getValue());
         }
 
         // Apply pulse1 animation to background alpha
-        float animatedAlpha = MathHelper.clamp(MathAnimations.pulse1(backgroundColor.getAlpha() / 255.0f, 0.2f, 0.001f), 0f, 1.0f);
+        float animatedAlpha = MathHelper.clamp(MathAnimations.pulse1(backgroundColor.getAlpha() / 255.0f, 0.5f, 0.01f), 0f, 1.0f);
         Color animatedBackgroundColor = ColorHelper.changeAlpha(backgroundColor, (int) (animatedAlpha * 255));
         Color gradientColor = ColorHelper.changeAlpha(backgroundColor, (int) (animatedAlpha * 255 * 0.7f));
 
         DrawHelper.enableScissor(widgetBox);
 
-        // Draw gradient background with rounded corners
+        // Draw gradient background with rounded.fsh corners
         if (!isInEditor) {
             DrawHelper.drawRoundedGradientRectangle(
-                    matrix,
+                    context,
                     animatedBackgroundColor,
                     gradientColor,
                     gradientColor,
                     animatedBackgroundColor,
-                    x, y, width, height, 5,
-                    false, true, false, false
+                    x + offset, y, width, height, 4,
+                    false, true,false, false
             );
         }
 
@@ -240,7 +233,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
             for (int i = 1; i <= gridLines; i++) {
                 float yPos = y + stepY * i;
-                DrawHelper.drawHorizontalLine(matrix, x, width, yPos, 0.5f, 0x4DFFFFFF); // Semi-transparent white
+                DrawHelper.drawHorizontalLine(context, x + offset, width, yPos, 0.5f, 0x4DFFFFFF); // Semi-transparent white
 
                 // Draw value labels on the left axis
                 float value = maxValue - (i * valueStep);
@@ -248,25 +241,29 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
                 //Scale the text to its proper position and size with grid lines
                 DrawHelper.scaleAndPosition(context.getMatrices(), x - 2, yPos, scale);
-                context.drawText(mc.textRenderer, valueText, x - mc.textRenderer.getWidth(valueText), (int) (yPos - (mc.textRenderer.fontHeight * scale) / 2.0f), 0xFFFFFFFF, true);
+                int texWidth = mc.textRenderer.getWidth(valueText);
+                context.drawText(mc.textRenderer, valueText, x  + (texWidth >= offset - 2? 2 : texWidth + 2), (int) (yPos - (mc.textRenderer.fontHeight * scale) / 2.0f), 0xFFFFFFFF, true);
                 DrawHelper.stopScaling(context.getMatrices());
+                offset = Math.max(offset, texWidth + 2);
             }
+
+            x += offset;
 
             // Draw vertical grid lines (time axis)
             float stepX = width / 5; // 5 vertical lines
             for (int i = 1; i < 5; i++) {
                 float xPos = x + stepX * i;
-                DrawHelper.drawVerticalLine(matrix, xPos, y, height, 0.5f, 0x4DFFFFFF);
+                DrawHelper.drawVerticalLine(context, xPos, y, height, 0.5f, 0x4DFFFFFF);
             }
         }
 
         // Draw interpolated graph curve
         List<float[]> points = getInterpolatedPoints();
-        drawInterpolatedCurve(matrix, points, graphColor.getRGB(), lineThickness);
+        drawInterpolatedCurve(context, points, graphColor.getRGB(), lineThickness);
 
         // Draw shadow effect under the graph
         drawGradientShadow(
-                matrix, points, y + height,
+                context, points, y + height,
                 ColorHelper.changeAlpha(graphColor, 50).getRGB(),
                 0x00000000
         );
@@ -279,8 +276,8 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
 
         // Draw axes
-        DrawHelper.drawHorizontalLine(matrix, x, width, y + height - 1, 1.0f, 0xFFFFFFFF); // X-axis
-        DrawHelper.drawVerticalLine(matrix, x, y, height, 1.0f, 0xFFFFFFFF); // Y-axis
+        DrawHelper.drawHorizontalLine(context, x, width, y + height - 1, 1.0f, 0xFFFFFFFF); // X-axis
+        DrawHelper.drawVerticalLine(context, x, y, height, 1.0f, 0xFFFFFFFF); // Y-axis
 
         // Draw min and max value labels with formatted values
         /*
@@ -296,7 +293,8 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         context.drawText(mc.textRenderer, formattedMinVal, x - mc.textRenderer.getWidth(formattedMinVal), (int) (y + height - 4), 0xFFFFFFFF, true);
         DrawHelper.stopScaling(context.getMatrices());
 
-        this.widgetBox.setDimensions(x, y, width, height,shouldScale, GlobalConfig.get().getScale());
+        x -= offset;
+        this.widgetBox.setDimensions(x, y, width + offset, height, shouldScale, GlobalConfig.get().getScale());
         DrawHelper.disableScissor();
 
         if (menu != null) menu.set(getX(), getY(), (int) Math.ceil(getHeight()));
@@ -473,18 +471,19 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     @Override
     public void readFromTag(NbtCompound tag) {
         super.readFromTag(tag);
-        this.width = tag.getFloat("width");
-        this.height = tag.getFloat("height");
-        this.maxDataPoints = tag.getInt("maxDataPoints");
-        this.minValue = tag.getFloat("minValue");
-        this.maxValue = tag.getFloat("maxValue");
-        this.graphColor = new Color(tag.getInt("graphColor"));
-        this.backgroundColor = new Color(tag.getInt("backgroundColor"));
-        this.lineThickness = tag.getFloat("lineThickness");
-        this.showGrid = tag.getBoolean("showGrid");
-        this.gridLines = tag.getInt("gridLines");
-        this.label = tag.getString("label");
-        this.autoUpdateRange = tag.getBoolean("autoUpdateRange");
+        this.width = tag.getFloat("width").orElse(100f);
+        this.height = tag.getFloat("height").orElse(50f);
+        this.maxDataPoints = tag.getInt("maxDataPoints").orElse(100);
+        this.minValue = tag.getFloat("minValue").orElse(0f);
+        this.maxValue = tag.getFloat("maxValue").orElse(1f);
+        this.graphColor = new Color(tag.getInt("graphColor").orElse(0xFF00FF00)); // default green
+        this.backgroundColor = new Color(tag.getInt("backgroundColor").orElse(0xFF000000)); // default black
+        this.lineThickness = tag.getFloat("lineThickness").orElse(1.0f);
+        this.showGrid = tag.getBoolean("showGrid").orElse(true);
+        this.gridLines = tag.getInt("gridLines").orElse(5);
+        this.label = tag.getString("label").orElse("Graph");
+        this.autoUpdateRange = tag.getBoolean("autoUpdateRange").orElse(false);
+
         this.setMinValue(minValue);
         this.setMaxValue(maxValue);
 

@@ -39,7 +39,7 @@ public class ClassicSkin extends Skin {
         ContextMenuProperties properties = contextMenu.getProperties();
 
         // Draw the background
-        drawBackground(matrices, contextMenu, properties);
+        drawBackground(drawContext, contextMenu, properties);
 
         int yOffset = contextMenu.y + 3;
         int width = 10;
@@ -48,7 +48,7 @@ public class ClassicSkin extends Skin {
 
             // Adjust mouse coordinates based on the scale
             if (contextMenu.getProperties().hoverEffect() && contextMenu.isMouseOver(mouseX, mouseY, contextMenu.x + 1, yOffset - 1, contextMenu.getWidth() - 2, option.getHeight())) {
-                drawBackground(matrices, contextMenu, properties, yOffset - 1, contextMenu.getWidth(), option.getHeight() + 1, contextMenu.getProperties().getHoverColor().getRGB(), false);
+                drawBackground(drawContext, contextMenu, properties, yOffset - 1, contextMenu.getWidth(), option.getHeight() + 1, contextMenu.getProperties().getHoverColor().getRGB(), false);
             }
 
             option.render(drawContext, contextMenu.x + 4, yOffset, mouseX, mouseY);
@@ -60,19 +60,19 @@ public class ClassicSkin extends Skin {
 
         // Draw the border if needed
         if (properties.shouldDrawBorder()) {
-            drawBorder(matrices, contextMenu, properties);
+            drawBorder(drawContext, contextMenu, properties);
         }
     }
 
-    private void drawBackground(MatrixStack matrices, ContextMenu<?> contextMenu, ContextMenuProperties properties) {
-        drawBackground(matrices, contextMenu, properties, contextMenu.y, contextMenu.getWidth(), contextMenu.getHeight(), properties.getBackgroundColor().getRGB(), properties.shadow());
+    private void drawBackground(DrawContext drawContext, ContextMenu<?> contextMenu, ContextMenuProperties properties) {
+        drawBackground(drawContext, contextMenu, properties, contextMenu.y, contextMenu.getWidth(), contextMenu.getHeight(), properties.getBackgroundColor().getRGB(), properties.shadow());
     }
 
-    private void drawBackground(MatrixStack matrices, ContextMenu<?> contextMenu, ContextMenuProperties properties, int yOffset, int width, int height, int color, boolean shadow) {
+    private void drawBackground(DrawContext drawContext, ContextMenu<?> contextMenu, ContextMenuProperties properties, int yOffset, int width, int height, int color, boolean shadow) {
         if (properties.roundedCorners()) {
             // Rounded
             if (shadow) {
-                DrawHelper.drawRoundedRectangleWithShadowBadWay(matrices.peek().getPositionMatrix(),
+                DrawHelper.drawRoundedRectangleWithShadowBadWay(drawContext,
                         contextMenu.x,
                         yOffset,
                         width,
@@ -84,7 +84,7 @@ public class ClassicSkin extends Skin {
                         1
                 );
             } else {
-                DrawHelper.drawRoundedRectangle(matrices.peek().getPositionMatrix(),
+                DrawHelper.drawRoundedRectangle(drawContext,
                         contextMenu.x,
                         yOffset,
                         width,
@@ -96,7 +96,7 @@ public class ClassicSkin extends Skin {
         } else {
             // Normal
             if (shadow) {
-                DrawHelper.drawRectangleWithShadowBadWay(matrices.peek().getPositionMatrix(),
+                DrawHelper.drawRectangleWithShadowBadWay(drawContext,
                         contextMenu.x,
                         yOffset,
                         width,
@@ -107,7 +107,7 @@ public class ClassicSkin extends Skin {
                         1
                 );
             } else {
-                DrawHelper.drawRectangle(matrices.peek().getPositionMatrix(),
+                DrawHelper.drawRectangle(drawContext,
                         contextMenu.x,
                         yOffset,
                         width,
@@ -118,9 +118,9 @@ public class ClassicSkin extends Skin {
         }
     }
 
-    private void drawBorder(MatrixStack matrices, ContextMenu<?> contextMenu, ContextMenuProperties properties) {
+    private void drawBorder(DrawContext drawContext, ContextMenu<?> contextMenu, ContextMenuProperties properties) {
         if (properties.roundedCorners()) {
-            DrawHelper.drawOutlineRoundedBox(matrices.peek().getPositionMatrix(),
+            DrawHelper.drawOutlineRoundedBox(drawContext,
                     contextMenu.x,
                     contextMenu.y,
                     contextMenu.getWidth(),
@@ -130,7 +130,7 @@ public class ClassicSkin extends Skin {
                     properties.getBorderColor().getRGB()
             );
         } else {
-            DrawHelper.drawOutlineBox(matrices.peek().getPositionMatrix(),
+            DrawHelper.drawOutlineBox(drawContext,
                     contextMenu.x,
                     contextMenu.y,
                     contextMenu.getWidth(),
@@ -165,12 +165,12 @@ public class ClassicSkin extends Skin {
             option.setWidth(mc.textRenderer.getWidth(option.name) + 10);
 
             int shadowOpacity = Math.min(option.value.getAlpha(), 90);
-            DrawHelper.drawRoundedRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(),
+            DrawHelper.drawRoundedRectangleWithShadowBadWay(drawContext,
                     x + option.getWidth() - 10 + 1,
                     y - 1,
                     8,
                     8,
-                    2,
+                    3,
                     option.value.getRGB(),
                     shadowOpacity,
                     1,
@@ -244,7 +244,7 @@ public class ClassicSkin extends Skin {
             option.drawSlider(drawContext, x, y + textRenderer.fontHeight + 1, option.getWidth(), handleX);
 
             // Draw the handle
-            DrawHelper.drawRoundedRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(),
+            DrawHelper.drawRoundedRectangleWithShadowBadWay(drawContext,
                     (float) handleX,
                     (float) handleY,
                     handleWidth,

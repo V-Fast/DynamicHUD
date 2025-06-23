@@ -21,7 +21,7 @@ public class WidgetRenderer implements Input {
     public Widget selectedWidget = null;
     List<Widget> widgets;
     private boolean renderInGameHud = true;
-    private int Z_Index = 100;
+    private int Z_Index = -1;
 
     /**
      * Add the list of widgets the widgetRenderer should render

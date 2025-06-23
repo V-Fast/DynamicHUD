@@ -1,7 +1,7 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption;
 
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
-import com.tanishisherewith.dynamichud.helpers.ColorHelper;
+import com.tanishisherewith.dynamichud.helpers.MouseColorQuery;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 
@@ -62,19 +62,20 @@ public class ColorGradient {
         alphaSlider.render(drawContext, x + 10 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
 
         if (colorPickerButton.isPicking() && GlobalConfig.get().showColorPickerPreview()) {
-            int[] colors = ColorHelper.getMousePixelColor(mouseX, mouseY);
-            if (colors != null) {
-                int red = colors[0];
-                int green = colors[1];
-                int blue = colors[2];
+            MouseColorQuery.request(mouseX, mouseY, colors -> {
+                if (colors != null) {
+                    int red = colors[0];
+                    int green = colors[1];
+                    int blue = colors[2];
 
-                //Draw the preview box near the mouse pointer
-                drawContext.getMatrices().push();
-                drawContext.getMatrices().translate(0, 0, 2500);
-                drawContext.fill(mouseX + 10, mouseY, mouseX + 26, mouseY + 16, -1);
-                drawContext.fill(mouseX + 11, mouseY + 1, mouseX + 25, mouseY + 15, (red << 16) | (green << 8) | blue | 0xFF000000);
-                drawContext.getMatrices().pop();
-            }
+                    //Draw the preview box near the mouse pointer
+                    drawContext.getMatrices().push();
+                    drawContext.getMatrices().translate(0, 0, 2500);
+                    drawContext.fill(mouseX + 10, mouseY, mouseX + 26, mouseY + 16, -1);
+                    drawContext.fill(mouseX + 11, mouseY + 1, mouseX + 25, mouseY + 15, (red << 16) | (green << 8) | blue | 0xFF000000);
+                    drawContext.getMatrices().pop();
+                }
+            });
         }
     }
 
