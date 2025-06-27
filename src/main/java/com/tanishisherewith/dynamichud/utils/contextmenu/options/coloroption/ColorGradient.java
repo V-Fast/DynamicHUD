@@ -1,6 +1,7 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption;
 
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
+import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.MouseColorQuery;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -106,7 +107,7 @@ public class ColorGradient {
             }
         }
         */
-        alphaSlider.setColor(new Color(gradientBox.getColor()));
+        alphaSlider.setColor(new Color(gradientBox.getColor(), true));
         alphaSlider.onClick(mouseX, mouseY, button);
         onColorSelected.accept(alphaSlider.getColor());
 
@@ -126,7 +127,7 @@ public class ColorGradient {
         gradientSlider.onDrag(mouseX, mouseY, button);
         gradientBox.setHue(gradientSlider.getHue());
         gradientBox.onDrag(mouseX, mouseY, button);
-        alphaSlider.setColor(new Color(gradientBox.getColor()));
+        alphaSlider.setColor(new Color(gradientBox.getColor(), true));
         alphaSlider.onDrag(mouseX, mouseY, button);
         onColorSelected.accept(alphaSlider.getColor());
     }

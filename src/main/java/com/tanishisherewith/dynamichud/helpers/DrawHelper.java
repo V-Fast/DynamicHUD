@@ -156,7 +156,7 @@ public class DrawHelper {
     }
 
     /**
-     * Draws an outline rounded.fsh rectangle by drawing 4 side rectangles, and 4 arcs
+     * Draws an outline rounded rectangle
      *
      * @param x         X pos
      * @param y         Y pos
@@ -167,47 +167,26 @@ public class DrawHelper {
      * @param thickness thickness of the outline
      */
     public static void drawOutlineRoundedBox(DrawContext drawContext, float x, float y, float width, float height, float radius, float thickness, int color) {
-        // Draw the rectangles for the outline
-        drawRectangle(drawContext, x + radius, y, width - radius * 2, thickness, color); // Top rectangle
-        drawRectangle(drawContext, x + radius, y + height - thickness, width - radius * 2, thickness, color); // Bottom rectangle
-        drawRectangle(drawContext, x, y + radius, thickness, height - radius * 2, color); // Left rectangle
-        drawRectangle(drawContext, x + width - thickness, y + radius, thickness, height - radius * 2, color); // Right rectangle
-
-        // Draw the arcs at the corners for the outline
-        drawArc(drawContext, x + radius, y + radius, radius, thickness, color, 180, 270); // Top-left arc
-        drawArc(drawContext, x + width - radius, y + radius, radius, thickness, color, 90, 180); // Top-right arc
-        drawArc(drawContext, x + width - radius, y + height - radius, radius, thickness, color, 0, 90); // Bottom-right arc
-        drawArc(drawContext, x + radius, y + height - radius, radius, thickness, color, 270, 360); // Bottom-left arc
+        Color c = new Color(color, true);
+        drawOutlineRoundedBox(drawContext,x,y,width,height,new Vector4f(radius),thickness,c,c,c,c);
     }
 
-    public static void drawRainbowGradientRectangle(DrawContext drawContext, float x, float y, float width, float height, float alpha) {
+    public static void drawOutlineRoundedBox(DrawContext drawContext, float x, float y, float width, float height, Vector4f radii, float thickness,  Color tl, Color tr, Color br, Color bl) {
+        if (width <= 0 || height <= 0) return;
+        float maxRadius = Math.min(width, height) / 2;
+        radii.set(Math.min(radii.x, maxRadius), // top-left
+                Math.min(radii.y, maxRadius), // top-right
+                Math.min(radii.z, maxRadius), // bottom-right
+                Math.min(radii.w, maxRadius)  // bottom-left
+        );
         drawContext.draw(vcp -> {
+            VertexConsumer dvc =  vcp.getBuffer(CustomRenderLayers.ROUNDED_RECT_OUTLINE.apply(new CustomRenderLayers.OutlineParameters(radii, thickness ,new float[]{width, height})));
             Matrix4f matrix4f = drawContext.getMatrices().peek().getPositionMatrix();
-            VertexConsumer consumer = vcp.getBuffer(RenderLayer.getDebugQuads());
 
-            for (int i = 0; i <= width; i++) {
-                float hue = (float) i / width;
-                int color = Color.HSBtoRGB(hue, 1.0f, 1.0f);
-                color = (color & 0x00FFFFFF) | ((int) (alpha * 255) << 24);
-
-                float alphaVal = (color >> 24 & 255) / 255.0F;
-                int colorVal = ColorHelper.changeAlpha(color, (int) (alphaVal * 255)).getRGB();
-
-                consumer.vertex(matrix4f, x + i, y, 0.0f).color(colorVal);
-                consumer.vertex(matrix4f, x + i, y + height, 0.0f).color(colorVal);
-            }
-
-            for (int i = (int) width; i >= 0; i--) {
-                float hue = (float) i / width;
-                int color = Color.HSBtoRGB(hue, 1.0f, 1.0f);
-                color = (color & 0x00FFFFFF) | ((int) (alpha * 255) << 24);
-
-                float alphaVal = (color >> 24 & 255) / 255.0F;
-                int colorVal = ColorHelper.changeAlpha(color, (int) (alphaVal * 255)).getRGB();
-
-                consumer.vertex(matrix4f, x + i, y + height, 0.0f).color(colorVal);
-                consumer.vertex(matrix4f, x + i, y, 0.0f).color(colorVal);
-            }
+            dvc.vertex(matrix4f, x, y + height, 0).texture(0, 0).color(bl.getRGB());
+            dvc.vertex(matrix4f, x + width, y + height, 0).texture(width, 0).color(br.getRGB());
+            dvc.vertex(matrix4f, x + width, y, 0).texture(width, height).color(tr.getRGB());
+            dvc.vertex(matrix4f, x, y, 0).texture(0, height).color(tl.getRGB());
         });
     }
 
@@ -240,31 +219,6 @@ public class DrawHelper {
         }
     }
 
-
-    public static void drawRainbowGradient(DrawContext drawContext,float x, float y, float width, float height) {
-        Matrix4f matrix4f = RenderSystem.getModelViewMatrix();
-
-        GL40C.glColorMask(false,false,false,false);
-        GL40C.glClearColor(0.0F, 0.0F, 0.0F, 0.0F);
-        GL40C.glClear(GL40C.GL_COLOR_BUFFER_BIT);
-        GL40C.glColorMask(true, true, true, true);
-
-        drawRectangle(drawContext, x, y, width, height, Color.BLACK.getRGB());
-
-        drawContext.draw(vcp -> {
-            VertexConsumer consumer = vcp.getBuffer(CustomRenderLayers.QUADS_CUSTOM_BLEND);
-            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-            for (float i = 0; i < width; i += 1.0f) {
-                float hue = (i / width); // Multiply by 1 to go through the whole color spectrum once (red to red)
-                Color color = Color.getHSBColor(hue, 1.0f, 1.0f); // Full saturation and brightness
-
-                consumer.vertex(matrix4f, x + i, y, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-                consumer.vertex(matrix4f, x + i + 1.0f, y, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-                consumer.vertex(matrix4f, x + i + 1.0f, y + height, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-                consumer.vertex(matrix4f, x + i, y + height, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-            }
-        });
-    }
 
 
     /* ====  Drawing filled and outline circles  ==== */
@@ -542,22 +496,20 @@ public class DrawHelper {
      * @param color    Color of the rounded.fsh rectangle
      */
     public static void drawRoundedRectangle(DrawContext drawContext, float x, float y, boolean TL, boolean TR, boolean BL, boolean BR, float width, float height, float radius, int color) {
-        Vector4f radii = new Vector4f(
-                TL ? radius : 0,
-                TR ? radius : 0,
-                BR ? radius : 0,
-                BL ? radius : 0
-        );
+        Vector4f radii = new Vector4f(TR ? radius : 0.0f, BR ? radius : 0.0f, TL ? radius : 0.0f, BL ? radius : 0.0f);
 
-        Color c = new Color(color);
-        drawRoundedRectangle(drawContext,x,y,width,height, radii, c,c,c,c);
+        // Turns out Color class takes rgb by default not rgba
+        Color c = new Color(color, true);
+        drawRoundedRectangle(drawContext,x,y,width, height, radii, c,c,c,c);
     }
 
     /**
-     * Draws a rounded.fsh rectangle with customizable corner radii, corner colors, and selective corner rounding.
+     * Draws a rounded rectangle with customizable corner radii, corner colors, and selective corner rounding.
      * @param drawContext DrawContext for rendering
      * @param x X position
      * @param y Y position
+     *
+     *
      * @param width Width of the rectangle
      * @param height Height of the rectangle
      * @param radii Vector4f specifying radii for top-left, top-right, bottom-right, bottom-left corners
@@ -585,29 +537,18 @@ public class DrawHelper {
     /**
      * Draws an outline rounded.fsh gradient rectangle
      *
-     * @param color1   is applied to the bottom-left vertex (x, y + height).
-     * @param color2   is applied to the bottom-right vertex (x + width, y + height).
-     * @param color3   is applied to the top-right vertex (x + width, y).
-     * @param color4   is applied to the top-left vertex (x, y).
+     * @param tl   is applied to the top-left vertex (x, y).
+     * @param tr   is applied to the top-right vertex (x + width, y).
+     * @param br   is applied to the bottom-right vertex (x + width, y + height).
+     * @param bl   is applied to the bottom-left vertex (x, y + height).
      * @param x        X pos
      * @param y        Y pos
      * @param width    Width of rounded.fsh gradient rectangle
      * @param height   Height of rounded.fsh gradient rectangle
      * @param radius   Radius of the quadrants / the rounded.fsh gradient rectangle
      */
-    public static void drawOutlineGradientRoundedBox(DrawContext drawContext, float x, float y, float width, float height, float radius, float thickness, Color color1, Color color2, Color color3, Color color4) {
-        // Draw the rectangles for the outline with gradient
-        drawGradient(drawContext, x + radius, y, width - radius * 2, thickness, color1.getRGB(), color2.getRGB(), Direction.LEFT_RIGHT); // Top rectangle
-        drawGradient(drawContext, x + radius, y + height - thickness, width - radius * 2, thickness, color3.getRGB(), color4.getRGB(), Direction.RIGHT_LEFT); // Bottom rectangle
-
-        drawGradient(drawContext, x, y + radius, thickness, height - radius * 2, color4.getRGB(), color1.getRGB(), Direction.BOTTOM_TOP); // Left rectangle
-        drawGradient(drawContext, x + width - thickness, y + radius, thickness, height - radius * 2, color2.getRGB(), color3.getRGB(), Direction.TOP_BOTTOM); // Right rectangle
-
-        // Draw the arcs at the corners for the outline with gradient
-        drawArc(drawContext, x + radius, y + radius, radius, thickness, color1.getRGB(), 180, 270); // Top-left arc
-        drawArc(drawContext, x + width - radius, y + radius, radius, thickness, color2.getRGB(), 90, 180); // Top-right arc
-        drawArc(drawContext, x + width - radius, y + height - radius, radius, thickness, color3.getRGB(), 0, 90); // Bottom-right arc
-        drawArc(drawContext, x + radius, y + height - radius, radius, thickness, color4.getRGB(), 270, 360); // Bottom-left arc
+    public static void drawOutlineGradientRoundedBox(DrawContext drawContext, float x, float y, float width, float height, float radius, float thickness, Color tl, Color tr, Color br, Color bl) {
+        drawOutlineRoundedBox(drawContext,x,y,width,height,new Vector4f(radius),thickness,tl, tr, br,bl);
     }
 
     public static void drawCutRectangle(DrawContext drawContext, int x1, int y1, int x2, int y2, int z, int color, int cornerRadius) {
@@ -641,37 +582,37 @@ public class DrawHelper {
     /**
      * Draws a rounded.fsh gradient rectangle
      *
-     * @param color1 is applied to the top-left vertex (x, y).
-     * @param color2 is applied to the bottom-right vertex (x + width, y + height).
-     * @param color3 is applied to the top-right vertex (x + width, y).
-     * @param color4 is applied to the bottom-left vertex (x, y + height).
+     * @param tl   is applied to the top-left vertex (x, y).
+     * @param tr   is applied to the top-right vertex (x + width, y).
+     * @param br   is applied to the bottom-right vertex (x + width, y + height).
+     * @param bl   is applied to the bottom-left vertex (x, y + height).
      * @param x      X pos
      * @param y      Y pos
      * @param width  Width of rounded.fsh gradient rectangle
      * @param height Height of rounded.fsh gradient rectangle
      * @param radius Radius of the quadrants / the rounded.fsh gradient rectangle
      */
-    public static void drawRoundedGradientRectangle(DrawContext drawContext, Color color1, Color color2, Color color3, Color color4, float x, float y, float width, float height, float radius) {
-        drawRoundedGradientRectangle(drawContext, color1, color2, color3, color4, x, y, width, height, radius, true, true, true, true);
+    public static void drawRoundedGradientRectangle(DrawContext drawContext, Color tl, Color tr, Color br, Color bl, float x, float y, float width, float height, float radius) {
+        drawRoundedGradientRectangle(drawContext, tl,tr,br,bl, x, y, width, height, radius, true, true, true, true);
     }
 
     /**
      * Draws a rounded.fsh gradient rectangle
      *
-     * @param color1 is applied to the bottom-left vertex (x, y + height).
-     * @param color2 is applied to the bottom-right vertex (x + width, y + height).
-     * @param color3 is applied to the top-right vertex (x + width, y).
-     * @param color4 is applied to the top-left vertex (x, y).
+     * @param tl   is applied to the top-left vertex (x, y).
+     * @param tr   is applied to the top-right vertex (x + width, y).
+     * @param br   is applied to the bottom-right vertex (x + width, y + height).
+     * @param bl   is applied to the bottom-left vertex (x, y + height).
      * @param x      X pos
      * @param y      Y pos
      * @param width  Width of rounded.fsh gradient rectangle
      * @param height Height of rounded.fsh gradient rectangle
      * @param radius Radius of the quadrants / the rounded.fsh gradient rectangle
      */
-    public static void drawRoundedGradientRectangle(DrawContext drawContext, Color color1, Color color2, Color color3, Color color4, float x, float y, float width, float height, float radius, boolean TL, boolean TR, boolean BL, boolean BR) {
+    public static void drawRoundedGradientRectangle(DrawContext drawContext, Color tl, Color tr, Color br, Color bl, float x, float y, float width, float height, float radius, boolean TL, boolean TR, boolean BL, boolean BR) {
         drawRoundedRectangle(drawContext, x, y, width, height,
                 new Vector4f(TR ? radius : 0.0f, BR ? radius : 0.0f, TL ? radius : 0.0f, BL ? radius : 0.0f),
-                color1, color2, color3, color4);
+                tl,tr,br,bl);
     }
 
     /* ==== Drawing Lines ==== */

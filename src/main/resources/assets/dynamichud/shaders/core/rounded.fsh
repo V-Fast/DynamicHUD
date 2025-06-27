@@ -1,7 +1,6 @@
 #version 150
 
 uniform sampler2D Sampler0;
-
 uniform vec4 ColorModulator;
 uniform vec4 Roundness;
 uniform vec2 widthHeight;
@@ -22,7 +21,8 @@ void main() {
     vec2 widthHeight2 = widthHeight;
     float distance = sdRoundBoxOutline(texCoord0 - widthHeight2 / 2, widthHeight2 / 2, Roundness);
     float fw = fwidth(distance);
-    float alpha = 1.0 - distance;
+    // This is what allows the rectangle to support the original color's alpha.
+    float alpha = smoothstep(-fw, fw, -distance) * ColorModulator.a * vertexColor.a;
     vec4 color = ColorModulator * vertexColor * vec4(1, 1, 1, alpha);
     if (color.a < 0.01) discard;
     fragColor = color;

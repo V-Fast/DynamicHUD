@@ -78,6 +78,23 @@ public class CustomRenderLayers {
             .withUniform("widthHeight", UniformType.VEC2)
             .build());
 
+    private static final RenderPipeline ROUNDED_OUTLINE = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.MATRICES_COLOR_SNIPPET)
+            .withBlend(BlendFunction.TRANSLUCENT)
+            .withVertexFormat(VertexFormat.builder()
+                    .add("Position", VertexFormatElement.POSITION)
+                    .add("UV0", VertexFormatElement.UV0)
+                    .add("Color", VertexFormatElement.COLOR)
+                    .build(), VertexFormat.DrawMode.QUADS)
+            .withCull(true)
+            .withColorLogic(LogicOp.NONE)
+            .withFragmentShader(Identifier.of("dynamichud", "core/rounded_outline"))
+            .withVertexShader(Identifier.of("dynamichud", "core/rounded"))
+            .withLocation(Identifier.of("dynamichud", "pipeline/rounded_outline"))
+            .withUniform("Thickness", UniformType.VEC4)
+            .withUniform("Roundness", UniformType.VEC4)
+            .withUniform("widthHeight", UniformType.VEC2)
+            .build());
+
     public static final Function<RoundedParameters, RenderLayer> ROUNDED_RECT = Util.memoize(params -> {
         RenderLayer rl = RenderLayer.of(
                 "dynamichud/rounded",
@@ -89,6 +106,22 @@ public class CustomRenderLayers {
                         .build(false)
         );
         ((IRenderLayer) rl).dynamichud$setUniform("Roundness", params.roundness);
+        ((IRenderLayer) rl).dynamichud$setUniform("widthHeight", params.widthHeight);
+        return rl;
+    });
+
+    public static final Function<OutlineParameters, RenderLayer> ROUNDED_RECT_OUTLINE = Util.memoize(params -> {
+        RenderLayer rl = RenderLayer.of(
+                "neverdies/2d/rounded_rect_outline",
+                1024,
+                false,
+                false,
+                ROUNDED_OUTLINE,
+                RenderLayer.MultiPhaseParameters.builder()
+                        .build(false)
+        );
+        ((IRenderLayer) rl).dynamichud$setUniform("Roundness", params.roundness);
+        ((IRenderLayer) rl).dynamichud$setUniform("Thickness", new Vector4f(params.thickness,0f,0f,0f));
         ((IRenderLayer) rl).dynamichud$setUniform("widthHeight", params.widthHeight);
         return rl;
     });
@@ -105,4 +138,5 @@ public class CustomRenderLayers {
 
 
     public record RoundedParameters(Vector4f roundness, float[] widthHeight){}
+    public record OutlineParameters(Vector4f roundness, float thickness, float[] widthHeight){}
 }

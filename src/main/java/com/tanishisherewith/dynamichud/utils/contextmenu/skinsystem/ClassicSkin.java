@@ -249,7 +249,7 @@ public class ClassicSkin extends Skin {
                     (float) handleY,
                     handleWidth,
                     handleHeight,
-                    1,
+                    3,
                     0xFFFFFFFF,
                     90,
                     0.6f,
