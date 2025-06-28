@@ -18,8 +18,7 @@ float sdRoundBoxOutline(vec2 p, vec2 b, vec4 r) {
 }
 
 void main() {
-    vec2 widthHeight2 = widthHeight;
-    float distance = sdRoundBoxOutline(texCoord0 - widthHeight2 / 2, widthHeight2 / 2, Roundness);
+    float distance = sdRoundBoxOutline(texCoord0 - widthHeight / 2, widthHeight / 2, Roundness);
     float fw = fwidth(distance);
     // This is what allows the rectangle to support the original color's alpha.
     float alpha = smoothstep(-fw, fw, -distance) * ColorModulator.a * vertexColor.a;
