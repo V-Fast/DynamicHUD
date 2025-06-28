@@ -8,21 +8,13 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProvider;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
-import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.ClassicSkin;
-import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.MinecraftSkin;
-import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.ModernSkin;
 import com.tanishisherewith.dynamichud.widget.DynamicValueWidget;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 
-import javax.swing.*;
 import java.awt.Color;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class TextWidget extends DynamicValueWidget implements ContextMenuProvider {
     public static WidgetData<TextWidget> DATA = new WidgetData<>("TextWidget", "Display Text on screen", TextWidget::new);
@@ -33,9 +25,6 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
     protected boolean rainbow; // Whether to apply a rainbow effect to the text
     protected int rainbowSpeed = 2; //Speed of the rainbow effect
     protected float rainbowSpread = 0.01f, rainbowSaturation = 1.0f, rainbowBrightness = 1.0f;
-    private String registryKey;
-    //private DynamicValueRegistry valueRegistry;
-    private String registryID;
 
     public TextWidget() {
         this(DynamicValueRegistry.GLOBAL_ID, "unknown", false, false, Color.WHITE, "unknown");
@@ -55,63 +44,46 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
     }
 
     public void createMenu() {
-        ContextMenuProperties properties = ContextMenuProperties.builder().skin(new ModernSkin(Color.YELLOW)).build();
-        menu = new ContextMenu<>(getX(), getY(), properties);
+        menu = new ContextMenu<>(getX(), getY(),ContextMenuProperties.createGenericSimplified());
 
-        // Boolean Option
-        menu.addOption(new BooleanOption(Text.of("Toggle Shadow"),
+        menu.addOption(new BooleanOption(Text.of("Shadow"),
                 () -> this.shadow, value -> this.shadow = value,
                 BooleanOption.BooleanType.ON_OFF)
-                .description(Text.of("Enable or disable text shadow")));
-
-        // Color Option
+                .description(Text.of("Adds shadow to your text"))
+        );
+        menu.addOption(new BooleanOption(Text.of("Rainbow"),
+                () -> this.rainbow, value -> this.rainbow = value,
+                BooleanOption.BooleanType.ON_OFF)
+                .description(Text.of("Adds rainbow effect to your text"))
+        );
         menu.addOption(new ColorOption(Text.of("Text Color"),
                 () -> this.textColor, value -> this.textColor = value, menu)
-                .description(Text.of("Change the text color")));
-
-        // Double Option
-        menu.addOption(new DoubleOption(Text.of("Opacity"),
-                0.0, 1.0, 0.1f,
+                .description(Text.of("Specify the color you want to add to your text"))
+                .renderWhen(() -> !this.rainbow)
+        );
+        menu.addOption(new DoubleOption(Text.of("Rainbow Speed"),
+                1, 5.0f, 1,
+                () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue(), menu)
+                .renderWhen(() -> this.rainbow)
+        );
+        menu.addOption(new DoubleOption(Text.of("Rainbow Spread"),
+                0.001f, 0.15f, 0.001f,
+                () -> (double) this.rainbowSpread, value -> this.rainbowSpread = value.floatValue(), menu)
+                .renderWhen(() -> this.rainbow)
+                .withComplexity(Option.Complexity.Enhanced)
+        );
+        menu.addOption(new DoubleOption(Text.of("Rainbow Saturation"),
+                0, 1.0f, 0.1f,
+                () -> (double) this.rainbowSaturation, value -> this.rainbowSaturation = value.floatValue(), menu)
+                .renderWhen(() -> this.rainbow)
+                .withComplexity(Option.Complexity.Pro)
+        );
+        menu.addOption(new DoubleOption(Text.of("Rainbow Brightness"),
+                0, 1.0f, 0.01f,
                 () -> (double) this.rainbowBrightness, value -> this.rainbowBrightness = value.floatValue(), menu)
-                .description(Text.of("Adjust text opacity")));
-
-        // Runnable Option
-        AtomicBoolean ran = new AtomicBoolean(false);
-        menu.addOption(new RunnableOption(Text.of("Reset Position"),
-                ran::get, ran::set,
-                () -> this.setPosition(0, 0))
-                .description(Text.of("Reset widget to default position")));
-
-        // List Option
-        AtomicReference<String> style = new AtomicReference<>("Style1");
-        List<String> styles = Arrays.asList("Style1", "Style2", "Style3");
-        menu.addOption(new ListOption<>(Text.of("Text Style"),
-                style::get, style::set, styles)
-                .description(Text.of("Choose a text style")));
-
-        // Enum Option
-        menu.addOption(new EnumOption<>(Text.of("Alignment"),
-                () -> GroupLayout.Alignment.CENTER, value -> {}, GroupLayout.Alignment.values())
-                .description(Text.of("Set text alignment")));
-
-        // Option Group
-        OptionGroup group = new OptionGroup(Text.of("Display Options"));
-        group.addOption(new BooleanOption(Text.of("Bold Text"),
-                () -> false, value -> {}, BooleanOption.BooleanType.YES_NO)
-                .description(Text.of("Enable bold text")));
-        group.addOption(new DoubleOption(Text.of("Font Size"),
-                8.0, 24.0, 1.0f,
-                () -> 12.0, value -> {}, menu)
-                .description(Text.of("Adjust font size")));
-        menu.addOption(group);
-
-        // SubMenu Option
-        SubMenuOption subMenu = (SubMenuOption) new SubMenuOption(Text.of("Advanced Settings"), menu)
-                .description(Text.of("Open advanced settings"));
-        subMenu.getSubMenu().addOption(new BooleanOption(Text.of("Some Boolean"),
-                () -> false, value -> {}, BooleanOption.BooleanType.TRUE_FALSE)
-                .description(Text.of("True/False")));
-        menu.addOption(subMenu);
+                .renderWhen(() -> this.rainbow)
+                .withComplexity(Option.Complexity.Pro)
+        );
     }
 
     @Override
@@ -126,6 +98,7 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
             } else {
                 drawContext.drawText(mc.textRenderer, text, getX() + 2, getY() + 2, color, shadow);
             }
+            drawContext.draw();
             widgetBox.setDimensions(getX(), getY(), mc.textRenderer.getWidth(text) + 3, mc.textRenderer.fontHeight + 2, this.shouldScale, GlobalConfig.get().getScale());
         }
         menu.set(getX(), getY(), (int) Math.ceil(getHeight()));
@@ -159,15 +132,15 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
     @Override
     public void readFromTag(NbtCompound tag) {
         super.readFromTag(tag);
-        shadow = tag.getBoolean("Shadow");
-        rainbow = tag.getBoolean("Rainbow");
-        rainbowSpeed = tag.getInt("RainbowSpeed");
-        rainbowSpread = tag.getFloat("RainbowSpread");
-        rainbowSaturation = tag.getFloat("RainbowSaturation");
-        rainbowBrightness = tag.getFloat("RainbowBrightness");
-        textColor = new Color(tag.getInt("TextColor"));
-        registryKey = tag.getString("RegistryKey");
-        registryID = tag.getString("RegistryID");
+        shadow = tag.getBoolean("Shadow").orElse(false);
+        rainbow = tag.getBoolean("Rainbow").orElse(false);
+        rainbowSpeed = tag.getInt("RainbowSpeed").orElse(1);
+        rainbowSpread = tag.getFloat("RainbowSpread").orElse(1.0f);
+        rainbowSaturation = tag.getFloat("RainbowSaturation").orElse(1.0f);
+        rainbowBrightness = tag.getFloat("RainbowBrightness").orElse(1.0f);
+        textColor = new Color(tag.getInt("TextColor").orElse(0xFFFFFFFF), true); // default white
+        registryKey = tag.getString("RegistryKey").orElse("default:key");
+        registryID = tag.getString("RegistryID").orElse("default:id");
 
         //createMenu();
     }

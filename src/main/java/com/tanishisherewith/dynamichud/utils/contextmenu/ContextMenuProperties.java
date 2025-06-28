@@ -17,7 +17,7 @@ public class ContextMenuProperties {
     protected boolean drawBorder = true;
     protected boolean shadow = true;
     protected boolean roundedCorners = true;
-    protected int cornerRadius = 3;
+    protected int cornerRadius = 4;
     protected boolean hoverEffect = true;
     protected Color hoverColor = new Color(42, 42, 42, 150);
     protected boolean enableAnimations = true;

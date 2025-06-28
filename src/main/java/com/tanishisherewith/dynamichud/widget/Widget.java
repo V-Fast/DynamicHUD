@@ -315,7 +315,7 @@ public abstract class Widget implements Input {
         int backgroundColor = this.isVisible() ? GlobalConfig.get().getHudActiveColor().getRGB() : GlobalConfig.get().getHudInactiveColor().getRGB();
         WidgetBox box = this.getWidgetBox();
 
-        DrawHelper.drawRectangle(context.getMatrices().peek().getPositionMatrix(),
+        DrawHelper.drawRectangle(context,
                 box.x,
                 box.y,
                 box.getWidth(),
@@ -331,16 +331,16 @@ public abstract class Widget implements Input {
     }
 
     public void readFromTag(NbtCompound tag) {
-        modId = tag.getString("modId");
-        uid = new UID(tag.getString("UID"));
+        modId = tag.getString("modId").orElse("unknown");
+        uid = tag.contains("UID") ? new UID(tag.getString("UID").get()) : UID.generate();
         //     x = tag.getInt("x");
         //     y = tag.getInt("y");
-        anchor = Anchor.valueOf(tag.getString("anchor"));
-        offsetX = tag.getInt("offsetX");
-        offsetY = tag.getInt("offsetY");
-        isVisible = tag.getBoolean("isVisible");
-        isDraggable = tag.getBoolean("isDraggable");
-        shouldScale = tag.getBoolean("shouldScale");
+        anchor = Anchor.valueOf(tag.getString("anchor").orElse("CENTER"));
+        offsetX = tag.getInt("offsetX").orElse(0);
+        offsetY = tag.getInt("offsetY").orElse(0);
+        isVisible = tag.getBoolean("isVisible").orElse(true);
+        isDraggable = tag.getBoolean("isDraggable").orElse(true);
+        shouldScale = tag.getBoolean("shouldScale").orElse(true);
     }
 
     /**

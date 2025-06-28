@@ -53,7 +53,7 @@ public class HueSlider {
         float handleX = x + hue * width - handleWidth / 2.0f;
         float handleY = y - (handleHeight - height) / 2.0f;
 
-        DrawHelper.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), handleX, handleY, handleWidth, handleHeight, -1);
+        DrawHelper.drawRectangle(drawContext, handleX, handleY, handleWidth, handleHeight, -1);
         drawContext.getMatrices().pop();
     }
 
