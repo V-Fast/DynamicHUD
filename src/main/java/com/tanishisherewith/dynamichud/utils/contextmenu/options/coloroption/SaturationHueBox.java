@@ -1,7 +1,7 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption;
 
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.awt.*;
 
@@ -21,22 +21,19 @@ public class SaturationHueBox {
         this.size = size;
     }
 
-    public void render(DrawContext drawContext, int x, int y) {
+    public void render(GuiGraphics graphics, int x, int y) {
         setPosition(x, y);
-        drawContext.getMatrices().push();
-        drawContext.getMatrices().translate(0, 0, 406);
-        DrawHelper.drawOutlinedBox(drawContext, x - 2, y - 2, x + size + 2, y + size + 2, -1);
+        DrawHelper.drawOutlinedBox(graphics, x - 2, y - 2, x + size + 2, y + size + 2, -1);
 
         // Draw the gradient
-        DrawHelper.drawRoundedGradientRectangle(drawContext, Color.WHITE, Color.getHSBColor(hue, 1.0f, 1.0f),Color.BLACK, Color.BLACK, x, y, size, size, 3);
+        DrawHelper.drawRoundedGradientRectangle(graphics, Color.WHITE, Color.getHSBColor(hue, 1.0f, 1.0f),Color.BLACK, Color.BLACK, x, y, size, size, 3);
 
         // Draw the handle
         float handleSize = 1f;
         float handleX = x + 2 + saturation * size - handleSize / 2.0f;
         float handleY = y + 2 + (1.0f - value) * size - handleSize / 2.0f;
 
-        DrawHelper.drawFilledCircle(drawContext, handleX, handleY, handleSize, -1);
-        drawContext.getMatrices().pop();
+        DrawHelper.drawFilledCircle(graphics, handleX, handleY, handleSize, -1);
     }
 
 

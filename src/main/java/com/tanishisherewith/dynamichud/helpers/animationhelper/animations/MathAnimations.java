@@ -2,8 +2,10 @@ package com.tanishisherewith.dynamichud.helpers.animationhelper.animations;
 
 import com.tanishisherewith.dynamichud.helpers.animationhelper.Easing;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.EasingType;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.phys.Vec2;
+
+import java.util.Random;
 
 public class MathAnimations {
     /// SHAKE: Random offset animation with smooth decay
@@ -14,8 +16,8 @@ public class MathAnimations {
     }
 
     /// 2D Shake with different X/Y frequencies
-    public static Vec2f shake2D(float intensity, float freqX, float freqY) {
-        return new Vec2f(
+    public static Vec2 shake2D(float intensity, float freqX, float freqY) {
+        return new Vec2(
                 (float) Math.sin(System.currentTimeMillis() * freqX) * intensity,
                 (float) Math.cos(System.currentTimeMillis() * freqY) * intensity
         );
@@ -23,16 +25,16 @@ public class MathAnimations {
 
     /// FLICKER: Random flashing effect
     public static float flicker(float min, float max, float chance) {
-        Random rand = Random.create();
+        RandomSource rand = RandomSource.create();
         return rand.nextFloat() < chance ?
                 min + (max - min) * rand.nextFloat() :
                 max;
     }
 
     /// CIRCULAR MOTION: Perfect for rotation/orbital animations
-    public static Vec2f circularMotion(float radius, float speed, float phase) {
+    public static Vec2 circularMotion(float radius, float speed, float phase) {
         double angle = Math.toRadians((System.currentTimeMillis() * speed) % 360 + phase);
-        return new Vec2f(
+        return new Vec2(
                 (float) (Math.cos(angle) * radius),
                 (float) (Math.sin(angle) * radius)
         );
@@ -68,9 +70,9 @@ public class MathAnimations {
     }
 
     /// SPIRAL: Circular motion with expanding radius
-    public static Vec2f spiral(float baseRadius, float expansionRate, float speed) {
+    public static Vec2 spiral(float baseRadius, float expansionRate, float speed) {
         float t = System.currentTimeMillis() / 1000f;
-        return new Vec2f(
+        return new Vec2(
                 (float) ((baseRadius + expansionRate * t) * Math.cos(t * speed)),
                 (float) ((baseRadius + expansionRate * t) * Math.sin(t * speed))
         );

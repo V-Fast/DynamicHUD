@@ -2,11 +2,14 @@ package com.tanishisherewith.dynamichud.mixins;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.option.OptionsScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.client.gui.layouts.LayoutSettings;
+import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.options.OptionsScreen;
+import net.minecraft.network.chat.Component;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,21 +21,30 @@ import java.util.function.Supplier;
 @Mixin(OptionsScreen.class)
 public abstract class OptionsScreenMixin extends Screen {
     @Shadow
-    protected abstract ButtonWidget createButton(Text message, Supplier<Screen> screenSupplier);
+    protected abstract Button openScreenButton(Component component, Supplier<Screen> supplier);
 
-    protected OptionsScreenMixin(Text title) {
+    @Shadow
+    @Final
+    private HeaderAndFooterLayout layout;
+
+    protected OptionsScreenMixin(Component title) {
         super(title);
     }
 
-    @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/GridWidget$Adder;add(Lnet/minecraft/client/gui/widget/Widget;)Lnet/minecraft/client/gui/widget/Widget;", ordinal = 0))
-    private void init(CallbackInfo ci, @Local(ordinal = 0) DirectionalLayoutWidget directionalLayoutWidget) {
-        DirectionalLayoutWidget directionalLayoutWidget2 = directionalLayoutWidget.add(DirectionalLayoutWidget.horizontal());
+    @Inject(
+            method = "init",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/gui/layouts/LinearLayout;addChild(Lnet/minecraft/client/gui/layouts/LayoutElement;)Lnet/minecraft/client/gui/layouts/LayoutElement;",
+                    ordinal = 1 // this is where the FOV row is added
+            )
+    )
+    private void injectDHLayout(CallbackInfo ci, @Local(ordinal = 0) LinearLayout header) {
+        LinearLayout dhLayout = header.addChild(LinearLayout.vertical(), layoutSettings -> layoutSettings.paddingLeft(-20));
 
-        directionalLayoutWidget2.getMainPositioner().marginLeft(-26).marginY(-28);
+        Button dhButton = openScreenButton(Component.literal("DH"), () -> GlobalConfig.get().createYACLGUI());
+        dhButton.setWidth(20);
 
-        ButtonWidget widget = createButton(Text.of("DH"), () -> GlobalConfig.get().createYACLGUI());
-        widget.setDimensions(20, 20);
-
-        directionalLayoutWidget2.add(widget);
+        dhLayout.addChild(dhButton);
     }
 }

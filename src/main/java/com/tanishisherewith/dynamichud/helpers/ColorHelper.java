@@ -1,16 +1,8 @@
 package com.tanishisherewith.dynamichud.helpers;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.util.Window;
-import net.minecraft.util.math.MathHelper;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL30;
+import net.minecraft.util.Mth;
 
 import java.awt.*;
-import java.nio.ByteBuffer;
 
 /**
  * This class provides helper methods for working with colors.
@@ -113,9 +105,9 @@ public class ColorHelper {
         float pi = (float) Math.PI;
 
         float[] rainbow = new float[3];
-        rainbow[0] = 0.5F + 0.5F * MathHelper.sin(x * pi);
-        rainbow[1] = 0.5F + 0.5F * MathHelper.sin((x + 4F / 3F) * pi);
-        rainbow[2] = 0.5F + 0.5F * MathHelper.sin((x + 8F / 3F) * pi);
+        rainbow[0] = 0.5F + 0.5F * Mth.sin(x * pi);
+        rainbow[1] = 0.5F + 0.5F * Mth.sin((x + 4F / 3F) * pi);
+        rainbow[2] = 0.5F + 0.5F * Mth.sin((x + 8F / 3F) * pi);
         return rainbow;
     }
 

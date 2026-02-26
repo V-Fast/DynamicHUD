@@ -4,6 +4,7 @@ import com.tanishisherewith.dynamichud.widget.WidgetManager;
 import com.tanishisherewith.dynamichud.widgets.GraphWidget;
 import com.tanishisherewith.dynamichud.widgets.ItemWidget;
 import com.tanishisherewith.dynamichud.widgets.TextWidget;
+import net.minecraft.client.KeyMapping;
 
 /**
  * The default implementation for included widgets.
@@ -26,5 +27,10 @@ public class DefaultIntegrationImpl implements DynamicHudIntegration {
                 ItemWidget.DATA,
                 GraphWidget.DATA
         );
+    }
+
+    @Override
+    public KeyMapping getKeyBind() {
+        return null;
     }
 }

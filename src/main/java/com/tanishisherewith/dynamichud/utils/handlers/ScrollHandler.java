@@ -1,6 +1,5 @@
 package com.tanishisherewith.dynamichud.utils.handlers;
 
-import net.minecraft.util.math.MathHelper;
 
 public class ScrollHandler {
     protected int scrollOffset;
@@ -23,7 +22,7 @@ public class ScrollHandler {
 
         this.maxScrollOffset = maxYOffset;
         applyMomentum();
-        scrollOffset = MathHelper.clamp(scrollOffset, 0, maxScrollOffset);
+        scrollOffset = Math.clamp(scrollOffset, 0, maxScrollOffset);
     }
 
     public void mouseScrolled(double deltaY) {
@@ -41,7 +40,7 @@ public class ScrollHandler {
     }
 
     public void addOffset(int offset) {
-        this.scrollOffset = MathHelper.clamp(scrollOffset + offset, 0, maxScrollOffset);
+        this.scrollOffset = Math.clamp(scrollOffset + offset, 0, maxScrollOffset);
     }
 
     public void updateScrollPosition(double mouseY) {
@@ -50,7 +49,7 @@ public class ScrollHandler {
             double deltaY = lastMouseY - mouseY;
 
             // Update the scroll offset based on the mouse movement
-            scrollOffset = MathHelper.clamp(scrollOffset - (int) (deltaY * SCROLL_SPEED), 0, maxScrollOffset);
+            scrollOffset = Math.clamp(scrollOffset - (int) (deltaY * SCROLL_SPEED), 0, maxScrollOffset);
 
             // Update the last mouse position
             lastMouseY = mouseY;
@@ -62,7 +61,7 @@ public class ScrollHandler {
         double timeDelta = (currentTime - lastScrollTime) / 1000.0;
         scrollOffset += (int) (scrollVelocity * timeDelta);
         scrollVelocity *= 0.9; // Decay factor
-        scrollOffset = MathHelper.clamp(scrollOffset, 0, maxScrollOffset);
+        scrollOffset = Math.clamp(scrollOffset, 0, maxScrollOffset);
     }
 
     public int getScrollOffset() {

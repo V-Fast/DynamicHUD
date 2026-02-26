@@ -1,6 +1,5 @@
 {
   "required": true,
-  "minVersion": "0.8",
   "package": "com.tanishisherewith.dynamichud.mixins",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
@@ -10,7 +9,11 @@
     "defaultRequire": 1
   },
   "client": [
-    "OptionsScreenMixin",
-    "RenderLayerMixin"
-  ]
+    "BufferBuilderMixin",
+    "MinecraftMixin",
+    "OptionsScreenMixin"
+  ],
+  "overwrites": {
+    "requireAnnotations": true
+  }
 }

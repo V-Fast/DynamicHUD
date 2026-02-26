@@ -3,14 +3,14 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.MouseColorQuery;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.awt.*;
 import java.util.function.Consumer;
 
 public class ColorGradient {
-    final MinecraftClient client = MinecraftClient.getInstance();
+    final Minecraft client = Minecraft.getInstance();
     private final Consumer<Color> onColorSelected; // The callback to call when a color is selected
     private final HueSlider gradientSlider;
     private final SaturationHueBox gradientBox;
@@ -52,15 +52,15 @@ public class ColorGradient {
         display = false;
     }
 
-    public void render(DrawContext drawContext, int x1, int y1, int mouseX, int mouseY) {
+    public void render(GuiGraphics graphics, int x1, int y1, int mouseX, int mouseY) {
         setPos(x1, y1);
         if (!display) {
             return;
         }
-        gradientSlider.render(drawContext, x, y + client.textRenderer.fontHeight + 4);
-        gradientBox.render(drawContext, x, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
-        // colorPickerButton.render(drawContext, x + 24 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 8);
-        alphaSlider.render(drawContext, x + 10 + boxSize, y + client.textRenderer.fontHeight + gradientSlider.getHeight() + 10);
+        gradientSlider.render(graphics, x, y + client.font.lineHeight + 4);
+        gradientBox.render(graphics, x, y + client.font.lineHeight + gradientSlider.getHeight() + 10);
+        // colorPickerButton.render(graphics, x + 24 + boxSize, y + client.font.lineHeight + gradientSlider.getHeight() + 8);
+        alphaSlider.render(graphics, x + 10 + boxSize, y + client.font.lineHeight + gradientSlider.getHeight() + 10);
 
         if (colorPickerButton.isPicking() && GlobalConfig.get().showColorPickerPreview()) {
             MouseColorQuery.request(mouseX, mouseY, colors -> {
@@ -70,11 +70,8 @@ public class ColorGradient {
                     int blue = colors[2];
 
                     //Draw the preview box near the mouse pointer
-                    drawContext.getMatrices().push();
-                    drawContext.getMatrices().translate(0, 0, 2500);
-                    drawContext.fill(mouseX + 10, mouseY, mouseX + 26, mouseY + 16, -1);
-                    drawContext.fill(mouseX + 11, mouseY + 1, mouseX + 25, mouseY + 15, (red << 16) | (green << 8) | blue | 0xFF000000);
-                    drawContext.getMatrices().pop();
+                    graphics.fill(mouseX + 10, mouseY, mouseX + 26, mouseY + 16, -1);
+                    graphics.fill(mouseX + 11, mouseY + 1, mouseX + 25, mouseY + 15, (red << 16) | (green << 8) | blue | 0xFF000000);
                 }
             });
         }

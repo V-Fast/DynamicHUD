@@ -9,9 +9,8 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.Conte
 import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.DefaultContextMenuScreenFactory;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -72,7 +71,7 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
         options.add(option);
     }
 
-    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
+    public void render(GuiGraphics graphics, int x, int y, int mouseX, int mouseY) {
         if (newScreenFlag && screenFactory != null) {
             DynamicHUD.MC.setScreen(screenFactory.create(this, properties));
             return;
@@ -83,12 +82,12 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
         update();
         if (scale <= 0.0f || newScreenFlag) return;
 
-        DrawHelper.scaleAndPosition(drawContext.getMatrices(), x, y, scale);
+        DrawHelper.scaleAndPosition(graphics.pose(), x, y, scale);
 
         properties.getSkin().setContextMenu(this);
-        properties.getSkin().renderContextMenu(drawContext, this, mouseX, mouseY);
+        properties.getSkin().renderContextMenu(graphics, this, mouseX, mouseY);
 
-        DrawHelper.stopScaling(drawContext.getMatrices());
+        DrawHelper.stopScaling(graphics.pose());
     }
 
     public void update() {
@@ -104,7 +103,7 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
             scale -= 0.1f;
         }
 
-        scale = MathHelper.clamp(scale, 0, 1.0f);
+        scale = Math.clamp(scale, 0, 1.0f);
     }
 
     public void close() {
@@ -121,7 +120,7 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
     public void open() {
         shouldDisplay = true;
         update();
-        parentScreen = DynamicHUD.MC.currentScreen;
+        parentScreen = DynamicHUD.MC.screen;
         if (properties.getSkin().shouldCreateNewScreen()) {
             newScreenFlag = true;
         }

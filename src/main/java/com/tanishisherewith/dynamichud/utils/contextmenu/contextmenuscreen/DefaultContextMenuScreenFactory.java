@@ -2,7 +2,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen;
 
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 /**
  * Default implementation of the {@link ContextMenuScreenFactory} providing a {@link ContextMenuScreen}

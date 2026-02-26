@@ -2,10 +2,9 @@ package com.tanishisherewith.dynamichud.widget;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.mixins.ScreenMixin;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.NbtList;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -128,8 +127,8 @@ public class WidgetManager {
      * @param file The file to save to
      */
     public static void saveWidgets(File file, List<Widget> widgets) throws IOException {
-        NbtCompound rootTag = new NbtCompound();
-        NbtList widgetList = new NbtList();
+        CompoundTag rootTag = new CompoundTag();
+        ListTag widgetList = new ListTag();
 
         printInfo("Saving widgets");
 
@@ -140,7 +139,7 @@ public class WidgetManager {
 
         Set<String> widgetSet = new HashSet<>();
         for (Widget widget : widgets) {
-            NbtCompound widgetTag = new NbtCompound();
+            CompoundTag widgetTag = new CompoundTag();
             //I faced this exception once and had to spend 10 minutes trying to find it. P.S. It leaves 0 stacktrace message
             try {
                 widget.writeToTag(widgetTag);
@@ -190,20 +189,20 @@ public class WidgetManager {
             file = new File(file.getAbsolutePath() + ".backup");
         }
 
-        NbtCompound rootTag = NbtIo.read(file.toPath());
+        CompoundTag rootTag = NbtIo.read(file.toPath());
 
         if (rootTag == null) {
             printWarn("RootTag is null. File is either empty or corrupted: " + file);
             return Collections.emptyList();
         }
-        NbtList widgetList = rootTag.getList("widgets").orElse(null);
+        ListTag widgetList = rootTag.getList("widgets").orElse(null);
         if (widgetList == null) {
             printWarn("WidgetList is null. File is empty: " + file);
             return Collections.emptyList();
         }
         List<Widget> widgetsToAdd = new ArrayList<>();
         for (int i = 0; i < widgetList.size(); i++) {
-            NbtCompound widgetTag = widgetList.getCompound(i).orElse(null);
+            CompoundTag widgetTag = widgetList.getCompound(i).orElse(null);
             if(widgetTag == null) continue;
             WidgetData<?> widgetData = widgetDataMap.get(widgetTag.getString("name").orElse("unknown"));
             if (widgetData == null) {

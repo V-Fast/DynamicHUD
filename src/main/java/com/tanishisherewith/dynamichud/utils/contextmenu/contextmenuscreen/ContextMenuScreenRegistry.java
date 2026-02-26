@@ -1,6 +1,6 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen;
 
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 public class ContextMenuScreenRegistry {
     public Class<? extends Screen> screenKlass;

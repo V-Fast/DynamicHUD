@@ -3,10 +3,10 @@ package com.tanishisherewith.dynamichud.widgets;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * This is just an example widget, not supposed to be used.
@@ -25,21 +25,21 @@ public class ItemWidget extends Widget {
     }
 
     @Override
-    public void renderWidget(DrawContext context, int mouseX, int mouseY) {
-        context.drawItem(item, x, y);
+    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY) {
+        graphics.renderItem(item, x, y);
         widgetBox.setDimensions(getX(), getY(), 16, 16, this.shouldScale, GlobalConfig.get().getScale());
     }
 
     @Override
-    public void writeToTag(NbtCompound tag) {
+    public void writeToTag(CompoundTag tag) {
         super.writeToTag(tag);
-        tag.putInt("ItemID", Item.getRawId(item.getItem()));
+        tag.putInt("ItemID", Item.getId(item.getItem()));
     }
 
     @Override
-    public void readFromTag(NbtCompound tag) {
+    public void readFromTag(CompoundTag tag) {
         super.readFromTag(tag);
-        item = Item.byRawId(tag.getInt("ItemID").orElse(0)).getDefaultStack();
+        item = Item.byId(tag.getInt("ItemID").orElse(0)).getDefaultInstance();
     }
 
     public void setItemStack(ItemStack item) {

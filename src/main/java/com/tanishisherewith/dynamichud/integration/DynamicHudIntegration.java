@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.integration;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.tanishisherewith.dynamichud.IntegrationTest;
 import com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
@@ -7,8 +8,8 @@ import com.tanishisherewith.dynamichud.widget.WidgetManager;
 import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
@@ -19,16 +20,6 @@ import java.io.File;
  * @see DefaultIntegrationImpl
  */
 public interface DynamicHudIntegration {
-    /**
-     * The key binding for opening the editor screen.
-     */
-    KeyBinding EDITOR_SCREEN_KEY_BINDING = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-            "DynamicHud Editor Screen",
-            InputUtil.Type.KEYSYM,
-            GLFW.GLFW_KEY_RIGHT_SHIFT,
-            "DynamicHud"
-    ));
-
     /**
      * The filename for the widgets file.
      */
@@ -97,7 +88,5 @@ public interface DynamicHudIntegration {
      *
      * @return The keybind.
      */
-    default KeyBinding getKeyBind() {
-        return EDITOR_SCREEN_KEY_BINDING;
-    }
+     KeyMapping getKeyBind();
 }

@@ -1,12 +1,19 @@
 package com.tanishisherewith.dynamichud.screens;
 
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
+import com.tanishisherewith.dynamichud.utils.Util;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.vehicle.minecart.Minecart;
+import org.jspecify.annotations.NonNull;
 import org.lwjgl.glfw.GLFW;
 
 public abstract class AbstractMoveableScreen extends Screen {
@@ -15,7 +22,7 @@ public abstract class AbstractMoveableScreen extends Screen {
     /**
      * Constructs a AbstractMoveableScreen object.
      */
-    public AbstractMoveableScreen(Text title, WidgetRenderer renderer) {
+    public AbstractMoveableScreen(Component title, WidgetRenderer renderer) {
         super(title);
         this.widgetRenderer = renderer;
     }
@@ -26,92 +33,95 @@ public abstract class AbstractMoveableScreen extends Screen {
     }
 
     @Override
-    public void onDisplayed() {
-        super.onDisplayed();
+    public void added() {
+        super.added();
         widgetRenderer.isInEditor = true;
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        widgetRenderer.mouseDragged(mouseX, mouseY, button, deltaX, deltaY, GlobalConfig.get().getSnapSize());
-        ContextMenuManager.getInstance().mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+        widgetRenderer.mouseDragged(event.x(), event.y(), event.button(),
+                dx, dy,
+                GlobalConfig.get().getSnapSize());
+        ContextMenuManager.getInstance().mouseDragged(event.x(), event.y(), event.button(),
+                dx, dy);
+        return super.mouseDragged(event, dx, dy);
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (widgetRenderer.mouseClicked(mouseX, mouseY, button)) {
-            handleClickOnWidget(widgetRenderer.selectedWidget, mouseX, mouseY, button);
+    public boolean mouseClicked(MouseButtonEvent event, boolean bl) {
+        if (widgetRenderer.mouseClicked(event.x(), event.y(), event.button())) {
+            handleClickOnWidget(widgetRenderer.selectedWidget, event.x(), event.y(), event.button());
         }
-        ContextMenuManager.getInstance().mouseClicked(mouseX, mouseY, button);
-        return super.mouseClicked(mouseX, mouseY, button);
+        ContextMenuManager.getInstance().mouseClicked(event.x(), event.y(), event.button());
+        return super.mouseClicked(event, bl);
     }
 
     @Override
-    public boolean charTyped(char chr, int modifiers) {
-        widgetRenderer.charTyped(chr, modifiers);
-        ContextMenuManager.getInstance().charTyped(chr, modifiers);
-        return super.charTyped(chr, modifiers);
+    public boolean charTyped(CharacterEvent event) {
+        widgetRenderer.charTyped((char) event.codepoint(), event.modifiers());
+        ContextMenuManager.getInstance().charTyped((char) event.codepoint(), event.modifiers());
+        return super.charTyped(event);
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        widgetRenderer.mouseReleased(mouseX, mouseY, button);
-        ContextMenuManager.getInstance().mouseReleased(mouseX, mouseY, button);
-        return super.mouseReleased(mouseX, mouseY, button);
+    public boolean mouseReleased(MouseButtonEvent event) {
+        widgetRenderer.mouseReleased(event.x(), event.y(), event.button());
+        ContextMenuManager.getInstance().mouseReleased(event.x(), event.y(), event.button());
+        return super.mouseReleased(event);
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        widgetRenderer.keyPressed(keyCode, scanCode, modifiers);
-        ContextMenuManager.getInstance().keyPressed(keyCode, scanCode, modifiers);
-        if (widgetRenderer.selectedWidget != null && (keyCode == GLFW.GLFW_KEY_DELETE || keyCode == GLFW.GLFW_KEY_BACKSPACE)) {
-            //       trayWidget.minimizeWidget(widgetRenderer.selectedWidget);
+    public boolean keyPressed(KeyEvent event) {
+        widgetRenderer.keyPressed(event.key(), event.scancode(), event.modifiers());
+        ContextMenuManager.getInstance().keyPressed(event.key(), event.scancode(), event.modifiers());
+        if (widgetRenderer.selectedWidget != null &&
+                (event.key() == GLFW.GLFW_KEY_DELETE || event.key() == GLFW.GLFW_KEY_BACKSPACE)) {
+            // trayWidget.minimizeWidget(widgetRenderer.selectedWidget);
         }
-
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(event);
     }
 
     @Override
-    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        widgetRenderer.keyReleased(keyCode, scanCode, modifiers);
-        ContextMenuManager.getInstance().keyReleased(keyCode, scanCode, modifiers);
-        return super.keyReleased(keyCode, scanCode, modifiers);
+    public boolean keyReleased(KeyEvent event) {
+        widgetRenderer.keyReleased(event.key(), event.scancode(), event.modifiers());
+        ContextMenuManager.getInstance().keyReleased(event.key(), event.scancode(), event.modifiers());
+        return super.keyReleased(event);
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        widgetRenderer.mouseScrolled(mouseX, mouseY, verticalAmount, horizontalAmount);
-        ContextMenuManager.getInstance().mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
-        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+    public boolean mouseScrolled(double x, double y, double horizontalAmount, double verticalAmount) {
+        widgetRenderer.mouseScrolled(x, y, verticalAmount, horizontalAmount);
+        ContextMenuManager.getInstance().mouseScrolled(x, y, horizontalAmount, verticalAmount);
+        return super.mouseScrolled(x, y, horizontalAmount, verticalAmount);
     }
 
     /**
      * Renders this screen and its widgets on the screen.
      *
-     * @param drawContext The matrix stack used for rendering
+     * @param graphics The matrix stack used for rendering
      * @param mouseX      The current x position of the mouse cursor
      * @param mouseY      The current y position of the mouse cursor
      * @param delta       The time elapsed since the last frame in seconds
      */
     @Override
-    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        if (this.client.world == null) {
-            renderInGameBackground(drawContext);
+    public void render(@NonNull GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        if (this.minecraft.level == null) {
+            renderBackground(graphics,mouseX,mouseY,delta);
         }
-        drawContext.drawText(client.textRenderer, title, client.getWindow().getScaledWidth() / 2 - client.textRenderer.getWidth(title.getString()) / 2, textRenderer.fontHeight / 2, -1, true);
+        graphics.drawCenteredString(this.font, this.title, this.width / 2, this.font.lineHeight / 2,-1);
 
         // Draw each widget
-        widgetRenderer.renderWidgets(drawContext, mouseX, mouseY);
+        widgetRenderer.renderWidgets(graphics, mouseX, mouseY);
 
-        ContextMenuManager.getInstance().renderAll(drawContext, mouseX, mouseY);
+        ContextMenuManager.getInstance().renderAll(graphics, mouseX, mouseY);
 
         if (GlobalConfig.get().shouldDisplayDescriptions()) {
             for (Widget widget : widgetRenderer.getWidgets()) {
                 if (widget == null || widget.isShiftDown) continue;
 
                 if (widget.getWidgetBox().isMouseOver(mouseX, mouseY)) {
-                    drawContext.drawTooltip(client.textRenderer, widget.tooltipText, mouseX, mouseY);
+                    graphics.setTooltipForNextFrame(this.font, widget.tooltipText, mouseX, mouseY);
                     break;
                 }
             }
@@ -122,16 +132,15 @@ public abstract class AbstractMoveableScreen extends Screen {
     }
 
     @Override
-    public void close() {
+    public void onClose() {
         widgetRenderer.isInEditor = false;
         widgetRenderer.onCloseScreen();
         ContextMenuManager.getInstance().onClose();
-        super.close();
+        super.onClose();
     }
 
     @Override
-    public boolean shouldPause() {
+    public boolean isPauseScreen() {
         return false;
     }
 }
-

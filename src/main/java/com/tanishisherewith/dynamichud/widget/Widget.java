@@ -4,15 +4,14 @@ import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.internal.UID;
 import com.tanishisherewith.dynamichud.utils.Input;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
 public abstract class Widget implements Input {
-    public static MinecraftClient mc = MinecraftClient.getInstance();
+    public static Minecraft mc = Minecraft.getInstance();
     public WidgetData<?> DATA;
     /**
      * This is the UID of the widget used to identify during loading and saving.
@@ -39,7 +38,7 @@ public abstract class Widget implements Input {
      */
     public String modId = "unknown";
 
-    public Text tooltipText;
+    public Component tooltipText;
 
     // Boolean to know if the widget is currently being displayed in an instance of AbstractMoveableScreen
     protected boolean isInEditor = false;
@@ -66,7 +65,7 @@ public abstract class Widget implements Input {
         widgetBox = new WidgetBox(0, 0, 0, 0);
         this.modId = modId;
         this.anchor = anchor;
-        this.tooltipText = Text.of(DATA.description());
+        this.tooltipText = Component.literal(DATA.description());
         init();
     }
 
@@ -128,7 +127,7 @@ public abstract class Widget implements Input {
     // Update position based on anchor and offset
     void updatePosition(int screenWidth, int screenHeight) {
         if (offsetX == 0 || offsetY == 0) {
-            calculateOffset(x, y, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());
+            calculateOffset(x, y, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
         }
 
         int anchorX = getAnchorX(screenWidth);
@@ -141,9 +140,9 @@ public abstract class Widget implements Input {
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
-        if (mc.getWindow() != null) {
-            calculateOffset(x, y, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());
-            updatePosition(mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());
+        if(mc.getWindow() != null) {
+            calculateOffset(x, y, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
+            updatePosition(mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
         }
     }
 
@@ -159,17 +158,17 @@ public abstract class Widget implements Input {
     /**
      * Renders the widget on the screen.
      */
-    public final void render(DrawContext drawContext, int mouseX, int mouseY) {
+    public final void render(GuiGraphics graphics, int mouseX, int mouseY) {
         if (!isVisible()) return;
 
 
         if (shouldScale) {
-            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().getScale());
+            DrawHelper.scaleAndPosition(graphics.pose(), getX(), getY(), GlobalConfig.get().getScale());
         }
-        renderWidget(drawContext, mouseX, mouseY);
+        renderWidget(graphics, mouseX, mouseY);
 
         if (shouldScale) {
-            DrawHelper.stopScaling(drawContext.getMatrices());
+            DrawHelper.stopScaling(graphics.pose());
         }
         clampPosition();
     }
@@ -177,18 +176,18 @@ public abstract class Widget implements Input {
     /**
      * Renders the widget on the editor screen.
      */
-    public final void renderInEditor(DrawContext drawContext, int mouseX, int mouseY) {
+    public final void renderInEditor(GuiGraphics graphics, int mouseX, int mouseY) {
         if (!isInEditor) return;
 
-        drawWidgetBackground(drawContext);
+        drawWidgetBackground(graphics);
 
         if (shouldScale) {
-            DrawHelper.scaleAndPosition(drawContext.getMatrices(), getX(), getY(), GlobalConfig.get().getScale());
+            DrawHelper.scaleAndPosition(graphics.pose(), getX(), getY(), GlobalConfig.get().getScale());
         }
-        renderWidgetInEditor(drawContext, mouseX, mouseY);
+        renderWidgetInEditor(graphics, mouseX, mouseY);
 
         if (shouldScale) {
-            DrawHelper.stopScaling(drawContext.getMatrices());
+            DrawHelper.stopScaling(graphics.pose());
         }
         clampPosition();
     }
@@ -199,21 +198,21 @@ public abstract class Widget implements Input {
      * The mouse position values are only passed when in a {@link com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen} screen.
      * </p>
      *
-     * @param context DrawContext Object
+     * @param graphics GuiGraphics Object
      * @param mouseX  X position of mouse.
      * @param mouseY  Y position of mouse
      */
-    public abstract void renderWidget(DrawContext context, int mouseX, int mouseY);
+    public abstract void renderWidget(GuiGraphics graphics, int mouseX, int mouseY);
 
     /**
      * Renders the widget in the editor screen with a background.
      * Override this method without super call to remove the background.
      * Could also be used to display placeholder values.
      */
-    private void renderWidgetInEditor(DrawContext context, int mouseX, int mouseY) {
-        //drawWidgetBackground(context);
+    private void renderWidgetInEditor(GuiGraphics graphics, int mouseX, int mouseY) {
+        //drawWidgetBackground(graphics);
 
-        renderWidget(context, mouseX, mouseY);
+        renderWidget(graphics, mouseX, mouseY);
     }
 
     @Override
@@ -233,8 +232,8 @@ public abstract class Widget implements Input {
     /* Input related methods. Override with **super call** to add your own input-based code like contextMenu */
 
     public void clampPosition() {
-        this.x = (int) MathHelper.clamp(this.x, 0, mc.getWindow().getScaledWidth() - getWidth());
-        this.y = (int) MathHelper.clamp(this.y, 0, mc.getWindow().getScaledHeight() - getHeight());
+        this.x = (int) org.joml.Math.clamp(this.x, 0, mc.getWindow().getGuiScaledWidth() - getWidth());
+        this.y = (int) org.joml.Math.clamp(this.y, 0, mc.getWindow().getGuiScaledHeight() - getHeight());
     }
 
     @Override
@@ -252,8 +251,8 @@ public abstract class Widget implements Input {
             // Higher the snapSize, more the grid boxes
             if (this.isShiftDown) {
                 // Calculate the size of each snap box
-                int snapBoxWidth = mc.getWindow().getScaledWidth() / snapSize;
-                int snapBoxHeight = mc.getWindow().getScaledHeight() / snapSize;
+                int snapBoxWidth = mc.getWindow().getGuiScaledWidth() / snapSize;
+                int snapBoxHeight = mc.getWindow().getGuiScaledHeight() / snapSize;
 
                 // Calculate the index of the snap box that the new position would be in and
                 // snap the new position to the top-left corner of the snap box
@@ -261,10 +260,10 @@ public abstract class Widget implements Input {
                 newY = (newY / snapBoxHeight) * snapBoxHeight;
             }
 
-            this.x = (int) MathHelper.clamp(newX, 0, mc.getWindow().getScaledWidth() - getWidth());
-            this.y = (int) MathHelper.clamp(newY, 0, mc.getWindow().getScaledHeight() - getHeight());
+            this.x = (int) org.joml.Math.clamp(newX, 0, mc.getWindow().getGuiScaledWidth() - getWidth());
+            this.y = (int) org.joml.Math.clamp(newY, 0, mc.getWindow().getGuiScaledHeight() - getHeight());
 
-            calculateOffset(x, y, mc.getWindow().getScaledWidth(), mc.getWindow().getScaledHeight());  // Set initial offset
+            calculateOffset(x, y, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());  // Set initial offset
 
             return true;
         }
@@ -311,11 +310,11 @@ public abstract class Widget implements Input {
      * Displays a faint grayish background if enabled or faint reddish background if disabled.
      * Drawn with 2 pixel offset to all sides
      */
-    protected void drawWidgetBackground(DrawContext context) {
+    protected void drawWidgetBackground(GuiGraphics graphics) {
         int backgroundColor = this.isVisible() ? GlobalConfig.get().getHudActiveColor().getRGB() : GlobalConfig.get().getHudInactiveColor().getRGB();
         WidgetBox box = this.getWidgetBox();
 
-        DrawHelper.drawRectangle(context,
+        DrawHelper.drawRectangle(graphics,
                 box.x,
                 box.y,
                 box.getWidth(),
@@ -324,13 +323,13 @@ public abstract class Widget implements Input {
     }
 
     /**
-     * Set the tooltip text of the widget
+     * Set the tooltip Component of the widget
      */
-    protected void setTooltipText(Text text) {
-        this.tooltipText = text;
+    protected void setTooltipText(Component Component) {
+        this.tooltipText = Component;
     }
 
-    public void readFromTag(NbtCompound tag) {
+    public void readFromTag(CompoundTag tag) {
         modId = tag.getString("modId").orElse("unknown");
         uid = tag.contains("UID") ? new UID(tag.getString("UID").get()) : UID.generate();
         //     x = tag.getInt("x");
@@ -348,7 +347,7 @@ public abstract class Widget implements Input {
      *
      * @param tag The tag to write to
      */
-    public void writeToTag(NbtCompound tag) {
+    public void writeToTag(CompoundTag tag) {
         tag.putString("name", DATA.name());
         tag.putString("modId", modId);
         tag.putString("UID", uid.getUniqueID());

@@ -1,12 +1,13 @@
 package com.tanishisherewith.dynamichud.internal;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.Skin;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Util;
 
 import java.awt.*;
@@ -17,52 +18,53 @@ public class WarningScreen extends Screen {
     private final List<ModError> modErrors;
 
     public WarningScreen(List<ModError> modErrors) {
-        super(Text.of("DynamicHUD Warning"));
+        super(Component.literal("DynamicHUD Warning"));
         this.modErrors = modErrors;
     }
 
     @Override
     protected void init() {
-        ButtonWidget confirmButton = ButtonWidget.builder(Text.of("I Understand"), button -> MinecraftClient.getInstance().setScreen(null))
-                .dimensions(this.width / 2 - 100, this.height - 40, 200, 20)
-                .narrationSupplier((e) -> Text.literal("I understand"))
+        Button confirmButton = Button.builder(Component.literal("I Understand"), button -> Minecraft.getInstance().setScreen(null))
+                .bounds(this.width / 2 - 100, this.height - 40, 200, 20)
+                .createNarration((e) -> Component.literal("I understand"))
                 .build();
 
-        ButtonWidget logs_folder = ButtonWidget.builder(Text.of("Open logs"), button -> {
-                    File logsFolder = new File(MinecraftClient.getInstance().runDirectory, "logs");
-                    Util.getOperatingSystem().open(logsFolder);
+        Button logs_folder = Button.builder(Component.literal("Open logs"), button -> {
+                    File logsFolder = new File(Minecraft.getInstance().gameDirectory, "logs");
+                    Util.getPlatform().openFile(logsFolder);
                 })
-                .dimensions(this.width / 2 - 100, this.height - 70, 200, 20)
-                .narrationSupplier((e) -> Text.literal("Open logs"))
+                .bounds(this.width / 2 - 100, this.height - 70, 200, 20)
+                .createNarration((e) -> Component.literal("Open logs"))
                 .build();
 
         // Add "I Understand" button
-        this.addDrawableChild(confirmButton);
-        this.addDrawableChild(logs_folder);
+        this.addRenderableWidget(confirmButton);
+        this.addRenderableWidget(logs_folder);
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        super.render(graphics, mouseX, mouseY, delta);
 
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
-        context.drawCenteredTextWithShadow(this.textRenderer, "Mods with bad implementation of DynamicHUD found!", this.width / 2, 35, Color.ORANGE.getRGB());
+        graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
+        graphics.drawCenteredString(this.font, "Mods with bad implementation of DynamicHUD found!", this.width / 2, 35, Color.ORANGE.getRGB());
 
         int y = 60;
         for (ModError error : modErrors) {
-            Text modName = Text.literal("> \"" + error.modName() + "\"").formatted(Formatting.RED);
-            context.drawText(this.textRenderer, modName, this.width / 2 - 100, y, -1, false);
-            List<OrderedText> errorMessage = this.textRenderer.wrapLines(Text.literal("Error: " + error.errorMessage()), this.width / 2);
+            Component modName = Component.literal("> \"" + error.modName() + "\"").withStyle(ChatFormatting.RED);
+            graphics.drawString(this.font, modName, this.width / 2 - 100, y, -1, false);
+            List<FormattedCharSequence> errorMessage =
+                    this.font.split(Component.literal("Error: " + error.errorMessage()), this.width / 2);
 
-            if (mouseX >= this.width / 2 - 100 && mouseX <= this.width / 2 - 100 + this.textRenderer.getWidth(modName) && mouseY >= y && mouseY <= y + this.textRenderer.fontHeight) {
-                context.drawOrderedTooltip(textRenderer, errorMessage, mouseX, mouseY);
+            if (Skin.isMouseOver(mouseX,mouseY,(double) this.width / 2 - 102, y - 1, this.font.width(modName) + 4,this.font.lineHeight + 2)) {
+                graphics.setTooltipForNextFrame(errorMessage, mouseX, mouseY);
             }
             y += 11; // Space between mod errors
         }
 
         y += 5;
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.of("Please report this problem to the respective mod owners."), this.width / 2, y, -1);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Widgets of these mods won't work.").formatted(Formatting.YELLOW), this.width / 2, y + 10, -1);
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Check latest.log for more details").formatted(Formatting.ITALIC), this.width / 2, y + 30, -1);
+        graphics.drawCenteredString(this.font, Component.literal("Please report this problem to the respective mod owners."), this.width / 2, y, -1);
+        graphics.drawCenteredString(this.font, Component.literal("Widgets of these mods won't work.").withStyle(ChatFormatting.YELLOW), this.width / 2, y + 10, -1);
+        graphics.drawCenteredString(this.font, Component.literal("Check latest.log for more details").withStyle(ChatFormatting.ITALIC), this.width / 2, y + 30, -1);
     }
 }

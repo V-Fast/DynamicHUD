@@ -2,8 +2,8 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,7 +14,7 @@ public class OptionGroup extends Option<OptionGroup> {
     private final List<Option<?>> groupOptions = new ArrayList<>();
     protected boolean expanded; // Skins can choose to use this or ignore it
 
-    public OptionGroup(Text name) {
+    public OptionGroup(Component name) {
         super(name, () -> null, (v) -> {}, () -> true);
         this.expanded = false;
     }
@@ -38,8 +38,8 @@ public class OptionGroup extends Option<OptionGroup> {
     }
 
     @Override
-    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
-        super.render(drawContext,x,y,mouseX,mouseY);
+    public void render(GuiGraphics graphics, int x, int y, int mouseX, int mouseY) {
+        super.render(graphics,x,y,mouseX,mouseY);
     }
 
     public boolean isExpanded() {
@@ -65,7 +65,7 @@ public class OptionGroup extends Option<OptionGroup> {
 
     public static class OptionGroupRenderer implements SkinRenderer<Option<OptionGroup>> {
         @Override
-        public void render(DrawContext drawContext, Option<OptionGroup> option, int x, int y, int mouseX, int mouseY) {}
+        public void render(GuiGraphics graphics, Option<OptionGroup> option, int x, int y, int mouseX, int mouseY) {}
 
         @Override
         public boolean mouseClicked(Option<OptionGroup> option2, double mouseX, double mouseY, int button) {

@@ -5,15 +5,15 @@ import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.utils.Input;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class Option<T> implements Input {
-    public Text name, description = Text.empty();
+    public Component name, description = Component.empty();
     public T value = null;
     protected int x, y;
     protected int width = 0;
@@ -22,16 +22,16 @@ public abstract class Option<T> implements Input {
     protected Supplier<T> getter;
     protected Consumer<T> setter;
     protected T defaultValue = null;
-    protected MinecraftClient mc = MinecraftClient.getInstance();
+    protected Minecraft mc = Minecraft.getInstance();
     protected ContextMenuProperties properties;
     protected SkinRenderer<Option<T>> renderer;
     protected Complexity complexity = Complexity.Simple;
 
-    public Option(Text name, Supplier<T> getter, Consumer<T> setter) {
+    public Option(Component name, Supplier<T> getter, Consumer<T> setter) {
         this(name, getter, setter, () -> true);
     }
 
-    public Option(Text name, Supplier<T> getter, Consumer<T> setter, Supplier<Boolean> shouldRender, ContextMenuProperties properties) {
+    public Option(Component name, Supplier<T> getter, Consumer<T> setter, Supplier<Boolean> shouldRender, ContextMenuProperties properties) {
         this.name = name;
         this.getter = getter;
         this.setter = setter;
@@ -41,7 +41,7 @@ public abstract class Option<T> implements Input {
         updateProperties(properties);
     }
 
-    public Option(Text name, Supplier<T> getter, Consumer<T> setter, Supplier<Boolean> shouldRender) {
+    public Option(Component name, Supplier<T> getter, Consumer<T> setter, Supplier<Boolean> shouldRender) {
         this(name, getter, setter, shouldRender, ContextMenuProperties.createGenericSimplified());
     }
 
@@ -63,13 +63,13 @@ public abstract class Option<T> implements Input {
         }
     }
 
-    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
+    public void render(GuiGraphics graphics, int x, int y, int mouseX, int mouseY) {
         this.x = x;
         this.y = y;
         this.value = get();
 
         // Retrieve the renderer and ensure it is not null
-        renderer.render(drawContext, this, x, y, mouseX, mouseY);
+        renderer.render(graphics, this, x, y, mouseX, mouseY);
     }
 
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
@@ -163,7 +163,7 @@ public abstract class Option<T> implements Input {
         this.y = y;
     }
 
-    public Option<T> description(Text description) {
+    public Option<T> description(Component description) {
         this.description = description;
         return this;
     }
@@ -177,11 +177,11 @@ public abstract class Option<T> implements Input {
         return renderer;
     }
 
-    public Text getName() {
+    public Component getName() {
         return name;
     }
 
-    public Text getDescription() {
+    public Component getDescription() {
         return description;
     }
 

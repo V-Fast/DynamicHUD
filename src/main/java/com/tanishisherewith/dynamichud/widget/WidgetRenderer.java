@@ -6,10 +6,9 @@ import com.tanishisherewith.dynamichud.internal.System;
 import com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.utils.Input;
 import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.ContextMenuScreenRegistry;
-import dev.isxander.yacl3.gui.YACLScreen;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.GameMenuScreen;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.PauseScreen;
+import net.minecraft.client.gui.screens.Screen;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -21,19 +20,19 @@ public class WidgetRenderer implements Input {
     public Widget selectedWidget = null;
     List<Widget> widgets;
     private boolean renderInGameHud = true;
-    private int Z_Index = -1;
+    //private int Z_Index = -1;
 
     /**
      * Add the list of widgets the widgetRenderer should render
      * <p>
-     * By default, it adds the {@link GameMenuScreen} to allow rendering of the widgets in the pause/main menu screen.
+     * By default, it adds the {@link PauseScreen} to allow rendering of the widgets in the pause/main menu screen.
      *
      * @param widgets List of widgets to render
      */
     public WidgetRenderer(List<Widget> widgets) {
         this.widgets = widgets;
         // Render in GameMenuScreen
-        this.allowedScreens = screen -> screen.getClass() == GameMenuScreen.class ||
+        this.allowedScreens = screen -> screen.getClass() == PauseScreen.class ||
                 System.getInstances(ContextMenuScreenRegistry.class, DynamicHUD.MOD_ID).stream().anyMatch(registry -> registry.screenKlass == screen.getClass());
     }
 
@@ -88,22 +87,22 @@ public class WidgetRenderer implements Input {
         if (GlobalConfig.get().renderInDebugScreen()) {
             return true;
         }
-        return !DynamicHUD.MC.getDebugHud().shouldShowDebugHud();
+        return !DynamicHUD.MC.getDebugOverlay().showDebugScreen();
     }
 
-    public void renderWidgets(DrawContext context, int mouseX, int mouseY) {
+    public void renderWidgets(GuiGraphics graphics, int mouseX, int mouseY) {
         if (WidgetManager.getWidgets().isEmpty() || !renderInDebugScreen()) return;
 
-        Screen currentScreen = DynamicHUD.MC.currentScreen;
+        Screen currentScreen = DynamicHUD.MC.screen;
 
-        context.getMatrices().push();
-        context.getMatrices().translate(0, 0, Z_Index);
+       // graphics.pose().pushMatrix();
+       // graphics.pose().translate(0, 0,Z_Index);
 
         //Render in editing screen
         if (currentScreen instanceof AbstractMoveableScreen) {
             for (Widget widget : widgets) {
                 widget.isInEditor = true;
-                widget.renderInEditor(context, mouseX, mouseY);
+                widget.renderInEditor(graphics, mouseX, mouseY);
             }
             return;
         }
@@ -111,15 +110,15 @@ public class WidgetRenderer implements Input {
         if ((currentScreen == null && renderInGameHud) || allowedScreens.test(currentScreen)) {
             for (Widget widget : widgets) {
                 widget.isInEditor = false;
-                widget.render(context, 0, 0);
+                widget.render(graphics, 0, 0);
             }
         }
-        context.getMatrices().pop();
+        //graphics.pose().popMatrix();
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        Screen currentScreen = DynamicHUD.MC.currentScreen;
+        Screen currentScreen = DynamicHUD.MC.screen;
         if (currentScreen == null) {
             return false;
         }
@@ -139,7 +138,7 @@ public class WidgetRenderer implements Input {
 
     @Override
     public void mouseScrolled(double mouseX, double mouseY, double vAmount, double hAmount) {
-        Screen currentScreen = DynamicHUD.MC.currentScreen;
+        Screen currentScreen = DynamicHUD.MC.screen;
         if (currentScreen == null) {
             return;
         }
@@ -155,7 +154,7 @@ public class WidgetRenderer implements Input {
     }
 
     public void onCloseScreen() {
-        if (DynamicHUD.MC.currentScreen instanceof AbstractMoveableScreen) {
+        if (DynamicHUD.MC.screen instanceof AbstractMoveableScreen) {
             for (Widget widget : widgets) {
                 widget.onClose();
             }
@@ -168,7 +167,7 @@ public class WidgetRenderer implements Input {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        Screen currentScreen = DynamicHUD.MC.currentScreen;
+        Screen currentScreen = DynamicHUD.MC.screen;
         if (currentScreen == null) {
             return false;
         }
@@ -186,7 +185,7 @@ public class WidgetRenderer implements Input {
     }
 
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY, int snapSize) {
-        Screen currentScreen = DynamicHUD.MC.currentScreen;
+        Screen currentScreen = DynamicHUD.MC.screen;
         if (currentScreen == null) {
             return false;
         }
@@ -206,7 +205,7 @@ public class WidgetRenderer implements Input {
 
     @Override
     public void keyPressed(int key, int scanCode, int modifiers) {
-        Screen currentScreen = DynamicHUD.MC.currentScreen;
+        Screen currentScreen = DynamicHUD.MC.screen;
         if (currentScreen instanceof AbstractMoveableScreen && (key == GLFW.GLFW_KEY_LEFT_SHIFT || key == GLFW.GLFW_KEY_RIGHT_SHIFT)) {
             for (Widget widget : widgets) {
                 widget.isShiftDown = true;
@@ -216,7 +215,7 @@ public class WidgetRenderer implements Input {
 
     @Override
     public void keyReleased(int key, int scanCode, int modifiers) {
-        Screen currentScreen = DynamicHUD.MC.currentScreen;
+        Screen currentScreen = DynamicHUD.MC.screen;
         if (currentScreen instanceof AbstractMoveableScreen && (key == GLFW.GLFW_KEY_LEFT_SHIFT || key == GLFW.GLFW_KEY_RIGHT_SHIFT)) {
             for (Widget widget : widgets) {
                 widget.isShiftDown = false;
@@ -224,8 +223,8 @@ public class WidgetRenderer implements Input {
         }
     }
 
-    public WidgetRenderer withZIndex(int z_Index) {
-        this.Z_Index = z_Index;
-        return this;
-    }
+  //  public WidgetRenderer withZIndex(int z_Index) {
+     //   this.Z_Index = z_Index;
+   //     return this;
+   // }
 }

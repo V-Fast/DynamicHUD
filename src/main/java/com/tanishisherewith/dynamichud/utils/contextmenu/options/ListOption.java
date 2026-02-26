@@ -1,6 +1,6 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -10,7 +10,7 @@ public class ListOption<T> extends Option<T> {
     private final List<T> values;
     private int currentIndex = 0;
 
-    public ListOption(Text name, Supplier<T> getter, Consumer<T> setter, List<T> values) {
+    public ListOption(Component name, Supplier<T> getter, Consumer<T> setter, List<T> values) {
         super(name, getter, setter);
         this.values = values;
         this.value = getter.get();

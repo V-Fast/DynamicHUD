@@ -4,8 +4,8 @@ import com.tanishisherewith.dynamichud.DynamicHUD;
 
 public class Util {
     public static Quadrant getQuadrant(int x, int y) {
-        int screenWidth = DynamicHUD.MC.getWindow().getScaledWidth();
-        int screenHeight = DynamicHUD.MC.getWindow().getScaledHeight();
+        int screenWidth = DynamicHUD.MC.getWindow().getGuiScaledWidth();
+        int screenHeight = DynamicHUD.MC.getWindow().getGuiScaledHeight();
 
         if (x < screenWidth / 2) {
             if (y < screenHeight / 2) {
@@ -34,5 +34,9 @@ public class Util {
     public static boolean warnIfTrue(boolean expression, String message, Object... objects) {
         if (expression) DynamicHUD.logger.warn(message, objects);
         return expression;
+    }
+
+    public static boolean isSafeToContinue() {
+        return DynamicHUD.MC.getWindow() != null && DynamicHUD.MC.font != null;
     }
 }

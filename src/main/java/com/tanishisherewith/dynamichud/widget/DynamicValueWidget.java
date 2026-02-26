@@ -4,7 +4,7 @@ import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.utils.Util;
 import com.tanishisherewith.dynamichud.widgets.GraphWidget;
 import com.tanishisherewith.dynamichud.widgets.TextWidget;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.function.Supplier;
 
@@ -36,14 +36,14 @@ public abstract class DynamicValueWidget extends Widget {
     }
 
     @Override
-    public void writeToTag(NbtCompound tag) {
+    public void writeToTag(CompoundTag tag) {
         super.writeToTag(tag);
         tag.putString("RegistryID", registryID);
         tag.putString("RegistryKey", registryKey);
     }
 
     @Override
-    public void readFromTag(NbtCompound tag) {
+    public void readFromTag(CompoundTag tag) {
         super.readFromTag(tag);
         registryID = tag.getString("RegistryID").orElse(DynamicValueRegistry.GLOBAL_ID);
         registryKey = tag.getString("RegistryKey").orElse("null");

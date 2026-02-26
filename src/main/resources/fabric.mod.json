@@ -26,7 +26,10 @@
     ]
   },
   "mixins": [
-    "dynamichud.mixins.json"
+      {
+        "config": "dynamichud.mixins.json",
+        "environment": "client"
+      }
   ],
   "depends": {
     "fabricloader": ">=${loader_version}",

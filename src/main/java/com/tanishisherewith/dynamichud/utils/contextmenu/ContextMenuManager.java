@@ -1,7 +1,7 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu;
 
 import com.tanishisherewith.dynamichud.utils.Input;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +21,11 @@ public class ContextMenuManager implements Input {
         providers.add(provider);
     }
 
-    public void renderAll(DrawContext drawContext, int mouseX, int mouseY) {
+    public void renderAll(GuiGraphics graphics, int mouseX, int mouseY) {
         for (ContextMenuProvider provider : providers) {
             ContextMenu<?> contextMenu = provider.getContextMenu();
             if (contextMenu != null) {
-                contextMenu.render(drawContext, contextMenu.getX(), contextMenu.getY(), mouseX, mouseY);
+                contextMenu.render(graphics, contextMenu.getX(), contextMenu.getY(), mouseX, mouseY);
             }
         }
     }

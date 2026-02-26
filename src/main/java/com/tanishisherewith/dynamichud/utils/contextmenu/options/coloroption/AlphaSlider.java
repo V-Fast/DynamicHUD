@@ -2,7 +2,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption;
 
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.awt.*;
 
@@ -25,13 +25,13 @@ public class AlphaSlider {
         this.alpha = color.getAlpha() / 255f;
     }
 
-    public void render(DrawContext drawContext, int x, int y) {
+    public void render(GuiGraphics graphics, int x, int y) {
         this.x = x;
         this.y = y;
 
-        DrawHelper.drawOutlinedBox(drawContext, x - 2, y - 2, x + width + 2, y + height + 2, Color.WHITE.getRGB());
-        DrawHelper.drawGradient(drawContext, x, y, width, height, color.getRGB(), ColorHelper.changeAlpha(color, 0).getRGB(), DrawHelper.Direction.TOP_BOTTOM);
-        drawContext.fill(x - 2, y + alphaHandleY - 1, x + width + 2, y + alphaHandleY + 1, Color.WHITE.getRGB());
+        DrawHelper.drawOutlinedBox(graphics, x - 2, y - 2, x + width + 2, y + height + 2, Color.WHITE.getRGB());
+        DrawHelper.drawGradient(graphics, x, y, width, height, color.getRGB(), ColorHelper.changeAlpha(color, 0).getRGB(), DrawHelper.Direction.TOP_BOTTOM);
+        graphics.fill(x - 2, y + alphaHandleY - 1, x + width + 2, y + alphaHandleY + 1, Color.WHITE.getRGB());
     }
 
     public Color getColor() {

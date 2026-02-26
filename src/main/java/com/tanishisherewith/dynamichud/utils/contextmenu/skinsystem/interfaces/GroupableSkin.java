@@ -2,11 +2,11 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces;
 
 import com.tanishisherewith.dynamichud.utils.contextmenu.layout.LayoutContext;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.OptionGroup;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 
 public interface GroupableSkin {
     LayoutContext.Offset getGroupIndent();
 
-    void renderGroup(DrawContext drawContext, OptionGroup group, int groupX, int groupY, int mouseX, int mouseY);
+    void renderGroup(GuiGraphics graphics, OptionGroup group, int groupX, int groupY, int mouseX, int mouseY);
 }
 

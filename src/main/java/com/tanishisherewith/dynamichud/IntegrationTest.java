@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.tanishisherewith.dynamichud.integration.DynamicHudConfigurator;
 import com.tanishisherewith.dynamichud.integration.DynamicHudIntegration;
 import com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen;
@@ -7,8 +8,12 @@ import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widgets.GraphWidget;
 import com.tanishisherewith.dynamichud.widgets.TextWidget;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.text.Text;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 
@@ -23,13 +28,13 @@ public class IntegrationTest implements DynamicHudIntegration {
     public void init() {
         //Global registry
         // We recommend using the syntax "modid:key_name" for easier debugging and to prevent data conflicts in global registries.
-        DynamicValueRegistry.registerGlobal("dynamichud:FPS", () -> "FPS: " + DynamicHUD.MC.getCurrentFps());
+        DynamicValueRegistry.registerGlobal("dynamichud:FPS", () -> "FPS: " + DynamicHUD.MC.getFps());
 
         //Local registry
         registry = new DynamicValueRegistry(DynamicHUD.MOD_ID);
-        registry.registerLocal("Hello", () -> "Hello " + DynamicHUD.MC.getSession().getUsername() + "!");
+        registry.registerLocal("Hello", () -> "Hello " + DynamicHUD.MC.getGameProfile().name() + "!");
         registry.registerLocal("DynamicHUD", () -> "DynamicHUD");
-        registry.registerLocal("FPS", () -> DynamicHUD.MC.getCurrentFps());
+        registry.registerLocal("FPS", () -> DynamicHUD.MC.getFps());
 
         FPSWidget = new TextWidget.Builder()
                 .setX(250)
@@ -99,7 +104,7 @@ public class IntegrationTest implements DynamicHudIntegration {
                     //renderer.shouldRenderInGameHud(true);
                     renderer.addScreen(TitleScreen.class);
                 })
-                .withMoveableScreen(config -> new AbstractMoveableScreen(Text.literal("Editor Screen"), config.getRenderer()) {});
+                .withMoveableScreen(config -> new AbstractMoveableScreen(Component.literal("Editor Screen"), config.getRenderer()) {});
 
         return configurator;
     }
@@ -107,5 +112,10 @@ public class IntegrationTest implements DynamicHudIntegration {
     @Override
     public void registerCustomWidgets() {
         //WidgetManager.addWidgetData(MyWidget.DATA);
+    }
+
+    @Override
+    public KeyMapping getKeyBind() {
+        return DynamicHUD.EDITOR_SCREEN_KEYBIND;
     }
 }

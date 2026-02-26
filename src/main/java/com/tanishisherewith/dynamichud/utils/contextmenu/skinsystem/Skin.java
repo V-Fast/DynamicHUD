@@ -5,8 +5,8 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.OptionGroup;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.GroupableSkin;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public abstract class Skin {
-    protected static final MinecraftClient mc = MinecraftClient.getInstance();
+    protected static final Minecraft mc = Minecraft.getInstance();
     protected ContextMenu<?> contextMenu;
     protected Map<Class<? extends Option<?>>, Supplier<SkinRenderer<? extends Option<?>>>> renderers = new HashMap<>();
     private boolean createNewScreen;
@@ -82,7 +82,7 @@ public abstract class Skin {
         this.renderers = renderers;
     }
 
-    public abstract void renderContextMenu(DrawContext drawContext, ContextMenu<?> contextMenu, int mouseX, int mouseY);
+    public abstract void renderContextMenu(GuiGraphics graphics, ContextMenu<?> contextMenu, int mouseX, int mouseY);
 
     public boolean mouseClicked(ContextMenu<?> menu, double mouseX, double mouseY, int button) {
         return false;
@@ -113,7 +113,7 @@ public abstract class Skin {
         this.createNewScreen = createNewScreen;
     }
 
-    protected boolean isMouseOver(double mouseX, double mouseY, double x, double y, double width, double height) {
+    public static boolean isMouseOver(double mouseX, double mouseY, double x, double y, double width, double height) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
 
