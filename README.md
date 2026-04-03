@@ -12,17 +12,19 @@ DynamicHUD is a special tool for Minecraft mod creators who use Fabric. It works
 ### Developed stage
 <details>
 	<summary>View Showcase video</summary>
-	[Watch on youtube](https://youtu.be/nQ-oiHyhrm8)
+	https://youtu.be/nQ-oiHyhrm8?si=vXLUPrj7plPRuPHv
+
 </details>
 
-### Mid stage (1.2.0)
+### Mid stage (v1.2.0)
 <details>
   <summary>View Demo video</summary>
+	
   [!Mid stage demo video](https://github.com/V-Fast/DynamicHUD/assets/120117618/2abfcdf5-d786-4e58-acae-aefe51b77b4a)
 
 </details>
 
-### Early stages
+### Super early stages
 <details>
   <summary>View Demo video</summary>
   
