@@ -17,9 +17,23 @@ public class CustomRenderLayers {
     public static final RenderPipeline COLOR_LINE = RenderPipeline.builder()
             .withLocation(Identifier.fromNamespaceAndPath("dynamichud", "color_line"))
             .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.DEBUG_LINES)
-            .withFragmentShader(Identifier.withDefaultNamespace("position_color"))
-            .withVertexShader(Identifier.withDefaultNamespace("position_color"))
+            .withFragmentShader(Identifier.withDefaultNamespace("core/position_color"))
+            .withVertexShader(Identifier.withDefaultNamespace("core/position_color"))
             .build();
+
+    public static final RenderPipeline COLOR_TRIANGLES = RenderPipeline.builder()
+            .withLocation(Identifier.fromNamespaceAndPath("dynamichud", "color_triangles"))
+            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLES)
+            .withVertexShader(Identifier.withDefaultNamespace("core/position_color"))
+            .withFragmentShader(Identifier.withDefaultNamespace("core/position_color"))
+            .build();
+
+    public static RenderPipeline TRIANGLE_STRIP = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.GUI_SNIPPET)
+            .withLocation(Identifier.fromNamespaceAndPath("dynamichud", "pipeline/triangle_strip"))
+            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_STRIP)
+            .withBlend(BlendFunction.TRANSLUCENT)
+            .build()
+    );
 
     // Width/Height in UV1
     public static final VertexFormatElement ELM_WIDTH_HEIGHT =
@@ -74,12 +88,6 @@ public class CustomRenderLayers {
             .withLocation(Identifier.fromNamespaceAndPath("dynamichud", "pipeline/triangle_fan_custom_blend_func"))
             .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_FAN)
             .withBlend(new BlendFunction(SourceFactor.DST_ALPHA, DestFactor.ONE_MINUS_DST_ALPHA))
-            .build()
-    );
-    public static RenderPipeline TRIANGLE_STRIP = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.GUI_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath("dynamichud", "pipeline/triangle_strip"))
-            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_STRIP)
-            .withBlend(BlendFunction.TRANSLUCENT)
             .build()
     );
 

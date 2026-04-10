@@ -2,11 +2,12 @@ package com.tanishisherewith.dynamichud.renderstates;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.state.GuiElementRenderState;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix3x2fc;
+import org.joml.Matrix3x2fStack;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
@@ -15,18 +16,16 @@ public record InterpolatedCurveRenderState(
         List<float[]> points,
         float thickness,
         int color,
-        Matrix3x2fc pose,
+        Matrix3x2fStack pose,
         RenderPipeline pipeline,
+        int width,
+        int height,
         @Nullable ScreenRectangle scissorArea
 ) implements GuiElementRenderState {
 
     @Override
     public void buildVertices(@NonNull VertexConsumer consumer) {
-        consumer.addVertexWith2DPose(pose, 10, 10).setColor(color);
-        consumer.addVertexWith2DPose(pose, 100, 10).setColor(color);
-        consumer.addVertexWith2DPose(pose, 10, 20).setColor(color);
-        consumer.addVertexWith2DPose(pose, 100, 20).setColor(color);
-        /*
+        consumer.setLineWidth(thickness);
         for (int i = 0; i < points.size(); i++) {
             float[] point = points.get(i);
             float x = point[0];
@@ -37,23 +36,21 @@ public record InterpolatedCurveRenderState(
             float length = (float) Math.sqrt(dx * dx + dy * dy);
             if (length == 0) continue;
 
-            float offsetX = (thickness * 0.5f * dy) / length;
-            float offsetY = (thickness * 0.5f * -dx) / length;
+            float offsetX = (dy) / length;
+            float offsetY = (-dx) / length;
 
             consumer.addVertexWith2DPose(pose, x + offsetX, y + offsetY).setColor(color);
             consumer.addVertexWith2DPose(pose, x - offsetX, y - offsetY).setColor(color);
         }
-
-         */
     }
 
     @Override
-    public TextureSetup textureSetup() {
+    public @NonNull TextureSetup textureSetup() {
         return TextureSetup.noTexture();
     }
 
     @Override
     public @Nullable ScreenRectangle bounds() {
-        return null;
+        return DrawHelper.createBounds(pose,scissorArea,points.getFirst()[0],points.getFirst()[1],width,height);
     }
 }

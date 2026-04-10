@@ -2,10 +2,12 @@ package com.tanishisherewith.dynamichud.renderstates;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.state.GuiElementRenderState;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix3x2fStack;
 import org.joml.Matrix3x2fc;
 import org.jspecify.annotations.NonNull;
 
@@ -17,8 +19,10 @@ public record GradientShadowRenderState(
         float bottomY,
         int startColor,
         int endColor,
-        Matrix3x2fc pose,
+        Matrix3x2fStack pose,
         RenderPipeline pipeline,
+        int width,
+        int height,
         @Nullable ScreenRectangle scissorArea
 ) implements GuiElementRenderState {
 
@@ -33,12 +37,12 @@ public record GradientShadowRenderState(
         }
     }
     @Override
-    public TextureSetup textureSetup() {
+    public @NonNull TextureSetup textureSetup() {
         return TextureSetup.noTexture();
     }
 
     @Override
-    public @org.jspecify.annotations.Nullable ScreenRectangle bounds() {
-        return null;
+    public @Nullable ScreenRectangle bounds() {
+        return DrawHelper.createBounds(pose,scissorArea,points.getFirst()[0],points.getFirst()[1],width,height);
     }
 }

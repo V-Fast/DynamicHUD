@@ -1,7 +1,5 @@
 package com.tanishisherewith.dynamichud.helpers;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.renderstates.GeometryRenderState;
 import com.tanishisherewith.dynamichud.renderstates.QuadColorRectRenderState;
 import com.tanishisherewith.dynamichud.renderstates.RoundedRectRenderState;
@@ -9,7 +7,6 @@ import com.tanishisherewith.dynamichud.utils.CustomRenderLayers;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -29,6 +26,12 @@ import static com.tanishisherewith.dynamichud.helpers.TextureHelper.mc;
  * Credits: <a href="https://github.com/HeliosMinecraft/HeliosClient/blob/main/src/main/java/dev/heliosclient/util/render/Renderer2D.java">HeliosClient</a>
  */
 public class DrawHelper {
+    public static final float[] SINA = {0,0.1736482f,0.3420201f,0.5f,0.6427876f,0.7660444f,0.8660254f,0.9396926f,0.9848077f,1,0.9848078f,0.9396927f,0.8660255f,0.7660446f,0.6427878f,0.5000002f,0.3420205f,0.1736485f,3.894144E-07f,-0.1736478f,-0.3420197f,-0.4999996f,-0.6427872f,-0.7660443f,-0.8660252f,-0.9396925f,-0.9848077f,-1,-0.9848078f,-0.9396928f,-0.8660257f,-0.7660449f,-0.6427881f,-0.5000006f,-0.3420208f,-0.1736489f,0,0.1736482f,0.3420201f,0.5f,0.6427876f,0.7660444f,0.8660254f,0.9396926f,0.9848077f};
+    public static final float[] COSA = new float[45];
+    static {
+        // Cosa is simply Sina shifted by 90 degrees (9 steps)
+        System.arraycopy(SINA, 9, COSA, 0, 36);
+    }
 
     /**
      * Draws a singular gradient rectangle  on screen with the given parameters
@@ -51,7 +54,6 @@ public class DrawHelper {
 
             g.guiRenderState.submitGuiElement(
                     new QuadColorRectRenderState(RenderPipelines.GUI,g.pose(),x,y,width,height,c,
-                            new ScreenRectangle((int) x, (int) y,(int)width,(int) height),
                             g.scissorStack.peek())
             );
     }
@@ -64,14 +66,22 @@ public class DrawHelper {
         enableScissor((int) box.x, (int) box.y, (int) box.getWidth(), (int) box.getHeight(), mc.getWindow().getGuiScale(),graphics);
     }
 
-    public static void enableScissor(int x, int y, int width, int height, double scaleFactor, GuiGraphics graphics) {
+    public static void enableScissor(int x, int y, int width, int height, float scaleFactor, GuiGraphics graphics) {
+        scaleFactor = scaleFactor / mc.getWindow().getGuiScale();
         int scissorX = (int) (x * scaleFactor);
         int scissorY = (int) (y * scaleFactor);
         int scissorWidth = (int) (width * scaleFactor);
         int scissorHeight = (int) (height * scaleFactor);
 
-        ScreenRectangle rect = new ScreenRectangle(x, y, width, height);
+        ScreenRectangle rect = new ScreenRectangle(scissorX, scissorY, scissorWidth, scissorHeight);
         graphics.scissorStack.push(rect);
+    }
+
+    /**
+     * All coordinates by minecraft need to unscaled first and then scaled by our factor.
+     */
+    public static float scaleFactor(float scale) {
+        return scale / mc.getWindow().getGuiScale();
     }
 
 
@@ -158,10 +168,9 @@ public class DrawHelper {
         int[] intColors = {tl.getRGB(),tr.getRGB(),br.getRGB(),bl.getRGB()};
 
         graphics.guiRenderState.submitGuiElement(new RoundedRectRenderState(
-                CustomRenderLayers.ROUNDED_RECT_OUTLINE,
+                CustomRenderLayers.TRIANGLE_FAN_CUSTOM_BLEND,
                 graphics.pose(),
-                x, y, width, height, thickness, intColors, radii, graphics.scissorStack.peek(),
-                new ScreenRectangle(new ScreenPosition((int) x, (int) y), (int) width, (int) height)
+                x, y, width, height, thickness, intColors, radii, graphics.scissorStack.peek()
         ));
     }
 
@@ -486,10 +495,9 @@ public class DrawHelper {
         int[] intColors = {tl.getRGB(),tr.getRGB(),br.getRGB(),bl.getRGB()};
 
         graphics.guiRenderState.submitGuiElement(new RoundedRectRenderState(
-                CustomRenderLayers.ROUNDED_RECT,
+                CustomRenderLayers.TRIANGLE_FAN_CUSTOM_BLEND,
                 graphics.pose(),
-                x, y, width, height, 0f, intColors, radii, graphics.scissorStack.peek(),
-                new ScreenRectangle(new ScreenPosition((int) x, (int) y), (int) width, (int) height)
+                x, y, width, height, -1f, intColors, radii, graphics.scissorStack.peek()
         ));
     }
 
@@ -593,16 +601,9 @@ public class DrawHelper {
         graphics.fill(x2 - 1, y1 + 1, x2, y2 - 1, color);
     }
 
-    public static void unscaledProjection() {
-        //RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getWidth(), mc.getWindow().getHeight(), 0, 1000, 21000), ProjectionType.ORTHOGRAPHIC);
-    }
-
-    public static void scaledProjection() {
-        //RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, (float) (mc.getWindow().getWidth() / mc.getWindow().getGuiScale()), (float) (mc.getWindow().getFramebufferHeight() / mc.getWindow().getScaleFactor()), 0, 1000, 21000), ProjectionType.ORTHOGRAPHIC);
-    }
-
-    public static void customScaledProjection(float scale) {
-        //RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getWidth() / scale, mc.getWindow().getHeight() / scale, 0, 1000, 21000), ProjectionType.ORTHOGRAPHIC);
+    public static void scaledProjection(float scale, GuiGraphics graphics) {
+        graphics.pose().pushMatrix();
+        graphics.pose().scale(scale/mc.getWindow().getGuiScale());
     }
 
     /**
@@ -622,6 +623,14 @@ public class DrawHelper {
         matrices.scale(scale, scale);
 
         matrices.translate(-x, -y);
+    }
+
+    /**
+     * Creating bounds for Render states
+     */
+    public static ScreenRectangle createBounds(Matrix3x2fStack pose, ScreenRectangle scissor, float x, float y, float w, float h) {
+        ScreenRectangle bounds = new ScreenRectangle((int) x, (int) y, (int) w, (int) h).transformAxisAligned(pose);
+        return scissor == null ? bounds : scissor.intersection(bounds);
     }
 
     /**

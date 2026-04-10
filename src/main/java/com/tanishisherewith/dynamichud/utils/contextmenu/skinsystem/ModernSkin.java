@@ -135,7 +135,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         mouseY = (int) (mc.mouseHandler.ypos() / SCALE_FACTOR);
 
         // Apply custom scaling to counteract Minecraft's default scaling
-        DrawHelper.customScaledProjection(SCALE_FACTOR);
+        DrawHelper.scaledProjection(SCALE_FACTOR, graphics);
 
         updateContextDimensions();
         contextMenu.set(contextMenuX, contextMenuY, 0);
@@ -182,7 +182,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         renderToolTipText(graphics, mouseX, mouseY);
 
         //Reset our scaling so minecraft runs normally\
-        DrawHelper.scaledProjection();
+        DrawHelper.stopScaling(graphics.pose());
     }
 
     private void updateContextDimensions() {

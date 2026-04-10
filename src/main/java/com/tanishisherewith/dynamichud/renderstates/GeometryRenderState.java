@@ -17,8 +17,6 @@ public record GeometryRenderState(
         @Nullable ScreenRectangle scissorArea
 ) implements GuiElementRenderState {
 
-    public record VertexData(float x, float y, int color) {}
-
     @Override
     public void buildVertices(VertexConsumer consumer) {
         for (int i = 0; i < vertices.length / 2; i++) {
@@ -31,6 +29,7 @@ public record GeometryRenderState(
     public TextureSetup textureSetup() {
         return TextureSetup.noTexture();
     }
+
     @Override
     public @Nullable ScreenRectangle bounds() {
         return null;

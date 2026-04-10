@@ -167,17 +167,16 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         if (points.size() < 2) return;
 
         graphics.guiRenderState.submitGuiElement(
-                new InterpolatedCurveRenderState(points, thickness, color, graphics.pose(), CustomRenderLayers.QUADS_CUSTOM_BLEND, graphics.scissorStack.peek())
+                new InterpolatedCurveRenderState(points, thickness, color, graphics.pose(), CustomRenderLayers.TRIANGLE_STRIP, (int) width, (int) height, graphics.scissorStack.peek())
         );
     }
-
 
     // draw a gradient shadow under the curve
     private void drawGradientShadow(GuiGraphics graphics, List<float[]> points, float bottomY, int startColor, int endColor) {
         if (points.size() < 2) return;
 
-        graphics.guiRenderState.submitGuiElement(
-                new GradientShadowRenderState(points,bottomY, startColor, endColor, graphics.pose(), CustomRenderLayers.TRIANGLE_STRIP, graphics.scissorStack.peek())
+       graphics.guiRenderState.submitGuiElement(
+                new GradientShadowRenderState(points,bottomY, startColor, endColor, graphics.pose(), CustomRenderLayers.TRIANGLE_STRIP, (int) width, (int) height, graphics.scissorStack.peek())
         );
     }
 

@@ -2,23 +2,23 @@ package com.tanishisherewith.dynamichud.renderstates;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.state.GuiElementRenderState;
-import org.joml.Matrix3x2f;
+import org.joml.Matrix3x2fStack;
 import org.jspecify.annotations.Nullable;
 
 import java.awt.*;
 
 public record QuadColorRectRenderState(
         RenderPipeline pipeline,
-        Matrix3x2f pose,
+        Matrix3x2fStack pose,
         float x,
         float y,
         float width,
         float height,
         int[] color,
-        ScreenRectangle bounds,
         ScreenRectangle scissorArea
 ) implements GuiElementRenderState {
 
@@ -37,6 +37,6 @@ public record QuadColorRectRenderState(
 
     @Override
     public @Nullable ScreenRectangle bounds() {
-        return this.scissorArea != null ? this.scissorArea.intersection(bounds) : this.bounds;
+        return DrawHelper.createBounds(pose,scissorArea,x,y,width,height);
     }
 }
