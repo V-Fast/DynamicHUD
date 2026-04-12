@@ -28,12 +28,16 @@ public record GradientShadowRenderState(
 
     @Override
     public void buildVertices(@NonNull VertexConsumer consumer) {
-        for (float[] point : points) {
-            float x = point[0];
-            float y = point[1];
+        for (int i = 0; i < points.size() - 1; i++) {
+            float x1 = points.get(i)[0];
+            float y1 = points.get(i)[1];
+            float x2 = points.get(i + 1)[0];
+            float y2 = points.get(i + 1)[1];
 
-            consumer.addVertexWith2DPose(pose, x, y).setColor(startColor);
-            consumer.addVertexWith2DPose(pose, x, bottomY).setColor(endColor);
+            consumer.addVertexWith2DPose(pose, x1, y1).setColor(startColor); // Topleft
+            consumer.addVertexWith2DPose(pose, x1, bottomY).setColor(endColor); // Bottomleft
+            consumer.addVertexWith2DPose(pose, x2, bottomY).setColor(endColor); // Bottomright
+            consumer.addVertexWith2DPose(pose, x2, y2).setColor(startColor); // Topright
         }
     }
     @Override

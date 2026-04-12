@@ -30,8 +30,7 @@ public class CustomRenderLayers {
 
     public static RenderPipeline TRIANGLE_STRIP = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.GUI_SNIPPET)
             .withLocation(Identifier.fromNamespaceAndPath("dynamichud", "pipeline/triangle_strip"))
-            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_STRIP)
-            .withBlend(BlendFunction.TRANSLUCENT)
+            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLES)
             .build()
     );
 
@@ -87,7 +86,7 @@ public class CustomRenderLayers {
     public static RenderPipeline TRIANGLE_FAN_CUSTOM_BLEND = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.GUI_SNIPPET)
             .withLocation(Identifier.fromNamespaceAndPath("dynamichud", "pipeline/triangle_fan_custom_blend_func"))
             .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_FAN)
-            .withBlend(new BlendFunction(SourceFactor.DST_ALPHA, DestFactor.ONE_MINUS_DST_ALPHA))
+           // .withBlend(new BlendFunction(SourceFactor.DST_ALPHA, DestFactor.ONE_MINUS_DST_ALPHA))
             .build()
     );
 

@@ -26,21 +26,35 @@ public record InterpolatedCurveRenderState(
     @Override
     public void buildVertices(@NonNull VertexConsumer consumer) {
         consumer.setLineWidth(thickness);
-        for (int i = 0; i < points.size(); i++) {
-            float[] point = points.get(i);
-            float x = point[0];
-            float y = point[1];
+        if (points.size() < 2) return;
 
-            float dx = (i < points.size() - 1) ? points.get(i + 1)[0] - x : x - points.get(i - 1)[0];
-            float dy = (i < points.size() - 1) ? points.get(i + 1)[1] - y : y - points.get(i - 1)[1];
+        //  build individual QUADS
+        for (int i = 0; i < points.size() - 1; i++) {
+            float[] p1 = points.get(i);
+            float[] p2 = points.get(i + 1);
+
+            float x1 = p1[0];
+            float y1 = p1[1];
+            float x2 = p2[0];
+            float y2 = p2[1];
+
+            float dx = x2 - x1;
+            float dy = y2 - y1;
             float length = (float) Math.sqrt(dx * dx + dy * dy);
             if (length == 0) continue;
 
-            float offsetX = (dy) / length;
-            float offsetY = (-dx) / length;
+            // normals for line thickness
+            float offsetX = (thickness * 0.5f * dy) / length;
+            float offsetY = (thickness * 0.5f * -dx) / length;
 
-            consumer.addVertexWith2DPose(pose, x + offsetX, y + offsetY).setColor(color);
-            consumer.addVertexWith2DPose(pose, x - offsetX, y - offsetY).setColor(color);
+            //Topleft
+            consumer.addVertexWith2DPose(pose, x1 + offsetX, y1 + offsetY).setColor(color);
+            //Bottomleft
+            consumer.addVertexWith2DPose(pose, x1 - offsetX, y1 - offsetY).setColor(color);
+            //Bottomright
+            consumer.addVertexWith2DPose(pose, x2 - offsetX, y2 - offsetY).setColor(color);
+            //Topright
+            consumer.addVertexWith2DPose(pose, x2 + offsetX, y2 + offsetY).setColor(color);
         }
     }
 
@@ -51,6 +65,7 @@ public record InterpolatedCurveRenderState(
 
     @Override
     public @Nullable ScreenRectangle bounds() {
-        return DrawHelper.createBounds(pose,scissorArea,points.getFirst()[0],points.getFirst()[1],width,height);
+        if (points.isEmpty()) return null;
+        return DrawHelper.createBounds(pose, scissorArea, points.getFirst()[0], points.getFirst()[1], width, height);
     }
 }

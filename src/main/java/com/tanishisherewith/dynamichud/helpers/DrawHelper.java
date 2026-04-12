@@ -168,7 +168,7 @@ public class DrawHelper {
         int[] intColors = {tl.getRGB(),tr.getRGB(),br.getRGB(),bl.getRGB()};
 
         graphics.guiRenderState.submitGuiElement(new RoundedRectRenderState(
-                CustomRenderLayers.TRIANGLE_FAN_CUSTOM_BLEND,
+                RenderPipelines.DEBUG_QUADS,
                 graphics.pose(),
                 x, y, width, height, thickness, intColors, radii, graphics.scissorStack.peek()
         ));
@@ -465,7 +465,7 @@ public class DrawHelper {
      * @param color    Color of the rounded.fsh rectangle
      */
     public static void drawRoundedRectangle(GuiGraphics graphics, float x, float y, boolean TL, boolean TR, boolean BL, boolean BR, float width, float height, float radius, int color) {
-        Vector4f radii = new Vector4f(TR ? radius : 0.0f, BR ? radius : 0.0f, TL ? radius : 0.0f, BL ? radius : 0.0f);
+        Vector4f radii = new Vector4f(TL ? radius : 0.0f, TR ? radius : 0.0f, BR ? radius : 0.0f, BL ? radius : 0.0f);
 
         // Turns out Color class takes rgb by default not rgba
         Color c = new Color(color, true);
@@ -495,7 +495,7 @@ public class DrawHelper {
         int[] intColors = {tl.getRGB(),tr.getRGB(),br.getRGB(),bl.getRGB()};
 
         graphics.guiRenderState.submitGuiElement(new RoundedRectRenderState(
-                CustomRenderLayers.TRIANGLE_FAN_CUSTOM_BLEND,
+                RenderPipelines.DEBUG_QUADS,
                 graphics.pose(),
                 x, y, width, height, -1f, intColors, radii, graphics.scissorStack.peek()
         ));

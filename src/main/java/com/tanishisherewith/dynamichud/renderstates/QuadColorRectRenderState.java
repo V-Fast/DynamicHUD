@@ -7,9 +7,8 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.state.GuiElementRenderState;
 import org.joml.Matrix3x2fStack;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
-import java.awt.*;
 
 public record QuadColorRectRenderState(
         RenderPipeline pipeline,
@@ -31,7 +30,7 @@ public record QuadColorRectRenderState(
     }
 
     @Override
-    public TextureSetup textureSetup() {
+    public @NonNull TextureSetup textureSetup() {
         return TextureSetup.noTexture();
     }
 

@@ -16,21 +16,78 @@ import static com.tanishisherewith.dynamichud.helpers.DrawHelper.SINA;
 
 public record RoundedRectRenderState(
         RenderPipeline pipeline,
-        Matrix3x2fStack pose, // Using Matrix3x2fc for 2D optimization
+        Matrix3x2fStack pose,
         float x, float y,
         float width, float height,
         float thickness,
-        int[] colors,       // [TL, BL, BR, TR]
-        Vector4f roundness, // [x=TL, y=TR, z=BR, w=BL]
+        int[] colors,
+        Vector4f roundness,
         @Nullable ScreenRectangle scissorArea
 ) implements GuiElementRenderState {
 
-        @Override
+    @Override
     public void buildVertices(@NonNull VertexConsumer consumer) {
-        if (thickness > 0) {
-            drawContinuousOutline(consumer);
-        } else {
-            drawFill(consumer);
+        float fX = 0, fY = 0, fIX = 0, fIY = 0;
+        int fC = 0;
+        float pX = 0, pY = 0, pIX = 0, pIY = 0;
+        int pC = 0;
+
+        float midX = x + (width * 0.5f);
+        float midY = y + (height * 0.5f);
+        int midC = (thickness <= 0) ? averageColors(colors) : 0;
+
+        // 9 steps per quadrant to match the 360 precomputed tables
+        for (int k = 0; k <= 36; k++) {
+            int i = k % 36;
+            float r, cx, cy;
+            int color;
+
+            // Quadrants:- 0-8:BR, 9-17:BL, 18-26:TL, 27-35:TR
+            if (i < 9) {
+                r = roundness.z; cx = x + width - r; cy = y + height - r; color = colors[2];
+            } else if (i < 18) {
+                r = roundness.w; cx = x + r; cy = y + height - r; color = colors[3];
+            } else if (i < 27) {
+                r = roundness.x; cx = x + r; cy = y + r; color = colors[0];
+            } else {
+                r = roundness.y; cx = x + width - r; cy = y + r; color = colors[1];
+            }
+
+            float cX = cx + (r * COSA[i]);
+            float cY = cy + (r * SINA[i]);
+            float cIX = 0, cIY = 0;
+
+            if (thickness > 0) {
+                // clamping inner radius to 0
+                float ir = Math.max(0, r - thickness);
+                cIX = cx + (ir * COSA[i]);
+                cIY = cy + (ir * SINA[i]);
+            }
+
+            if (k == 0) {
+                // Cache the first vertex set to ensure pixel-perfect loop closure
+                fX = cX; fY = cY; fIX = cIX; fIY = cIY; fC = color;
+            } else {
+                float tX = (k == 36) ? fX : cX;
+                float tY = (k == 36) ? fY : cY;
+                float tIX = (k == 36) ? fIX : cIX;
+                float tIY = (k == 36) ? fIY : cIY;
+                int tC = (k == 36) ? fC : color;
+
+                if (thickness > 0) {
+                    consumer.addVertexWith2DPose(pose, pX, pY).setColor(pC);
+                    consumer.addVertexWith2DPose(pose, pIX, pIY).setColor(pC);
+                    consumer.addVertexWith2DPose(pose, tIX, tIY).setColor(tC);
+                    consumer.addVertexWith2DPose(pose, tX, tY).setColor(tC);
+                } else {
+                    consumer.addVertexWith2DPose(pose, midX, midY).setColor(midC);
+                    consumer.addVertexWith2DPose(pose, pX, pY).setColor(pC);
+                    consumer.addVertexWith2DPose(pose, tX, tY).setColor(tC);
+                    consumer.addVertexWith2DPose(pose, tX, tY).setColor(tC);
+                }
+            }
+
+            pX = cX; pY = cY; pIX = cIX; pIY = cIY; pC = color;
         }
     }
 
@@ -42,123 +99,7 @@ public record RoundedRectRenderState(
             g += (color >> 8) & 0xFF;
             b += color & 0xFF;
         }
-        return (a / 4 << 24) | (r / 4 << 16) | (g / 4 << 8) | (b / 4);
-    }
-
-    private void drawFill(VertexConsumer consumer) {
-        float cx = x + (width / 2.0f);
-        float cy = y + (height / 2.0f);
-        float halfWidth = width * 0.5f;
-        float halfHeight = height * 0.5f;
-
-        // Start Fan at center
-        consumer.addVertexWith2DPose(pose, cx, cy).setColor(averageColors(colors));
-
-        // 1. Bottom-Right (Original i=0-9)
-        // Original logic: x0 = cx + (0.5f * dx), y0 = cy + (0.5f * dy)
-        float brRadius = roundness.z;
-        float dx = width - (brRadius * 2); // This is localized for the specific corner
-        float dy = height - (brRadius * 2);
-
-        float x0 = cx + (0.5f * (width - brRadius * 2));
-        float y0 = cy + (0.5f * (height - brRadius * 2));
-
-        if (brRadius > 0) {
-            for (int i = 0; i < 9; i++) {
-                // Using + for SINA to match your original: y = y0 + (r * sina[i])
-                consumer.addVertexWith2DPose(pose, x0 + (brRadius * COSA[i]), y0 + (brRadius * SINA[i])).setColor(colors[2]);
-            }
-        } else {
-            consumer.addVertexWith2DPose(pose, cx + halfWidth, cy + halfHeight).setColor(colors[2]);
-        }
-
-        // 2. Bottom-Left (Original i=9-18)
-        float blRadius = roundness.w;
-        x0 = cx - (0.5f * (width - blRadius * 2));
-        y0 = cy + (0.5f * (height - blRadius * 2));
-        if (blRadius > 0) {
-            for (int i = 9; i < 18; i++) {
-                consumer.addVertexWith2DPose(pose, x0 + (blRadius * COSA[i]), y0 + (blRadius * SINA[i])).setColor(colors[1]);
-            }
-        } else {
-            consumer.addVertexWith2DPose(pose, cx - halfWidth, cy + halfHeight).setColor(colors[1]);
-        }
-
-        // 3. Top-Left (Original i=18-27)
-        float tlRadius = roundness.x;
-        x0 = cx - (0.5f * (width - tlRadius * 2));
-        y0 = cy - (0.5f * (height - tlRadius * 2));
-        if (tlRadius > 0) {
-            for (int i = 18; i < 27; i++) {
-                consumer.addVertexWith2DPose(pose, x0 + (tlRadius * COSA[i]), y0 + (tlRadius * SINA[i])).setColor(colors[0]);
-            }
-        } else {
-            consumer.addVertexWith2DPose(pose, cx - halfWidth, cy - halfHeight).setColor(colors[0]);
-        }
-
-        // 4. Top-Right (Original i=27-36)
-        float trRadius = roundness.y;
-        x0 = cx + (0.5f * (width - trRadius * 2));
-        y0 = cy - (0.5f * (height - trRadius * 2));
-        if (trRadius > 0) {
-            for (int i = 27; i < 36; i++) {
-                consumer.addVertexWith2DPose(pose, x0 + (trRadius * COSA[i]), y0 + (trRadius * SINA[i])).setColor(colors[3]);
-            }
-        } else {
-            consumer.addVertexWith2DPose(pose, cx + halfWidth, cy - halfHeight).setColor(colors[3]);
-        }
-
-        // 5. Final Closing Vertex (Matches your specific !BR logic)
-        if (roundness.z <= 0) {
-            consumer.addVertexWith2DPose(pose, cx + halfWidth, cy + halfHeight).setColor(colors[2]);
-        } else {
-            // Your original: buf.vertex(ma, x, cy + (0.5f * dy), 0)
-            // x here was the last calculated x (cx + halfWidth)
-            consumer.addVertexWith2DPose(pose, cx + halfWidth, cy + (0.5f * (height - brRadius * 2))).setColor(colors[2]);
-        }
-    }
-
-    private void drawContinuousOutline(VertexConsumer consumer) {
-        consumer.setLineWidth(thickness);
-        float innerShift = thickness;
-
-        // Quadrant 1: Top-Right (i=0-9)
-        float cx = x + width - roundness.y;
-        float cy = y + roundness.y;
-        walkArc(consumer, cx, cy, roundness.y, roundness.y - innerShift, colors[3], 0, 9);
-
-        // Quadrant 2: Top-Left (i=9-18)
-        cx = x + roundness.x;
-        cy = y + roundness.x;
-        walkArc(consumer, cx, cy, roundness.x, roundness.x - innerShift, colors[0], 9, 18);
-
-        // Quadrant 3: Bottom-Left (i=18-27)
-        cx = x + roundness.w;
-        cy = y + height - roundness.w;
-        walkArc(consumer, cx, cy, roundness.w, roundness.w - innerShift, colors[1], 18, 27);
-
-        // Quadrant 4: Bottom-Right (i=27-36)
-        cx = x + width - roundness.z;
-        cy = y + height - roundness.z;
-        walkArc(consumer, cx, cy, roundness.z, roundness.z - innerShift, colors[2], 27, 36);
-
-        // Close the loop back to the start of Quadrant 1
-        float startX = x + width;
-        float startY = y + roundness.y;
-        consumer.addVertexWith2DPose(pose, startX, startY).setColor(colors[3]);
-        consumer.addVertexWith2DPose(pose, startX - innerShift, startY).setColor(colors[3]);
-    }
-
-    /**
-     * Walks a specific corner arc, pushing vertices for both outer and inner radii.
-     */
-    private void walkArc(VertexConsumer c, float cx, float cy, float outerR, float innerR, int color, int start, int end) {
-        for (int i = start; i <= end; i++) {
-            // Outer Ring Vertex
-            c.addVertexWith2DPose(pose, cx + (outerR * COSA[i]), cy - (outerR * SINA[i])).setColor(color);
-            // Inner Ring Vertex
-            c.addVertexWith2DPose(pose, cx + (innerR * COSA[i]), cy - (innerR * SINA[i])).setColor(color);
-        }
+        return ((a / 4) << 24) | ((r / 4) << 16) | ((g / 4) << 8) | (b / 4);
     }
 
     @Override
@@ -168,6 +109,6 @@ public record RoundedRectRenderState(
 
     @Override
     public @Nullable ScreenRectangle bounds() {
-        return DrawHelper.createBounds(pose,scissorArea,x,y,width,height);
+        return DrawHelper.createBounds(pose, scissorArea, x, y, width, height);
     }
 }

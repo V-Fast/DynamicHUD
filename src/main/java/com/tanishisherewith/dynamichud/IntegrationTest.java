@@ -87,6 +87,7 @@ public class IntegrationTest implements DynamicHudIntegration {
                 .setDraggable(true)
                 .setDisplay(true)
                 .showGrid(true)
+                .shouldScale(true)
                 .registryKey("FPS")
                 .registryID(registry.getId())
                 .build()

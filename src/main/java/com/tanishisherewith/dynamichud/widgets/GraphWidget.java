@@ -7,7 +7,6 @@ import com.tanishisherewith.dynamichud.renderstates.GradientShadowRenderState;
 import com.tanishisherewith.dynamichud.renderstates.InterpolatedCurveRenderState;
 import com.tanishisherewith.dynamichud.utils.CustomRenderLayers;
 import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
-import com.tanishisherewith.dynamichud.utils.Util;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
@@ -21,7 +20,6 @@ import com.tanishisherewith.dynamichud.widget.WidgetBox;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
 import com.twelvemonkeys.lang.Validate;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -57,7 +55,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     private boolean autoUpdateRange = false;
     private float stepY;
     private float valueStep;
-    private float scale;
+    private float valueScale;
     int offset = -2;
 
     public GraphWidget(String registryID, String registryKey, String modId, Anchor anchor, float width, float height, int maxDataPoints, float minValue, float maxValue, Color graphColor, Color backgroundColor, float lineThickness, boolean showGrid, int gridLines, String label) {
@@ -87,7 +85,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         this.widgetBox = new WidgetBox(x, y, (int) width, (int) height);
         this.stepY = height / (gridLines + 1);
         this.valueStep = (maxValue - minValue) / (gridLines + 1);
-        this.scale = (float) Math.clamp((stepY / 9.5), 0.0f, 1.0f);
+        this.valueScale = (float) Math.clamp((stepY / 9.5), 0.0f, 1.0f);
 
         computeOffset();
 
@@ -137,26 +135,72 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         if (dataPoints.length < 2) return points;
 
         float xStep = width / (dataPoints.length - 1);
+        float range = Math.max(maxValue - minValue, 0.0001f);
+
+        //Pre-calculate Y coordinates
+        float[] yVals = new float[dataPoints.length];
+        for (int i = 0; i < dataPoints.length; i++) {
+            int index = (head + i) % dataPoints.length;
+            yVals[i] = y + height - ((dataPoints[index] - minValue) / range * height);
+        }
+
+        // Monotone Cubic Spline (Fritsch-Carlson) calculation
+        float[] m = new float[dataPoints.length];
+        for (int i = 0; i < dataPoints.length; i++) {
+            if (i == 0) {
+                m[i] = yVals[1] - yVals[0];
+            } else if (i == dataPoints.length - 1) {
+                m[i] = yVals[dataPoints.length - 1] - yVals[dataPoints.length - 2];
+            } else {
+                float sPrev = yVals[i] - yVals[i - 1];
+                float sNext = yVals[i + 1] - yVals[i];
+
+                if (sPrev * sNext <= 0) {
+                    m[i] = 0; // Local peak/valley so clamp tangent to prevent overshoot
+                } else {
+                    m[i] = (sPrev + sNext) / 2.0f;
+                    // Clamp tangent magnitude to max 3x of smallest secant
+                    float maxMag = 3.0f * Math.min(Math.abs(sPrev), Math.abs(sNext));
+                    if (Math.abs(m[i]) > maxMag) {
+                        m[i] = Math.signum(m[i]) * maxMag;
+                    }
+                }
+            }
+        }
+
+        //Generate curve with distance filtering to fix tearing
         for (int i = 0; i < dataPoints.length - 1; i++) {
-            int index1 = (head + i) % dataPoints.length;
-            int index2 = (head + i + 1) % dataPoints.length;
+            float y0 = yVals[i];
+            float y1 = yVals[i + 1];
+            float m0 = m[i];
+            float m1 = m[i + 1];
+            float x0 = x + i * xStep;
 
-            float x1 = x + i * xStep;
-            float y1 = y + height - ((dataPoints[index1] - minValue) / (maxValue - minValue) * height);
-            float x2 = x + (i + 1) * xStep;
-            float y2 = y + height - ((dataPoints[index2] - minValue) / (maxValue - minValue) * height);
-
-            // Add interpolated points using hermite spline (simplified)
-            for (float t = 0; t <= 1; t += 0.03f) {
+            for (float t = 0; t <= 1.0f; t += 0.05f) {
                 float t2 = t * t;
                 float t3 = t2 * t;
+
+                // Hermite basis functions
                 float h00 = 2 * t3 - 3 * t2 + 1;
                 float h10 = t3 - 2 * t2 + t;
                 float h01 = -2 * t3 + 3 * t2;
+                float h11 = t3 - t2;
 
-                float px = h00 * x1 + h10 * xStep + h01 * x2;
-                float py = h00 * y1 + h10 * (y2 - y1) + h01 * y2;
-                points.add(new float[]{px, py});
+                float px = x0 + t * xStep;
+                float py = h00 * y0 + h10 * m0 + h01 * y1 + h11 * m1;
+
+                // Vertex Simplifier: Only add point if it moved a safe distance.
+                // This prevents float-precision "divide by zero" errors when normals are
+                if (points.isEmpty()) {
+                    points.add(new float[]{px, py});
+                } else {
+                    float[] lastP = points.get(points.size() - 1);
+                    float distSq = (px - lastP[0]) * (px - lastP[0]) + (py - lastP[1]) * (py - lastP[1]);
+                    // Add only if distance is safe OR if it's the strict end of the segment
+                    if (distSq > 0.5f || t >= 0.99f) {
+                        points.add(new float[]{px, py});
+                    }
+                }
             }
         }
         return points;
@@ -167,7 +211,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         if (points.size() < 2) return;
 
         graphics.guiRenderState.submitGuiElement(
-                new InterpolatedCurveRenderState(points, thickness, color, graphics.pose(), CustomRenderLayers.TRIANGLE_STRIP, (int) width, (int) height, graphics.scissorStack.peek())
+                new InterpolatedCurveRenderState(points, thickness, color, graphics.pose(), CustomRenderLayers.QUADS_CUSTOM_BLEND, (int) width, (int) height, graphics.scissorStack.peek())
         );
     }
 
@@ -176,7 +220,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         if (points.size() < 2) return;
 
        graphics.guiRenderState.submitGuiElement(
-                new GradientShadowRenderState(points,bottomY, startColor, endColor, graphics.pose(), CustomRenderLayers.TRIANGLE_STRIP, (int) width, (int) height, graphics.scissorStack.peek())
+                new GradientShadowRenderState(points,bottomY, startColor, endColor, graphics.pose(), RenderPipelines.DEBUG_QUADS, (int) width, (int) height, graphics.scissorStack.peek())
         );
     }
 
@@ -212,7 +256,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
         // Draw grid lines and value markings
         if (showGrid) {
-            //TODO: The scale is too small when no. of grid lines is greater than 21 (20 is the barely visible threshold)
+            //TODO: The valueScale is too small when no. of grid lines is greater than 21 (20 is the barely visible threshold)
 
             for (int i = 1; i <= gridLines; i++) {
                 float yPos = y + stepY * i;
@@ -222,11 +266,11 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
                 float value = maxValue - (i * valueStep);
                 String valueText = formatValue(value);
 
-                float texWidth = mc.font.width(valueText) * scale;
+                float texWidth = mc.font.width(valueText) * valueScale;
 
                 //Scale the Component to its proper position and size with grid lines
-                DrawHelper.scaleAndPosition(graphics.pose(), x - 2, yPos, scale);
-                graphics.drawString(mc.font, valueText, Math.round(x + offset - texWidth), (int) (yPos - (mc.font.lineHeight * scale) / 2.0f), 0xFFFFFFFF, true);
+                DrawHelper.scaleAndPosition(graphics.pose(), x - 2, yPos, valueScale);
+                graphics.drawString(mc.font, valueText, Math.round(x + offset - texWidth), (int) (yPos - (mc.font.lineHeight * valueScale) / 2.0f), 0xFFFFFFFF, true);
                 DrawHelper.stopScaling(graphics.pose());
             }
 
@@ -241,16 +285,18 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
             }
         }
 
-        // Draw interpolated graph curve
         List<float[]> points = getInterpolatedPoints();
-        drawInterpolatedCurve(graphics, points, graphColor.getRGB(), lineThickness);
 
         // Draw shadow effect under the graph
         drawGradientShadow(
                 graphics, points, y + height,
-                ColorHelper.changeAlpha(graphColor, 50).getRGB(),
+                ColorHelper.changeAlpha(graphColor, 100).getRGB(),
                 0x00000000
         );
+
+        // Draw interpolated graph curve
+        drawInterpolatedCurve(graphics, points, graphColor.getRGB(), lineThickness);
+
         DrawHelper.drawChromaText(
                 graphics, label,
                 x + 5, y + 5,
@@ -345,8 +391,8 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         String lastText = formatValue(maxValue - (gridLines * valueStep));
 
         offset = Math.max(
-                (int) Math.ceil(mc.font.width(firstText) * this.scale),
-                (int) Math.ceil(mc.font.width(lastText) * this.scale)
+                (int) Math.ceil(mc.font.width(firstText) * this.valueScale),
+                (int) Math.ceil(mc.font.width(lastText) * this.valueScale)
         );
     }
 
@@ -428,7 +474,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         this.gridLines = gridLines;
         this.stepY = height / (gridLines + 1);
         this.valueStep = (maxValue - minValue) / (gridLines + 1);
-        this.scale = (float) Math.clamp((stepY / 9.5), 0.0f, 1.0f);
+        this.valueScale = (float) Math.clamp((stepY / 9.5), 0.0f, 1.0f);
     }
 
     public boolean isShowGrid() {
