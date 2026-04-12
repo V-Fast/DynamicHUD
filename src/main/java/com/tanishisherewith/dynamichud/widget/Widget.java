@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.widget;
 
+import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.internal.UID;
@@ -163,7 +164,7 @@ public abstract class Widget implements Input {
 
 
         if (shouldScale) {
-            DrawHelper.scaleAndPosition(graphics.pose(), getX(), getY(), GlobalConfig.get().getScale());
+            DrawHelper.scaleAndPosition(graphics.pose(), getX(), getY(), DynamicHUD.getGlobalScale());
         }
         renderWidget(graphics, mouseX, mouseY);
 
@@ -182,7 +183,7 @@ public abstract class Widget implements Input {
         drawWidgetBackground(graphics);
 
         if (shouldScale) {
-            DrawHelper.scaleAndPosition(graphics.pose(), getX(), getY(), GlobalConfig.get().getScale());
+            DrawHelper.scaleAndPosition(graphics.pose(), getX(), getY(), DynamicHUD.getGlobalScale());
         }
         renderWidgetInEditor(graphics, mouseX, mouseY);
 

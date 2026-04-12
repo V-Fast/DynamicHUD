@@ -70,4 +70,14 @@ public class DynamicHUD implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(mc-> MouseColorQuery.processIfPending());
     }
+
+    /**
+     * Get applied scale on all widgets, modified by YACL.
+     * <br>
+     * From {@link GlobalConfig#getScale()}
+     * @return scale in float
+     */
+    public static float getGlobalScale() {
+        return GlobalConfig.get().getScale();
+    }
 }

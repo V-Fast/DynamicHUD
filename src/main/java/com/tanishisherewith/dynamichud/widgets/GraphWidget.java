@@ -1,6 +1,6 @@
 package com.tanishisherewith.dynamichud.widgets;
 
-import com.tanishisherewith.dynamichud.config.GlobalConfig;
+import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.renderstates.GradientShadowRenderState;
@@ -324,7 +324,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
         if(showGrid) x -= offset;
 
-        this.widgetBox.setDimensions(x, y, width + offset, height, shouldScale, GlobalConfig.get().getScale());
+        this.widgetBox.setDimensions(x, y, width + offset, height, shouldScale, DynamicHUD.getGlobalScale());
      //   DrawHelper.disableScissor();
 
         if (menu != null) menu.set(getX(), getY(), (int) Math.ceil(getHeight()));
