@@ -1,4 +1,4 @@
-package com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen;
+package com.tanishisherewith.dynamichud.utils.contextmenu.screen;
 
 import net.minecraft.client.gui.screens.Screen;
 

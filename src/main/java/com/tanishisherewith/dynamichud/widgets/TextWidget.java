@@ -3,6 +3,7 @@ package com.tanishisherewith.dynamichud.widgets;
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
+import com.tanishisherewith.dynamichud.integration.IntegrationManager;
 import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
@@ -92,43 +93,50 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
                 .renderWhen(() -> this.rainbow)
                 .withComplexity(Option.Complexity.Pro)
         );
-        // Runnable Option
-        AtomicBoolean ran = new AtomicBoolean(false);
-        menu.addOption(new RunnableOption(Component.literal("Reset Position"),
-                ran::get, ran::set,
-                () -> this.setPosition(0, 0))
-                .description(Component.literal("Reset widget to default position")));
+        if(IntegrationManager.IS_TEST_MODE) {
+            // Runnable Option
+            AtomicBoolean ran = new AtomicBoolean(false);
+            menu.addOption(new RunnableOption(Component.literal("Reset Position"),
+                    ran::get, ran::set,
+                    () -> this.setPosition(0, 0))
+                    .description(Component.literal("Reset widget to default position")));
 
-        // List Option
-        AtomicReference<String> style = new AtomicReference<>("Style1");
-        List<String> styles = Arrays.asList("Style1", "Style2", "Style3");
-        menu.addOption(new ListOption<>(Component.literal("Text Style"),
-                style::get, style::set, styles)
-                .description(Component.literal("Choose a text style")));
+            // List Option
+            AtomicReference<String> style = new AtomicReference<>("Style1");
+            List<String> styles = Arrays.asList("Style1", "Style2", "Style3");
+            menu.addOption(new ListOption<>(Component.literal("Text Style"),
+                    style::get, style::set, styles)
+                    .description(Component.literal("Choose a text style")));
 
-        // Enum Option
-        menu.addOption(new EnumOption<>(Component.literal("Alignment"),
-                () -> GroupLayout.Alignment.CENTER, value -> {}, GroupLayout.Alignment.values())
-                .description(Component.literal("Set text alignment")));
+            // Enum Option
+            AtomicReference<GroupLayout.Alignment> align = new AtomicReference<>(GroupLayout.Alignment.CENTER);
 
-        // Option Group
-        OptionGroup group = new OptionGroup(Component.literal("Display Options"));
-        group.addOption(new BooleanOption(Component.literal("Bold Text"),
-                () -> false, value -> {}, BooleanOption.BooleanType.YES_NO)
-                .description(Component.literal("Enable bold text")));
-        group.addOption(new DoubleOption(Component.literal("Font Size"),
-                8.0, 24.0, 1.0f,
-                () -> 12.0, value -> {}, menu)
-                .description(Component.literal("Adjust font size")));
-        menu.addOption(group);
+            menu.addOption(new EnumOption<>(Component.literal("Alignment"),
+                    align::get, align::set, GroupLayout.Alignment.values())
+                    .description(Component.literal("Set text alignment")));
 
-        // SubMenu Option
-        SubMenuOption subMenu = (SubMenuOption) new SubMenuOption(Component.literal("Advanced Settings"), menu)
-                .description(Component.literal("Open advanced settings"));
-        subMenu.getSubMenu().addOption(new BooleanOption(Component.literal("Some Boolean"),
-                () -> false, value -> {}, BooleanOption.BooleanType.TRUE_FALSE)
-                .description(Component.literal("True/False")));
-        menu.addOption(subMenu);
+            // Option Group
+            OptionGroup group = new OptionGroup(Component.literal("Display Options"));
+            group.addOption(new BooleanOption(Component.literal("Bold Text"),
+                    () -> false, value -> {
+            }, BooleanOption.BooleanType.YES_NO)
+                    .description(Component.literal("Enable bold text")));
+            group.addOption(new DoubleOption(Component.literal("Font Size"),
+                    8.0, 24.0, 1.0f,
+                    () -> 12.0, value -> {
+            }, menu).description(Component.literal("Adjust font size")));
+
+            menu.addOption(group);
+
+            // SubMenu Option
+            SubMenuOption subMenu = (SubMenuOption) new SubMenuOption(Component.literal("Advanced Settings"), menu)
+                    .description(Component.literal("Open advanced settings"));
+            subMenu.getSubMenu().addOption(new BooleanOption(Component.literal("Some Boolean"),
+                    () -> false, value -> {
+            }, BooleanOption.BooleanType.TRUE_FALSE)
+                    .description(Component.literal("True/False")));
+            menu.addOption(subMenu);
+        }
     }
 
     @Override

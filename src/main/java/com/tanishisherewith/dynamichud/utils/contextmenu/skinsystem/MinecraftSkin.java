@@ -2,6 +2,9 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
+import com.tanishisherewith.dynamichud.helpers.animationhelper.AnimationProperty;
+import com.tanishisherewith.dynamichud.helpers.animationhelper.EasingType;
+import com.tanishisherewith.dynamichud.helpers.animationhelper.animations.ValueAnimation;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.layout.LayoutContext;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
@@ -22,6 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntSupplier;
 
+import static com.tanishisherewith.dynamichud.helpers.ColorHelper.DARK_GREEN;
+import static com.tanishisherewith.dynamichud.helpers.ColorHelper.DARK_RED;
+
 /**
  * This is one of the Skins provided by DynamicHUD featuring the minecraft-like style rendering.
  * It runs on a separate screen and provides more complex features like scrolling and larger dimension.
@@ -33,26 +39,28 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             Identifier.withDefaultNamespace("widget/button_disabled"),
             Identifier.withDefaultNamespace("widget/button_highlighted")
     );
-    public static final int DEFAULT_SCROLLBAR_WIDTH = 8;
-    public static final int DEFAULT_PANEL_WIDTH = 248;
-    public static final int DEFAULT_PANEL_HEIGHT = 165;
     public static final Identifier DEFAULT_BACKGROUND_PANEL = Identifier.withDefaultNamespace("textures/gui/demo_background.png");
     public static final Identifier SCROLLER_TEXTURE = Identifier.withDefaultNamespace("widget/scroller");
     public static final Identifier SCROLL_BAR_BACKGROUND = Identifier.withDefaultNamespace("widget/scroller_background");
     public static final Identifier GROUP_BACKGROUND = Identifier.fromNamespaceAndPath(DynamicHUD.MOD_ID, "textures/minecraftskin/group_panel.png");
 
     private final Identifier BACKGROUND_PANEL;
+
+    public static final int DEFAULT_SCROLLBAR_WIDTH = 8;
+    public static final int DEFAULT_PANEL_WIDTH = 248;
+    public static final int DEFAULT_PANEL_HEIGHT = 165;
     private final int panelWidth;
     private final int panelHeight;
-    private PanelColor panelColor;
+    private final int groupPanelWidth = 60; // Width for the group panel
 
     private int imageX, imageY;
     private final ScrollHandler scrollHandler;
 
     private List<OptionGroup> optionGroups;
     private OptionGroup selectedGroup;
+
+    private PanelColor panelColor;
     private final ScrollHandler groupScrollHandler;
-    private final int groupPanelWidth = 60; // Width for the group panel
     private final IntSupplier groupPanelX = () -> imageX - groupPanelWidth - 15;
 
     public MinecraftSkin(PanelColor color) {
@@ -100,6 +108,19 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             selectedGroup.setExpanded(true);
             scrollHandler.updateScrollPosition(0);
         }
+    }
+
+    private int getOptionHeight(Option<?> option) {
+        if (option instanceof SubMenuOption) return 20;
+        if (option instanceof ColorOption colorOption) {
+            int baseHeight = 25;
+            if (colorOption.getColorGradient().shouldDisplay()) {
+                int colorGradientHeight = colorOption.getColorGradient().getBoxSize() + 10 + colorOption.getColorGradient().getGradientSlider().getHeight();
+                return baseHeight + colorGradientHeight;
+            }
+            return baseHeight;
+        }
+        return 25;
     }
 
     @Override
@@ -185,13 +206,17 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
     private int renderSelectedGroupOptions(GuiGraphics graphics, int mouseX, int mouseY) {
         int yOffset = imageY + 12 - scrollHandler.getScrollOffset();
+        int targetWidth = panelWidth - 25;
+
         for (Option<?> option : selectedGroup.getGroupOptions()) {
             if (!option.shouldRender()) continue;
 
-            if (yOffset >= imageY - option.getHeight() && yOffset <= imageY + option.getHeight() + panelHeight) {
-                option.render(graphics, imageX + 4, yOffset, mouseX, mouseY);
+            option.setHeight(getOptionHeight(option));
+            yOffset = contextMenu.getLayoutEngine().layoutOption(option, imageX + 4, yOffset, targetWidth);
+
+            if (option.getY() >= imageY - option.getHeight() && option.getY() <= imageY + option.getHeight() + panelHeight) {
+                option.render(graphics, option.getX(), option.getY(), mouseX, mouseY);
             }
-            yOffset += option.getHeight() + 1;
         }
         return yOffset;
     }
@@ -390,21 +415,44 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             int color = option.value ? Color.GREEN.getRGB() : Color.RED.getRGB();
             graphics.drawString(mc.font, Component, (int) (option.getX() + (width / 2.0f) - (mc.font.width(Component) / 2.0f)), y + 5, color, true);
 
-            option.setHeight(25);
 
             //Widths don't matter in this skin
             option.setWidth(width);
         }
-
-        @Override
-        public boolean mouseClicked(BooleanOption option, double mouseX, double mouseY, int button) {
-            return SkinRenderer.super.mouseClicked(option, mouseX, mouseY, button);
-        }
     }
 
     public class MinecraftColorOptionRenderer implements SkinRenderer<ColorOption> {
+        private ValueAnimation scaleAnimation;
+        private float scale = 0.0f;
+
+        @Override
+        public void init(ColorOption option) {
+            this.scaleAnimation = new ValueAnimation(new AnimationProperty<>() {
+                @Override
+                public Float get() {
+                    return scale;
+                }
+
+                @Override
+                public void set(Float value) {
+                    scale = value;
+                }
+            }, 0.0f, 1.0f);
+            scaleAnimation.easing(EasingType.EASE_OUT_BACK);
+            scaleAnimation.duration(200);
+            this.scaleAnimation.onComplete(() -> {
+                if (scale <= 0.0f) {
+                    option.getColorGradient().close();
+                }
+            });
+        }
+
         @Override
         public void render(GuiGraphics graphics, ColorOption option, int x, int y, int mouseX, int mouseY) {
+            if (scaleAnimation != null) {
+                scaleAnimation.update();
+            }
+
             graphics.drawString(mc.font, option.name, x + 15, y + 25 / 2 - 5, -1, true);
 
             option.setPosition(x + panelWidth - 45, y);
@@ -423,25 +471,70 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
                     1,
                     1);
 
-
-            option.setHeight(25);
             option.setWidth(width);
 
             if (option.getColorGradient().getColorPickerButton().isPicking()) {
-                DrawHelper.disableScissor(graphics); // Disable scissor test for the colorpicker
+                DrawHelper.disableScissor(graphics);
             }
-            //TODO: WHAT IS THISSSSS
-            int colorGradientWidth = option.getColorGradient().getBoxSize() + option.getColorGradient().getAlphaSlider().getWidth() + option.getColorGradient().getColorPickerButton().getWidth();
-            option.getColorGradient().render(graphics, x + panelWidth / 2 - colorGradientWidth / 2, y + 12, mouseX, mouseY);
 
-            if (option.getColorGradient().shouldDisplay()) {
+            int colorGradientWidth = option.getColorGradient().getBoxSize() + option.getColorGradient().getAlphaSlider().getWidth() + option.getColorGradient().getColorPickerButton().getWidth();
+            int pickerX = x + panelWidth / 2 - colorGradientWidth / 2;
+            int pickerY = y + 12;
+
+            if (scale > 0.0f) {
+                DrawHelper.scaleAndPosition(graphics.pose(), pickerX + colorGradientWidth / 2.0f, pickerY, scale);
+                option.getColorGradient().render(graphics, pickerX, pickerY, mouseX, mouseY);
+                DrawHelper.stopScaling(graphics.pose());
+            }
+
+            int baseHeight = 25;
+            if (option.getColorGradient().shouldDisplay() || (scaleAnimation != null && !scaleAnimation.isFinished())) {
                 int colorGradientHeight = option.getColorGradient().getBoxSize() + 10 + option.getColorGradient().getGradientSlider().getHeight();
-                option.setHeight(option.getHeight() + colorGradientHeight);
+                option.setHeight(baseHeight + (int) (colorGradientHeight * scale));
+            } else {
+                option.setHeight(baseHeight);
             }
 
             if (option.getColorGradient().getColorPickerButton().isPicking()) {
                 DrawHelper.enableScissor(imageX, imageY + 2, panelWidth, panelHeight - 4, graphics);
             }
+        }
+
+        @Override
+        public boolean mouseClicked(ColorOption option, double mouseX, double mouseY, int button) {
+            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX, mouseY, option.getX(), option.getY(), 20, 20)) {
+                boolean isOpening = !option.getColorGradient().shouldDisplay();
+                scaleAnimation.startValue(scale);
+                if (isOpening) {
+                    option.getColorGradient().display();
+                    scaleAnimation.endValue(1.0f);
+                } else {
+                    scaleAnimation.endValue(0.0f);
+                }
+                scaleAnimation.start();
+                return true;
+            }
+
+            if (option.getColorGradient().shouldDisplay()) {
+                option.getColorGradient().mouseClicked(mouseX, mouseY, button);
+            }
+            return false;
+        }
+
+        @Override
+        public boolean mouseDragged(ColorOption option, double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+            if (option.getColorGradient().shouldDisplay()) {
+                option.getColorGradient().mouseDragged(mouseX, mouseY, button);
+            }
+            return SkinRenderer.super.mouseDragged(option, mouseX, mouseY, button, deltaX, deltaY);
+        }
+
+        @Override
+        public boolean mouseReleased(ColorOption option, double mouseX, double mouseY, int button) {
+            if (option.getColorGradient().shouldDisplay()) {
+                option.getColorGradient().mouseReleased(mouseX, mouseY, button);
+            }
+            return SkinRenderer.super.mouseReleased(option, mouseX, mouseY, button);
         }
     }
 
@@ -452,16 +545,10 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         private static final Identifier HANDLE_HIGHLIGHTED_TEXTURE = Identifier.withDefaultNamespace("widget/slider_handle_highlighted");
 
         @Override
-        public void init(DoubleOption option) {
-            SkinRenderer.super.init(option);
-        }
-
-        @Override
         public void render(GuiGraphics graphics, DoubleOption option, int x, int y, int mouseX, int mouseY) {
             graphics.drawString(mc.font, option.name, x + 15, y + 25 / 2 - 5, -1, true);
 
             option.setWidth(panelWidth - 150);
-            option.setHeight(25);
             option.setPosition(x + panelWidth - 122, y);
 
             double sliderX = option.getX() + ((option.value - option.minValue) / (option.maxValue - option.minValue)) * (option.getWidth() - 8);
@@ -476,11 +563,6 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             // Format option.value to the determined number of decimal places
             String formattedValue = String.format("%." + decimalPlaces + "f", option.value);
             graphics.drawCenteredString(mc.font, formattedValue, option.getX() + option.getWidth() / 2, y + Math.round((float) mc.font.lineHeight /2), -1);
-        }
-
-        @Override
-        public boolean mouseClicked(DoubleOption option, double mouseX, double mouseY, int button) {
-            return SkinRenderer.super.mouseClicked(option, mouseX, mouseY, button);
         }
     }
 
@@ -499,7 +581,6 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         @Override
         public void render(GuiGraphics graphics, EnumOption<E> option, int x, int y, int mouseX, int mouseY) {
             calculateMaxWidth(option);
-            option.setHeight(25);
             option.setWidth(maxWidth);
 
             graphics.drawString(mc.font, option.name.copy().append(": "), x + 15, y + 25 / 2 - 5, -1, true);
@@ -527,7 +608,6 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         @Override
         public void render(GuiGraphics graphics, ListOption<E> option, int x, int y, int mouseX, int mouseY) {
             calculateMaxWidth(option);
-            option.setHeight(25);
             option.setWidth(maxWidth);
 
             graphics.drawString(mc.font, option.name.copy().append(": "), x + 15, y + 25 / 2 - 5, -1, true);
@@ -543,7 +623,6 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     public class MinecraftSubMenuRenderer implements SkinRenderer<SubMenuOption> {
         @Override
         public void render(GuiGraphics graphics, SubMenuOption option, int x, int y, int mouseX, int mouseY) {
-            option.setHeight(20);
             option.setWidth(30);
 
             graphics.drawString(mc.font, option.name, x + 15, y + 25 / 2 - 5, -1, true);
@@ -559,12 +638,9 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     }
 
     public class MinecraftRunnableRenderer implements SkinRenderer<RunnableOption> {
-        Color DARK_RED = new Color(116, 0, 0);
-        Color DARK_GREEN = new Color(24, 132, 0, 226);
 
         @Override
         public void render(GuiGraphics graphics, RunnableOption option, int x, int y, int mouseX, int mouseY) {
-            option.setHeight(25);
             option.setWidth(26);
 
             graphics.drawString(mc.font, option.name.copy().append(": "), x + 15, y + 25 / 2 - 5, -1, true);

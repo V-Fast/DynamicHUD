@@ -91,7 +91,7 @@ public class MathAnimations {
     /// Linear interpolation between values over time with easing
     public static float lerp(float start, float end, long startTime, float duration, EasingType easing) {
         float progress = (System.currentTimeMillis() - startTime) / duration;
-        progress = Math.min(1, Math.max(0, progress)); // Clamp 0-1
+        progress = Math.clamp(progress, 0, 1);
         return start + (end - start) * Easing.apply(easing, progress);
     }
 

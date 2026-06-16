@@ -25,7 +25,6 @@ public class SubMenuOption extends Option<Boolean> {
         this.subMenu = parentMenu.createSubMenu(parentMenu.x + parentMenu.getWidth(), this.y, properties.cloneSkin());
         this.subMenu.getProperties().setHeightOffset(0);
         this.subMenu.setVisible(get());
-        this.renderer.init(this);
     }
 
     public <T extends ContextMenuProperties> SubMenuOption(Component name, ContextMenu<?> parentMenu, T properties) {
@@ -43,24 +42,25 @@ public class SubMenuOption extends Option<Boolean> {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (super.mouseClicked(mouseX, mouseY, button)) {
-            subMenu.toggleDisplay();
-            set(subMenu.isVisible());
+            toggle();
             return true;
         }
-        subMenu.mouseClicked(mouseX, mouseY, button);
-        return false;
+        return subMenu.mouseClicked(mouseX, mouseY, button);
+    }
+
+    public void toggle(){
+        subMenu.toggleDisplay();
+        set(subMenu.isVisible());
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        subMenu.mouseReleased(mouseX, mouseY, button);
-        return super.mouseReleased(mouseX, mouseY, button);
+        return subMenu.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        subMenu.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        return subMenu.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
     public SubMenuOption getOption() {

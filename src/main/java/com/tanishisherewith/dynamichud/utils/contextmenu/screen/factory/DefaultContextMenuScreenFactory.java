@@ -1,7 +1,8 @@
-package com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen;
+package com.tanishisherewith.dynamichud.utils.contextmenu.screen.factory;
 
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
+import com.tanishisherewith.dynamichud.utils.contextmenu.screen.ContextMenuScreen;
 import net.minecraft.client.gui.screens.Screen;
 
 /**

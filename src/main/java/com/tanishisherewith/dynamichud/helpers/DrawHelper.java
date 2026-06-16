@@ -5,6 +5,7 @@ import com.tanishisherewith.dynamichud.renderstates.QuadColorRectRenderState;
 import com.tanishisherewith.dynamichud.renderstates.RoundedRectRenderState;
 import com.tanishisherewith.dynamichud.utils.CustomRenderLayers;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
+import net.fabricmc.fabric.api.renderer.v1.render.RenderLayerHelper;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
@@ -13,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
 import org.joml.Vector4f;
 
@@ -31,6 +33,7 @@ public class DrawHelper {
     static {
         // Cosa is simply Sina shifted by 90 degrees (9 steps)
         System.arraycopy(SINA, 9, COSA, 0, 36);
+        System.arraycopy(SINA, 9, COSA, 36, 9);
     }
 
     /**
@@ -53,7 +56,7 @@ public class DrawHelper {
             };
 
             g.guiRenderState.submitGuiElement(
-                    new QuadColorRectRenderState(RenderPipelines.GUI,g.pose(),x,y,width,height,c,
+                    new QuadColorRectRenderState(RenderPipelines.GUI,new Matrix3x2f(g.pose()),x,y,width,height,c,
                             g.scissorStack.peek())
             );
     }
@@ -169,7 +172,7 @@ public class DrawHelper {
 
         graphics.guiRenderState.submitGuiElement(new RoundedRectRenderState(
                 RenderPipelines.DEBUG_QUADS,
-                graphics.pose(),
+                new Matrix3x2f(graphics.pose()),
                 x, y, width, height, thickness, intColors, radii, graphics.scissorStack.peek()
         ));
     }
@@ -236,7 +239,7 @@ public class DrawHelper {
 
         graphics.guiRenderState.submitGuiElement(new GeometryRenderState(
                 CustomRenderLayers.TRIANGLE_STRIP,
-                graphics.pose(),
+                new Matrix3x2f(graphics.pose()),
                 verts, colors, graphics.scissorStack.peek()
         ));
     }
@@ -250,25 +253,33 @@ public class DrawHelper {
      * @param color    color of the circle outline
      */
     public static void drawFilledCircle(GuiGraphics graphics, float xCenter, float yCenter, float radius, int color) {
-        int segments = 72; // 5-degree steps for smoothness
-        float[] verts = new float[(segments + 2) * 2];
-        int[] colors = new int[segments + 2];
+        int segments = 36;
+        float[] verts = new float[segments * 4 * 2];
+        int[] colors = new int[segments * 4];
 
-        // Center point
-        verts[0] = xCenter; verts[1] = yCenter;
-        colors[0] = color;
+        int vIdx = 0;
+        int cIdx = 0;
 
-        for (int i = 0; i <= segments; i++) {
-            float rad = (float) Math.toRadians(i * 5);
-            int idx = (i + 1) * 2;
-            verts[idx] = xCenter + (float) Math.sin(rad) * radius;
-            verts[idx + 1] = yCenter + (float) Math.cos(rad) * radius;
-            colors[i + 1] = color;
+        for (int i = 0; i < segments; i++) {
+            float x1 = xCenter + SINA[i] * radius;
+            float y1 = yCenter + COSA[i] * radius;
+            float x2 = xCenter + SINA[i + 1] * radius;
+            float y2 = yCenter + COSA[i + 1] * radius;
+
+            verts[vIdx++] = xCenter; verts[vIdx++] = yCenter;
+            verts[vIdx++] = x1;      verts[vIdx++] = y1;
+            verts[vIdx++] = x2;      verts[vIdx++] = y2;
+            verts[vIdx++] = x2;      verts[vIdx++] = y2;
+
+            colors[cIdx++] = color;
+            colors[cIdx++] = color;
+            colors[cIdx++] = color;
+            colors[cIdx++] = color;
         }
 
         graphics.guiRenderState.submitGuiElement(new GeometryRenderState(
-                CustomRenderLayers.TRIANGLE_FAN_CUSTOM_BLEND,
-                graphics.pose(),
+                CustomRenderLayers.QUADS_CUSTOM_BLEND,
+                new Matrix3x2f(graphics.pose()),
                 verts, colors, graphics.scissorStack.peek()
         ));
     }
@@ -324,7 +335,7 @@ public class DrawHelper {
 
         graphics.guiRenderState.submitGuiElement(new GeometryRenderState(
                 CustomRenderLayers.TRIANGLE_FAN_CUSTOM_BLEND,
-                graphics.pose(),
+                new Matrix3x2f(graphics.pose()),
                 verts, colors, graphics.scissorStack.peek()
         ));
     }
@@ -364,7 +375,7 @@ public class DrawHelper {
 
         graphics.guiRenderState.submitGuiElement(new GeometryRenderState(
                 CustomRenderLayers.TRIANGLE_FAN_CUSTOM_BLEND,
-                graphics.pose(),
+                new Matrix3x2f(graphics.pose()),
                 verts, colors, graphics.scissorStack.peek()
         ));
     }
@@ -399,7 +410,7 @@ public class DrawHelper {
 
         graphics.guiRenderState.submitGuiElement(new GeometryRenderState(
                 CustomRenderLayers.COLOR_LINE,
-                graphics.pose(),
+                new Matrix3x2f(graphics.pose()),
                 vertices,
                 colors,
                 graphics.scissorStack.peek()
@@ -496,7 +507,7 @@ public class DrawHelper {
 
         graphics.guiRenderState.submitGuiElement(new RoundedRectRenderState(
                 RenderPipelines.DEBUG_QUADS,
-                graphics.pose(),
+                new Matrix3x2f(graphics.pose()),
                 x, y, width, height, -1f, intColors, radii, graphics.scissorStack.peek()
         ));
     }
@@ -628,7 +639,7 @@ public class DrawHelper {
     /**
      * Creating bounds for Render states
      */
-    public static ScreenRectangle createBounds(Matrix3x2fStack pose, ScreenRectangle scissor, float x, float y, float w, float h) {
+    public static ScreenRectangle createBounds(Matrix3x2f pose, ScreenRectangle scissor, float x, float y, float w, float h) {
         ScreenRectangle bounds = new ScreenRectangle((int) x, (int) y, (int) w, (int) h).transformAxisAligned(pose);
         return scissor == null ? bounds : scissor.intersection(bounds);
     }

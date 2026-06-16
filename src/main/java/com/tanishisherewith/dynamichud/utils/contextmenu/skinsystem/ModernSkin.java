@@ -22,12 +22,14 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.tanishisherewith.dynamichud.helpers.ColorHelper.DARK_GREEN;
+import static com.tanishisherewith.dynamichud.helpers.ColorHelper.DARK_RED;
+
 public class ModernSkin extends Skin implements GroupableSkin {
     static Color DARK_GRAY = new Color(20, 20, 20, 229);
     static Color DARKER_GRAY = new Color(10, 10, 10, 243);
     static Color DARKER_GRAY_2 = new Color(12, 12, 12, 246);
 
-    private final Color themeColor;
     private final float radius;
     private final Component defaultToolTipHeader;
     private final Component defaultToolTipText;
@@ -39,12 +41,10 @@ public class ModernSkin extends Skin implements GroupableSkin {
     private static int SCALE_FACTOR = 4;
     private final ScrollHandler scrollHandler;
 
-
-    public ModernSkin(Color themeColor, float radius, Component defaultToolTipHeader, Component defaultToolTipText) {
-        this.themeColor = themeColor;
+    public ModernSkin(float radius, Component defaultToolTipHeader, Component defaultToolTipText) {
         this.radius = radius;
-        TOOLTIP_TEXT = defaultToolTipText;
-        TOOLTIP_HEAD = defaultToolTipHeader;
+        this.TOOLTIP_TEXT = defaultToolTipText;
+        this.TOOLTIP_HEAD = defaultToolTipHeader;
         this.defaultToolTipText = defaultToolTipText;
         this.defaultToolTipHeader = defaultToolTipHeader;
 
@@ -61,21 +61,17 @@ public class ModernSkin extends Skin implements GroupableSkin {
         setCreateNewScreen(true);
     }
 
-    public ModernSkin(Color themeColor, float radius) {
-        this(themeColor, radius, Component.literal("Example Tip"), Component.literal("Hover over a setting to see its tool-tip (if present) here!"));
-    }
-
-    public ModernSkin(Color themeColor) {
-        this(themeColor, 4);
+    public ModernSkin(float radius) {
+        this(radius, Component.literal("Example Tip"), Component.literal("Hover over a setting to see its tool-tip (if present) here!"));
     }
 
     public ModernSkin() {
-        this(Color.CYAN.darker().darker());
+        this(4);
     }
 
     @Override
     public LayoutContext.Offset getGroupIndent() {
-        return new LayoutContext.Offset(2, 2);
+        return new LayoutContext.Offset(4, 4);
     }
 
     public void enableSkinScissor(GuiGraphics graphics) {
@@ -84,6 +80,24 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
     @Override
     public void renderGroup(GuiGraphics graphics, OptionGroup group, int groupX, int groupY, int mouseX, int mouseY) {
+        int targetWidth = (int) (width * 0.8f - 18);
+        renderGroup(graphics, group, groupX, groupY, targetWidth, mouseX, mouseY);
+    }
+    private int calcOptionHeight(Option<?> option) {
+        if (option instanceof BooleanOption || option instanceof DoubleOption) return 14;
+        if (option instanceof EnumOption || option instanceof ListOption) return mc.font.lineHeight + 2;
+        if (option instanceof SubMenuOption) return 16;
+        if (option instanceof RunnableOption) return mc.font.lineHeight + 6;
+        if (option instanceof ColorOption colorOption) {
+            return colorOption.getHeight() > 0 ? colorOption.getHeight() : 20;
+        }
+        if (option instanceof OptionGroup group) {
+            return group.isExpanded() ? group.getHeight() : 20;
+        }
+        return option.getHeight() > 0 ? option.getHeight() : mc.font.lineHeight;
+    }
+
+    public void renderGroup(GuiGraphics graphics, OptionGroup group, int groupX, int groupY, int targetWidth, int mouseX, int mouseY) {
         mouseX = (int) (mc.mouseHandler.xpos() / SCALE_FACTOR);
         mouseY = (int) (mc.mouseHandler.ypos() / SCALE_FACTOR);
 
@@ -101,11 +115,16 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
         if (group.isExpanded()) {
             int yOffset = groupY + 16 + getGroupIndent().top();
+            int nestedIndent = getGroupIndent().left();
+            int subWidth = targetWidth - nestedIndent - 8;
+
             for (Option<?> option : group.getGroupOptions()) {
                 if (!option.shouldRender()) continue;
 
-                option.render(graphics, groupX + getGroupIndent().left(), yOffset, mouseX, mouseY);
-                yOffset += option.getHeight() + 1;
+                // Position child option with layout engine
+                option.setHeight(calcOptionHeight(option));
+                yOffset = contextMenu.getLayoutEngine().layoutOption(option, groupX + nestedIndent, yOffset, subWidth);
+                option.render(graphics, option.getX(), option.getY(), mouseX, mouseY);
             }
 
             group.setHeight(yOffset - groupY);
@@ -116,8 +135,8 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
     private void drawScrollbar(GuiGraphics graphics) {
         if (getMaxScrollOffset() > 0) {
-            int scrollbarX = contextMenuX + width + 5; // Position at the right of the panel
-            int scrollbarY = contextMenuY + 19; // Position below the header
+            int scrollbarX = contextMenuX + width + 5;
+            int scrollbarY = contextMenuY + 19;
             int handleHeight = (int) ((float) (height - 23) * ((height - 23) / (float) contextMenu.getHeight()));
             int handleY = scrollbarY + (int) ((float) ((height - 23) - handleHeight) * ((float) scrollHandler.getScrollOffset() / getMaxScrollOffset()));
 
@@ -128,33 +147,34 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
     @Override
     public void renderContextMenu(GuiGraphics graphics, ContextMenu<?> contextMenu, int mouseX, int mouseY) {
-        //This is equivalent to "Auto" GUI scale in minecraft options
         SCALE_FACTOR = mc.getWindow().calculateScale(0, mc.isEnforceUnicode());
+        this.contextMenu = contextMenu;
 
         mouseX = (int) (mc.mouseHandler.xpos() / SCALE_FACTOR);
         mouseY = (int) (mc.mouseHandler.ypos() / SCALE_FACTOR);
 
-        // Apply custom scaling to counteract Minecraft's default scaling
         DrawHelper.scaledProjection(SCALE_FACTOR, graphics);
 
         updateContextDimensions();
         contextMenu.set(contextMenuX, contextMenuY, 0);
 
-        //Background
+        // Background
         DrawHelper.drawRoundedRectangle(graphics,
                 contextMenuX, contextMenuY, width, height, radius, DARKER_GRAY.getRGB());
 
         drawBackButton(graphics, mouseX, mouseY);
 
-        //OptionStartX = Tool-Tip width + padding
         int optionStartX = contextMenu.x + (int) (width * 0.2f) + 10;
+        int targetWidth = (int) (width * 0.8f - 18);
 
-        //Background behind the options
+        // Background behind the options scroll area
         DrawHelper.drawRoundedRectangle(graphics,
                 optionStartX, contextMenuY + 19, width * 0.8f - 14, height - 23, radius, DARK_GRAY.getRGB());
 
         enableSkinScissor(graphics);
+
         int yOffset = contextMenu.y + 19 + 3 - scrollHandler.getScrollOffset();
+
         for (Option<?> option : getOptions(contextMenu)) {
             if (!option.shouldRender()) continue;
 
@@ -162,14 +182,18 @@ public class ModernSkin extends Skin implements GroupableSkin {
                 setTooltipText(option.name, option.description);
             }
 
-            if (option instanceof OptionGroup group) {
-                this.renderGroup(graphics, group, optionStartX + 2, yOffset, mouseX, mouseY);
-            } else {
-                option.render(graphics, optionStartX + 2, yOffset, mouseX, mouseY);
-            }
+            option.setHeight(calcOptionHeight(option));
+            int nextY = contextMenu.getLayoutEngine().layoutOption(option, optionStartX + 2, yOffset, targetWidth);
 
-            yOffset += option.getHeight() + 1;
+            if (option instanceof OptionGroup group) {
+                this.renderGroup(graphics, group, optionStartX + 2, yOffset, targetWidth, mouseX, mouseY);
+                yOffset += group.getHeight() + contextMenu.getLayoutEngine().getItemSpacing();
+            } else {
+                option.render(graphics, option.getX(), option.getY(), mouseX, mouseY);
+                yOffset = nextY;
+            }
         }
+
         DrawHelper.disableScissor(graphics);
 
         contextMenu.setWidth(width);
@@ -181,7 +205,6 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
         renderToolTipText(graphics, mouseX, mouseY);
 
-        //Reset our scaling so minecraft runs normally\
         DrawHelper.stopScaling(graphics.pose());
     }
 
@@ -199,7 +222,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         int textWidth = mc.font.width(backText);
 
         boolean isHoveringOver = isMouseOver(mouseX, mouseY, contextMenuX + 2, contextMenuY + 2, textWidth + 8, 14);
-        int color = isHoveringOver ? themeColor.darker().getRGB() : themeColor.getRGB();
+        int color = isHoveringOver ? getThemeColor().darker().getRGB() : getThemeColor().getRGB();
 
         DrawHelper.drawRoundedRectangleWithShadowBadWay(graphics,
                 contextMenuX + 2, contextMenuY + 2, textWidth + 8, 14, radius, color, 125, 2, 2);
@@ -219,7 +242,6 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
         float textScale = 0.8f;
 
-        // Draw background
         DrawHelper.drawRoundedRectangle(
                 graphics,
                 contextMenuX + 2,
@@ -243,7 +265,6 @@ public class ModernSkin extends Skin implements GroupableSkin {
             return;
         }
 
-        //Draw the head Component
         graphics.drawString(
                 mc.font,
                 TOOLTIP_HEAD,
@@ -257,7 +278,6 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
         DrawHelper.scaleAndPosition(graphics.pose(), contextMenuX + 4, tooltipY + 19, textScale);
 
-        // Draw Component
         int textY = tooltipY + 19;
         for (FormattedCharSequence line : wrappedText) {
             graphics.drawString(
@@ -277,8 +297,8 @@ public class ModernSkin extends Skin implements GroupableSkin {
     }
 
     public void setTooltipText(Component head_text, Component tooltip_text) {
-        TOOLTIP_TEXT = tooltip_text;
-        TOOLTIP_HEAD = head_text;
+        this.TOOLTIP_TEXT = tooltip_text;
+        this.TOOLTIP_HEAD = head_text;
     }
 
     private int getMaxScrollOffset() {
@@ -309,19 +329,24 @@ public class ModernSkin extends Skin implements GroupableSkin {
         if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
             int optionStartX = contextMenuX + (int) (width * 0.2f) + 10;
             int yOffset = contextMenu.y + 22 - scrollHandler.getScrollOffset();
+            int spacing = contextMenu.getLayoutEngine().getItemSpacing();
+
             for (Option<?> option : getOptions(contextMenu)) {
                 if (!option.shouldRender()) continue;
 
+                int optHeight = calcOptionHeight(option);
                 if (option instanceof OptionGroup group) {
+                    Component groupText = group.name.copy().append(" " + (group.isExpanded() ? "-" : "+"));
                     if (isMouseOver(mouseX, mouseY, optionStartX + 2, yOffset,
-                            mc.font.width(group.name + " " + (group.isExpanded() ? "-" : "+")) + 6,
+                            mc.font.width(groupText) + 6,
                             16)) {
                         group.setExpanded(!group.isExpanded());
-                        break;
+                        return true;
                     }
+                    yOffset += group.getHeight() + spacing;
+                } else {
+                    yOffset += optHeight + spacing;
                 }
-
-                yOffset += option.getHeight() + 1;
             }
         }
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX, mouseY, contextMenuX + 2, contextMenuY + 2, mc.font.width("< Back") + 8, 14)) {
@@ -344,7 +369,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
     }
 
     public Color getThemeColor() {
-        return themeColor;
+        return contextMenu.getProperties().getAccentColor();
     }
 
     public class ModernBooleanRenderer implements SkinRenderer<BooleanOption> {
@@ -352,15 +377,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
         @Override
         public void render(GuiGraphics graphics, BooleanOption option, int x, int y, int mouseX, int mouseY) {
-            int backgroundWidth = (int) (width * 0.8f - 14);
-
-            option.setHeight(14);
-            option.setPosition(x, y);
-            option.setWidth(backgroundWidth);
-
-            // Calculate the current progress of the animation
-            int toggleBgX = x + backgroundWidth - 30;
-            // Background
+            int toggleBgX = x + option.getWidth() - 30;
             boolean active = option.get();
             Color backgroundColor = active ? getThemeColor() : DARKER_GRAY;
             Color hoveredColor = isMouseOver(mouseX, mouseY, toggleBgX, y + 2, 14, 7) ? backgroundColor.darker() : backgroundColor;
@@ -373,7 +390,6 @@ public class ModernSkin extends Skin implements GroupableSkin {
                     125, 1, 1
             );
 
-            // Draw toggle circle
             float startX = active ? toggleBgX + 4 : toggleBgX + 10;
             float endX = active ? toggleBgX + 10 : toggleBgX + 4;
             EasingType easingType = active ? EasingType.EASE_IN_CUBIC : EasingType.EASE_OUT_QUAD;
@@ -381,7 +397,6 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
             DrawHelper.drawFilledCircle(graphics, toggleX, y + 2 + 3.3f, 2.8f, Color.WHITE.getRGB());
 
-            // Draw option name
             graphics.drawString(
                     mc.font,
                     option.name,
@@ -397,8 +412,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             mouseX = mc.mouseHandler.xpos() / SCALE_FACTOR;
             mouseY = mc.mouseHandler.ypos() / SCALE_FACTOR;
 
-            int backgroundWidth = (int) (width * 0.8f - 14);
-            int toggleBgX = option.getX() + backgroundWidth - 30;
+            int toggleBgX = option.getX() + option.getWidth() - 30;
 
             if (isMouseOver(mouseX, mouseY, toggleBgX, option.getY(), 14, option.getHeight())) {
                 option.set(!option.get());
@@ -408,7 +422,6 @@ public class ModernSkin extends Skin implements GroupableSkin {
             return false;
         }
     }
-
 
     public class ModernColorOptionRenderer implements SkinRenderer<ColorOption> {
         private static final float ANIMATION_SPEED = 0.1f;
@@ -432,9 +445,6 @@ public class ModernSkin extends Skin implements GroupableSkin {
         public void render(GuiGraphics graphics, ColorOption option, int x, int y, int mouseX, int mouseY) {
             update(option);
 
-            int backgroundWidth = (int) (width * 0.8f - 14);
-
-            // Draw option name
             graphics.drawString(
                     mc.font,
                     option.name,
@@ -444,17 +454,12 @@ public class ModernSkin extends Skin implements GroupableSkin {
                     false
             );
 
-            option.setWidth(20);
-            option.setPosition(x, y);
-
-
             int width = 20;
             int shadowOpacity = Math.min(option.value.getAlpha(), 45);
 
-            //The shape behind the preview
-            Color behindColor = isMouseOver(mouseX, mouseY, x + backgroundWidth - width - 17, y + 1, width + 2, 14) ? getThemeColor().darker().darker() : getThemeColor();
+            Color behindColor = isMouseOver(mouseX, mouseY, x + option.getWidth() - width - 17, y + 1, width + 2, 14) ? getThemeColor().darker().darker() : getThemeColor();
             DrawHelper.drawRoundedRectangleWithShadowBadWay(graphics,
-                    x + backgroundWidth - width - 17,
+                    x + option.getWidth() - width - 17,
                     y + 1,
                     width + 2,
                     14,
@@ -464,19 +469,17 @@ public class ModernSkin extends Skin implements GroupableSkin {
                     1,
                     1);
 
-            //The letter above the shape behind the preview
             graphics.drawString(
                     mc.font,
                     option.getColorGradient().shouldDisplay() ? "^" : "v",
-                    x + backgroundWidth - 21,
+                    x + option.getWidth() - 21,
                     y + 4,
                     -1,
                     false
             );
 
-            //Preview
             DrawHelper.drawRoundedRectangleWithShadowBadWay(graphics,
-                    x + backgroundWidth - width - 15,
+                    x + option.getWidth() - width - 15,
                     y + 2,
                     width - 8,
                     12,
@@ -488,18 +491,17 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
             int targetHeight = (int) (option.getColorGradient().getBoxSize() + option.getColorGradient().getGradientBox().getSize() * scale);
             option.setHeight(option.getColorGradient().shouldDisplay() ? targetHeight : 20);
-            option.setWidth(width);
 
             if (option.getColorGradient().getColorPickerButton().isPicking()) {
-                DrawHelper.disableScissor(graphics); //Disable scissor so the color picker preview works
+                DrawHelper.disableScissor(graphics);
             }
 
-            DrawHelper.scaleAndPosition(graphics.pose(), x + backgroundWidth / 2.0f, y, scale);
-            option.getColorGradient().render(graphics, x + backgroundWidth / 2 - 50, y + 6, mouseX, mouseY);
+            DrawHelper.scaleAndPosition(graphics.pose(), x + option.getWidth() / 2.0f, y, scale);
+            option.getColorGradient().render(graphics, x + option.getWidth() / 2 - 50, y + 6, mouseX, mouseY);
             DrawHelper.stopScaling(graphics.pose());
 
             if (option.getColorGradient().getColorPickerButton().isPicking()) {
-                enableSkinScissor(graphics); // re-enable the scissor
+                enableSkinScissor(graphics);
             }
         }
 
@@ -507,7 +509,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         public boolean mouseClicked(ColorOption option, double mouseX, double mouseY, int button) {
             mouseX = mc.mouseHandler.xpos() / SCALE_FACTOR;
             mouseY = mc.mouseHandler.ypos() / SCALE_FACTOR;
-            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX, mouseY, option.getX() + (int) (width * 0.8f - 14) - 37, option.getY(), 22, 16)) {
+            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX, mouseY, option.getX() + option.getWidth() - 37, option.getY(), 22, 16)) {
                 option.isVisible = !option.isVisible;
                 if (option.isVisible) {
                     option.getColorGradient().display();
@@ -517,35 +519,32 @@ public class ModernSkin extends Skin implements GroupableSkin {
                 }
                 return true;
             }
-            option.getColorGradient().mouseClicked(mouseX, mouseY, button);
-            return false;
+            return option.getColorGradient().mouseClicked(mouseX, mouseY, button);
         }
 
         @Override
         public boolean mouseDragged(ColorOption option, double mouseX, double mouseY, int button, double deltaX, double deltaY) {
             mouseX = mc.mouseHandler.xpos() / SCALE_FACTOR;
             mouseY = mc.mouseHandler.ypos() / SCALE_FACTOR;
-            option.getColorGradient().mouseDragged(mouseX, mouseY, button);
-            return SkinRenderer.super.mouseDragged(option, mouseX, mouseY, button, deltaX, deltaY);
+            return  option.getColorGradient().mouseDragged(mouseX, mouseY, button) && SkinRenderer.super.mouseDragged(option, mouseX, mouseY, button, deltaX, deltaY);
         }
 
         @Override
         public boolean mouseReleased(ColorOption option, double mouseX, double mouseY, int button) {
             mouseX = mc.mouseHandler.xpos() / SCALE_FACTOR;
             mouseY = mc.mouseHandler.ypos() / SCALE_FACTOR;
-            option.getColorGradient().mouseReleased(mouseX, mouseY, button);
-
-            return SkinRenderer.super.mouseReleased(option, mouseX, mouseY, button);
+            return option.getColorGradient().mouseReleased(mouseX, mouseY, button) && SkinRenderer.super.mouseReleased(option, mouseX, mouseY, button);
         }
     }
 
     public class ModernDoubleRenderer implements SkinRenderer<DoubleOption> {
         private double displayValue;
         private static final float ANIMATION_SPEED = 0.1f;
+        int sliderBackgroundWidth = 120;
+        int sliderBackgroundHeight = 2;
 
         @Override
         public void render(GuiGraphics graphics, DoubleOption option, int x, int y, int mouseX, int mouseY) {
-            // Draw option name
             graphics.drawString(
                     mc.font,
                     option.name,
@@ -554,44 +553,31 @@ public class ModernSkin extends Skin implements GroupableSkin {
                     -1,
                     false
             );
+            int sliderX = x + option.getWidth() - sliderBackgroundWidth - 10;
 
-            int backgroundWidth = (int) (width * 0.8f - 14);
-            int sliderBackgroundWidth = 120;
-            int sliderBackgroundHeight = 2;
-            int sliderX = x + backgroundWidth - sliderBackgroundWidth - 10;
-
-            option.setPosition(x, y);
-            option.setWidth(sliderBackgroundWidth);
-            option.setHeight(14);
-
-            // Smoothly interpolate to the new value
             displayValue = Mth.lerp(ANIMATION_SPEED, displayValue, option.get());
 
-            // Background
             DrawHelper.drawRoundedRectangle(
                     graphics,
                     sliderX, y, sliderBackgroundWidth, sliderBackgroundHeight, 1, DARKER_GRAY.getRGB()
             );
 
-            // Active fill
-            int activeFillWidth = (int) ((displayValue - option.minValue) / (option.maxValue - option.minValue) * option.getWidth());
+            int activeFillWidth = (int) ((displayValue - option.minValue) / (option.maxValue - option.minValue) * sliderBackgroundWidth);
             Color fillColor = isMouseOver(mouseX, mouseY, sliderX, y, sliderBackgroundWidth, sliderBackgroundHeight + 4) ? getThemeColor().darker().darker() : getThemeColor();
             DrawHelper.drawRoundedRectangle(
                     graphics,
                     sliderX, y, activeFillWidth, sliderBackgroundHeight, 2, fillColor.getRGB()
             );
 
-            // Draw slider handle
             float sliderHandleX = sliderX + activeFillWidth - 5;
             DrawHelper.drawFilledCircle(graphics, sliderHandleX + 5, y + 1, 2, Color.WHITE.getRGB());
 
-            // Draw value Component
-            String Component = String.format("%.2f", displayValue);
-            DrawHelper.scaleAndPosition(graphics.pose(), sliderX + 120 - mc.font.width(Component), y + 7, 0.6f);
+            String label = String.format("%.2f", displayValue);
+            DrawHelper.scaleAndPosition(graphics.pose(), sliderX + sliderBackgroundWidth - mc.font.width(label), y + 7, 0.6f);
             graphics.drawString(
                     mc.font,
-                    Component,
-                    sliderX + sliderBackgroundWidth + 10 - mc.font.width(Component),
+                    label,
+                    sliderX + sliderBackgroundWidth + 10 - mc.font.width(label),
                     y + 2,
                     -1,
                     true
@@ -603,7 +589,8 @@ public class ModernSkin extends Skin implements GroupableSkin {
         public boolean mouseClicked(DoubleOption option, double mouseX, double mouseY, int button) {
             mouseX = mc.mouseHandler.xpos() / SCALE_FACTOR;
             mouseY = mc.mouseHandler.ypos() / SCALE_FACTOR;
-            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX, mouseY, option.getX() + (int) (width * 0.8f - 14) - 125, option.getY() - 1, option.getWidth() + 2, option.getHeight() + 1)) {
+            int sliderX = option.getX() + option.getWidth() - sliderBackgroundWidth - 10;
+            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX, mouseY, sliderX - 2, option.getY() - 1, sliderBackgroundWidth + 4, option.getHeight() + 1)) {
                 option.setDragging(true);
                 return true;
             }
@@ -614,10 +601,8 @@ public class ModernSkin extends Skin implements GroupableSkin {
         public boolean mouseDragged(DoubleOption option, double mouseX, double mouseY, int button, double deltaX, double deltaY) {
             if (option.isDragging()) {
                 mouseX = mc.mouseHandler.xpos() / SCALE_FACTOR;
-                int backgroundWidth = (int) (width * 0.8f - 14);
-                int sliderBackgroundWidth = 120;
-                int sliderX = option.getX() + backgroundWidth - sliderBackgroundWidth - 10;
-                option.step(mouseX, sliderX);
+                int sliderX = option.getX() + option.getWidth() - sliderBackgroundWidth - 10;
+                option.step(mouseX, sliderX, sliderBackgroundWidth);
                 return true;
             }
             return false;
@@ -636,25 +621,23 @@ public class ModernSkin extends Skin implements GroupableSkin {
     public class ModernEnumRenderer<E extends Enum<E>> implements SkinRenderer<EnumOption<E>> {
         @Override
         public void render(GuiGraphics graphics, EnumOption<E> option, int x, int y, int mouseX, int mouseY) {
-            // Set dimensions for the main label and dropdown area
             option.setHeight(mc.font.lineHeight + 2);
 
-            // Draw main option name and selected option
             Component mainLabel = option.name.copy().append(": ");
             String selectedOption = option.get().toString();
             graphics.drawString(mc.font, mainLabel, x + 4, y + 2, -1, false);
-            Color fillColor = isMouseOver(mouseX, mouseY, x + 4 + mc.font.width(mainLabel), y, mc.font.width(selectedOption) + 5, mc.font.lineHeight + 2) ? getThemeColor().darker().darker() : getThemeColor();
+            boolean isMouseOverText = isMouseOver(mouseX, mouseY, x + 4 + mc.font.width(mainLabel), y, mc.font.width(selectedOption) + 5, mc.font.lineHeight + 2);
+            Color fillColor = isMouseOverText ? getThemeColor().darker().darker() : getThemeColor();
             DrawHelper.drawRoundedRectangle(
                     graphics,
                     x + 4 + mc.font.width(mainLabel), y, mc.font.width(selectedOption) + 5, mc.font.lineHeight + 2, 2,
                     fillColor.getRGB()
             );
-            // "<" and ">" buttons
-            int contextMenuWidth = (int) (width * 0.8f - 14);
-            int leftX = x + contextMenuWidth - 30;
+
+            int leftX = x + option.getWidth() - 30;
             boolean hoveredOverLeft = isMouseOver(mouseX, mouseY, leftX, y, mc.font.width("<") + 5, mc.font.lineHeight);
             boolean hoveredOverRight = isMouseOver(mouseX, mouseY, leftX + mc.font.width("<") + 6, y, mc.font.width(">") + 5, mc.font.lineHeight);
-            // Shadow
+
             DrawHelper.drawRoundedRectangle(
                     graphics,
                     leftX + 1, y + 3,
@@ -686,7 +669,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             graphics.drawString(mc.font, "<", leftX + mc.font.width("<") / 2 + 1, y + 3, -1, false);
             graphics.drawString(mc.font, ">", leftX + mc.font.width("<") + 7 + mc.font.width(">") / 2, y + 3, -1, false);
 
-            graphics.drawString(mc.font, selectedOption, x + 6 + mc.font.width(mainLabel), y + 2, Color.LIGHT_GRAY.getRGB(), false);
+            graphics.drawString(mc.font, selectedOption, x + 6 + mc.font.width(mainLabel), y + 2, Color.LIGHT_GRAY.getRGB(), isMouseOverText);
         }
 
         @Override
@@ -698,13 +681,10 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
             int x = option.getX();
             int y = option.getY();
-            String mainLabel = option.name + ": ";
+            Component mainLabel = option.name.copy().append(": ");
             String selectedOption = option.get().toString();
 
-            // Check if the main label is clicked to cycle
-            // "<" and ">" buttons
-            int contextMenuWidth = (int) (width * 0.8f - 14);
-            int leftX = x + contextMenuWidth - 30;
+            int leftX = x + option.getWidth() - 30;
             boolean hoveredOverLeft = isMouseOver(mouseX, mouseY, leftX, y, mc.font.width("<") + 5, mc.font.lineHeight);
             boolean hoveredOverRight = isMouseOver(mouseX, mouseY, leftX + mc.font.width("<") + 6, y, mc.font.width(">") + 5, mc.font.lineHeight);
             boolean hoveredOverMainLabel = isMouseOver(mouseX, mouseY, x + 4 + mc.font.width(mainLabel), y, mc.font.width(selectedOption) + 5, mc.font.lineHeight + 2);
@@ -714,47 +694,41 @@ public class ModernSkin extends Skin implements GroupableSkin {
                 int index = Arrays.asList(values).indexOf(option.value);
 
                 if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT || hoveredOverLeft) {
-                    // Cycle forward
                     E nextVal = values[(index + 1) % values.length];
                     option.set(nextVal);
                 } else if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT || hoveredOverRight) {
-                    // Cycle backward with wrap-around
                     E nextVal = values[(index - 1 + values.length) % values.length];
                     option.set(nextVal);
+                } else {
+                    return false;
                 }
                 return true;
             }
 
-            return SkinRenderer.super.mouseClicked(option, mouseX, mouseY, button);
+            return false;
         }
-
     }
 
     public class ModernListRenderer<E> implements SkinRenderer<ListOption<E>> {
-
         @Override
         public void render(GuiGraphics graphics, ListOption<E> option, int x, int y, int mouseX, int mouseY) {
-
-            // Set dimensions for the main label and dropdown area
             option.setHeight(mc.font.lineHeight + 2);
 
-            // Draw main option name and selected option
             Component mainLabel = option.name.copy().append(": ");
             String selectedOption = option.get().toString();
             graphics.drawString(mc.font, mainLabel, x + 4, y + 2, -1, false);
-            Color fillColor = isMouseOver(mouseX, mouseY, x + 4 + mc.font.width(mainLabel), y, mc.font.width(selectedOption) + 5, mc.font.lineHeight + 2) ? getThemeColor().darker().darker() : getThemeColor();
+            boolean isMouseOverText = isMouseOver(mouseX, mouseY, x + 4 + mc.font.width(mainLabel), y, mc.font.width(selectedOption) + 5, mc.font.lineHeight + 2);
+            Color fillColor = isMouseOverText ? getThemeColor().darker().darker() : getThemeColor();
             DrawHelper.drawRoundedRectangle(
                     graphics,
                     x + 4 + mc.font.width(mainLabel), y, mc.font.width(selectedOption) + 5, mc.font.lineHeight + 2, 2,
                     fillColor.getRGB()
             );
 
-            // "<" and ">" buttons
-            int contextMenuWidth = (int) (width * 0.8f - 14);
-            int leftX = x + contextMenuWidth - 30;
+            int leftX = x + option.getWidth() - 30;
             boolean hoveredOverLeft = isMouseOver(mouseX, mouseY, leftX, y, mc.font.width("<") + 5, mc.font.lineHeight);
             boolean hoveredOverRight = isMouseOver(mouseX, mouseY, leftX + mc.font.width("<") + 6, y, mc.font.width(">") + 5, mc.font.lineHeight);
-            // Shadow
+
             DrawHelper.drawRoundedRectangle(
                     graphics,
                     leftX + 1, y + 3,
@@ -786,77 +760,62 @@ public class ModernSkin extends Skin implements GroupableSkin {
             graphics.drawString(mc.font, "<", leftX + mc.font.width("<") / 2 + 1, y + 3, -1, false);
             graphics.drawString(mc.font, ">", leftX + mc.font.width("<") + 7 + mc.font.width(">") / 2, y + 3, -1, false);
 
-            graphics.drawString(mc.font, selectedOption, x + 6 + mc.font.width(mainLabel), y + 2, Color.LIGHT_GRAY.getRGB(), false);
+            graphics.drawString(mc.font, selectedOption, x + 6 + mc.font.width(mainLabel), y + 2, Color.LIGHT_GRAY.getRGB(), isMouseOverText);
         }
 
         @Override
         public boolean mouseClicked(ListOption<E> option, double mouseX, double mouseY, int button) {
             if (option.getValues().isEmpty()) return false;
 
-            mouseX /= SCALE_FACTOR;
-            mouseY /= SCALE_FACTOR;
+            mouseX = mc.mouseHandler.xpos() / SCALE_FACTOR;
+            mouseY = mc.mouseHandler.ypos() / SCALE_FACTOR;
 
             int x = option.getX();
             int y = option.getY();
             Component mainLabel = option.name.copy().append(": ");
             String selectedOption = option.get().toString();
 
-            // Calculate positions
-            int contextMenuWidth = (int) (width * 0.8f - 14);
-            int leftX = x + contextMenuWidth - 30;
-
-            // Check hover states
+            int leftX = x + option.getWidth() - 30;
             boolean hoveredOverLeft = isMouseOver(mouseX, mouseY, leftX, y, mc.font.width("<") + 5, mc.font.lineHeight);
             boolean hoveredOverRight = isMouseOver(mouseX, mouseY, leftX + mc.font.width("<") + 6, y, mc.font.width(">") + 5, mc.font.lineHeight);
             boolean hoveredOverMainLabel = isMouseOver(mouseX, mouseY, x + 4 + mc.font.width(mainLabel), y, mc.font.width(selectedOption) + 5, mc.font.lineHeight + 2);
 
-            // Check if any area is clicked
             if (hoveredOverLeft || hoveredOverRight || hoveredOverMainLabel) {
                 List<E> values = option.getValues();
                 int currentIndex = values.indexOf(option.value);
                 int nextIndex;
 
-                // Determine the next index based on the button clicked
                 if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT || hoveredOverLeft) {
-                    nextIndex = (currentIndex + 1) % values.size(); // Cycle forward
+                    nextIndex = (currentIndex + 1) % values.size();
                 } else if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT || hoveredOverRight) {
-                    nextIndex = (currentIndex - 1 + values.size()) % values.size(); // Cycle backward
+                    nextIndex = (currentIndex - 1 + values.size()) % values.size();
                 } else {
-                    return false; // No valid click
+                    return false;
                 }
 
                 option.set(values.get(nextIndex));
                 return true;
             }
 
-            return SkinRenderer.super.mouseClicked(option, mouseX, mouseY, button);
+            return false;
         }
     }
 
     public class ModernSubMenuRenderer implements SkinRenderer<SubMenuOption> {
         @Override
         public void render(GuiGraphics graphics, SubMenuOption option, int x, int y, int mouseX, int mouseY) {
-            mouseX = (int) (mc.mouseHandler.xpos() / SCALE_FACTOR);
-            mouseY = (int) (mc.mouseHandler.ypos() / SCALE_FACTOR);
+            String textLabel = "Open";
+            int xPos = x + option.getWidth() - 40;
 
-            String Component = "Open";
-            int contextMenuWidth = (int) (width * 0.8f - 14);
-            int xPos = x + 4 + contextMenuWidth - 40;
-
-            option.setPosition(xPos - 1, y);
-            option.setWidth(mc.font.width(Component) + 5);
             option.setHeight(16);
 
             graphics.drawString(mc.font, option.name, x + 4, y + 4, -1, false);
-
-            graphics.drawString(mc.font, Component, xPos + 2, y + 4, Color.WHITE.getRGB(), true);
-
-            Color fillColor = isMouseOver(mouseX, mouseY, xPos + 2, y + 4, mc.font.width(Component) + 5, mc.font.lineHeight + 4) ? getThemeColor().darker().darker() : getThemeColor();
+            Color fillColor = isMouseOver(mouseX, mouseY, xPos + 2, y + 4, mc.font.width(textLabel) + 5, mc.font.lineHeight + 4) ? getThemeColor().darker().darker() : getThemeColor();
 
             DrawHelper.drawRoundedRectangleWithShadowBadWay(
                     graphics,
                     xPos - 1, y + 1,
-                    mc.font.width(Component) + 5, mc.font.lineHeight + 4,
+                    mc.font.width(textLabel) + 5, mc.font.lineHeight + 4,
                     2,
                     fillColor.getRGB(),
                     180,
@@ -866,11 +825,13 @@ public class ModernSkin extends Skin implements GroupableSkin {
             DrawHelper.drawOutlineRoundedBox(
                     graphics,
                     xPos - 1, y + 1,
-                    mc.font.width(Component) + 5, mc.font.lineHeight + 4,
+                    mc.font.width(textLabel) + 5, mc.font.lineHeight + 4,
                     2,
                     0.7f,
                     Color.WHITE.getRGB()
             );
+
+            graphics.drawString(mc.font, textLabel, xPos + 2, y + 4, Color.WHITE.getRGB(), true);
 
             option.getSubMenu().render(graphics, x + option.getParentMenu().getWidth(), y, mouseX, mouseY);
         }
@@ -893,58 +854,61 @@ public class ModernSkin extends Skin implements GroupableSkin {
         public boolean mouseReleased(SubMenuOption option, double mouseX, double mouseY, int button) {
             mouseX = mc.mouseHandler.xpos() / SCALE_FACTOR;
             mouseY = mc.mouseHandler.ypos() / SCALE_FACTOR;
-            return SkinRenderer.super.mouseReleased(option, mouseX, mouseY, button);
+            return isMouseOver(mouseX, mouseY, option.getX() + option.getWidth() - 40 + 2, option.getY() + 4, mc.font.width("Open") + 5, mc.font.lineHeight + 4);
         }
 
         @Override
         public boolean mouseClicked(SubMenuOption option, double mouseX, double mouseY, int button) {
             mouseX = mc.mouseHandler.xpos() / SCALE_FACTOR;
             mouseY = mc.mouseHandler.ypos() / SCALE_FACTOR;
-            return SkinRenderer.super.mouseClicked(option, mouseX, mouseY, button);
+            if(isMouseOver(mouseX, mouseY, option.getX() + option.getWidth() - 40 + 2, option.getY() + 4, mc.font.width("Open") + 5, mc.font.lineHeight + 4)){
+                option.toggle();
+                return true;
+            }
+            return false;
         }
     }
 
     public class ModernRunnableRenderer implements SkinRenderer<RunnableOption> {
-        Color DARK_RED = new Color(116, 0, 0);
-        Color DARK_GREEN = new Color(24, 132, 0, 226);
-
         @Override
         public void render(GuiGraphics graphics, RunnableOption option, int x, int y, int mouseX, int mouseY) {
-            String Component = "Run ▶";
-            int contextMenuWidth = (int) (width * 0.8f - 14);
-            int xPos = x + 4 + contextMenuWidth - 45;
+            String labelText = "Run ▶";
+            int xPos = x + option.getWidth() - 45;
 
-            option.setPosition(xPos - 1, y);
-            option.setWidth(mc.font.width(Component) + 5);
             option.setHeight(mc.font.lineHeight + 6);
 
             graphics.drawString(mc.font, option.name, x + 4, y + 4, -1, false);
 
-            graphics.drawString(mc.font, Component, xPos + 2, y + 4, option.value ? DARK_GREEN.getRGB() : DARK_RED.getRGB(), true);
-
-            Color fillColor = isMouseOver(mouseX, mouseY, xPos + 2, y + 4, mc.font.width(Component) + 5, mc.font.lineHeight + 4) ? getThemeColor().darker().darker() : getThemeColor();
+            Color fillColor = isMouseOver(mouseX, mouseY, xPos + 2, y + 4, mc.font.width(labelText) + 5, mc.font.lineHeight + 4) ? getThemeColor().darker().darker() : getThemeColor();
 
             DrawHelper.drawRoundedRectangleWithShadowBadWay(
                     graphics,
                     xPos - 1, y + 1,
-                    mc.font.width(Component) + 5, mc.font.lineHeight + 4,
+                    mc.font.width(labelText) + 5, mc.font.lineHeight + 4,
                     2,
                     fillColor.getRGB(),
                     180,
                     1,
                     1
             );
+
+            graphics.drawString(mc.font, labelText, xPos + 2, y + 4, option.value ? DARK_GREEN.getRGB() : DARK_RED.getRGB(), true);
         }
 
         @Override
         public boolean mouseClicked(RunnableOption option, double mouseX, double mouseY, int button) {
             mouseX = mc.mouseHandler.xpos() / SCALE_FACTOR;
             mouseY = mc.mouseHandler.ypos() / SCALE_FACTOR;
-            return SkinRenderer.super.mouseClicked(option, mouseX, mouseY, button);
+            if(isMouseOver(mouseX, mouseY, option.getX() + option.getWidth() - 45 + 2, option.getY() + 4, mc.font.width("Run ▶") + 5, mc.font.lineHeight + 4)){
+                option.toggle();
+                return true;
+            }
+            return false;
         }
     }
+
     @Override
     public Skin clone() {
-        return new ModernSkin(themeColor,radius,defaultToolTipHeader,defaultToolTipText);
+        return new ModernSkin(radius, defaultToolTipHeader, defaultToolTipText);
     }
 }

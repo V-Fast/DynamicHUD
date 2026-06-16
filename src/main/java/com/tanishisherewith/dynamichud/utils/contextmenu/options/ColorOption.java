@@ -17,7 +17,6 @@ public class ColorOption extends Option<Color> {
         super(name, getter, setter);
         this.parentMenu = parentMenu;
         this.colorGradient = new ColorGradient(x + this.parentMenu.getWidth(), y - 10, get(), this::set, 50, 100);
-        this.renderer.init(this);
     }
 
     @Override
@@ -30,21 +29,19 @@ public class ColorOption extends Option<Color> {
             } else {
                 colorGradient.close();
             }
+            return true;
         }
-        colorGradient.mouseClicked(mouseX, mouseY, button);
-        return super.mouseClicked(mouseX, mouseY, button);
+        return colorGradient.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        colorGradient.mouseReleased(mouseX, mouseY, button);
-        return super.mouseReleased(mouseX, mouseY, button);
+        return colorGradient.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        colorGradient.mouseDragged(mouseX, mouseY, button);
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        return colorGradient.mouseDragged(mouseX, mouseY, button);
     }
 
     public ColorGradient getColorGradient() {

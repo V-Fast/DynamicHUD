@@ -1,4 +1,4 @@
-package com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen;
+package com.tanishisherewith.dynamichud.utils.contextmenu.screen;
 
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
@@ -13,7 +13,7 @@ public class ContextMenuScreen extends Screen {
     ContextMenu<?> contextMenu;
     ContextMenuProperties properties;
 
-    protected ContextMenuScreen(ContextMenu<?> menu, ContextMenuProperties properties) {
+    public ContextMenuScreen(ContextMenu<?> menu, ContextMenuProperties properties) {
         super(Component.literal("ContextMenu screen"));
         this.contextMenu = menu;
         this.properties = properties;

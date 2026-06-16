@@ -70,7 +70,7 @@ public abstract class Skin {
         return flattened;
     }
 
-    protected List<Option<?>> getOptions(ContextMenu<?> menu) {
+    public List<Option<?>> getOptions(ContextMenu<?> menu) {
         return supportsGroups() ? menu.getOptions() : flattenOptions(menu.getOptions());
     }
 

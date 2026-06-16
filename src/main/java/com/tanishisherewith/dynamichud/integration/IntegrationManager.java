@@ -32,7 +32,7 @@ public final class IntegrationManager {
     public static final Map<String, List<Widget>> FILE_MAP = new HashMap<>();
     private static final List<WidgetRenderer> widgetRenderers = new ArrayList<>();
 
-    private static boolean enableTestIntegration = false;
+    public static boolean IS_TEST_MODE = false;
 
 
     public static void addWidgetRenderer(WidgetRenderer widgetRenderer) {
@@ -59,7 +59,7 @@ public final class IntegrationManager {
         String[] args = FabricLoader.getInstance().getLaunchArguments(true);
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("--dynamicHudTest") && i + 1 < args.length) {
-                enableTestIntegration = Boolean.parseBoolean(args[i + 1]);
+                IS_TEST_MODE = Boolean.parseBoolean(args[i + 1]);
                 break;
             }
         }
@@ -72,7 +72,7 @@ public final class IntegrationManager {
 
         var integrations = new ArrayList<>(getRegisteredIntegrations());
 
-        if (enableTestIntegration) {
+        if (IS_TEST_MODE) {
             EntrypointContainer<DynamicHudIntegration> testIntegration = getTestIntegration();
             if (testIntegration != null) {
                 integrations.add(testIntegration);

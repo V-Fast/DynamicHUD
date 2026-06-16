@@ -7,16 +7,19 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.state.GuiElementRenderState;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix3x2fStack;
+import org.joml.Matrix3x2f;
 import org.joml.Vector4f;
 import org.jspecify.annotations.NonNull;
 
 import static com.tanishisherewith.dynamichud.helpers.DrawHelper.COSA;
 import static com.tanishisherewith.dynamichud.helpers.DrawHelper.SINA;
 
+/**
+ * Using Matrix3x2f is essential for these shapes to be affected by MatrixStack changes.
+ */
 public record RoundedRectRenderState(
         RenderPipeline pipeline,
-        Matrix3x2fStack pose,
+        Matrix3x2f pose,
         float x, float y,
         float width, float height,
         float thickness,

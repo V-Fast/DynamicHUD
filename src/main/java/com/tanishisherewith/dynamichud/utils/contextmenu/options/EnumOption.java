@@ -19,7 +19,6 @@ public class EnumOption<E extends Enum<E>> extends Option<E> {
                 break;
             }
         }
-        this.renderer.init(this);
     }
 
     @Override
@@ -39,8 +38,9 @@ public class EnumOption<E extends Enum<E>> extends Option<E> {
                 value = values[currentIndex];
             }
             set(value);
+            return true;
         }
-        return true;
+        return false;
     }
 
     public E[] getValues() {

@@ -22,7 +22,6 @@ public class RunnableOption extends Option<Boolean> {
         super(name, getter, setter);
         this.name = name;
         this.task = task;
-        this.renderer.init(this);
     }
 
     public RunnableOption(Component name, boolean defaultValue, Runnable task) {
@@ -33,15 +32,18 @@ public class RunnableOption extends Option<Boolean> {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (super.mouseClicked(mouseX, mouseY, button)) {
-            set(true);
-            try {
-                task.run();
-            } catch (Throwable e) {
-                DynamicHUD.logger.error("Encountered error while running task for {}", this.name, e);
-            }
-            set(false);
+            toggle();
             return true;
         }
-        return true;
+        return false;
+    }
+    public void toggle(){
+        set(true);
+        try {
+            task.run();
+        } catch (Throwable e) {
+            DynamicHUD.logger.error("Encountered error while running task for {}", this.name, e);
+        }
+        set(false);
     }
 }

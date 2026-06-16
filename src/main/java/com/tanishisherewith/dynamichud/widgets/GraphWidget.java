@@ -15,6 +15,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.options.BooleanOption;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.ColorOption;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.DoubleOption;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
+import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.MinecraftSkin;
 import com.tanishisherewith.dynamichud.widget.DynamicValueWidget;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
@@ -23,6 +24,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import org.joml.Matrix3x2f;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -211,7 +213,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         if (points.size() < 2) return;
 
         graphics.guiRenderState.submitGuiElement(
-                new InterpolatedCurveRenderState(points, thickness, color, graphics.pose(), CustomRenderLayers.QUADS_CUSTOM_BLEND, (int) width, (int) height, graphics.scissorStack.peek())
+                new InterpolatedCurveRenderState(points, thickness, color, new Matrix3x2f(graphics.pose()), CustomRenderLayers.QUADS_CUSTOM_BLEND, (int) width, (int) height, graphics.scissorStack.peek())
         );
     }
 
@@ -220,7 +222,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         if (points.size() < 2) return;
 
        graphics.guiRenderState.submitGuiElement(
-                new GradientShadowRenderState(points,bottomY, startColor, endColor, graphics.pose(), RenderPipelines.DEBUG_QUADS, (int) width, (int) height, graphics.scissorStack.peek())
+                new GradientShadowRenderState(points,bottomY, startColor, endColor, new Matrix3x2f(graphics.pose()), RenderPipelines.DEBUG_QUADS, (int) width, (int) height, graphics.scissorStack.peek())
         );
     }
 
@@ -274,7 +276,6 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
                 DrawHelper.stopScaling(graphics.pose());
             }
 
-            // Update the offsets for the rest of the elements drawn.
             x += offset;
 
             // Draw vertical grid lines (time axis)
@@ -294,7 +295,6 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
                 0x00000000
         );
 
-        // Draw interpolated graph curve
         drawInterpolatedCurve(graphics, points, graphColor.getRGB(), lineThickness);
 
         DrawHelper.drawChromaText(
@@ -348,7 +348,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     }
 
     public void createMenu() {
-        ContextMenuProperties properties = ContextMenuProperties.builder().build();
+        ContextMenuProperties properties = ContextMenuProperties.builder().skin(new MinecraftSkin(MinecraftSkin.PanelColor.FOREST_GREEN)).build();
         menu = new ContextMenu<>(getX(), (int) (getY() + widgetBox.getHeight()), properties);
 
         menu.addOption(new BooleanOption(Component.literal("Show Grid"),

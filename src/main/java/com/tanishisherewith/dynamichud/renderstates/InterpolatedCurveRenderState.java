@@ -7,7 +7,7 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.state.GuiElementRenderState;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix3x2fStack;
+import org.joml.Matrix3x2f;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public record InterpolatedCurveRenderState(
         List<float[]> points,
         float thickness,
         int color,
-        Matrix3x2fStack pose,
+        Matrix3x2f pose,
         RenderPipeline pipeline,
         int width,
         int height,

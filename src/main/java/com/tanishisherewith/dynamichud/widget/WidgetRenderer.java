@@ -5,7 +5,7 @@ import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.internal.System;
 import com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.utils.Input;
-import com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen.ContextMenuScreenRegistry;
+import com.tanishisherewith.dynamichud.utils.contextmenu.screen.ContextMenuScreenRegistry;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;

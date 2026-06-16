@@ -61,6 +61,7 @@ public abstract class Option<T> implements Input {
             DynamicHUD.logger.error("Renderer not found for class: {} in the following skin: {}", this.getClass().getName(), properties.getSkin());
             throw new RuntimeException();
         }
+        this.renderer.init(this);
     }
 
     public void render(GuiGraphics graphics, int x, int y, int mouseX, int mouseY) {

@@ -37,6 +37,10 @@ public class ColorHelper {
 
     public static int r, g, b, a;
 
+    // Used in [ClassicSkin.java]
+    public static Color DARK_RED = new Color(116, 0, 0);
+    public static Color DARK_GREEN = new Color(24, 132, 0, 226);
+
     public ColorHelper(int r, int g, int b, int a) {
         ColorHelper.r = r;
         ColorHelper.g = g;

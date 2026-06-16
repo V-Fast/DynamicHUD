@@ -15,10 +15,7 @@ public abstract class BufferBuilderMixin implements VertexConsumer, IBufferBuild
     @Shadow
     protected abstract long beginElement(VertexFormatElement element);
 
-    /**
-     * The "Library" secret sauce.
-     * This allows you to write N floats to a custom GENERIC element.
-     */
+
     @Unique
     public VertexConsumer dynamicHUD$writeGenericFloats(VertexFormatElement element, float... values) {
         long addr = this.beginElement(element);

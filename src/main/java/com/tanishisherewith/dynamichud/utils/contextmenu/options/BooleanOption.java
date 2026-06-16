@@ -15,7 +15,6 @@ public class BooleanOption extends Option<Boolean> {
     public BooleanOption(Component name, Supplier<Boolean> getter, Consumer<Boolean> setter, BooleanType booleanType) {
         super(name, getter, setter);
         this.booleanType = booleanType;
-        this.renderer.init(this);
     }
 
     public BooleanOption(Component name, Supplier<Boolean> getter, Consumer<Boolean> setter) {

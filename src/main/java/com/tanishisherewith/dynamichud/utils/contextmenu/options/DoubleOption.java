@@ -28,7 +28,6 @@ public class DoubleOption extends Option<Double> {
         this.step = step;
         this.parentMenu = parentMenu;
         Validate.isTrue(this.step > 0.0f, "Step cannot be less than or equal to 0 (zero)");
-        this.renderer.init(this);
     }
 
     public void drawSlider(GuiGraphics graphics, int sliderX, int sliderY, int sliderWidth, double handleX) {
@@ -43,8 +42,9 @@ public class DoubleOption extends Option<Double> {
         if (super.mouseClicked(mouseX, mouseY, button) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             step(mouseX);
             isDragging = true;
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -57,7 +57,7 @@ public class DoubleOption extends Option<Double> {
         this.step(mouseX, x);
     }
 
-    public void step(double mouseX, double x) {
+    public void step(double mouseX, double x, double width) {
         double newValue = minValue + (float) (mouseX - x) / width * (maxValue - minValue);
         // Round the new value to the nearest step
         newValue = Math.round(newValue / step) * step;
@@ -66,10 +66,16 @@ public class DoubleOption extends Option<Double> {
     }
 
 
+    public void step(double mouseX, double x) {
+       this.step(mouseX, x, width);
+    }
+
+
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (isMouseOver(mouseX, mouseY) && isDragging) {
             step(mouseX);
+            return true;
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }

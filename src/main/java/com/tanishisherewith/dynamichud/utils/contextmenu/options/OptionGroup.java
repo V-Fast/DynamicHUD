@@ -71,10 +71,14 @@ public class OptionGroup extends Option<OptionGroup> {
         public boolean mouseClicked(Option<OptionGroup> option2, double mouseX, double mouseY, int button) {
             OptionGroup option = (OptionGroup) option2;
 
-            for (Option subOption : option.getGroupOptions()) {
-                subOption.getRenderer().mouseClicked(subOption, mouseX, mouseY, button);
+            if (option.isExpanded()) {
+                for (Option subOption : option.getGroupOptions()) {
+                    if (subOption.getRenderer().mouseClicked(subOption, mouseX, mouseY, button)) {
+                        return true;
+                    }
+                }
             }
-            return SkinRenderer.super.mouseClicked(option, mouseX, mouseY, button);
+            return false;
         }
 
         @Override
@@ -82,9 +86,9 @@ public class OptionGroup extends Option<OptionGroup> {
             OptionGroup option = (OptionGroup) option2;
 
             for (Option subOption : option.getGroupOptions()) {
-                subOption.getRenderer().mouseReleased(subOption, mouseX, mouseY, button);
+                if(subOption.getRenderer().mouseReleased(subOption, mouseX, mouseY, button)) return true;
             }
-            return SkinRenderer.super.mouseReleased(option, mouseX, mouseY, button);
+            return false;
         }
 
         @Override
@@ -92,9 +96,9 @@ public class OptionGroup extends Option<OptionGroup> {
             OptionGroup option = (OptionGroup) option2;
 
             for (Option subOption : option.getGroupOptions()) {
-                subOption.getRenderer().mouseDragged(subOption, mouseX, mouseY, button, deltaX, deltaY);
+                if(subOption.getRenderer().mouseDragged(subOption, mouseX, mouseY, button, deltaX, deltaY)) return true;
             }
-            return SkinRenderer.super.mouseDragged(option, mouseX, mouseY, button, deltaX, deltaY);
+            return false;
         }
 
         @Override

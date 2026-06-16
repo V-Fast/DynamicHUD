@@ -1,7 +1,6 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption;
 
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
-import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.MouseColorQuery;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -111,15 +110,16 @@ public class ColorGradient {
         return true;
     }
 
-    public void mouseReleased(double mouseX, double mouseY, int button) {
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
         gradientSlider.onRelease(mouseX, mouseY, button);
         gradientBox.onRelease(mouseX, mouseY, button);
         alphaSlider.onRelease(mouseX, mouseY, button);
+        return false;
     }
 
-    public void mouseDragged(double mouseX, double mouseY, int button) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button) {
         if (!display) {
-            return;
+            return false;
         }
         gradientSlider.onDrag(mouseX, mouseY, button);
         gradientBox.setHue(gradientSlider.getHue());
@@ -127,6 +127,7 @@ public class ColorGradient {
         alphaSlider.setColor(new Color(gradientBox.getColor(), true));
         alphaSlider.onDrag(mouseX, mouseY, button);
         onColorSelected.accept(alphaSlider.getColor());
+        return true;
     }
 
     public int getBoxSize() {

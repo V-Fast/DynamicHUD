@@ -20,7 +20,6 @@ public class ListOption<T> extends Option<T> {
                 break;
             }
         }
-        this.renderer.init(this);
     }
 
     @Override
@@ -40,8 +39,9 @@ public class ListOption<T> extends Option<T> {
                 value = values.get(currentIndex);
             }
             set(value);
+            return true;
         }
-        return true;
+        return false;
     }
 
     public List<T> getValues() {

@@ -10,6 +10,7 @@ import java.awt.*;
  */
 public class ContextMenuProperties {
     protected Color backgroundColor = new Color(107, 112, 126, 124);
+    protected Color accentColor = new Color(104, 151, 187, 255); // Color.CYAN.darker().darker();
     protected Color borderColor = Color.BLACK;
     protected float borderWidth = 1f;
     protected int padding = 5;  // The amount of padding around the rectangle
@@ -91,6 +92,10 @@ public class ContextMenuProperties {
         return skin;
     }
 
+    public Color getAccentColor() {
+        return accentColor;
+    }
+
     /**
      * @return Cloned object of every property except skin
      */
@@ -141,6 +146,11 @@ public class ContextMenuProperties {
 
         public Builder<T> backgroundColor(Color backgroundColor) {
             properties.backgroundColor = backgroundColor;
+            return this;
+        }
+
+        public Builder<T> accentColor(Color accentColor) {
+            properties.accentColor = accentColor;
             return this;
         }
 
