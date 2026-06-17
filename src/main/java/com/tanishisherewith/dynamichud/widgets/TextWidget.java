@@ -1,7 +1,6 @@
 package com.tanishisherewith.dynamichud.widgets;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
-import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.integration.IntegrationManager;
 import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
@@ -10,7 +9,6 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProvider;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
-import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.MinecraftSkin;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.ModernSkin;
 import com.tanishisherewith.dynamichud.widget.DynamicValueWidget;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
@@ -55,6 +53,8 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
     public void createMenu() {
         menu = new ContextMenu<>(getX(), getY(),ContextMenuProperties.builder().skin(new ModernSkin()).build());
 
+    //    if(IntegrationManager.IS_TEST_MODE) menu.setLayoutEngine(new LayoutEngine(20,20,20,80));
+
         menu.addOption(new BooleanOption(Component.literal("Shadow"),
                 () -> this.shadow, value -> this.shadow = value,
                 BooleanOption.BooleanType.ON_OFF)
@@ -71,7 +71,7 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
                 .renderWhen(() -> !this.rainbow)
         );
         menu.addOption(new DoubleOption(Component.literal("Rainbow Speed"),
-                1, 5.0f, 1,
+                1, 5, 1,
                 () -> (double) this.rainbowSpeed, value -> this.rainbowSpeed = value.intValue(), menu)
                 .renderWhen(() -> this.rainbow)
         );
@@ -101,19 +101,16 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
                     () -> this.setPosition(0, 0))
                     .description(Component.literal("Reset widget to default position")));
 
-            // List Option
             AtomicReference<String> style = new AtomicReference<>("Style1");
-            List<String> styles = Arrays.asList("Style1", "Style2", "Style3");
-            menu.addOption(new ListOption<>(Component.literal("Text Style"),
-                    style::get, style::set, styles)
-                    .description(Component.literal("Choose a text style")));
-
-            // Enum Option
             AtomicReference<GroupLayout.Alignment> align = new AtomicReference<>(GroupLayout.Alignment.CENTER);
 
-            menu.addOption(new EnumOption<>(Component.literal("Alignment"),
-                    align::get, align::set, GroupLayout.Alignment.values())
-                    .description(Component.literal("Set text alignment")));
+            // List Option
+            List<String> styles = Arrays.asList("Style1", "Style2", "Style3");
+            menu.addOption(new CycleOption<>(Component.literal("Text Style"), style::get, style::set, styles));
+
+            // Enum Option
+            menu.addOption(new CycleOption<>(Component.literal("Alignment"), align::get, align::set, GroupLayout.Alignment.values()));
+
 
             // Option Group
             OptionGroup group = new OptionGroup(Component.literal("Display Options"));

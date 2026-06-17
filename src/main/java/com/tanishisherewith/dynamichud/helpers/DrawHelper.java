@@ -625,12 +625,11 @@ public class DrawHelper {
      * @param scale Scale the matrices
      */
     public static void scaleAndPosition(Matrix3x2fStack matrices, float x, float y, float scale) {
-        matrices.pushMatrix(); // Save the current transformation state
+        matrices.pushMatrix();
 
         // Translate the origin back to the desired position
         matrices.translate(x, y);
 
-        // Scale the matrix
         matrices.scale(scale, scale);
 
         matrices.translate(-x, -y);
@@ -654,12 +653,11 @@ public class DrawHelper {
      * @param scale  Scale the matrices
      */
     public static void scaleAndPosition(Matrix3x2fStack matrices, float x, float y, float width, float height, float scale) {
-        matrices.pushMatrix(); // Save the current transformation state
+        matrices.pushMatrix();
 
         // Translate the origin back to the desired position
         matrices.translate(x + width / 2.0f, y + height / 2.0f);
 
-        // Scale the matrix
         matrices.scale(scale, scale);
 
         matrices.translate(-(x + width / 2.0f), -(y + height / 2.0f));

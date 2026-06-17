@@ -239,7 +239,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
    //     DrawHelper.enableScissor(widgetBox);
 
-        // Draw gradient background with rounded.fsh corners
+        // Draw gradient background with rounded corners
         if (!isInEditor) {
             DrawHelper.drawRoundedRectangle(
                     graphics,
@@ -352,7 +352,10 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         menu = new ContextMenu<>(getX(), (int) (getY() + widgetBox.getHeight()), properties);
 
         menu.addOption(new BooleanOption(Component.literal("Show Grid"),
-                () -> this.showGrid, value -> this.showGrid = value,
+                () -> this.showGrid, value -> {
+                        this.showGrid = value;
+                        this.computeOffset();
+                },
                 BooleanOption.BooleanType.YES_NO)
                 .description(Component.literal("Shows a grid and Y axis values"))
         );
@@ -360,7 +363,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
                 1, 25, 1,
                 () -> (double) this.gridLines, value -> {
                        this.setGridLines(value.intValue());
-                       computeOffset();
+                       this.computeOffset();
                 }, menu)
                 .renderWhen(() -> this.showGrid)
         );
@@ -384,9 +387,13 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     }
 
     private void computeOffset(){
+        if(!showGrid) {
+            offset = 0;
+            return;
+        }
+
         // The first Component is usually the largest but a negative value may occupy more width so we check the first and last Component.
         // Idk how this will break.
-
         String firstText = formatValue(maxValue - valueStep);
         String lastText = formatValue(maxValue - (gridLines * valueStep));
 

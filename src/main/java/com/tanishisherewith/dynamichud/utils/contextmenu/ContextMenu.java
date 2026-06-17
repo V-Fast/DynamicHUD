@@ -112,7 +112,7 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
 
         if (scale <= 0.0f || newScreenFlag) return;
 
-        DrawHelper.scaleAndPosition(graphics.pose(), this.x + width/2.0f, this.y + height/2.0f, scale);
+        DrawHelper.scaleAndPosition(graphics.pose(), this.x, this.y,this.width,this.height, scale);
 
         properties.getSkin().setContextMenu(this);
         properties.getSkin().renderContextMenu(graphics, this, mouseX, mouseY);
@@ -124,6 +124,7 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
         if (layoutEngine != null) {
             layoutEngine.applyLayout(this);
         }
+
         if (!properties.enableAnimations()) {
             scale = shouldDisplay ? 1.0f : 0.0f;
             return;
@@ -212,8 +213,8 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         if (!shouldDisplay) return false;
         for (Option option : options) {
-            if(option.shouldRender() && option.getRenderer().mouseReleased(option, mouseX, mouseY, button)){
-                return true;
+            if(option.shouldRender()){
+                option.getRenderer().mouseReleased(option, mouseX, mouseY, button);
             }
         }
         return properties.getSkin().mouseReleased(this, mouseX, mouseY, button);

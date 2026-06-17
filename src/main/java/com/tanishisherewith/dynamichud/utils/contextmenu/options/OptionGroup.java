@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 // A group is just another type of Option that contains other options
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class OptionGroup extends Option<OptionGroup> {
     private final List<Option<?>> groupOptions = new ArrayList<>();
     protected boolean expanded; // Skins can choose to use this or ignore it

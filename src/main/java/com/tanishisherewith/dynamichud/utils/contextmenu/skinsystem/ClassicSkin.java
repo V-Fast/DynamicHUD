@@ -21,8 +21,7 @@ public class ClassicSkin extends Skin {
         super();
         addRenderer(BooleanOption.class, ClassicBooleanRenderer::new);
         addRenderer(ColorOption.class, ClassicColorOptionRenderer::new);
-        addRenderer(EnumOption.class, ClassicEnumRenderer::new);
-        addRenderer(ListOption.class, ClassicListRenderer::new);
+        addRenderer(CycleOption.class, ClassicCycleRenderer::new);
         addRenderer(SubMenuOption.class, ClassicSubMenuRenderer::new);
         addRenderer(RunnableOption.class, ClassicRunnableRenderer::new);
         addRenderer(DoubleOption.class, ClassicDoubleRenderer::new);
@@ -34,10 +33,6 @@ public class ClassicSkin extends Skin {
     public void renderContextMenu(GuiGraphics graphics, ContextMenu<?> contextMenu, int mouseX, int mouseY) {
         this.contextMenu = contextMenu;
         ContextMenuProperties properties = contextMenu.getProperties();
-
-        if (contextMenu.getLayoutEngine() != null) {
-            contextMenu.getLayoutEngine().applyLayout(contextMenu);
-        }
 
         drawBackground(graphics, contextMenu, properties);
 
@@ -120,19 +115,11 @@ public class ClassicSkin extends Skin {
         }
     }
 
-    public static class ClassicEnumRenderer<E extends Enum<E>> implements SkinRenderer<EnumOption<E>> {
+    public static class ClassicCycleRenderer<E> implements SkinRenderer<CycleOption<E>> {
         @Override
-        public void render(GuiGraphics graphics, EnumOption<E> option, int x, int y, int mouseX, int mouseY) {
+        public void render(GuiGraphics graphics, CycleOption<E> option, int x, int y, int mouseX, int mouseY) {
             graphics.drawString(mc.font, option.name.copy().append(": "), x, y, Color.WHITE.getRGB(), false);
-            graphics.drawString(mc.font, option.get().name(), x + mc.font.width(option.name + ": ") + 1, y, Color.CYAN.getRGB(), false);
-        }
-    }
-
-    public static class ClassicListRenderer<E> implements SkinRenderer<ListOption<E>> {
-        @Override
-        public void render(GuiGraphics graphics, ListOption<E> option, int x, int y, int mouseX, int mouseY) {
-            graphics.drawString(mc.font, option.name.copy().append(": "), x, y + 1, Color.WHITE.getRGB(), false);
-            graphics.drawString(mc.font, option.get().toString(), x + mc.font.width(option.name + ": ") + 1, y + 1, Color.CYAN.getRGB(), false);
+            graphics.drawString(mc.font, option.get().toString(), x + mc.font.width(option.name + ": ") + 1, y, Color.CYAN.getRGB(), false);
         }
     }
 

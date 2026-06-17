@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import org.jspecify.annotations.NonNull;
 
 public class ContextMenuScreen extends Screen {
     ContextMenu<?> contextMenu;
@@ -41,7 +42,7 @@ public class ContextMenuScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void renderBackground(@NonNull GuiGraphics guiGraphics, int i, int j, float f) {
 
     }
 

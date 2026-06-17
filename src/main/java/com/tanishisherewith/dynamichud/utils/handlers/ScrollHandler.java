@@ -48,10 +48,8 @@ public class ScrollHandler {
             // Calculate the difference in mouse Y position
             double deltaY = lastMouseY - mouseY;
 
-            // Update the scroll offset based on the mouse movement
-            scrollOffset = Math.clamp(scrollOffset - (int) (deltaY * SCROLL_SPEED), 0, maxScrollOffset);
+            scrollOffset = Math.clamp(scrollOffset - (int) deltaY, 0, maxScrollOffset);
 
-            // Update the last mouse position
             lastMouseY = mouseY;
         }
     }

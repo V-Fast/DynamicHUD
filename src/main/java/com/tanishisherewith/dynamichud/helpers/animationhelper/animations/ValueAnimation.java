@@ -17,6 +17,7 @@ public class ValueAnimation extends Animation {
         this.startValue = start;
         this.endValue = end;
         this.easing = easingType;
+        this.value = startValue;
     }
 
     public ValueAnimation(AnimationProperty<Float> property, float start, float end) {
@@ -42,6 +43,10 @@ public class ValueAnimation extends Animation {
     public ValueAnimation endValue(float endValue) {
         this.endValue = endValue;
         return this;
+    }
+
+    public void setValue(float value) {
+        this.value = value;
     }
 
     public float getValue() {

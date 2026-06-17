@@ -1,9 +1,13 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.layout;
 import com.tanishisherewith.dynamichud.DynamicHUD;
+import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
+import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.Skin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import org.joml.Vector2d;
 
 import java.util.List;
 
@@ -12,15 +16,20 @@ public class LayoutEngine {
     private int verticalPadding = 4;
     private int itemSpacing = 2;
     private int minWidth = 80;
-    private LayoutStrategy activeStrategy = new VerticalFlowStrategy();
+    private LayoutStrategy activeStrategy;
 
     public LayoutEngine() {}
 
     public LayoutEngine(int horizontalPadding, int verticalPadding, int itemSpacing, int minWidth) {
+         this(horizontalPadding,verticalPadding,itemSpacing,minWidth,new VerticalFlowStrategy());
+    }
+
+    public LayoutEngine(int horizontalPadding, int verticalPadding, int itemSpacing, int minWidth, LayoutStrategy layoutStrategy) {
         this.horizontalPadding = horizontalPadding;
         this.verticalPadding = verticalPadding;
         this.itemSpacing = itemSpacing;
         this.minWidth = minWidth;
+        this.activeStrategy = layoutStrategy;
     }
 
     @FunctionalInterface
@@ -31,7 +40,6 @@ public class LayoutEngine {
         void layout(ContextMenu<?> menu, LayoutEngine engine);
     }
 
-
     /**
      * Executes the currently active layout strategy to position and size options dynamically.
      */
@@ -39,48 +47,6 @@ public class LayoutEngine {
         if (activeStrategy != null) {
             activeStrategy.layout(menu, this);
         }
-    }
-
-    /**
-     * Linear layout for skins that need to know their total dimensions
-     */
-    public void performSimpleLayout(ContextMenu<?> menu) {
-        if (menu == null) return;
-
-        Font font = Minecraft.getInstance().font;
-        List<Option<?>> visibleOptions = menu.getProperties().getSkin().getOptions(menu);
-        int paddingValue = menu.getProperties().getPadding();
-
-        //width calculation
-        int maxInnerWidth = minWidth;
-        for (Option<?> option : visibleOptions) {
-            if (!option.shouldRender()) continue;
-
-            int preferredWidth = option.getWidth() > 0 ? option.getWidth() : font.width(option.getName());
-
-            maxInnerWidth = Math.max(maxInnerWidth, preferredWidth);
-        }
-
-        int totalMenuWidth = maxInnerWidth + (horizontalPadding * 2) + paddingValue;
-
-        int currentY = menu.getY() + verticalPadding + 3;
-        int currentX = menu.getX() + horizontalPadding;
-
-        // height calculation
-        for (Option<?> option : visibleOptions) {
-            if (!option.shouldRender()) continue;
-
-            int itemHeight = option.getHeight() > 0 ? option.getHeight() : font.lineHeight;
-
-            option.setWidth(totalMenuWidth - (horizontalPadding * 2) - paddingValue);
-            option.setHeight(itemHeight);
-            option.setPosition(currentX, currentY);
-
-            currentY += itemHeight + itemSpacing;
-        }
-
-        menu.setWidth(totalMenuWidth);
-        menu.setHeight(currentY - menu.getY());
     }
 
     /**
@@ -133,7 +99,7 @@ public class LayoutEngine {
     public static class VerticalFlowStrategy implements LayoutStrategy {
         @Override
         public void layout(ContextMenu<?> menu, LayoutEngine engine) {
-            if (menu == null || menu.getProperties() == null) return;
+            if (menu == null) return;
 
             Font font = Minecraft.getInstance().font;
             List<Option<?>> visibleOptions = menu.getProperties().getSkin().getOptions(menu);
@@ -161,6 +127,23 @@ public class LayoutEngine {
 
             menu.setWidth(totalMenuWidth);
             menu.setHeight(currentY - menu.getY());
+        }
+    }
+
+    public record Offset(int left, int top) {
+        public Offset(int all) {
+            this(all, all);
+        }
+
+        public static Offset zero() {
+            return new Offset(0);
+        }
+
+        public Offset add(Offset other) {
+            return new Offset(
+                    this.left + other.left,
+                    this.top + other.top
+            );
         }
     }
 }

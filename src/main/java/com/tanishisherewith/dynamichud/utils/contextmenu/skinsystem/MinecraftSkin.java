@@ -6,7 +6,7 @@ import com.tanishisherewith.dynamichud.helpers.animationhelper.AnimationProperty
 import com.tanishisherewith.dynamichud.helpers.animationhelper.EasingType;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.animations.ValueAnimation;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
-import com.tanishisherewith.dynamichud.utils.contextmenu.layout.LayoutContext;
+import com.tanishisherewith.dynamichud.utils.contextmenu.layout.LayoutEngine;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.GroupableSkin;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
@@ -49,9 +49,9 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     public static final int DEFAULT_SCROLLBAR_WIDTH = 8;
     public static final int DEFAULT_PANEL_WIDTH = 248;
     public static final int DEFAULT_PANEL_HEIGHT = 165;
-    private final int panelWidth;
-    private final int panelHeight;
-    private final int groupPanelWidth = 60; // Width for the group panel
+    private int panelWidth;
+    private int panelHeight;
+    private int groupPanelWidth = 60; // Width for the group panel
 
     private int imageX, imageY;
     private final ScrollHandler scrollHandler;
@@ -68,12 +68,12 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         this.panelColor = color;
         addRenderer(BooleanOption.class, MinecraftBooleanRenderer::new);
         addRenderer(DoubleOption.class, MinecraftDoubleRenderer::new);
-        addRenderer(EnumOption.class, MinecraftEnumRenderer::new);
-        addRenderer(ListOption.class, MinecraftListRenderer::new);
+        addRenderer(CycleOption.class, MinecraftCycleRenderer::new);
         addRenderer(SubMenuOption.class, MinecraftSubMenuRenderer::new);
         addRenderer(RunnableOption.class, MinecraftRunnableRenderer::new);
         addRenderer(ColorOption.class, MinecraftColorOptionRenderer::new);
 
+        // if in case of different texture support.
         this.panelHeight = DEFAULT_PANEL_HEIGHT;
         this.panelWidth = DEFAULT_PANEL_WIDTH;
         this.BACKGROUND_PANEL = DEFAULT_BACKGROUND_PANEL;
@@ -322,8 +322,8 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     }
 
     @Override
-    public LayoutContext.Offset getGroupIndent() {
-        return LayoutContext.Offset.zero();
+    public LayoutEngine.Offset getGroupIndent() {
+        return LayoutEngine.Offset.zero();
     }
 
     public void setPanelColor(PanelColor panelColor) {
@@ -557,7 +557,6 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, option.isMouseOver(mouseX, mouseY) ? HIGHLIGHTED_TEXTURE : TEXTURE, option.getX(), y, option.getWidth(), 20);
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, isMouseOverHandle ? HANDLE_HIGHLIGHTED_TEXTURE : HANDLE_TEXTURE, (int) Math.round(sliderX), y, 8, 20);
 
-            // Determine the number of decimal places in option.step
             int decimalPlaces = String.valueOf(option.step).split("\\.")[1].length();
 
             // Format option.value to the determined number of decimal places
@@ -566,37 +565,10 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         }
     }
 
-    public class MinecraftEnumRenderer<E extends Enum<E>> implements SkinRenderer<EnumOption<E>> {
+    public class MinecraftCycleRenderer<E> implements SkinRenderer<CycleOption<E>> {
         private int maxWidth = 50;
 
-        private void calculateMaxWidth(EnumOption<E> option) {
-            for (E enumConstant : option.getValues()) {
-                int width = mc.font.width(enumConstant.name()) + 5;
-                if (width > maxWidth) {
-                    maxWidth = width;
-                }
-            }
-        }
-
-        @Override
-        public void render(GuiGraphics graphics, EnumOption<E> option, int x, int y, int mouseX, int mouseY) {
-            calculateMaxWidth(option);
-            option.setWidth(maxWidth);
-
-            graphics.drawString(mc.font, option.name.copy().append(": "), x + 15, y + 25 / 2 - 5, -1, true);
-
-            option.setPosition(x + panelWidth - maxWidth - 25, y);
-
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, option.isMouseOver(mouseX, mouseY)), option.getX(), y, maxWidth, 20);
-            String Component = option.get().toString();
-            graphics.drawString(mc.font, Component, option.getX() + maxWidth / 2 - mc.font.width(Component) / 2, y + 5, Color.CYAN.getRGB(), true);
-        }
-    }
-
-    public class MinecraftListRenderer<E> implements SkinRenderer<ListOption<E>> {
-        private int maxWidth = 50;
-
-        private void calculateMaxWidth(ListOption<E> option) {
+        private void calculateMaxWidth(CycleOption<E> option) {
             for (E listValues : option.getValues()) {
                 int width = mc.font.width(listValues.toString()) + 5;
                 if (width > maxWidth) {
@@ -606,7 +578,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         }
 
         @Override
-        public void render(GuiGraphics graphics, ListOption<E> option, int x, int y, int mouseX, int mouseY) {
+        public void render(GuiGraphics graphics, CycleOption<E> option, int x, int y, int mouseX, int mouseY) {
             calculateMaxWidth(option);
             option.setWidth(maxWidth);
 
