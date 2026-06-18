@@ -29,14 +29,14 @@ public class ContextMenuScreen extends Screen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         contextMenu.update();
-        DrawHelper.scaleAndPosition(graphics.pose(), (float) width / 2, (float) height / 2, contextMenu.getScale());
+        DrawHelper.scaleAndPosition(graphics.pose(), (float) width / 2, (float) height / 2, contextMenu.getMenuScale());
 
         properties.getSkin().setContextMenu(contextMenu);
         properties.getSkin().renderContextMenu(graphics, contextMenu, mouseX, mouseY);
 
         DrawHelper.stopScaling(graphics.pose());
 
-        if (contextMenu.getScale() <= 0 && !contextMenu.isVisible()) {
+        if (contextMenu.getMenuScale() <= 0 && !contextMenu.isVisible()) {
             contextMenu.close();
         }
     }

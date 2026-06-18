@@ -40,9 +40,10 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
     protected int width = 0;
     protected int height = 0, widgetHeight = 0;
     protected boolean shouldDisplay = false;
-    protected float scale = 0.0f;
+    protected float animScale = 0.0f;
     protected Screen parentScreen = null;
     protected boolean newScreenFlag = false;
+    protected float menuScale = 1.0f;
 
     private final ValueAnimation scaleAnimation;
 
@@ -73,18 +74,18 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
         this.scaleAnimation = new ValueAnimation(new AnimationProperty<>() {
             @Override
             public Float get() {
-                return scale;
+                return animScale;
             }
 
             @Override
             public void set(Float value) {
-                scale = value;
+                animScale = value;
             }
         }, 0.0f, 1.0f);
         this.scaleAnimation.easing(EasingType.EASE_IN_CUBIC);
         this.scaleAnimation.duration(280);
         this.scaleAnimation.onComplete(() -> {
-            if (scale <= 0.0f && parentScreen != null && properties.getSkin().shouldCreateNewScreen()) {
+            if (animScale <= 0.0f && parentScreen != null && properties.getSkin().shouldCreateNewScreen()) {
                 DynamicHUD.MC.setScreen(parentScreen);
             }
         });
@@ -99,6 +100,14 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
         options.add(option);
     }
 
+    public float getMenuScale() {
+        return animScale * menuScale;
+    }
+
+    public void setMenuScale(float menuScale) {
+        this.menuScale = Math.clamp(menuScale, 0.3f, 2.0f);
+    }
+
     public void render(GuiGraphics graphics, int xPos, int yPos, int mouseX, int mouseY) {
         if (newScreenFlag && screenFactory != null) {
             DynamicHUD.MC.setScreen(screenFactory.create(this, properties));
@@ -110,12 +119,12 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
 
         update();
 
-        if (scale <= 0.0f || newScreenFlag) return;
+        if (animScale <= 0.0f || newScreenFlag) return;
 
-        DrawHelper.scaleAndPosition(graphics.pose(), this.x, this.y,this.width,this.height, scale);
+        DrawHelper.scaleAndPosition(graphics.pose(), this.x, this.y,this.width,this.height, getMenuScale());
 
         properties.getSkin().setContextMenu(this);
-        properties.getSkin().renderContextMenu(graphics, this, mouseX, mouseY);
+        properties.getSkin().renderContextMenu(graphics, this, getTMouseX(mouseX), getTMouseY(mouseY));
 
         DrawHelper.stopScaling(graphics.pose());
     }
@@ -126,7 +135,7 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
         }
 
         if (!properties.enableAnimations()) {
-            scale = shouldDisplay ? 1.0f : 0.0f;
+            animScale = shouldDisplay ? 1.0f : 0.0f;
             return;
         }
 
@@ -140,11 +149,11 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
             option.onClose();
         }
         if (properties.enableAnimations()) {
-            scaleAnimation.startValue(scale);
+            scaleAnimation.startValue(animScale);
             scaleAnimation.endValue(0.0f);
             scaleAnimation.start();
         } else {
-            scale = 0.0f;
+            animScale = 0.0f;
             if (properties.getSkin().shouldCreateNewScreen() && parentScreen != null) {
                 DynamicHUD.MC.setScreen(parentScreen);
             }
@@ -159,11 +168,11 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
             newScreenFlag = true;
         }
         if (properties.enableAnimations()) {
-            scaleAnimation.startValue(scale);
+            scaleAnimation.startValue(animScale);
             scaleAnimation.endValue(1.0f);
             scaleAnimation.start();
         } else {
-            scale = 0.0f;
+            animScale = 0.0f;
             if (properties.getSkin().shouldCreateNewScreen() && parentScreen != null) {
                 DynamicHUD.MC.setScreen(parentScreen);
             }
@@ -176,6 +185,14 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
         } else {
             open();
         }
+    }
+
+    protected int getTMouseX(double mouseX) {
+        return (int) ((mouseX - getX()) / getMenuScale() + getX());
+    }
+
+    protected int getTMouseY(double mouseY) {
+        return (int) ((mouseY - getY()) / getMenuScale() + getY());
     }
 
     public void toggleDisplay(WidgetBox widgetBox, double mouseX, double mouseY, int button) {
@@ -201,8 +218,9 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (!shouldDisplay) return false;
+
         for (Option option : options) {
-            if (option.shouldRender() && option.getRenderer().mouseClicked(option ,mouseX, mouseY, button)) {
+            if (option.shouldRender() && option.getRenderer().mouseClicked(option ,getTMouseX(mouseX), getTMouseY(mouseY), button)) {
                 return true;
             }
         }
@@ -214,7 +232,7 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
         if (!shouldDisplay) return false;
         for (Option option : options) {
             if(option.shouldRender()){
-                option.getRenderer().mouseReleased(option, mouseX, mouseY, button);
+                option.getRenderer().mouseReleased(option, getTMouseX(mouseX), getTMouseY(mouseY), button);
             }
         }
         return properties.getSkin().mouseReleased(this, mouseX, mouseY, button);
@@ -223,8 +241,12 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (!shouldDisplay) return false;
+
+        double tDeltaX = deltaX / getMenuScale();
+        double tDeltaY = deltaY / getMenuScale();
+
         for (Option option : options) {
-           if(option.shouldRender() && option.getRenderer().mouseDragged(option, mouseX, mouseY, button, deltaX, deltaY)){
+           if(option.shouldRender() && option.getRenderer().mouseDragged(option, getTMouseX(mouseX), getTMouseY(mouseY), button, tDeltaX, tDeltaY)){
                return true;
            }
         }
@@ -325,10 +347,6 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
 
     public <K extends ContextMenuProperties> ContextMenu<K> createSubMenu(int x, int y, K properties) {
         return new ContextMenu<>(x, y, properties, screenFactory, this);
-    }
-
-    public float getScale() {
-        return scale;
     }
 
     public boolean isVisible() {

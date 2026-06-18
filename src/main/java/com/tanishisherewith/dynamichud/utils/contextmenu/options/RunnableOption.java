@@ -37,6 +37,7 @@ public class RunnableOption extends Option<Boolean> {
         }
         return false;
     }
+
     public void toggle(){
         set(true);
         try {

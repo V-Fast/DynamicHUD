@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
 public abstract class Widget implements Input {
@@ -47,7 +48,7 @@ public abstract class Widget implements Input {
     // Absolute position of the widget on screen in pixels.
     protected int x, y;
 
-    protected boolean shouldScale = true;
+    protected boolean canScale = true;
 
     protected Anchor anchor;         // The chosen anchor point
 
@@ -94,13 +95,12 @@ public abstract class Widget implements Input {
         return y;
     }
 
-    public float getWidth() {
-        return widgetBox.getWidth();
+    public float getScale() {
+        return canScale ? widgetBox.getScale() * DynamicHUD.getGlobalScale() : 1.0f;
     }
 
-    public float getHeight() {
-        return widgetBox.getHeight();
-    }
+    public float getWidth() { return widgetBox.getWidth(); }
+    public float getHeight() { return widgetBox.getHeight(); }
 
     private void calculateOffset(int initialX, int initialY, int screenWidth, int screenHeight) {
         int anchorX = getAnchorX(screenWidth);
@@ -163,12 +163,12 @@ public abstract class Widget implements Input {
         if (!isVisible()) return;
 
 
-        if (shouldScale) {
-            DrawHelper.scaleAndPosition(graphics.pose(), getX(), getY(), DynamicHUD.getGlobalScale());
+        if (canScale) {
+            DrawHelper.scaleAndPosition(graphics.pose(), getX(), getY(), getScale());
         }
         renderWidget(graphics, mouseX, mouseY);
 
-        if (shouldScale) {
+        if (canScale) {
             DrawHelper.stopScaling(graphics.pose());
         }
         clampPosition();
@@ -182,12 +182,12 @@ public abstract class Widget implements Input {
 
         drawWidgetBackground(graphics);
 
-        if (shouldScale) {
-            DrawHelper.scaleAndPosition(graphics.pose(), getX(), getY(), DynamicHUD.getGlobalScale());
+        if (canScale) {
+            DrawHelper.scaleAndPosition(graphics.pose(), getX(), getY(), getScale());
         }
         renderWidgetInEditor(graphics, mouseX, mouseY);
 
-        if (shouldScale) {
+        if (canScale) {
             DrawHelper.stopScaling(graphics.pose());
         }
         clampPosition();
@@ -216,6 +216,14 @@ public abstract class Widget implements Input {
         renderWidget(graphics, mouseX, mouseY);
     }
 
+    protected int getTransformedMouseX(double mouseX) {
+        return (int) ((mouseX - getX()) / getScale() + getX());
+    }
+
+    protected int getTransformedMouseY(double mouseY) {
+        return (int) ((mouseY - getY()) / getScale() + getY());
+    }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (widgetBox.isMouseOver(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
@@ -233,8 +241,8 @@ public abstract class Widget implements Input {
     /* Input related methods. Override with **super call** to add your own input-based code like contextMenu */
 
     public void clampPosition() {
-        this.x = (int) org.joml.Math.clamp(this.x, 0, mc.getWindow().getGuiScaledWidth() - getWidth());
-        this.y = (int) org.joml.Math.clamp(this.y, 0, mc.getWindow().getGuiScaledHeight() - getHeight());
+        this.x = (int) Mth.clamp(this.x, 0, mc.getWindow().getGuiScaledWidth() - getWidth());
+        this.y = (int) Mth.clamp(this.y, 0, mc.getWindow().getGuiScaledHeight() - getHeight());
     }
 
     @Override
@@ -261,8 +269,8 @@ public abstract class Widget implements Input {
                 newY = (newY / snapBoxHeight) * snapBoxHeight;
             }
 
-            this.x = (int) org.joml.Math.clamp(newX, 0, mc.getWindow().getGuiScaledWidth() - getWidth());
-            this.y = (int) org.joml.Math.clamp(newY, 0, mc.getWindow().getGuiScaledHeight() - getHeight());
+            this.x = (int) Mth.clamp(newX, 0, mc.getWindow().getGuiScaledWidth() - getWidth());
+            this.y = (int) Mth.clamp(newY, 0, mc.getWindow().getGuiScaledHeight() - getHeight());
 
             calculateOffset(x, y, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());  // Set initial offset
 
@@ -285,6 +293,12 @@ public abstract class Widget implements Input {
      */
     @Override
     public void mouseScrolled(double mouseX, double mouseY, double vAmount, double hAmount) {
+        if (canScale && widgetBox.isMouseOver(mouseX,mouseY) && GLFW.glfwGetKey(mc.getWindow().handle(),GLFW.GLFW_KEY_LEFT_CONTROL) == GLFW.GLFW_PRESS) {
+            widgetBox.setScale(widgetBox.getScale() + (float) vAmount * 0.05f);
+
+            clampPosition();
+            calculateOffset(x, y, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
+        }
     }
 
     @Override
@@ -309,7 +323,6 @@ public abstract class Widget implements Input {
 
     /**
      * Displays a faint grayish background if enabled or faint reddish background if disabled.
-     * Drawn with 2 pixel offset to all sides
      */
     protected void drawWidgetBackground(GuiGraphics graphics) {
         int backgroundColor = this.isVisible() ? GlobalConfig.get().getHudActiveColor().getRGB() : GlobalConfig.get().getHudInactiveColor().getRGB();
@@ -330,6 +343,10 @@ public abstract class Widget implements Input {
         this.tooltipText = Component;
     }
 
+    public void setWidgetScale(float widgetScale) {
+        widgetBox.setScale(widgetScale);
+    }
+
     public void readFromTag(CompoundTag tag) {
         modId = tag.getString("modId").orElse("unknown");
         uid = tag.contains("UID") ? new UID(tag.getString("UID").get()) : UID.generate();
@@ -340,7 +357,9 @@ public abstract class Widget implements Input {
         offsetY = tag.getInt("offsetY").orElse(0);
         isVisible = tag.getBoolean("isVisible").orElse(true);
         isDraggable = tag.getBoolean("isDraggable").orElse(true);
-        shouldScale = tag.getBoolean("shouldScale").orElse(true);
+        canScale = tag.getBoolean("canScale").orElse(true);
+
+        widgetBox.setScale(tag.getFloat("widgetScale").orElse(1.0f));
     }
 
     /**
@@ -353,7 +372,8 @@ public abstract class Widget implements Input {
         tag.putString("modId", modId);
         tag.putString("UID", uid.getUniqueID());
         tag.putBoolean("isDraggable", isDraggable);
-        tag.putBoolean("shouldScale", shouldScale);
+        tag.putBoolean("canScale", canScale);
+        tag.putFloat("widgetScale", widgetBox.getScale());
         //    tag.putInt("x", x);
         //     tag.putInt("y", y);
         tag.putString("anchor", anchor.name());
@@ -374,8 +394,8 @@ public abstract class Widget implements Input {
         this.uid = uid;
     }
 
-    public void setShouldScale(boolean shouldScale) {
-        this.shouldScale = shouldScale;
+    public void setCanScale(boolean canScale) {
+        this.canScale = canScale;
     }
 
     public String getModId() {
@@ -393,7 +413,7 @@ public abstract class Widget implements Input {
                 ", isVisible=" + isVisible +
                 ", isDraggable=" + isDraggable +
                 ", shiftDown=" + isShiftDown +
-                ", shouldScale=" + shouldScale +
+                ", canScale=" + canScale +
                 '}';
     }
 

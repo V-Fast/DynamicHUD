@@ -1,6 +1,5 @@
 package com.tanishisherewith.dynamichud.widgets;
 
-import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.integration.IntegrationManager;
 import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
@@ -148,10 +147,10 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
             } else {
                 graphics.drawString(mc.font, Component, getX() + 2, getY() + 2, color, shadow);
             }
-            widgetBox.setDimensions(getX(), getY(), mc.font.width(Component) + 3, mc.font.lineHeight + 2, this.shouldScale, DynamicHUD.getGlobalScale());
+            widgetBox.setDimensions(getX(), getY(), mc.font.width(Component) + 3, mc.font.lineHeight + 2, this.canScale);
         }
-        menu.set(getX(), getY(), (int) Math.ceil(getHeight()));
 
+        menu.set(getX(), getY(), (int) Math.ceil(getHeight()));
     }
 
     @Override
@@ -236,7 +235,7 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
 
             widget.setPosition(x, y);
             widget.setDraggable(isDraggable);
-            widget.setShouldScale(shouldScale);
+            widget.setCanScale(shouldScale);
             return widget;
         }
     }

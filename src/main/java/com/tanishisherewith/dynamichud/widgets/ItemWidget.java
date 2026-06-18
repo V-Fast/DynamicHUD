@@ -1,7 +1,5 @@
 package com.tanishisherewith.dynamichud.widgets;
 
-import com.tanishisherewith.dynamichud.DynamicHUD;
-import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
 import net.minecraft.client.gui.GuiGraphics;
@@ -28,7 +26,7 @@ public class ItemWidget extends Widget {
     @Override
     public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY) {
         graphics.renderItem(item, x, y);
-        widgetBox.setDimensions(getX(), getY(), 16, 16, this.shouldScale, DynamicHUD.getGlobalScale());
+        widgetBox.setDimensions(getX(), getY(), 16, 16, this.canScale);
     }
 
     @Override
