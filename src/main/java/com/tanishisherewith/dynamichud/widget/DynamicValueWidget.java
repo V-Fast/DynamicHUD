@@ -19,7 +19,7 @@ public abstract class DynamicValueWidget extends Widget {
     protected Supplier<?> valueSupplier;
 
     public DynamicValueWidget(WidgetData<?> data, String modID, String registryID, String registryKey) {
-        this(data, modID, Anchor.CENTER, registryID, registryKey);
+        this(data, modID, Anchor._default(), registryID, registryKey);
     }
 
     public DynamicValueWidget(WidgetData<?> data, String modId, Anchor anchor, String registryID, String registryKey) {

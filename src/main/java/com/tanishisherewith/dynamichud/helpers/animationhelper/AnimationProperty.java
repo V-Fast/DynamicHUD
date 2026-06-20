@@ -1,6 +1,6 @@
 package com.tanishisherewith.dynamichud.helpers.animationhelper;
 
-// AnimationProperty.java
+// Use this to set/get the variable on which the animation should apply to
 public interface AnimationProperty<T> {
     T get();
     void set(T value);

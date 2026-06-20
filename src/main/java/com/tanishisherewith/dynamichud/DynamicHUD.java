@@ -60,7 +60,7 @@ public class DynamicHUD implements ClientModInitializer {
          * Using the fabric event {@link HudElementRegistry} to render widgets in the game HUD.
          * Mouse positions are passed in the negatives even though theoretically it's in the centre of the screen.
          */
-        HudElementRegistryImpl.attachElementAfter(VanillaHudElements.MISC_OVERLAYS,
+        HudElementRegistryImpl.attachElementBefore(VanillaHudElements.MISC_OVERLAYS,
                 Identifier.fromNamespaceAndPath("dynamichud","hudrender_callback"),
                         (graphics, tickCounter) -> {
                             for (WidgetRenderer widgetRenderer : IntegrationManager.getWidgetRenderers()) {

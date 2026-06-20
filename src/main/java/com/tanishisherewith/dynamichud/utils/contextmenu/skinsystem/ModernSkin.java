@@ -22,7 +22,9 @@ import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.tanishisherewith.dynamichud.helpers.ColorHelper.DARK_GREEN;
 import static com.tanishisherewith.dynamichud.helpers.ColorHelper.DARK_RED;
@@ -42,6 +44,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
     private Component TOOLTIP_HEAD;
     private static int SCALE_FACTOR = 4;
     private final ScrollHandler scrollHandler;
+    private final Map<OptionGroup, GroupAnimData> groupAnimations = new HashMap<>();
 
     public ModernSkin(float radius, Component defaultToolTipHeader, Component defaultToolTipText) {
         this.radius = radius;
@@ -98,13 +101,41 @@ public class ModernSkin extends Skin implements GroupableSkin {
         return option.getHeight() > 0 ? option.getHeight() : mc.font.lineHeight;
     }
 
-    public void renderGroup(GuiGraphics graphics, OptionGroup group, int groupX, int groupY, int targetWidth, int mouseX, int mouseY) {
-        mouseX = (int) (mc.mouseHandler.xpos() / SCALE_FACTOR);
-        mouseY = (int) (mc.mouseHandler.ypos() / SCALE_FACTOR);
+    private int computeGroupFullHeight(OptionGroup group, int groupX, int groupY, int targetWidth) {
+        // If collapsed, just return 20 (the header height)
+        if (!group.isExpanded()) return 20;
 
-        if (group.isExpanded() && group.getHeight() > 20) {
+        int yOffset = groupY + 16 + getGroupIndent().top(); // header height + indent
+        int nestedIndent = getGroupIndent().left();
+        int subWidth = targetWidth - nestedIndent - 8;
+
+        for (Option<?> option : group.getGroupOptions()) {
+            if (!option.shouldRender()) continue;
+            option.setHeight(calcOptionHeight(option));
+            yOffset = contextMenu.getLayoutEngine().layoutOption(option, groupX + nestedIndent, yOffset, subWidth);
+        }
+        return yOffset - groupY; // total height
+    }
+
+    // Adds a nice animation while opening and closing
+    public void renderGroup(GuiGraphics graphics, OptionGroup group, int groupX, int groupY, int targetWidth, int mouseX, int mouseY) {
+        GroupAnimData animData = groupAnimations.computeIfAbsent(group, g -> new GroupAnimData(20f));
+        AnimationProperty<Float> heightProp = animData.property;
+        if (group.isExpanded() && heightProp.get() <= 20f) {
+            int fullHeight = computeGroupFullHeight(group, groupX, groupY, targetWidth);
+            heightProp.set((float) fullHeight);
+        }
+
+        if (animData.animation != null) {
+            animData.animation.update();
+        }
+
+        float animatedHeight = heightProp.get();
+        int groupHeight = Math.round(animatedHeight);
+
+        if (group.isExpanded() && groupHeight > 20) {
             DrawHelper.drawRoundedRectangle(graphics,
-                    groupX + 1, groupY + 14, width - groupX - 8 + contextMenuX, group.getHeight() - 16, radius, DARKER_GRAY_2.getRGB());
+                    groupX + 1, groupY + 14, width - groupX - 8 + contextMenuX, groupHeight - 16, radius, DARKER_GRAY_2.getRGB());
         }
 
         Component groupText = group.name.copy().append(" " + (group.isExpanded() ? "-" : "+"));
@@ -114,24 +145,29 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
         graphics.drawString(mc.font, groupText, groupX + 4, groupY + 4, -1, true);
 
-        if (group.isExpanded()) {
+        if (group.isExpanded() && groupHeight > 20) {
+            int clipX = groupX + 1;
+            int clipY = groupY + 16;
+            int clipWidth = targetWidth + getGroupIndent().left() + 8;
+            int clipHeight = groupHeight - 16;
+            DrawHelper.enableScissor(clipX, clipY, clipWidth, clipHeight, SCALE_FACTOR, graphics);
+
             int yOffset = groupY + 16 + getGroupIndent().top();
             int nestedIndent = getGroupIndent().left();
             int subWidth = targetWidth - nestedIndent - 8;
 
             for (Option<?> option : group.getGroupOptions()) {
                 if (!option.shouldRender()) continue;
-
-                // Position child option with layout engine
                 option.setHeight(calcOptionHeight(option));
                 yOffset = contextMenu.getLayoutEngine().layoutOption(option, groupX + nestedIndent, yOffset, subWidth);
                 option.render(graphics, option.getX(), option.getY(), mouseX, mouseY);
             }
 
-            group.setHeight(yOffset - groupY);
-        } else {
-            group.setHeight(20);
+            DrawHelper.disableScissor(graphics);
         }
+
+        // actual height for layout
+        group.setHeight(groupHeight);
     }
 
     private void drawScrollbar(GuiGraphics graphics) {
@@ -334,14 +370,30 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
             for (Option<?> option : getOptions(contextMenu)) {
                 if (!option.shouldRender()) continue;
-
                 int optHeight = calcOptionHeight(option);
                 if (option instanceof OptionGroup group) {
                     Component groupText = group.name.copy().append(" " + (group.isExpanded() ? "-" : "+"));
                     if (isMouseOver(mouseX, mouseY, optionStartX + 2, yPos,
-                            mc.font.width(groupText) + 6,
-                            16)) {
-                        group.setExpanded(!group.isExpanded());
+                            mc.font.width(groupText) + 6, 16)) {
+                        boolean willBeExpanded = !group.isExpanded();
+                        group.setExpanded(willBeExpanded);
+
+                        GroupAnimData animData = groupAnimations.computeIfAbsent(group, g -> new GroupAnimData(20f));
+                        AnimationProperty<Float> heightProp = animData.property;
+                        float current = heightProp.get();
+                        float target;
+                        if (willBeExpanded) {
+                            int targetWidthForGroup = (int) (width * 0.8f - 18);
+                            int fullHeight = computeGroupFullHeight(group, optionStartX + 2, yPos, targetWidthForGroup);
+                            target = Math.max(fullHeight, 20);
+                        } else {
+                            target = 20f;
+                        }
+
+                        ValueAnimation anim = new ValueAnimation(heightProp, current, target, EasingType.EASE_OUT_QUAD);
+                        anim.duration(200);
+                        anim.start();
+                        animData.animation = anim;
                         return true;
                     }
                     yPos += group.getHeight() + spacing;
@@ -901,5 +953,19 @@ public class ModernSkin extends Skin implements GroupableSkin {
     @Override
     public Skin clone() {
         return new ModernSkin(radius, defaultToolTipHeader, defaultToolTipText);
+    }
+
+
+    private static class GroupAnimData {
+        AnimationProperty<Float> property;
+        ValueAnimation animation;
+
+        GroupAnimData(float initial) {
+            property = new AnimationProperty<Float>() {
+                private float value = initial;
+                @Override public Float get() { return value; }
+                @Override public void set(Float v) { value = v; }
+            };
+        }
     }
 }

@@ -5,6 +5,7 @@ import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.internal.UID;
 import com.tanishisherewith.dynamichud.utils.Input;
+import com.tanishisherewith.dynamichud.widgets.GraphWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;
@@ -12,6 +13,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
+/**
+ * This is the base Widget class that handles the rendering, scaling, dragging, anchoring and positioning of the Widget.
+ * <p>
+ * Default fields are made to help with all the basic functions of a widget.
+ * Main fields include: {@link #uid},{@link #isVisible},{@link #isDraggable},{@link #canScale},{@link #isInEditor},{@link #widgetBox},{@link #DATA}
+ */
 public abstract class Widget implements Input {
     public static Minecraft mc = Minecraft.getInstance();
     public WidgetData<?> DATA;
@@ -59,12 +66,12 @@ public abstract class Widget implements Input {
     protected int offsetX, offsetY;  // Offset from the anchor point
 
     public Widget(WidgetData<?> DATA, String modId) {
-        this(DATA, modId, Anchor.CENTER);
+        this(DATA, modId, Anchor._default());
     }
 
     public Widget(WidgetData<?> DATA, String modId, Anchor anchor) {
         this.DATA = DATA;
-        widgetBox = new WidgetBox(0, 0, 0, 0);
+        this.widgetBox = new WidgetBox(0, 0, 0, 0);
         this.modId = modId;
         this.anchor = anchor;
         this.tooltipText = Component.literal(DATA.description());
@@ -216,14 +223,6 @@ public abstract class Widget implements Input {
         renderWidget(graphics, mouseX, mouseY);
     }
 
-    protected int getTransformedMouseX(double mouseX) {
-        return (int) ((mouseX - getX()) / getScale() + getX());
-    }
-
-    protected int getTransformedMouseY(double mouseY) {
-        return (int) ((mouseY - getY()) / getScale() + getY());
-    }
-
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (widgetBox.isMouseOver(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
@@ -238,12 +237,12 @@ public abstract class Widget implements Input {
         return false;
     }
 
-    /* Input related methods. Override with **super call** to add your own input-based code like contextMenu */
-
     public void clampPosition() {
         this.x = (int) Mth.clamp(this.x, 0, mc.getWindow().getGuiScaledWidth() - getWidth());
         this.y = (int) Mth.clamp(this.y, 0, mc.getWindow().getGuiScaledHeight() - getHeight());
     }
+
+    /** Input related methods. Override with **super call** to add your own input-based code like contextMenu **/
 
     @Override
     public final boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
@@ -352,9 +351,9 @@ public abstract class Widget implements Input {
         uid = tag.contains("UID") ? new UID(tag.getString("UID").get()) : UID.generate();
         //     x = tag.getInt("x");
         //     y = tag.getInt("y");
-        anchor = Anchor.valueOf(tag.getString("anchor").orElse("CENTER"));
-        offsetX = tag.getInt("offsetX").orElse(0);
-        offsetY = tag.getInt("offsetY").orElse(0);
+        anchor = Anchor.valueOf(tag.getString("anchor").orElse("TOP_LEFT"));
+        offsetX = tag.getIntOr("offsetX", 0);
+        offsetY = tag.getIntOr("offsetY",0);
         isVisible = tag.getBoolean("isVisible").orElse(true);
         isDraggable = tag.getBoolean("isDraggable").orElse(true);
         canScale = tag.getBoolean("canScale").orElse(true);
@@ -390,10 +389,6 @@ public abstract class Widget implements Input {
         return widgetBox;
     }
 
-    public void setUid(UID uid) {
-        this.uid = uid;
-    }
-
     public void setCanScale(boolean canScale) {
         this.canScale = canScale;
     }
@@ -417,16 +412,26 @@ public abstract class Widget implements Input {
                 '}';
     }
 
-    public enum Anchor {TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTER}
+    public enum Anchor {
+        TOP_LEFT,
+        TOP_RIGHT,
+        BOTTOM_LEFT,
+        BOTTOM_RIGHT,
+        CENTER;
+
+        public static Anchor _default(){
+            return TOP_LEFT;
+        }
+    }
 
     public abstract static class WidgetBuilder<T, S> {
         protected int x;
         protected int y;
-        protected boolean display = true;
+        protected boolean isVisible = true;
         protected boolean isDraggable = true;
         protected boolean shouldScale = true;
         protected String modID = "unknown";
-
+        protected Anchor anchor = Anchor._default();
 
         /**
          * X Position of the widget of the scaled screen.
@@ -444,8 +449,8 @@ public abstract class Widget implements Input {
             return self();
         }
 
-        public T setDisplay(boolean display) {
-            this.display = display;
+        public T setIsVisible(boolean isVisible) {
+            this.isVisible = isVisible;
             return self();
         }
 
@@ -461,6 +466,11 @@ public abstract class Widget implements Input {
 
         public T setModID(String modID) {
             this.modID = modID;
+            return self();
+        }
+
+        public T anchor(Anchor anchor) {
+            this.anchor = anchor;
             return self();
         }
 

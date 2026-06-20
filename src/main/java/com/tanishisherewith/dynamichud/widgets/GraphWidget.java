@@ -94,12 +94,12 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     }
 
     public GraphWidget() {
-        this(DynamicValueRegistry.GLOBAL_ID, "unknown", "unknown", Anchor.CENTER, 0, 0, 5, 0, 10, Color.RED, Color.GREEN, 0, false, 0, "empty");
+        this(DynamicValueRegistry.GLOBAL_ID, "unknown", "unknown", Anchor._default(), 0, 0, 5, 0, 10, Color.RED, Color.GREEN, 0, false, 0, "empty");
     }
 
     @Override
     public void init() {
-        // Initialize the buffer with minValue, mimicking ArrayList behavior
+        // init the buffer with minValue
         for (int i = 0; i < maxDataPoints; i++) {
             dataPoints[i] = minValue;
         }
@@ -270,7 +270,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
                 float texWidth = mc.font.width(valueText) * valueScale;
 
                 //Scale the Component to its proper position and size with grid lines
-                DrawHelper.scaleAndPosition(graphics.pose(), x - 2, yPos, valueScale);
+                DrawHelper.scaleAndPosition(graphics.pose(), x - 2, yPos,texWidth,mc.font.lineHeight * valueScale, valueScale);
                 graphics.drawString(mc.font, valueText, Math.round(x + offset - texWidth), (int) (yPos - (mc.font.lineHeight * valueScale) / 2.0f), 0xFFFFFFFF, true);
                 DrawHelper.stopScaling(graphics.pose());
             }
@@ -318,7 +318,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
         DrawHelper.scaleAndPosition(graphics.pose(), x - 5, y + gHeight, 0.5f);
         String formattedMinVal = formatValue(minValue);
-        graphics.drawString(mc.font, formattedMinVal, x - mc.font.width(formattedMinVal), (int) (y + gHeight - 4), 0xFFFFFFFF, true);
+        graphics.drawString(mc.font, formattedMinVal, (int) (x - mc.font.width(formattedMinVal)), (int) (y + gHeight - 4), 0xFFFFFFFF, true);
         DrawHelper.stopScaling(graphics.pose());
 
         if(showGrid) x -= offset;
@@ -331,12 +331,16 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
     // format large values (like: 1000 -> 1K, 1000000 -> 1M)
     private String formatValue(float value) {
-        if (Math.abs(value) >= 1_000_000) {
-            return String.format("%.1fM", value / 1_000_000).trim();
-        } else if (Math.abs(value) >= 1_000) {
-            return String.format("%.1fK", value / 1_000).trim();
+        float absVal = Math.abs(value);
+
+        if (absVal >= 1_000_000) {
+            long rounded = Math.round(value / 1_000_000f);
+            return String.format("%dM", rounded);
+        } else if (absVal >= 1_000) {
+            long rounded = Math.round(value / 1_000f);
+            return String.format("%dK", rounded);
         } else {
-            return String.format("%.0f", value).trim();
+            return String.format("%d", (int) value);
         }
     }
 
@@ -543,7 +547,6 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     }
 
     public static class GraphWidgetBuilder extends DynamicValueWidgetBuilder<GraphWidgetBuilder, GraphWidget> {
-        private Anchor anchor = Anchor.CENTER;
         private float gWidth = 100;
         private float gHeight = 50;
         private int maxDataPoints = 50;
@@ -561,11 +564,6 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
         public GraphWidgetBuilder label(String label) {
             this.label = label;
-            return this;
-        }
-
-        public GraphWidgetBuilder anchor(Anchor anchor) {
-            this.anchor = anchor;
             return this;
         }
 
@@ -630,7 +628,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
             widget.setPosition(x, y);
             widget.setDraggable(isDraggable);
             widget.setCanScale(shouldScale);
-            widget.isVisible = display;
+            widget.isVisible = isVisible;
             return widget;
         }
     }
