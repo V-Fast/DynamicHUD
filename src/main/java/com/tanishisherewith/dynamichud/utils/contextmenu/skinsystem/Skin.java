@@ -54,7 +54,7 @@ public abstract class Skin {
      * Flatten a list of options, expanding any groups into their constituent options.
      * Used by skins that don't support group rendering.
      */
-    protected List<Option<?>> flattenOptions(List<Option<?>> options) {
+    public static List<Option<?>> flattenOptions(List<Option<?>> options) {
         List<Option<?>> flattened = new ArrayList<>();
 
         for (Option<?> option : options) {
@@ -100,6 +100,9 @@ public abstract class Skin {
     }
 
     public void keyReleased(ContextMenu<?> menu, int key, int scanCode, int modifiers) {
+    }
+
+    public void charTyped(ContextMenu<?> menu, char c, int modifiers) {
     }
 
     public void mouseScrolled(ContextMenu<?> menu, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {

@@ -5,6 +5,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
@@ -80,6 +81,12 @@ public class ContextMenuScreen extends Screen {
     public boolean keyPressed(KeyEvent event) {
         contextMenu.keyPressed(event.key(), event.scancode(), event.modifiers());
         return super.keyPressed(event);
+    }
+
+    @Override
+    public boolean charTyped(CharacterEvent characterEvent) {
+        contextMenu.charTyped(characterEvent.codepointAsString().charAt(0), characterEvent.modifiers());
+        return super.charTyped(characterEvent);
     }
 
     @Override

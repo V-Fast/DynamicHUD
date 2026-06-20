@@ -8,11 +8,13 @@ import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.vehicle.minecart.Minecart;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -59,8 +61,9 @@ public abstract class AbstractMoveableScreen extends Screen {
 
     @Override
     public boolean charTyped(CharacterEvent event) {
-        widgetRenderer.charTyped((char) event.codepoint(), event.modifiers());
-        ContextMenuManager.getInstance().charTyped((char) event.codepoint(), event.modifiers());
+        char c = Character.toString(event.codepoint()).charAt(0);
+        widgetRenderer.charTyped(c, event.modifiers());
+        ContextMenuManager.getInstance().charTyped(c, event.modifiers());
         return super.charTyped(event);
     }
 

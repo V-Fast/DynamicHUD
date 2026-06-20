@@ -28,6 +28,7 @@ public class OptionGroup extends Option<OptionGroup> {
         return Collections.unmodifiableList(groupOptions);
     }
 
+
     @Override
     public void updateProperties(ContextMenuProperties properties) {
         super.updateProperties(properties);

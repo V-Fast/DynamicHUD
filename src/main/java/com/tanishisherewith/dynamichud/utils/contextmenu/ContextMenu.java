@@ -20,10 +20,8 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ContextMenu<T extends ContextMenuProperties> implements Input {
@@ -291,11 +289,14 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
     @Override
     public void charTyped(char c, int modifiers) {
         if (!shouldDisplay) return;
+
         for (Option<?> option : options) {
             if(option.shouldRender()) {
                 option.charTyped(c, modifiers);
             }
         }
+
+        properties.getSkin().charTyped(this, c, modifiers);
     }
 
     public void set(int x, int y, int widgetHeight) {

@@ -38,7 +38,7 @@ public abstract class Option<T> implements Input {
         this.shouldRender = shouldRender;
         this.value = get();
         this.defaultValue = get();
-        updateProperties(properties);
+        this.updateProperties(properties);
     }
 
     public Option(Component name, Supplier<T> getter, Consumer<T> setter, Supplier<Boolean> shouldRender) {
