@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem;
 
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.AnimationProperty;
@@ -14,6 +15,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.GroupableSkin;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
 import com.tanishisherewith.dynamichud.utils.handlers.ScrollHandler;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.CharacterEvent;
@@ -21,14 +23,15 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Style;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import org.jspecify.annotations.NonNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +62,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
     private final Map<OptionGroup, GroupAnimData> groupAnimations = new HashMap<>();
 
-    private EditBox searchBox;
+    private ModernSearchBox searchBox;
     private String searchQuery = "";
 
     public ModernSkin(float radius, Component defaultToolTipHeader, Component defaultToolTipText) {
@@ -127,24 +130,14 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
     private void renderSearchBox(GuiGraphics graphics, int mouseX, int mouseY){
         if (searchBox == null) {
-            searchBox = new EditBox(mc.font, searchBoxX, searchBoxY, searchBoxWidth, searchBoxHeight, Component.empty());
-            searchBox.setMaxLength(50);
-            searchBox.setEditable(true);
-            searchBox.active = true;
-            searchBox.setBordered(true);
-            searchBox.setVisible(true);
-            searchBox.setHint(Component.literal("Search..."));
-            searchBox.setCanLoseFocus(true);
+            searchBox = new ModernSearchBox(searchBoxX, searchBoxY, searchBoxWidth, searchBoxHeight);
             searchBox.setResponder(query -> {
                 searchQuery = query;
                 // Reset scroll so results show from top
                 scrollHandler.setScrollOffset(0);
             });
         }
-        searchBox.setX(searchBoxX);
-        searchBox.setY(searchBoxY);
-        searchBox.setWidth(searchBoxWidth);
-        searchBox.setHeight(searchBoxHeight);
+        searchBox.setTotalBounds(searchBoxX, searchBoxY, searchBoxWidth, searchBoxHeight);
 
         searchBox.render(graphics, mouseX, mouseY, mc.getDeltaTracker().getGameTimeDeltaTicks());
     }
@@ -305,7 +298,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         width = (int) (scaledWidth * 0.8f);
         height = (int) (scaledHeight * 0.8f);
         searchBoxWidth = (int)(width * 0.35f);
-        searchBoxHeight = 14;
+        searchBoxHeight = mc.font.lineHeight + 5;
         searchBoxX = contextMenuX + searchBoxWidth;
         searchBoxY = contextMenuY + 2;
     }
@@ -447,18 +440,13 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
     @Override
     public boolean mouseClicked(ContextMenu<?> menu, double mouseX, double mouseY, int button) {
-        if (searchBox != null) {
-            MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
-            if (searchBox.mouseClicked(event,false)) {
-                searchBox.setFocused(true);
-                return true;
-            } else{
-                searchBox.setFocused(false);
-            }
-        }
-
         mouseX = mc.mouseHandler.xpos() / SCALE_FACTOR;
         mouseY = mc.mouseHandler.ypos() / SCALE_FACTOR;
+        if (searchBox != null) {
+            MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
+            searchBox.mouseClicked(event,false);
+        }
+
 
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX, mouseY, contextMenuX + width - 5, contextMenuY + 19, 7, height)) {
             scrollHandler.startDragging(mouseY);
@@ -1061,6 +1049,138 @@ public class ModernSkin extends Skin implements GroupableSkin {
                 @Override public Float get() { return value; }
                 @Override public void set(Float v) { value = v; }
             };
+        }
+    }
+    public class ModernSearchBox extends EditBox {
+        private static final int CORNER_RADIUS = 6;
+        private static final int ICON_PADDING = 6;
+        private static final int CLEAR_BUTTON_SIZE = 16;
+        private static final int TEXT_PADDING = 4;
+
+        private final SquishAnimator clearAnimator = new SquishAnimator();
+        private int totalX, totalY, totalWidth, totalHeight;
+
+        public ModernSearchBox(int x, int y, int width, int height) {
+            super(mc.font, x, y, width, height, Component.empty());
+            this.setBordered(false);
+            this.setCentered(false);
+            this.setTextShadow(true);
+            this.setEditable(true);
+            this.setVisible(true);
+            this.setMaxLength(50);
+            this.active = true;
+            this.setCanLoseFocus(true);
+            this.setHint(Component.literal("Search..."));
+            setTotalBounds(x, y, width, height);
+        }
+
+        public void setTotalBounds(int x, int y, int width, int height) {
+            this.totalX = x;
+            this.totalY = y;
+            this.totalWidth = width;
+            this.totalHeight = height;
+
+            int iconWidth = mc.font.width("\uD83D\uDD0D");
+            int textX = totalX + iconWidth + ICON_PADDING + TEXT_PADDING;
+            int textWidth = totalWidth - (textX - totalX) - (CLEAR_BUTTON_SIZE + ICON_PADDING + TEXT_PADDING);
+            if (textWidth < 10) textWidth = 10;
+
+            this.setX(textX);
+            this.setY(totalY);
+            this.setWidth(textWidth);
+            this.setHeight(totalHeight);
+        }
+
+        @Override
+        public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+            if (!this.visible) return;
+
+            int x = totalX;
+            int y = totalY;
+            int w = totalWidth;
+            int h = totalHeight;
+
+            // Background
+            Color bgColor = isFocused() ? new Color(25, 25, 25, 240) : DARKER_GRAY;
+            DrawHelper.drawRoundedRectangleWithShadowBadWay(graphics, x, y, w, h, CORNER_RADIUS, bgColor.getRGB(),60,1,2);
+
+            if (isFocused()) {
+                float pulse = MathAnimations.pulse2(2.5f, 0.3f, 1.0f); // 2.5 oscillations/sec
+                int glowAlpha = (int) (pulse * 200 + 55); // alpha range 55–255
+                int glowColor = ColorHelper.changeAlpha(getThemeColor(), glowAlpha).getRGB();
+                DrawHelper.drawOutlineRoundedBox(graphics, x, y, w, h, CORNER_RADIUS, 1f, glowColor);
+            } else {
+                DrawHelper.drawOutlineRoundedBox(graphics, x, y, w, h, CORNER_RADIUS, 1f, DARK_GRAY.getRGB());
+            }
+
+
+            String icon = "\uD83D\uDD0D";
+            int iconX = x + ICON_PADDING;
+            int iconY = y + (h - mc.font.lineHeight) / 2 + 1;
+            int iconColor = isFocused()? Color.WHITE.getRGB() : 0x80FFFFFF;
+            graphics.drawString(mc.font, icon, iconX, iconY, iconColor, false);
+
+            graphics.pose().pushMatrix();
+            graphics.pose().translate(-1,3);
+            super.renderWidget(graphics, mouseX, mouseY, delta);
+            graphics.pose().popMatrix();
+
+            String clearText = "✕";
+            int clearWidth = mc.font.width(clearText);
+            int clearX = x + w - CLEAR_BUTTON_SIZE;
+            int clearY = y + (h - mc.font.lineHeight) / 2;
+            boolean isClearHovered = Skin.isMouseOver(mouseX, mouseY, clearX - 2, clearY - 1, clearWidth + 4, mc.font.lineHeight + 2);
+            clearAnimator.update(isClearHovered && (mouseX != -1 && mouseY != -1));
+
+            if (!getValue().isEmpty()) {
+                float scale = clearAnimator.getScale();
+                int clearBgColor = isClearHovered ? getThemeColor().darker().getRGB() : ColorHelper.changeAlpha(Color.WHITE, 30).getRGB();
+                int bgW = clearWidth + 4;
+                int bgH = mc.font.lineHeight;
+                DrawHelper.scaleAndPosition(graphics.pose(), clearX - 0.25f, clearY + 0.5f, bgW, bgH, scale);
+                DrawHelper.drawRoundedRectangle(graphics, clearX - 0.25f, clearY + 0.5f, bgW, bgH, 4, clearBgColor);
+                graphics.drawString(mc.font, clearText, clearX + 2, clearY + 1,
+                        isClearHovered ? 0xFFFFFFFF : 0xB0FFFFFF, false);
+                DrawHelper.stopScaling(graphics.pose());
+            }
+            if (isHovered()) {
+                graphics.requestCursor(CursorTypes.IBEAM);
+            }
+        }
+        @Override
+        public boolean mouseClicked(@NonNull MouseButtonEvent event, boolean bl) {
+            if (!this.isActive()) {
+                return false;
+            }
+            if (!getValue().isEmpty()) {
+                int clearX = totalX + totalWidth - CLEAR_BUTTON_SIZE - 2;
+                int clearY = totalY + (totalHeight - mc.font.lineHeight) / 2 - 1;
+                int clearW = mc.font.width("✕") + 4;
+                int clearH = mc.font.lineHeight + 2;
+                if (Skin.isMouseOver(event.x(), event.y(), clearX, clearY, clearW, clearH)) {
+                    setValue("");
+                    return true;
+                }
+            }
+
+            if (this.isValidClickButton(event.buttonInfo()) && Skin.isMouseOver(event.x(), event.y(), totalX, totalY, totalWidth, totalHeight)) {
+                this.playDownSound(Minecraft.getInstance().getSoundManager());
+                this.onClick(event, bl);
+                setFocused(true);
+                return true;
+            } else {
+                setFocused(false);
+            }
+
+            return false;
+        }
+
+        public int getTotalWidth() {
+            return totalWidth;
+        }
+
+        private Color getThemeColor() {
+            return ModernSkin.this.getThemeColor();
         }
     }
 }
