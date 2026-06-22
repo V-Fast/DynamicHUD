@@ -44,6 +44,7 @@ public class Util {
 
     /**
      * Returns a list of options sorted by higher fuzzy score from the query string.
+     * If minimumScore is -1, then two typos from query string will be tolerated.
      */
     public static List<Option<?>> getSearchResults(String query, int minimumScore, List<Option<?>> options) {
         if(options.isEmpty()) return new ArrayList<>();

@@ -197,11 +197,7 @@ public class DrawHelper {
         for (int i = 0; i < length; i++) {
             float hue = (time % (int) (5000 / speed)) / (5000f / speed) + (i * spread); // Adjust the hue based on time and character position
             hue = floorMod(hue, 1.0f); //  hue should stay within the range [0, 1]
-
-            // Convert the hue to an RGB color
             int color = Color.HSBtoRGB(hue, saturation, brightness);
-
-            // Draw the character with the calculated color
             graphics.drawString(mc.font, String.valueOf(Component.charAt(i)), x + mc.font.width(Component.substring(0, i)), y, color, shadow);
         }
     }

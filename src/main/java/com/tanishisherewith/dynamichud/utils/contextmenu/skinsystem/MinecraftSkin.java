@@ -5,6 +5,7 @@ import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.AnimationProperty;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.EasingType;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.animations.ValueAnimation;
+import com.tanishisherewith.dynamichud.utils.Util;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.layout.LayoutEngine;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
@@ -12,7 +13,12 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.G
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
 import com.tanishisherewith.dynamichud.utils.handlers.ScrollHandler;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.Identifier;
@@ -63,6 +69,13 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     private final ScrollHandler groupScrollHandler;
     private final IntSupplier groupPanelX = () -> imageX - groupPanelWidth - 15;
 
+    private final EditBox searchBox;
+    private String searchQuery = "";
+    private int searchBoxWidth = 0;
+    private int searchBoxHeight = 14;
+    private int searchBoxX = 0;
+    private int searchBoxY = 0;
+
     public MinecraftSkin(PanelColor color) {
         super();
         this.panelColor = color;
@@ -81,6 +94,21 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         this.groupScrollHandler = new ScrollHandler();
 
         setCreateNewScreen(true);
+
+        searchBox = new EditBox(mc.font, searchBoxX, searchBoxY, searchBoxWidth, searchBoxHeight, Component.empty());
+        searchBox.setResponder(query -> {
+            searchQuery = query;
+            scrollHandler.setScrollOffset(0);
+        });
+        searchBox.setHint(Component.literal("Search..."));
+    }
+
+    @Override
+    public List<Option<?>> getOptions(ContextMenu<?> menu) {
+        if(searchQuery != null && !searchQuery.isEmpty()) {
+            return Util.getSearchResults(searchQuery,-1, contextMenu.getOptions());
+        }
+        return super.getOptions(menu);
     }
 
     private void enableContextMenuScissor(GuiGraphics graphics) {
@@ -153,6 +181,13 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         // graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, isMouseOver(mouseX, mouseY, imageX + 3, imageY + 3, 14, 14)), imageX + 3, imageY + 3, 14, 14);
         // graphics.drawString(mc.font, "X", imageX + 10 - mc.font.width("X") / 2, imageY + 6, -1, true);
 
+        searchBoxWidth = panelWidth/2;
+        searchBoxHeight = mc.font.lineHeight + 5;
+        searchBoxX = imageX + (panelWidth - searchBoxWidth) / 2;
+        searchBoxY = imageY - 18;
+
+        renderSearchBox(graphics, mouseX, mouseY);
+
         this.enableContextMenuScissor(graphics);
 
         contextMenu.setWidth(panelWidth - 4);
@@ -169,6 +204,23 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
         // Disable scissor after rendering
         DrawHelper.disableScissor(graphics);
+    }
+
+    private void renderSearchBox(GuiGraphics graphics, int mouseX, int mouseY) {
+        searchBox.setX(searchBoxX);
+        searchBox.setY(searchBoxY);
+        searchBox.setWidth(searchBoxWidth);
+        searchBox.setHeight(searchBoxHeight);
+
+        searchBox.render(graphics, mouseX, mouseY, mc.getDeltaTracker().getGameTimeDeltaTicks());
+
+        String icon = "\uD83D\uDD0D";
+        int iconX = searchBoxX - 2 - mc.font.width(icon);
+        int iconY = searchBoxY + (searchBoxHeight - mc.font.lineHeight) / 2 + 1;
+        int iconColor = searchBox.isFocused()? Color.WHITE.getRGB() : 0x80FFFFFF;
+        //DrawHelper.drawRectangle(graphics,iconX - 2, iconY - 1, mc.font.width(icon) + 3, mc.font.lineHeight + 2,Color.BLACK.getRGB());
+        //DrawHelper.drawOutlineBox(graphics,iconX - 2, iconY - 1, mc.font.width(icon) + 3,mc.font.lineHeight + 2,1f,Color.GRAY.getRGB());
+        graphics.drawString(mc.font, icon, iconX, iconY, iconColor, false);
     }
 
     public void drawSingularButton(GuiGraphics graphics, String Component, int mouseX, int mouseY, int x, int y, int width, int height, boolean enabled) {
@@ -208,7 +260,14 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         int yOffset = imageY + 12 - scrollHandler.getScrollOffset();
         int targetWidth = panelWidth - 25;
 
-        for (Option<?> option : selectedGroup.getGroupOptions()) {
+        List<Option<?>> optionsToRender;
+        if (searchQuery != null && !searchQuery.isEmpty()) {
+            optionsToRender = getOptions(contextMenu);
+        } else {
+            optionsToRender = selectedGroup.getGroupOptions();
+        }
+
+        for (Option<?> option : optionsToRender) {
             if (!option.shouldRender()) continue;
 
             option.setHeight(getOptionHeight(option));
@@ -254,6 +313,15 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
     @Override
     public boolean mouseClicked(ContextMenu<?> menu, double mouseX, double mouseY, int button) {
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
+        if (searchBox.mouseClicked(event, false)) {
+            searchBox.setFocused(true);
+            return true;
+        } else{
+            searchBox.setFocused(false);
+        }
+
+
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             if (isMouseOver(mouseX, mouseY, imageX + 3, imageY + 3, 14, 14)) {
                 mc.getSoundManager().play(SimpleSoundInstance.forUI(
@@ -307,11 +375,16 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             scrollHandler.stopDragging();
             groupScrollHandler.stopDragging();
         }
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
+        searchBox.mouseReleased(event);
         return super.mouseReleased(menu, mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseDragged(ContextMenu<?> menu, double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
+        searchBox.mouseDragged(event, deltaX, deltaY);
+
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             if (isMouseOver(mouseX, mouseY, imageX + panelWidth + 5, imageY - 5, DEFAULT_SCROLLBAR_WIDTH + 5, panelHeight + 10)) {
                 scrollHandler.updateScrollPosition(mouseY);
@@ -319,6 +392,18 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             return true;
         }
         return super.mouseDragged(menu, mouseX, mouseY, button, deltaX, deltaY);
+    }
+
+    @Override
+    public void keyPressed(ContextMenu<?> menu, int key, int scanCode, int modifiers) {
+        searchBox.keyPressed(new KeyEvent(key, scanCode, modifiers));
+        super.keyPressed(menu, key, scanCode, modifiers);
+    }
+
+    @Override
+    public void charTyped(ContextMenu<?> menu, char c, int modifiers) {
+        searchBox.charTyped(new CharacterEvent(c, modifiers));
+        super.charTyped(menu, c, modifiers);
     }
 
     @Override

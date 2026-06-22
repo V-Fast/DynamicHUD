@@ -23,7 +23,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.network.chat.Style;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
@@ -40,7 +39,7 @@ import static com.tanishisherewith.dynamichud.helpers.ColorHelper.DARK_GREEN;
 import static com.tanishisherewith.dynamichud.helpers.ColorHelper.DARK_RED;
 
 public class ModernSkin extends Skin implements GroupableSkin {
-    static Color DARK_GRAY = new Color(20, 20, 20, 200);
+    static Color DARK_GRAY = new Color(20, 20, 20, 180);
     static Color DARKER_GRAY = new Color(10, 10, 10, 243);
     static Color DARKER_GRAY_2 = new Color(12, 12, 12, 246);
 
@@ -62,7 +61,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
     private final Map<OptionGroup, GroupAnimData> groupAnimations = new HashMap<>();
 
-    private ModernSearchBox searchBox;
+    private final ModernSearchBox searchBox;
     private String searchQuery = "";
 
     public ModernSkin(float radius, Component defaultToolTipHeader, Component defaultToolTipText) {
@@ -82,6 +81,13 @@ public class ModernSkin extends Skin implements GroupableSkin {
         this.scrollHandler = new ScrollHandler();
 
         setCreateNewScreen(true);
+
+        searchBox = new ModernSearchBox(searchBoxX, searchBoxY, searchBoxWidth, searchBoxHeight);
+        searchBox.setResponder(query -> {
+            searchQuery = query;
+            // Reset scroll so results show from top
+            scrollHandler.setScrollOffset(0);
+        });
     }
 
     @Override
@@ -129,16 +135,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
     }
 
     private void renderSearchBox(GuiGraphics graphics, int mouseX, int mouseY){
-        if (searchBox == null) {
-            searchBox = new ModernSearchBox(searchBoxX, searchBoxY, searchBoxWidth, searchBoxHeight);
-            searchBox.setResponder(query -> {
-                searchQuery = query;
-                // Reset scroll so results show from top
-                scrollHandler.setScrollOffset(0);
-            });
-        }
         searchBox.setTotalBounds(searchBoxX, searchBoxY, searchBoxWidth, searchBoxHeight);
-
         searchBox.render(graphics, mouseX, mouseY, mc.getDeltaTracker().getGameTimeDeltaTicks());
     }
 
@@ -403,26 +400,16 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
     @Override
     public void keyPressed(ContextMenu<?> menu, int key, int scanCode, int modifiers) {
-        if (searchBox != null && searchBox.isFocused()) {
-            searchBox.keyPressed(new KeyEvent(key,scanCode,modifiers));
+        if(searchBox.keyPressed(new KeyEvent(key,scanCode,modifiers))){
             return;
         }
+
         super.keyPressed(menu, key, scanCode, modifiers);
     }
 
     @Override
-    public void keyReleased(ContextMenu<?> menu, int key, int scanCode, int modifiers) {
-        if (searchBox != null && searchBox.isFocused()) {
-            searchBox.keyReleased(new KeyEvent(key,scanCode,modifiers));
-            return;
-        }
-        super.keyReleased(menu, key, scanCode, modifiers);
-    }
-
-    @Override
     public void charTyped(ContextMenu<?> menu, char c, int modifiers) {
-        if (searchBox != null && searchBox.isFocused()) {
-            searchBox.charTyped(new CharacterEvent((int) c,modifiers));
+        if (searchBox.charTyped(new CharacterEvent((int) c,modifiers))) {
             return;
         }
         super.charTyped(menu, c, modifiers);
@@ -431,10 +418,8 @@ public class ModernSkin extends Skin implements GroupableSkin {
     @Override
     public boolean mouseReleased(ContextMenu<?> menu, double mouseX, double mouseY, int button) {
         scrollHandler.stopDragging();
-        if (searchBox != null) {
-            MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
-            searchBox.mouseReleased(event);
-        }
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
+        searchBox.mouseReleased(event);
         return super.mouseReleased(menu, mouseX, mouseY, button);
     }
 
@@ -443,11 +428,8 @@ public class ModernSkin extends Skin implements GroupableSkin {
         mouseX = mc.mouseHandler.xpos() / SCALE_FACTOR;
         mouseY = mc.mouseHandler.ypos() / SCALE_FACTOR;
 
-        if (searchBox != null) {
-            MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
-            searchBox.mouseClicked(event,false);
-        }
-
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
+        searchBox.mouseClicked(event,false);
 
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX, mouseY, contextMenuX + width - 5, contextMenuY + 19, 7, height)) {
             scrollHandler.startDragging(mouseY);
