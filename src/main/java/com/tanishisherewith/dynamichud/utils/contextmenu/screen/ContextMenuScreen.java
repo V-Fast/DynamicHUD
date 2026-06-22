@@ -38,7 +38,7 @@ public class ContextMenuScreen extends Screen {
         DrawHelper.stopScaling(graphics.pose());
 
         if (contextMenu.getMenuScale() <= 0 && !contextMenu.isVisible()) {
-            contextMenu.close();
+            this.onClose();
         }
     }
 
@@ -49,14 +49,12 @@ public class ContextMenuScreen extends Screen {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean bl) {
-        contextMenu.mouseClicked(event.x(), event.y(), event.button());
-        return super.mouseClicked(event, bl);
+        return contextMenu.mouseClicked(event.x(), event.y(), event.button()) || super.mouseClicked(event, bl);
     }
 
     @Override
     public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
-        contextMenu.mouseDragged(event.x(), event.y(), event.button(), dx, dy);
-        return super.mouseDragged(event, dx, dy);
+        return contextMenu.mouseDragged(event.x(), event.y(), event.button(), dx, dy) ||  super.mouseDragged(event, dx, dy);
     }
 
     @Override
@@ -67,8 +65,7 @@ public class ContextMenuScreen extends Screen {
 
     @Override
     public boolean mouseReleased(MouseButtonEvent event) {
-        contextMenu.mouseReleased(event.x(), event.y(), event.button());
-        return super.mouseReleased(event);
+        return contextMenu.mouseReleased(event.x(), event.y(), event.button()) || super.mouseReleased(event);
     }
 
     @Override

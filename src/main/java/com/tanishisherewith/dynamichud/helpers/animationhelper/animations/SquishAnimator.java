@@ -30,9 +30,7 @@ public class SquishAnimator {
     public void update(boolean pressed) {
         if (this.isPressed != pressed) {
             this.isPressed = pressed;
-            animation.startValue(property.get());
-            animation.endValue(pressed ? pressedScale : normalScale);
-            animation.start();
+            animation.set(property.get(),pressed ? pressedScale : normalScale).start();
         }
         animation.update();
     }

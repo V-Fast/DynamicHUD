@@ -1,6 +1,7 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
+import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.AnimationProperty;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.EasingType;
@@ -81,10 +82,11 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
             }
         }, 0.0f, 1.0f);
         this.scaleAnimation.easing(EasingType.EASE_IN_CUBIC);
-        this.scaleAnimation.duration(280);
+        this.scaleAnimation.duration(GlobalConfig.get().getCmAnimationTimeInMs());
         this.scaleAnimation.onComplete(() -> {
             if (animScale <= 0.0f && parentScreen != null && properties.getSkin().shouldCreateNewScreen()) {
                 DynamicHUD.MC.setScreen(parentScreen);
+                parentScreen = null;
             }
         });
 
@@ -109,6 +111,7 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
     public void render(GuiGraphics graphics, int xPos, int yPos, int mouseX, int mouseY) {
         if (newScreenFlag && screenFactory != null) {
             DynamicHUD.MC.setScreen(screenFactory.create(this, properties));
+            newScreenFlag = false;
             return;
         }
 
@@ -147,13 +150,12 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
             option.onClose();
         }
         if (properties.enableAnimations()) {
-            scaleAnimation.startValue(animScale);
-            scaleAnimation.endValue(0.0f);
-            scaleAnimation.start();
+            scaleAnimation.set(animScale,0.0f).start();
         } else {
-            animScale = 0.0f;
+            scaleAnimation.setValue(0.0f);
             if (properties.getSkin().shouldCreateNewScreen() && parentScreen != null) {
                 DynamicHUD.MC.setScreen(parentScreen);
+                parentScreen = null;
             }
         }
     }
@@ -161,19 +163,24 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
     public void open() {
         shouldDisplay = true;
         update();
-        parentScreen = DynamicHUD.MC.screen;
+        if(parentScreen == null) {
+            Screen currentScreen = DynamicHUD.MC.screen;
+            if (currentScreen != null && !currentScreen.getClass().getSimpleName().contains("ContextMenuScreen")) {
+                parentScreen = currentScreen;
+            }
+            java.lang.System.out.println(parentScreen);
+        }
         if (properties.getSkin().shouldCreateNewScreen()) {
             newScreenFlag = true;
         }
         if (properties.enableAnimations()) {
-            scaleAnimation.startValue(animScale);
-            scaleAnimation.endValue(1.0f);
-            scaleAnimation.start();
+            scaleAnimation.set(animScale, 1.0f).start();
         } else {
-            animScale = 0.0f;
-            if (properties.getSkin().shouldCreateNewScreen() && parentScreen != null) {
+            scaleAnimation.setValue(1.0f);
+            /*if (properties.getSkin().shouldCreateNewScreen() && parentScreen != null) {
                 DynamicHUD.MC.setScreen(parentScreen);
-            }
+                parentScreen = null;
+            }*/
         }
     }
 
@@ -186,11 +193,11 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
     }
 
     protected int getTMouseX(double mouseX) {
-        return (int) ((mouseX - getX()) / getMenuScale() + getX());
+        return (int) (mouseX / getMenuScale());
     }
 
     protected int getTMouseY(double mouseY) {
-        return (int) ((mouseY - getY()) / getMenuScale() + getY());
+        return (int) (mouseY / getMenuScale());
     }
 
     public void toggleDisplay(WidgetBox widgetBox, double mouseX, double mouseY, int button) {

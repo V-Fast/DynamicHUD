@@ -1,81 +1,95 @@
 package com.tanishisherewith.dynamichud.utils.handlers;
 
+import net.minecraft.util.Mth;
 
 public class ScrollHandler {
-    protected int scrollOffset;
-    protected double scrollVelocity;
-    protected long lastScrollTime;
+    protected double scrollOffset;
+    protected double targetScrollOffset;
     protected boolean isDragging;
     protected int maxScrollOffset;
-    protected double SCROLL_SPEED = 1;
+    protected double SCROLL_SPEED = 1.0;
+    protected int trackHeight = 150;
     protected double lastMouseY;
 
     public ScrollHandler() {
-        this.scrollOffset = 0;
-        this.scrollVelocity = 0;
-        this.lastScrollTime = 0;
         this.isDragging = false;
     }
 
-    public void updateScrollOffset(int maxYOffset) {
-        if (maxYOffset < 0) maxYOffset = 0;
+    public void setScrollOffset(int offset) {
+        this.displayValuePosition(offset);
+    }
 
-        this.maxScrollOffset = maxYOffset;
-        applyMomentum();
-        scrollOffset = Math.clamp(scrollOffset, 0, maxScrollOffset);
+    public void setScrollOffsetDirectly(double offset) {
+        this.displayValue = offset;
+    }
+
+    public int getScrollOffset() {
+        return Math.toIntExact(Math.round(scrollOffset));
+    }
+
+    private double displayValue;
+    private static final float LERP_SPEED = 0.22f;
+
+    public void updateScrollOffset(int maxScrollOffset) {
+        if(maxScrollOffset <= 0) return;
+        this.maxScrollOffset = maxScrollOffset;
+        displayValue = Mth.lerp(LERP_SPEED, displayValue, targetScrollOffset);
+        displayValue = Mth.clamp(displayValue, 0.0, maxScrollOffset);
+        this.scrollOffset = Math.round(displayValue);
     }
 
     public void mouseScrolled(double deltaY) {
-        scrollVelocity -= deltaY * 10;
-        lastScrollTime = System.currentTimeMillis();
+        double amount = -deltaY * 18.0 * SCROLL_SPEED;
+        this.targetScrollOffset = Mth.clamp(targetScrollOffset + amount, 0.0, maxScrollOffset);
     }
 
     public void startDragging(double mouseY) {
-        isDragging = true;
-        lastMouseY = mouseY;
+        this.isDragging = true;
+        this.lastMouseY = mouseY;
     }
 
     public void stopDragging() {
-        isDragging = false;
+        this.isDragging = false;
     }
 
     public void addOffset(int offset) {
-        this.scrollOffset = Math.clamp(scrollOffset + offset, 0, maxScrollOffset);
+        this.targetScrollOffset = Mth.clamp(targetScrollOffset + offset, 0.0, maxScrollOffset);
     }
 
     public void updateScrollPosition(double mouseY) {
-        if (isDragging) {
-            // Calculate the difference in mouse Y position
-            double deltaY = lastMouseY - mouseY;
-
-            scrollOffset = Math.clamp(scrollOffset - (int) deltaY, 0, maxScrollOffset);
-
+        if (isDragging && maxScrollOffset > 0) {
+            double deltaY = mouseY - lastMouseY;
+            double scrollRatio = (double) maxScrollOffset / Math.max(1, trackHeight);
+            double offsetDelta = deltaY * scrollRatio;
+            this.targetScrollOffset = Mth.clamp(targetScrollOffset + offsetDelta, 0.0, maxScrollOffset);
             lastMouseY = mouseY;
         }
     }
 
-    private void applyMomentum() {
-        long currentTime = System.currentTimeMillis();
-        double timeDelta = (currentTime - lastScrollTime) / 1000.0;
-        scrollOffset += (int) (scrollVelocity * timeDelta);
-        scrollVelocity *= 0.9; // Decay factor
-        scrollOffset = Math.clamp(scrollOffset, 0, maxScrollOffset);
-    }
-
-    public int getScrollOffset() {
-        return Math.max(scrollOffset, 0);
-    }
-
-    public void setScrollOffset(int scrollOffset) {
-        this.scrollOffset = Math.clamp(scrollOffset, 0, maxScrollOffset);
+    private void displayValuePosition(double val) {
+        this.targetScrollOffset = Mth.clamp(val, 0.0, maxScrollOffset);
+        this.displayValue = this.targetScrollOffset;
+        this.scrollOffset = this.targetScrollOffset;
     }
 
     public boolean isOffsetWithinBounds(int offset) {
-        return scrollOffset + offset >= 0 && scrollOffset + offset <= maxScrollOffset;
+        return targetScrollOffset + offset >= 0 && targetScrollOffset + offset <= maxScrollOffset;
     }
 
     public ScrollHandler setScrollSpeed(double scrollSpeed) {
         this.SCROLL_SPEED = scrollSpeed;
         return this;
+    }
+
+    public void setTrackHeight(int trackHeight) {
+        this.trackHeight = trackHeight;
+    }
+
+    public int getTrackHeight() {
+        return trackHeight;
+    }
+
+    public boolean isDragging() {
+        return isDragging;
     }
 }

@@ -30,6 +30,9 @@ public final class GlobalConfig {
     private float scale = 1.0f;
 
     @SerialEntry
+    private int cmAnimationTimeInMs = 200;
+
+    @SerialEntry
     private boolean displayDescriptions = false;
 
     @SerialEntry
@@ -97,6 +100,12 @@ public final class GlobalConfig {
                                         .binding(100, () -> this.snapSize, newVal -> this.snapSize = newVal)
                                         .controller(integerOption -> IntegerFieldControllerBuilder.create(integerOption).range(10, 500))
                                         .build())
+                                .option(Option.<Integer>createBuilder()
+                                        .name(Component.literal("ContextMenu Animation Time"))
+                                        .description(OptionDescription.of(Component.literal("The time in seconds for context menu to open")))
+                                        .binding(200, () -> this.cmAnimationTimeInMs, newVal -> this.cmAnimationTimeInMs = newVal)
+                                        .controller(integerOption -> IntegerSliderControllerBuilder.create(integerOption).range(0, 500))
+                                        .build())
                                 .build())
                         .option(Option.<Color>createBuilder()
                                 .name(Component.literal("Widget HUD Active Background Color"))
@@ -151,6 +160,10 @@ public final class GlobalConfig {
 
     public Color getHudActiveColor() {
         return hudActiveColor;
+    }
+
+    public int getCmAnimationTimeInMs() {
+        return cmAnimationTimeInMs;
     }
 
     public com.tanishisherewith.dynamichud.utils.contextmenu.options.Option.Complexity complexity() {

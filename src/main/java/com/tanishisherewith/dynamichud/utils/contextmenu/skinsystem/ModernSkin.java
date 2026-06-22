@@ -40,7 +40,7 @@ import static com.tanishisherewith.dynamichud.helpers.ColorHelper.DARK_GREEN;
 import static com.tanishisherewith.dynamichud.helpers.ColorHelper.DARK_RED;
 
 public class ModernSkin extends Skin implements GroupableSkin {
-    static Color DARK_GRAY = new Color(20, 20, 20, 229);
+    static Color DARK_GRAY = new Color(20, 20, 20, 200);
     static Color DARKER_GRAY = new Color(10, 10, 10, 243);
     static Color DARKER_GRAY_2 = new Color(12, 12, 12, 246);
 
@@ -442,6 +442,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
     public boolean mouseClicked(ContextMenu<?> menu, double mouseX, double mouseY, int button) {
         mouseX = mc.mouseHandler.xpos() / SCALE_FACTOR;
         mouseY = mc.mouseHandler.ypos() / SCALE_FACTOR;
+
         if (searchBox != null) {
             MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
             searchBox.mouseClicked(event,false);
@@ -491,7 +492,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                 }
             }
         }
-        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX, mouseY, contextMenuX + 2, contextMenuY + 2, mc.font.width("< Back") + 8, 14)) {
+        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX, mouseY, contextMenuX + 1, contextMenuY + 1, mc.font.width("< Back") + 10, 16)) {
             mc.getSoundManager().play(SimpleSoundInstance.forUI(
                     SoundEvents.UI_BUTTON_CLICK, 1.0F));
             contextMenu.close();
@@ -501,6 +502,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             }
             searchQuery = "";
             groupAnimations.clear();
+            return true;
         }
         return super.mouseClicked(menu, mouseX, mouseY, button);
     }
@@ -1134,7 +1136,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
             if (!getValue().isEmpty()) {
                 float scale = clearAnimator.getScale();
-                int clearBgColor = isClearHovered ? getThemeColor().darker().getRGB() : ColorHelper.changeAlpha(Color.WHITE, 30).getRGB();
+                int clearBgColor = isClearHovered ? Color.RED.darker().getRGB() : ColorHelper.changeAlpha(Color.WHITE, 30).getRGB();
                 int bgW = clearWidth + 4;
                 int bgH = mc.font.lineHeight;
                 DrawHelper.scaleAndPosition(graphics.pose(), clearX - 0.25f, clearY + 0.5f, bgW, bgH, scale);
