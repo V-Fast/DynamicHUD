@@ -125,7 +125,7 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
         DrawHelper.scaleAndPosition(graphics.pose(), this.x, this.y,this.width,this.height, getMenuScale());
 
         properties.getSkin().setContextMenu(this);
-        properties.getSkin().renderContextMenu(graphics, this, getTMouseX(mouseX), getTMouseY(mouseY));
+        properties.getSkin().renderContextMenu(graphics, this, (int)getTMouseX(mouseX),(int) getTMouseY(mouseY));
 
         DrawHelper.stopScaling(graphics.pose());
     }
@@ -173,10 +173,6 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
             scaleAnimation.set(animScale, 1.0f).start();
         } else {
             scaleAnimation.setValue(1.0f);
-            /*if (properties.getSkin().shouldCreateNewScreen() && parentScreen != null) {
-                DynamicHUD.MC.setScreen(parentScreen);
-                parentScreen = null;
-            }*/
         }
     }
 
@@ -188,18 +184,20 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
         }
     }
 
-    protected int getTMouseX(double mouseX) {
-        return (int) (mouseX / getMenuScale());
+    protected double getTMouseX(double mouseX) {
+        return mouseX / getMenuScale();
     }
 
-    protected int getTMouseY(double mouseY) {
-        return (int) (mouseY / getMenuScale());
+    protected double getTMouseY(double mouseY) {
+        return mouseY / getMenuScale();
     }
 
-    public void toggleDisplay(WidgetBox widgetBox, double mouseX, double mouseY, int button) {
+    public boolean toggleDisplay(WidgetBox widgetBox, double mouseX, double mouseY, int button) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && widgetBox.isMouseOver(mouseX, mouseY)) {
             toggleDisplay();
+            return true;
         }
+        return false;
     }
 
     public void resetAllOptions() {

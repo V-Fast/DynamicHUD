@@ -13,6 +13,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
+import java.awt.*;
+
 /**
  * This is the base Widget class that handles the rendering, scaling, dragging, anchoring and positioning of the Widget.
  * <p>
@@ -35,6 +37,8 @@ public abstract class Widget implements Input {
     protected boolean isDraggable = true;
     //Boolean to check if the widget is being dragged
     public boolean dragging;
+    private boolean wasDragged = false;
+
     //To enable/disable snapping
     public boolean isShiftDown = false;
     /**
@@ -187,7 +191,7 @@ public abstract class Widget implements Input {
     public final void renderInEditor(GuiGraphics graphics, int mouseX, int mouseY) {
         if (!isInEditor) return;
 
-        drawWidgetBackground(graphics);
+        drawWidgetBackground(graphics,mouseX,mouseY);
 
         if (canScale) {
             DrawHelper.scaleAndPosition(graphics.pose(), getX(), getY(), getScale());
@@ -214,7 +218,6 @@ public abstract class Widget implements Input {
 
     /**
      * Renders the widget in the editor screen with a background.
-     * Override this method without super call to remove the background.
      * Could also be used to display placeholder values.
      */
     private void renderWidgetInEditor(GuiGraphics graphics, int mouseX, int mouseY) {
@@ -226,11 +229,13 @@ public abstract class Widget implements Input {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (widgetBox.isMouseOver(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            toggle();
+            wasDragged = false;
             if (isDraggable) {
                 startX = (int) (mouseX - x);
                 startY = (int) (mouseY - y);
                 dragging = true;
+            } else {
+                toggle(); // Static widgets toggle immediately
             }
             return true;
         }
@@ -251,7 +256,10 @@ public abstract class Widget implements Input {
 
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY, int snapSize) {
         if (!isDraggable) return false;
+
         if (dragging && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            wasDragged = true;
+
             int newX = (int) (mouseX - startX);
             int newY = (int) (mouseY - startY);
 
@@ -280,8 +288,17 @@ public abstract class Widget implements Input {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (dragging && widgetBox.isMouseOver(mouseX,mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            if (!wasDragged) {
+                toggle();
+                dragging = false;
+                wasDragged = false;
+                return true;
+            }
+        }
         dragging = false;
-        return true;
+        wasDragged = false;
+        return false;
     }
 
     /**
@@ -323,16 +340,18 @@ public abstract class Widget implements Input {
     /**
      * Displays a faint grayish background if enabled or faint reddish background if disabled.
      */
-    protected void drawWidgetBackground(GuiGraphics graphics) {
-        int backgroundColor = this.isVisible() ? GlobalConfig.get().getHudActiveColor().getRGB() : GlobalConfig.get().getHudInactiveColor().getRGB();
+    protected void drawWidgetBackground(GuiGraphics graphics, int mouseX, int mouseY) {
+        boolean isHovered = widgetBox.isMouseOver(mouseX, mouseY);
+        Color backgroundColor = this.isVisible() ? GlobalConfig.get().getHudActiveColor() : GlobalConfig.get().getHudInactiveColor();
         WidgetBox box = this.getWidgetBox();
+
 
         DrawHelper.drawRectangle(graphics,
                 box.x,
                 box.y,
                 box.getWidth(),
                 box.getHeight(),
-                backgroundColor);
+                isHovered ? backgroundColor.darker().darker().getRGB() : backgroundColor.getRGB());
     }
 
     /**

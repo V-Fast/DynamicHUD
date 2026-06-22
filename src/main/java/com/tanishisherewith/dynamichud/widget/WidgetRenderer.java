@@ -173,7 +173,9 @@ public class WidgetRenderer implements Input {
         }
         if (currentScreen instanceof AbstractMoveableScreen) {
             for (Widget widget : widgets) {
-                widget.mouseReleased(mouseX, mouseY, button);
+                if(widget.mouseReleased(mouseX, mouseY, button)){
+                    return true;
+                }
             }
         }
         return false;

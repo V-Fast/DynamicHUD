@@ -346,8 +346,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        menu.toggleDisplay(widgetBox, mouseX, mouseY, button);
-        return super.mouseClicked(mouseX, mouseY, button);
+        return menu.toggleDisplay(widgetBox, mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
     }
 
     public void createMenu() {

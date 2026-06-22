@@ -104,7 +104,7 @@ public final class GlobalConfig {
                                         .name(Component.literal("ContextMenu Animation Time"))
                                         .description(OptionDescription.of(Component.literal("The time in seconds for context menu to open")))
                                         .binding(200, () -> this.cmAnimationTimeInMs, newVal -> this.cmAnimationTimeInMs = newVal)
-                                        .controller(integerOption -> IntegerSliderControllerBuilder.create(integerOption).range(0, 500))
+                                        .controller(integerOption -> IntegerSliderControllerBuilder.create(integerOption).range(0, 500).step(1))
                                         .build())
                                 .build())
                         .option(Option.<Color>createBuilder()
