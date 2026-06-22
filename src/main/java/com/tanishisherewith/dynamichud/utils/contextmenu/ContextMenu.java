@@ -164,11 +164,7 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
         shouldDisplay = true;
         update();
         if(parentScreen == null) {
-            Screen currentScreen = DynamicHUD.MC.screen;
-            if (currentScreen != null && !currentScreen.getClass().getSimpleName().contains("ContextMenuScreen")) {
-                parentScreen = currentScreen;
-            }
-            java.lang.System.out.println(parentScreen);
+            parentScreen = DynamicHUD.MC.screen;
         }
         if (properties.getSkin().shouldCreateNewScreen()) {
             newScreenFlag = true;
