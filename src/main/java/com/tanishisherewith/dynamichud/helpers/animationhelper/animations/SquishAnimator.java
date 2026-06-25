@@ -1,28 +1,31 @@
 package com.tanishisherewith.dynamichud.helpers.animationhelper.animations;
 
-import com.tanishisherewith.dynamichud.helpers.animationhelper.AnimationProperty;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.EasingType;
 
-public class SquishAnimator {
-    private final ValueAnimation animation;
-    private final AnimationProperty<Float> property;
-    private boolean isPressed = false;
-    private float normalScale;
-    private float pressedScale;
+import java.util.function.Consumer;
 
-    public SquishAnimator(float normalScale, float pressedScale) {
+public class SquishAnimator extends ValueAnimation {
+    private boolean isPressed = false;
+    private final float normalScale;
+    private final float pressedScale;
+    private final ScaleHolder holder;
+
+    private SquishAnimator(ScaleHolder holder, float normalScale, float pressedScale) {
+        super(holder, normalScale, pressedScale);
+        this.holder = holder;
+        this.holder.value = normalScale;
         this.normalScale = normalScale;
         this.pressedScale = pressedScale;
-        this.property = new AnimationProperty<>() {
-            private float val = normalScale;
-            public Float get() { return val; }
-            public void set(Float v) { val = v; }
-        };
 
-        this.animation = new ValueAnimation(property, normalScale, pressedScale);
-        this.animation.easing(EasingType.EASE_OUT_BACK);
-        this.animation.duration(125);
+        // default polished easing configurations
+        this.easing(EasingType.EASE_OUT_BACK);
+        this.duration(125);
     }
+
+    public SquishAnimator(float normalScale, float pressedScale) {
+        this(new ScaleHolder(), normalScale, pressedScale);
+    }
+
     public SquishAnimator(){
         this(1.0f,0.95f);
     }
@@ -30,10 +33,19 @@ public class SquishAnimator {
     public void update(boolean pressed) {
         if (this.isPressed != pressed) {
             this.isPressed = pressed;
-            animation.set(property.get(),pressed ? pressedScale : normalScale).start();
+            this.set(holder.value,pressed ? pressedScale : normalScale).start();
         }
-        animation.update();
+        this.update();
     }
 
-    public float getScale() { return property.get(); }
+    public float getScale() { return holder.value; }
+
+    private static class ScaleHolder implements Consumer<Float> {
+        float value;
+
+        @Override
+        public void accept(Float v) {
+            this.value = v;
+        }
+    }
 }

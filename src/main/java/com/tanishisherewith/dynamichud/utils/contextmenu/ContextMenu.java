@@ -3,7 +3,6 @@ package com.tanishisherewith.dynamichud.utils.contextmenu;
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
-import com.tanishisherewith.dynamichud.helpers.animationhelper.AnimationProperty;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.EasingType;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.animations.ValueAnimation;
 import com.tanishisherewith.dynamichud.internal.System;
@@ -70,17 +69,7 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
         this.properties.getSkin().setContextMenu(this);
         this.layoutEngine = new LayoutEngine();
 
-        this.scaleAnimation = new ValueAnimation(new AnimationProperty<>() {
-            @Override
-            public Float get() {
-                return animScale;
-            }
-
-            @Override
-            public void set(Float value) {
-                animScale = value;
-            }
-        }, 0.0f, 1.0f);
+        this.scaleAnimation = new ValueAnimation(val-> animScale = val, 0.0f, 1.0f);
         this.scaleAnimation.easing(EasingType.EASE_IN_CUBIC);
         this.scaleAnimation.duration(GlobalConfig.get().getCmAnimationTimeInMs());
         this.scaleAnimation.onComplete(() -> {

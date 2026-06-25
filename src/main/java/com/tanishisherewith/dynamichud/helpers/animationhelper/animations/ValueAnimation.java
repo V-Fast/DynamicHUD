@@ -1,33 +1,50 @@
 package com.tanishisherewith.dynamichud.helpers.animationhelper.animations;
 
 import com.tanishisherewith.dynamichud.helpers.animationhelper.Animation;
-import com.tanishisherewith.dynamichud.helpers.animationhelper.AnimationProperty;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.Easing;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.EasingType;
 
+import java.util.function.Consumer;
+
 public class ValueAnimation extends Animation {
-    private final AnimationProperty<Float> property;
+    private final Consumer<Float> setter;
     private float startValue;
     private float endValue;
     private EasingType easing;
     private float value;
 
-    public ValueAnimation(AnimationProperty<Float> property, float start, float end, EasingType easingType) {
-        this.property = property;
+    /**
+     * Creates a new ValueAnimation with an easing type.
+     *
+     * @param setter     A functional callback (such as a lambda expression) to receive the updated float.
+     * @param start      The starting float value.
+     * @param end        The target ending float value.
+     * @param easingType The mathematical easing equation to apply.
+     */
+
+    public ValueAnimation(Consumer<Float> setter, float start, float end, EasingType easingType) {
+        this.setter = setter;
         this.startValue = start;
         this.endValue = end;
         this.easing = easingType;
         this.value = startValue;
     }
 
-    public ValueAnimation(AnimationProperty<Float> property, float start, float end) {
-        this(property, start, end, EasingType.LINEAR);
+    /**
+     * Creates a new ValueAnimation with linear easing.
+     *
+     * @param setter A functional callback (such as a lambda expression) to receive the updated float.
+     * @param start  The starting float value.
+     * @param end    The target ending float value.
+     */
+    public ValueAnimation(Consumer<Float> setter, float start, float end) {
+        this(setter, start, end, EasingType.LINEAR);
     }
 
     @Override
     protected void applyAnimation(float progress) {
         this.value = startValue + (endValue - startValue) * Easing.apply(easing, progress);
-        property.set(value);
+        setter.accept(value);
     }
 
     public ValueAnimation set(float startValue, float endValue){
@@ -53,7 +70,7 @@ public class ValueAnimation extends Animation {
 
     public void setValue(float value) {
         this.value = value;
-        property.set(value);
+        setter.accept(value);
     }
 
     public float getValue() {

@@ -3,7 +3,6 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
-import com.tanishisherewith.dynamichud.helpers.animationhelper.AnimationProperty;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.EasingType;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.animations.MathAnimations;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.animations.SquishAnimator;
@@ -157,10 +156,9 @@ public class ModernSkin extends Skin implements GroupableSkin {
     // Adds a nice animation while opening and closing
     public void renderGroup(GuiGraphics graphics, OptionGroup group, int groupX, int groupY, int targetWidth, int mouseX, int mouseY) {
         GroupAnimData animData = groupAnimations.computeIfAbsent(group, g -> new GroupAnimData(16f));
-        AnimationProperty<Float> heightProp = animData.property;
-        if (group.isExpanded() && heightProp.get() <= 16) {
+        if (group.isExpanded() && animData.value <= 16) {
             int fullHeight = computeGroupFullHeight(group, groupX, groupY, targetWidth);
-            heightProp.set((float) fullHeight);
+            animData.value = (float) fullHeight;
         }
 
         if (animData.animation != null) {
@@ -170,8 +168,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             }
         }
 
-        float animatedHeight = heightProp.get();
-        int groupHeight = Math.round(animatedHeight);
+        int groupHeight = Math.round(animData.value);
 
         if (group.isExpanded() && groupHeight > 16) {
             DrawHelper.drawRoundedRectangle(graphics,
@@ -451,8 +448,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                         group.setExpanded(willBeExpanded);
 
                         GroupAnimData animData = groupAnimations.computeIfAbsent(group, g -> new GroupAnimData(16f));
-                        AnimationProperty<Float> heightProp = animData.property;
-                        float current = heightProp.get();
+                        float current = animData.value;
                         float target;
                         if (willBeExpanded) {
                             int targetWidthForGroup = (int) (width * 0.8f - 18);
@@ -462,7 +458,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                             target = 16f;
                         }
 
-                        ValueAnimation anim = new ValueAnimation(heightProp, current, target, EasingType.EASE_OUT_QUAD);
+                        ValueAnimation anim = new ValueAnimation(val -> animData.value = val, current, target, EasingType.EASE_OUT_QUAD);
                         anim.duration(200);
                         anim.start();
                         animData.animation = anim;
@@ -1024,17 +1020,14 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
 
     private static class GroupAnimData {
-        AnimationProperty<Float> property;
+        float value;
         ValueAnimation animation;
 
         GroupAnimData(float initial) {
-            property = new AnimationProperty<Float>() {
-                private float value = initial;
-                @Override public Float get() { return value; }
-                @Override public void set(Float v) { value = v; }
-            };
+            this.value = initial;
         }
     }
+
     public class ModernSearchBox extends EditBox {
         private static final int CORNER_RADIUS = 6;
         private static final int ICON_PADDING = 6;

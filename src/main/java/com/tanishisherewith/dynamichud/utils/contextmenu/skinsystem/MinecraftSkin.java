@@ -2,7 +2,6 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
-import com.tanishisherewith.dynamichud.helpers.animationhelper.AnimationProperty;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.EasingType;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.animations.ValueAnimation;
 import com.tanishisherewith.dynamichud.utils.Util;
@@ -489,7 +488,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     public class MinecraftBooleanRenderer implements SkinRenderer<BooleanOption> {
         @Override
         public void render(GuiGraphics graphics, BooleanOption option, int x, int y, int mouseX, int mouseY) {
-            graphics.drawString(mc.font, option.name, x + 15, y + 25 / 2 - 5, -1, true);
+            graphics.drawString(mc.font, option.name, x + panelWidth - 75 + 15, y + 25 / 2 - 5, -1, true);
 
             int width = 50;
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, isMouseOver(mouseX, mouseY,x + panelWidth - 75, y, width, 20)), x + panelWidth - 75, y, width, 20);
@@ -506,17 +505,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
         @Override
         public void init(ColorOption option) {
-            this.scaleAnimation = new ValueAnimation(new AnimationProperty<>() {
-                @Override
-                public Float get() {
-                    return scale;
-                }
-
-                @Override
-                public void set(Float value) {
-                    scale = value;
-                }
-            }, 0.0f, 1.0f);
+            this.scaleAnimation = new ValueAnimation(val-> scale = val, 0.0f, 1.0f);
             scaleAnimation.easing(EasingType.EASE_OUT_BACK);
             scaleAnimation.duration(200);
             this.scaleAnimation.onComplete(() -> {
