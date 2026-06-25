@@ -488,14 +488,14 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     public class MinecraftBooleanRenderer implements SkinRenderer<BooleanOption> {
         @Override
         public void render(GuiGraphics graphics, BooleanOption option, int x, int y, int mouseX, int mouseY) {
-            graphics.drawString(mc.font, option.name, x + panelWidth - 75 + 15, y + 25 / 2 - 5, -1, true);
+            graphics.drawString(mc.font, option.name, x + 15, y + 25 / 2 - 5, -1, true);
 
             int width = 50;
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, isMouseOver(mouseX, mouseY,x + panelWidth - 75, y, width, 20)), x + panelWidth - 75, y, width, 20);
 
             Component Component = option.getBooleanType().getText(option.value);
             int color = option.value ? Color.GREEN.getRGB() : Color.RED.getRGB();
-            graphics.drawString(mc.font, Component, (int) (option.getX() + (width / 2.0f) - (mc.font.width(Component) / 2.0f)), y + 5, color, true);
+            graphics.drawString(mc.font, Component, (int) (x + panelWidth - 75 + (width / 2.0f) - (mc.font.width(Component) / 2.0f)), y + 5, color, true);
         }
     }
 
@@ -528,7 +528,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
             int shadowOpacity = Math.min(option.value.getAlpha(), 45);
             DrawHelper.drawRectangleWithShadowBadWay(graphics,
-                    option.getX() + 4,
+                    x + panelWidth - 45 + 4,
                     y + 4,
                     width - 8,
                     12,

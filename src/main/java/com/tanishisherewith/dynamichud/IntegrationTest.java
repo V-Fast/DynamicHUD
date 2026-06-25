@@ -76,7 +76,7 @@ public class IntegrationTest implements DynamicHudIntegration {
                 .graphColor(Color.CYAN)
                 .anchor(Widget.Anchor._default())
                 .gWidth(100)
-                .gHeight(150)
+                .gHeight(75)
                 .gridLines(10)
                 .backgroundColor(Color.DARK_GRAY)
                 .lineThickness(1f)
@@ -91,6 +91,7 @@ public class IntegrationTest implements DynamicHudIntegration {
                 .registryKey("FPS")
                 .registryID(registry.getId())
                 .build()
+                .setSampleInterval(120)
                 .autoUpdateRange();
     }
 

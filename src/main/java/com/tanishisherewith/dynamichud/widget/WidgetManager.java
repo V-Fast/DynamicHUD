@@ -1,6 +1,7 @@
 package com.tanishisherewith.dynamichud.widget;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
+import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.mixins.ScreenMixin;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -175,6 +176,8 @@ public class WidgetManager {
 
         // If save operation was successful, replace the old file with the new one
         Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+        GlobalConfig.HANDLER.save();
     }
 
     /**

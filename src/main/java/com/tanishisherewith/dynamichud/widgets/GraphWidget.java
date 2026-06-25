@@ -23,6 +23,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Util;
 import org.joml.Matrix3x2f;
 
 import java.awt.*;
@@ -58,6 +59,9 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     private float valueStep;
     private float valueScale;
     int offset = -2;
+
+    private long lastSampleTime = 0;
+    private long sampleIntervalMs = 100;
 
     public GraphWidget(String registryID, String registryKey, String modId, Anchor anchor, float gWidth, float gHeight, int maxDataPoints, float minValue, float maxValue, Color graphColor, Color backgroundColor, float lineThickness, boolean showGrid, int gridLines, String label) {
         super(DATA, modId, anchor, registryID, registryKey);
@@ -110,24 +114,90 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         return this;
     }
 
-    public void addDataPoint(Float value) {
-        if (value == null) return;
-        if (autoUpdateRange) {
-            if (getMaxValue() < value) {
-                setMaxValue(value + 10);
-                float diff = getMaxValue() - getPrevMaxValue();
-                setMinValue(getMinValue() + diff);
-            }
-            if (getMinValue() > value) {
-                setMinValue(value - 10);
-                float diff = getPrevMinValue() - getMinValue();
-                setMaxValue(getMaxValue() - diff);
-            }
+    /**
+     * Sets the timeline resolution (how many historical points are drawn on the graph width).
+     * Resizes the internal array live and shifts elements in order to prevent data loss.
+     */
+    public void setMaxDataPoints(int newMax) {
+        if (newMax <= 2 || newMax == this.maxDataPoints) return;
+
+        float[] newData = new float[newMax];
+        int oldSize = this.maxDataPoints;
+
+        // get historical data in order [oldest -> newest]
+        float[] chronologicalData = new float[oldSize];
+        for (int i = 0; i < oldSize; i++) {
+            chronologicalData[i] = dataPoints[(head + i) % oldSize];
         }
 
+        if (newMax >= oldSize) {
+            // Expand graph
+            float paddingValue = chronologicalData[0];
+            int padCount = newMax - oldSize;
+            for (int i = 0; i < padCount; i++) {
+                newData[i] = paddingValue;
+            }
+            System.arraycopy(chronologicalData, 0, newData, padCount, oldSize);
+        } else {
+            // Shrink graph
+            int skipCount = oldSize - newMax;
+            System.arraycopy(chronologicalData, skipCount, newData, 0, newMax);
+        }
+
+        this.dataPoints = newData;
+        this.maxDataPoints = newMax;
+        this.head = 0; // Buffer is now sequential, next insertion index is flatly at 0
+
+        if (autoUpdateRange) {
+            recalculateDynamicBounds();
+        }
+    }
+
+    /**
+     * Sets the active polling sample throttle interval
+     *
+     * @param ms Time window separation between new samples in milliseconds.
+     */
+    public GraphWidget setSampleInterval(long ms) {
+        this.sampleIntervalMs = Math.max(1L, ms);
+        return this;
+    }
+
+    public long getSampleInterval() {
+        return this.sampleIntervalMs;
+    }
+
+    /**
+     * check the active ring buffer values to adjust min/max boundaries
+     */
+    private void recalculateDynamicBounds() {
+        float currentMin = Float.MAX_VALUE;
+        float currentMax = -Float.MAX_VALUE;
+
+        for (float val : dataPoints) {
+            if (val < currentMin) currentMin = val;
+            if (val > currentMax) currentMax = val;
+        }
+
+        float padding = (currentMax - currentMin) * 0.15f;
+        if (padding <= 0) padding = 2.0f; // Prevent division-by-zero
+
+        setMinValue(currentMin - padding);
+        setMaxValue(currentMax + padding);
+    }
+
+    public void addDataPoint(Float value) {
+        if (value == null) return;
+
         int index = (head) % maxDataPoints;
-        dataPoints[index] = Math.clamp(value, minValue, maxValue);
-        head = (head + 1) % maxDataPoints; // Buffer full, overwrite oldest and move head
+        dataPoints[index] = value;
+        head = (head + 1) % maxDataPoints;
+
+        if (autoUpdateRange) {
+            recalculateDynamicBounds();
+        } else {
+            dataPoints[index] = Math.clamp(value, minValue, maxValue);
+        }
     }
 
     private List<float[]> getInterpolatedPoints() {
@@ -229,8 +299,10 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
     @Override
     public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY) {
-        if (valueSupplier != null) {
+        long currentTime = Util.getMillis();
+        if (valueSupplier != null && (currentTime - lastSampleTime >= sampleIntervalMs)) {
             addDataPoint(getValue());
+            lastSampleTime = currentTime;
         }
 
         // Safety check. Happens on startup
@@ -299,11 +371,13 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
         drawInterpolatedCurve(graphics, points, graphColor.getRGB(), lineThickness);
 
+        DrawHelper.scaleAndPosition(graphics.pose(), x + 5, y + 5, 0.75f);
         DrawHelper.drawChromaText(
                 graphics, label,
                 x + 5, y + 5,
                 1.0f, 0.8f, 1.0f, 0.05f, true
         );
+        DrawHelper.stopScaling(graphics.pose());
 
         if (!points.isEmpty()) {
             float[] livePoint = points.getLast();
@@ -378,6 +452,28 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
                        this.computeOffset();
                 }, menu)
                 .renderWhen(() -> this.showGrid)
+        );
+        menu.addOption(new BooleanOption(Component.literal("Auto Scale Range"),
+                        () -> this.autoUpdateRange, value -> {
+                    this.autoUpdateRange = value;
+                    if (value) recalculateDynamicBounds();
+                }, BooleanOption.BooleanType.YES_NO).description(Component.literal("Automatically updates Y-axis limits dynamically based on current values"))
+                .withComplexity(Option.Complexity.Simple)
+        );
+        menu.addOption(new DoubleOption(Component.literal("Timeline Points"),
+                        10, 300, 5,
+                        () -> (double) this.maxDataPoints, value -> {
+                    this.setMaxDataPoints(value.intValue());
+                    this.computeOffset();
+                }, menu).description(Component.literal("Adjusts how many total data points are saved on the visual timeline"))
+                .withComplexity(Option.Complexity.Enhanced)
+        );
+        menu.addOption(new DoubleOption(Component.literal("Sample Cooldown (ms)"),
+                        10, 2000, 10,
+                        () -> (double) this.sampleIntervalMs, value -> {
+                    this.setSampleInterval(value.longValue());
+                }, menu).description(Component.literal("Sets how often the graph polls for a new data point (in milliseconds)"))
+                .withComplexity(Option.Complexity.Pro)
         );
         menu.addOption(new ColorOption(Component.literal("Graph Line Color"),
                 () -> this.graphColor, value -> this.graphColor = value, menu)
@@ -566,6 +662,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         private boolean showGrid = true;
         private int gridLines = 4;
         private String label = "Graph";
+        private long sampleIntervalMs = 100;
 
         public GraphWidgetBuilder() {
         }
@@ -625,6 +722,11 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
             return this;
         }
 
+        public GraphWidgetBuilder sampleInterval(long ms) {
+            this.sampleIntervalMs = ms;
+            return this;
+        }
+
         @Override
         protected GraphWidgetBuilder self() {
             return this;
@@ -633,6 +735,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         @Override
         public GraphWidget build() {
             GraphWidget widget = new GraphWidget(registryID, registryKey, modID, anchor, gWidth, gHeight, maxDataPoints, minValue, maxValue, graphColor, backgroundColor, lineThickness, showGrid, gridLines, label);
+            widget.setSampleInterval(sampleIntervalMs);
             widget.setPosition(x, y);
             widget.setDraggable(isDraggable);
             widget.setCanScale(shouldScale);
