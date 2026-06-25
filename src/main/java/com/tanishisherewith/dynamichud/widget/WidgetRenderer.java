@@ -2,6 +2,7 @@ package com.tanishisherewith.dynamichud.widget;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
+import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.internal.System;
 import com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.utils.Input;
@@ -11,6 +12,7 @@ import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import org.lwjgl.glfw.GLFW;
 
+import java.awt.*;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -21,6 +23,12 @@ public class WidgetRenderer implements Input {
     List<Widget> widgets;
     private boolean renderInGameHud = true;
     //private int Z_Index = -1;
+
+    // Snapping Guideline Coordinates
+    private float snapLineX = -1;
+    private float snapLineY = -1;
+    private float screenCenterX = -1;
+    private float screenCenterY = -1;
 
     /**
      * Add the list of widgets the widgetRenderer should render
@@ -104,6 +112,10 @@ public class WidgetRenderer implements Input {
                 widget.isInEditor = true;
                 widget.renderInEditor(graphics, mouseX, mouseY);
             }
+
+            if(GlobalConfig.get().doSmartSnapping()) {
+                drawSnapGuides(graphics);
+            }
             return;
         }
         //Render in any other screen and the inGameHud
@@ -154,6 +166,7 @@ public class WidgetRenderer implements Input {
     }
 
     public void onCloseScreen() {
+        clearSnapLines();
         if (DynamicHUD.MC.screen instanceof AbstractMoveableScreen) {
             for (Widget widget : widgets) {
                 widget.onClose();
@@ -167,6 +180,9 @@ public class WidgetRenderer implements Input {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        selectedWidget = null;
+        clearSnapLines();
+
         Screen currentScreen = DynamicHUD.MC.screen;
         if (currentScreen == null) {
             return false;
@@ -197,10 +213,14 @@ public class WidgetRenderer implements Input {
                 // if they are overlapped on each other.
                 if (widget.mouseDragged(mouseX, mouseY, button, deltaX, deltaY, snapSize)) {
                     selectedWidget = widget;
+                    if(GlobalConfig.get().doSmartSnapping()) {
+                        applySnappingAndGuides(selectedWidget);
+                    }
                     return true;
                 }
             }
             selectedWidget = null;
+            clearSnapLines();
         }
         return false;
     }
@@ -225,7 +245,167 @@ public class WidgetRenderer implements Input {
         }
     }
 
-  //  public WidgetRenderer withZIndex(int z_Index) {
+    /**
+     * Renders alignment and screen axis guidelines if snapping conditions are met.
+     */
+    private void drawSnapGuides(GuiGraphics graphics) {
+        int screenWidth = DynamicHUD.MC.getWindow().getGuiScaledWidth();
+        int screenHeight = DynamicHUD.MC.getWindow().getGuiScaledHeight();
+
+        int screenCenterColor = new Color(255, 80, 80, 180).getRGB(); // Light red for screen axes
+        int widgetSnapColor = new Color(0, 220, 255, 180).getRGB();   // Bright cyan for widget alignments
+
+        // Screen Vertical Center guideline
+        if (screenCenterX != -1) {
+            DrawHelper.drawVerticalLine(graphics, screenCenterX, 0, screenHeight, 1.0f, screenCenterColor);
+        }
+
+        // Screen Horizontal Center guideline
+        if (screenCenterY != -1) {
+            DrawHelper.drawHorizontalLine(graphics, 0, screenWidth, screenCenterY, 1.0f, screenCenterColor);
+        }
+
+        // Neighboring Widget Vertical alignment guideline
+        if (snapLineX != -1) {
+            DrawHelper.drawVerticalLine(graphics, snapLineX, 0, screenHeight, 1.0f, widgetSnapColor);
+        }
+
+        // Neighboring Widget Horizontal alignment guideline
+        if (snapLineY != -1) {
+            DrawHelper.drawHorizontalLine(graphics, 0, screenWidth, snapLineY, 1.0f, widgetSnapColor);
+        }
+    }
+
+    /**
+     * Resets active alignment line parameters.
+     */
+    private void clearSnapLines() {
+        snapLineX = -1;
+        snapLineY = -1;
+        screenCenterX = -1;
+        screenCenterY = -1;
+    }
+
+    /**
+     * Evaluates alignment thresholds and snaps the dragged widget to relevant lines or centers.
+     */
+    private void applySnappingAndGuides(Widget dragged) {
+        clearSnapLines();
+
+        if (dragged == null) return;
+
+        int screenWidth = DynamicHUD.MC.getWindow().getGuiScaledWidth();
+        int screenHeight = DynamicHUD.MC.getWindow().getGuiScaledHeight();
+        float threshold = 4f; // Snap tolerance threshold in pixels
+
+        float dw = dragged.getWidth();
+        float dh = dragged.getHeight();
+
+        float dl = dragged.getX();
+        float dr = dl + dw;
+        float dcx = dl + dw / 2.0f;
+
+        float dt = dragged.getY();
+        float db = dt + dh;
+        float dcy = dt + dh / 2.0f;
+
+        boolean snappedX = false;
+        boolean snappedY = false;
+
+        float screenMidX = screenWidth / 2.0f;
+        float screenMidY = screenHeight / 2.0f;
+
+        if (Math.abs(dcx - screenMidX) < threshold) {
+            dragged.setPosition((int) (screenMidX - dw / 2.0f), dragged.getY());
+            screenCenterX = screenMidX;
+            snappedX = true;
+            // Refresh coordinates
+            dl = dragged.getX();
+            dr = dl + dw;
+            dcx = dl + dw / 2.0f;
+        }
+
+        if (Math.abs(dcy - screenMidY) < threshold) {
+            dragged.setPosition(dragged.getX(), (int) (screenMidY - dh / 2.0f));
+            screenCenterY = screenMidY;
+            snappedY = true;
+            // Refresh coordinates
+            dt = dragged.getY();
+            db = dt + dh;
+            dcy = dt + dh / 2.0f;
+        }
+
+        for (Widget other : widgets) {
+            if (other == dragged || !other.isVisible()) continue;
+
+            float ow = other.getWidth();
+            float oh = other.getHeight();
+
+            float ol = other.getX();
+            float or = ol + ow;
+            float ocx = ol + ow / 2.0f;
+
+            float ot = other.getY();
+            float ob = ot + oh;
+            float ocy = ot + oh / 2.0f;
+
+            // X-Axis Snap Checks
+            if (!snappedX) {
+                if (Math.abs(dl - ol) < threshold) { // Left to Left
+                    dragged.setPosition((int) ol, dragged.getY());
+                    snapLineX = ol;
+                    snappedX = true;
+                } else if (Math.abs(dl - or) < threshold) { // Left to Right
+                    dragged.setPosition((int) or, dragged.getY());
+                    snapLineX = or;
+                    snappedX = true;
+                } else if (Math.abs(dr - ol) < threshold) { // Right to Left
+                    dragged.setPosition((int) (ol - dw), dragged.getY());
+                    snapLineX = ol;
+                    snappedX = true;
+                } else if (Math.abs(dr - or) < threshold) { // Right to Right
+                    dragged.setPosition((int) (or - dw), dragged.getY());
+                    snapLineX = or;
+                    snappedX = true;
+                } else if (Math.abs(dcx - ocx) < threshold) { // Center to Center
+                    dragged.setPosition((int) (ocx - dw / 2.0f), dragged.getY());
+                    snapLineX = ocx;
+                    snappedX = true;
+                }
+            }
+
+            // Y-Axis Snap Checks
+            if (!snappedY) {
+                if (Math.abs(dt - ot) < threshold) { // Top to Top
+                    dragged.setPosition(dragged.getX(), (int) ot);
+                    snapLineY = ot;
+                    snappedY = true;
+                } else if (Math.abs(dt - ob) < threshold) { // Top to Bottom
+                    dragged.setPosition(dragged.getX(), (int) ob);
+                    snapLineY = ob;
+                    snappedY = true;
+                } else if (Math.abs(db - ot) < threshold) { // Bottom to Top
+                    dragged.setPosition(dragged.getX(), (int) (ot - dh));
+                    snapLineY = ot;
+                    snappedY = true;
+                } else if (Math.abs(db - ob) < threshold) { // Bottom to Bottom
+                    dragged.setPosition(dragged.getX(), (int) (ob - dh));
+                    snapLineY = ob;
+                    snappedY = true;
+                } else if (Math.abs(dcy - ocy) < threshold) { // Center to Center
+                    dragged.setPosition(dragged.getX(), (int) (ocy - dh / 2.0f));
+                    snapLineY = ocy;
+                    snappedY = true;
+                }
+            }
+
+            if (snappedX && snappedY) break;
+        }
+    }
+
+
+
+    //  public WidgetRenderer withZIndex(int z_Index) {
      //   this.Z_Index = z_Index;
    //     return this;
    // }

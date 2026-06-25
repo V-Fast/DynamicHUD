@@ -289,7 +289,6 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
         List<float[]> points = getInterpolatedPoints();
 
-        DrawHelper.enableScissor((int) x, (int) y, (int) gWidth, (int) gHeight, graphics);
 
         // Draw shadow effect under the graph
         drawGradientShadow(
@@ -312,7 +311,6 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
             DrawHelper.drawFilledCircle(graphics, livePoint[0], livePoint[1], 0.9f, 0x26FFFFFF);
         }
 
-        DrawHelper.disableScissor(graphics);
 
         // Draw axes
         DrawHelper.drawHorizontalLine(graphics, x, gWidth, y + gHeight - 1, 1.0f, 0xFFFFFFFF); // X-axis
@@ -330,7 +328,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         String formattedMinVal = formatValue(minValue);
 
         DrawHelper.scaleAndPosition(graphics.pose(), x - mc.font.width(formattedMinVal)/2.0f, y + gHeight,mc.font.width(formattedMinVal),mc.font.lineHeight * 0.5f, 0.5f);
-        graphics.drawString(mc.font, formattedMinVal, x - mc.font.width(formattedMinVal), (int) (y + gHeight + 1), 0xFFFFFFFF, true);
+        graphics.drawString(mc.font, formattedMinVal, x - mc.font.width(formattedMinVal), (int) (y + gHeight), 0xFFFFFFFF, true);
         DrawHelper.stopScaling(graphics.pose());
 
         if(showGrid) x -= offset;

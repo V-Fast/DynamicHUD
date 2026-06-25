@@ -42,6 +42,9 @@ public final class GlobalConfig {
     private boolean renderInDebugScreen = false;
 
     @SerialEntry
+    private boolean smartSnapping = true;
+
+    @SerialEntry
     private final boolean forceSameContextMenuSkin = true;
 
     //These package names are getting seriously long
@@ -79,7 +82,7 @@ public final class GlobalConfig {
                                 .option(Option.<Boolean>createBuilder()
                                         .name(Component.literal("Render in debug screen"))
                                         .description(OptionDescription.of(Component.literal("Renders widgets even when the debug screen is on")))
-                                        .binding(true, () -> this.renderInDebugScreen, newVal -> this.renderInDebugScreen = newVal)
+                                        .binding(false, () -> this.renderInDebugScreen, newVal -> this.renderInDebugScreen = newVal)
                                         .controller(booleanOption -> BooleanControllerBuilder.create(booleanOption).yesNoFormatter())
                                         .build())
                                 .option(Option.<Boolean>createBuilder()
@@ -91,7 +94,13 @@ public final class GlobalConfig {
                                 .option(Option.<Boolean>createBuilder()
                                         .name(Component.literal("Show widget descriptions/tooltips"))
                                         .description(OptionDescription.of(Component.literal("Shows the description of widgets as tooltips.")))
-                                        .binding(true, () -> this.displayDescriptions, newVal -> this.displayDescriptions = newVal)
+                                        .binding(false, () -> this.displayDescriptions, newVal -> this.displayDescriptions = newVal)
+                                        .controller(booleanOption -> BooleanControllerBuilder.create(booleanOption).yesNoFormatter())
+                                        .build())
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Component.literal("Smart Snapping"))
+                                        .description(OptionDescription.of(Component.literal("Enables widgets to automatically snap to each other or the center of the screen, displaying alignment guidelines while dragging")))
+                                        .binding(true, () -> this.smartSnapping, newVal -> this.smartSnapping = newVal)
                                         .controller(booleanOption -> BooleanControllerBuilder.create(booleanOption).yesNoFormatter())
                                         .build())
                                 .option(Option.<Integer>createBuilder()
@@ -164,6 +173,10 @@ public final class GlobalConfig {
 
     public int getCmAnimationTimeInMs() {
         return cmAnimationTimeInMs;
+    }
+
+    public boolean doSmartSnapping() {
+        return smartSnapping;
     }
 
     public com.tanishisherewith.dynamichud.utils.contextmenu.options.Option.Complexity complexity() {

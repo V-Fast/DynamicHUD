@@ -491,18 +491,12 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         public void render(GuiGraphics graphics, BooleanOption option, int x, int y, int mouseX, int mouseY) {
             graphics.drawString(mc.font, option.name, x + 15, y + 25 / 2 - 5, -1, true);
 
-            option.setPosition(x + panelWidth - 75, y);
-
             int width = 50;
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, option.isMouseOver(mouseX, mouseY)), option.getX(), y, width, 20);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, isMouseOver(mouseX, mouseY,x + panelWidth - 75, y, width, 20)), x + panelWidth - 75, y, width, 20);
 
             Component Component = option.getBooleanType().getText(option.value);
             int color = option.value ? Color.GREEN.getRGB() : Color.RED.getRGB();
             graphics.drawString(mc.font, Component, (int) (option.getX() + (width / 2.0f) - (mc.font.width(Component) / 2.0f)), y + 5, color, true);
-
-
-            //Widths don't matter in this skin
-            option.setWidth(width);
         }
     }
 
@@ -540,17 +534,15 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
             graphics.drawString(mc.font, option.name, x + 15, y + 25 / 2 - 5, -1, true);
 
-            option.setPosition(x + panelWidth - 45, y);
-
             int width = 20;
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(!option.isVisible, option.isMouseOver(mouseX, mouseY)), option.getX(), y, width, 20);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(!option.isVisible, isMouseOver(mouseX, mouseY,x + panelWidth - 45, y, width, 20)), x + panelWidth - 45, y, width, 20);
 
             int shadowOpacity = Math.min(option.value.getAlpha(), 45);
             DrawHelper.drawRectangleWithShadowBadWay(graphics,
                     option.getX() + 4,
                     y + 4,
                     width - 8,
-                    20 - 8,
+                    12,
                     option.value.getRGB(),
                     shadowOpacity,
                     1,
@@ -587,7 +579,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
         @Override
         public boolean mouseClicked(ColorOption option, double mouseX, double mouseY, int button) {
-            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX, mouseY, option.getX(), option.getY(), 20, 20)) {
+            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX, mouseY, option.getX() + panelWidth - 45, option.getY(), 20, 20)) {
                 boolean isOpening = !option.getColorGradient().shouldDisplay();
                 scaleAnimation.startValue(scale);
                 if (isOpening) {

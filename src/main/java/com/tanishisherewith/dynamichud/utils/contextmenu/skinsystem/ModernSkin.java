@@ -969,26 +969,26 @@ public class ModernSkin extends Skin implements GroupableSkin {
         @Override
         public void render(GuiGraphics graphics, RunnableOption option, int x, int y, int mouseX, int mouseY) {
             String labelText = "Run ▶";
+            float labelWidth = mc.font.width(labelText) + 5;
+
             int xPos = x + option.getWidth() - 45;
 
             option.setHeight(mc.font.lineHeight + 6);
 
-            boolean isHovering = isMouseOver(mouseX, mouseY, xPos + 2, y + 4, width, mc.font.lineHeight + 4);
+            boolean isHovering = isMouseOver(mouseX, mouseY, xPos + 2, y + 4, labelWidth, mc.font.lineHeight + 4);
             boolean isDown = isHovering && GLFW.glfwGetMouseButton(mc.getWindow().handle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;
             animator.update(isDown);
 
             graphics.drawString(mc.font, option.name, x + 4, y + 4, -1, false);
 
-            float width = mc.font.width(labelText) + 5;
-
             Color fillColor = isHovering ? getThemeColor().darker().darker() : getThemeColor();
 
-            DrawHelper.scaleAndPosition(graphics.pose(),xPos - 1, y + 1,width, mc.font.lineHeight + 4, animator.getScale());
+            DrawHelper.scaleAndPosition(graphics.pose(),xPos - 1, y + 1,labelWidth, mc.font.lineHeight + 4, animator.getScale());
 
             DrawHelper.drawRoundedRectangleWithShadowBadWay(
                     graphics,
                     xPos - 1, y + 1,
-                    width, mc.font.lineHeight + 4,
+                    labelWidth, mc.font.lineHeight + 4,
                     2,
                     fillColor.getRGB(),
                     180,
@@ -1104,6 +1104,9 @@ public class ModernSkin extends Skin implements GroupableSkin {
             int iconColor = isFocused()? Color.WHITE.getRGB() : 0x80FFFFFF;
             graphics.drawString(mc.font, icon, iconX, iconY, iconColor, false);
 
+
+            //Rendering the original edit-box widget without its border and background, and translating it to fit inside our search box
+            // EditBox handles the rest of the text and highlight rendering
             graphics.pose().pushMatrix();
             graphics.pose().translate(-1,3);
             super.renderWidget(graphics, mouseX, mouseY, delta);
