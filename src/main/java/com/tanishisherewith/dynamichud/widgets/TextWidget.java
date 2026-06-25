@@ -186,8 +186,6 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
         rainbowSaturation = tag.getFloat("RainbowSaturation").orElse(1.0f);
         rainbowBrightness = tag.getFloat("RainbowBrightness").orElse(1.0f);
         textColor = new Color(tag.getInt("TextColor").orElse(0xFFFFFFFF), true); // default white
-        registryKey = tag.getString("RegistryKey").orElse("default:key");
-        registryID = tag.getString("RegistryID").orElse("default:id");
 
         //createMenu();
     }

@@ -74,8 +74,6 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         this.setMaxValue(maxValue);
 
         internal_init();
-
-        createMenu();
         ContextMenuManager.getInstance().registerProvider(this);
     }
 
@@ -91,6 +89,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         computeOffset();
 
         setTooltipText(Component.literal("Graph displaying: " + label));
+        createMenu();
     }
 
     public GraphWidget() {
@@ -194,10 +193,12 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
                 float px = x0 + t * xStep;
                 float py = h00 * y0 + h10 * m0 + h01 * y1 + h11 * m1;
 
+                py = Math.clamp(py, y, y + gHeight);
+
                 if (points.isEmpty()) {
                     points.add(new float[]{px, py});
                 } else {
-                    float[] lastP = points.get(points.size() - 1);
+                    float[] lastP = points.getLast();
                     float distanceSq = (px - lastP[0]) * (px - lastP[0]) + (py - lastP[1]) * (py - lastP[1]);
                     if (distanceSq > 0.005f) {
                         points.add(new float[]{px, py});
@@ -288,6 +289,8 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
         List<float[]> points = getInterpolatedPoints();
 
+        DrawHelper.enableScissor((int) x, (int) y, (int) gWidth, (int) gHeight, graphics);
+
         // Draw shadow effect under the graph
         drawGradientShadow(
                 graphics, points, y + gHeight,
@@ -303,17 +306,17 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
                 1.0f, 0.8f, 1.0f, 0.05f, true
         );
 
-
-        // Draw axes
-        DrawHelper.drawHorizontalLine(graphics, x, gWidth, y + gHeight - 1, 1.0f, 0xFFFFFFFF); // X-axis
-        DrawHelper.drawVerticalLine(graphics, x, y, gHeight, 1.0f, 0xFFFFFFFF); // Y-axis
-
-
         if (!points.isEmpty()) {
             float[] livePoint = points.getLast();
 
             DrawHelper.drawFilledCircle(graphics, livePoint[0], livePoint[1], 0.9f, 0x26FFFFFF);
         }
+
+        DrawHelper.disableScissor(graphics);
+
+        // Draw axes
+        DrawHelper.drawHorizontalLine(graphics, x, gWidth, y + gHeight - 1, 1.0f, 0xFFFFFFFF); // X-axis
+        DrawHelper.drawVerticalLine(graphics, x, y, gHeight, 1.0f, 0xFFFFFFFF); // Y-axis
 
         // Draw min and max value labels with formatted values
         /*
@@ -325,8 +328,9 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
          */
 
         String formattedMinVal = formatValue(minValue);
-        DrawHelper.scaleAndPosition(graphics.pose(), x + (offset - mc.font.width(formattedMinVal))/2.0f, y + gHeight, 0.4f);
-        graphics.drawString(mc.font, formattedMinVal, x + offset - mc.font.width(formattedMinVal), (int) (y + gHeight + 1), 0xFFFFFFFF, true);
+
+        DrawHelper.scaleAndPosition(graphics.pose(), x - mc.font.width(formattedMinVal)/2.0f, y + gHeight,mc.font.width(formattedMinVal),mc.font.lineHeight * 0.5f, 0.5f);
+        graphics.drawString(mc.font, formattedMinVal, x - mc.font.width(formattedMinVal), (int) (y + gHeight + 1), 0xFFFFFFFF, true);
         DrawHelper.stopScaling(graphics.pose());
 
         if(showGrid) x -= offset;
@@ -545,7 +549,6 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         this.setMaxValue(maxValue);
 
         internal_init();
-        createMenu();
     }
 
     @Override

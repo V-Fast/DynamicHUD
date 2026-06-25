@@ -50,7 +50,7 @@ public abstract class DynamicValueWidget extends Widget {
 
         initializeValueSupplier();
 
-        if (valueSupplier == null) throw new IllegalStateException("Value supplier remains null");
+        if (valueSupplier == null) throw new IllegalStateException("Value supplier cannot be null. Invalid registry data found!");
     }
 
     /**
