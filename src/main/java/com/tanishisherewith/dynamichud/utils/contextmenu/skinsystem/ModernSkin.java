@@ -119,6 +119,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         int targetWidth = (int) (width * 0.8f - 18);
         renderGroup(graphics, group, groupX, groupY, targetWidth, mouseX, mouseY);
     }
+
     private int calcOptionHeight(Option<?> option) {
         if (option instanceof BooleanOption || option instanceof DoubleOption) return 14;
         if (option instanceof CycleOption) return 14;
@@ -1018,8 +1019,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         return new ModernSkin(radius, defaultToolTipHeader, defaultToolTipText);
     }
 
-
-    private static class GroupAnimData {
+    protected static class GroupAnimData {
         float value;
         ValueAnimation animation;
 
