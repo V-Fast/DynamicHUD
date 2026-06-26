@@ -8,6 +8,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProvider;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
+import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.ClassicSkin;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.ModernSkin;
 import com.tanishisherewith.dynamichud.widget.DynamicValueWidget;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
@@ -50,7 +51,7 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
     }
 
     public void createMenu() {
-        menu = new ContextMenu<>(getX(), getY(),ContextMenuProperties.builder().skin(new ModernSkin()).build());
+        menu = new ContextMenu<>(getX(), getY(),ContextMenuProperties.builder().skin(new ClassicSkin()).build());
 
     //    if(IntegrationManager.IS_TEST_MODE) menu.setLayoutEngine(new LayoutEngine(20,20,20,80));
 

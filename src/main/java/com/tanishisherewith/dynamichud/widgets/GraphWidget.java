@@ -459,7 +459,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     }
 
     public void createMenu() {
-        ContextMenuProperties properties = ContextMenuProperties.builder().skin(new MinecraftSkin(MinecraftSkin.PanelColor.FOREST_GREEN)).build();
+        ContextMenuProperties properties = ContextMenuProperties.builder().build();
         menu = new ContextMenu<>(getX(), (int) (getY() + widgetBox.getHeight()), properties);
 
         menu.addOption(new BooleanOption(Component.literal("Show Grid"),
