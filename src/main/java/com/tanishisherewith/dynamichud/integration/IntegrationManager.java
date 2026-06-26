@@ -13,8 +13,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.screens.TitleScreen;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +32,7 @@ public final class IntegrationManager {
     public static final Map<String, List<Widget>> FILE_MAP = new HashMap<>();
     private static final List<WidgetRenderer> widgetRenderers = new ArrayList<>();
 
-    private static boolean enableTestIntegration = false;
+    public static boolean IS_TEST_MODE = false;
 
 
     public static void addWidgetRenderer(WidgetRenderer widgetRenderer) {
@@ -49,8 +49,8 @@ public final class IntegrationManager {
      * @param key    The key to listen for
      * @param screen The AbstractMoveableScreen instance to use to set the screen
      */
-    public static void openScreen(KeyBinding key, AbstractMoveableScreen screen) {
-        if (key.wasPressed()) {
+    public static void openScreen(KeyMapping key, AbstractMoveableScreen screen) {
+        if (key.isDown()) {
             DynamicHUD.MC.setScreen(screen);
         }
     }
@@ -59,7 +59,7 @@ public final class IntegrationManager {
         String[] args = FabricLoader.getInstance().getLaunchArguments(true);
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("--dynamicHudTest") && i + 1 < args.length) {
-                enableTestIntegration = Boolean.parseBoolean(args[i + 1]);
+                IS_TEST_MODE = Boolean.parseBoolean(args[i + 1]);
                 break;
             }
         }
@@ -72,7 +72,7 @@ public final class IntegrationManager {
 
         var integrations = new ArrayList<>(getRegisteredIntegrations());
 
-        if (enableTestIntegration) {
+        if (IS_TEST_MODE) {
             EntrypointContainer<DynamicHudIntegration> testIntegration = getTestIntegration();
             if (testIntegration != null) {
                 integrations.add(testIntegration);
@@ -92,7 +92,7 @@ public final class IntegrationManager {
             String modId = metadata.getId();
 
             AbstractMoveableScreen screen;
-            KeyBinding binding;
+            KeyMapping binding;
             WidgetRenderer widgetRenderer;
             File widgetsFile;
             try {
@@ -161,7 +161,7 @@ public final class IntegrationManager {
             ClientTickEvents.START_CLIENT_TICK.register((client) -> {
                 if (BooleanPool.get("WarningScreenFlag")) return;
 
-                if (DynamicHUD.MC.currentScreen instanceof TitleScreen) {
+                if (DynamicHUD.MC.screen instanceof TitleScreen) {
                     DynamicHUD.MC.setScreen(new WarningScreen(bad_implementations));
                     BooleanPool.put("WarningScreenFlag", true);
                 }
@@ -185,13 +185,13 @@ public final class IntegrationManager {
     }
 
     /**
-     * This makes it so that if minecraft is launched with the program arguments
+     * If minecraft is launched with the program arguments
      * <p>
      * {@code --dynamicHudTest true}
      * </p>
-     * then it will
-     * load the {@link com.tanishisherewith.dynamichud.IntegrationTest} class as an entrypoint, eliminating any errors due to human incapacity of
-     * adding/removing a single line from the `fabric.mod.json`
+     * then it wil load the {@link com.tanishisherewith.dynamichud.IntegrationTest} class as an entrypoint,
+     * eliminating any errors due to human incapacity of adding/removing a single line from the `fabric.mod.json`
+     * This is for myself.
      */
     private static EntrypointContainer<DynamicHudIntegration> getTestIntegration() {
         DynamicHudIntegration testIntegration;

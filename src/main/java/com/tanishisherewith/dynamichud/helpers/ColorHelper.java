@@ -1,16 +1,8 @@
 package com.tanishisherewith.dynamichud.helpers;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.util.Window;
-import net.minecraft.util.math.MathHelper;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL30;
+import net.minecraft.util.Mth;
 
 import java.awt.*;
-import java.nio.ByteBuffer;
 
 /**
  * This class provides helper methods for working with colors.
@@ -44,6 +36,10 @@ public class ColorHelper {
     public static String reset = "\247r";
 
     public static int r, g, b, a;
+
+    // Used in [ClassicSkin.java]
+    public static Color DARK_RED = new Color(116, 0, 0);
+    public static Color DARK_GREEN = new Color(24, 132, 0, 226);
 
     public ColorHelper(int r, int g, int b, int a) {
         ColorHelper.r = r;
@@ -113,9 +109,9 @@ public class ColorHelper {
         float pi = (float) Math.PI;
 
         float[] rainbow = new float[3];
-        rainbow[0] = 0.5F + 0.5F * MathHelper.sin(x * pi);
-        rainbow[1] = 0.5F + 0.5F * MathHelper.sin((x + 4F / 3F) * pi);
-        rainbow[2] = 0.5F + 0.5F * MathHelper.sin((x + 8F / 3F) * pi);
+        rainbow[0] = 0.5F + 0.5F * Mth.sin(x * pi);
+        rainbow[1] = 0.5F + 0.5F * Mth.sin((x + 4F / 3F) * pi);
+        rainbow[2] = 0.5F + 0.5F * Mth.sin((x + 8F / 3F) * pi);
         return rainbow;
     }
 

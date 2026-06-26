@@ -4,7 +4,7 @@ import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.utils.Util;
 import com.tanishisherewith.dynamichud.widgets.GraphWidget;
 import com.tanishisherewith.dynamichud.widgets.TextWidget;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.function.Supplier;
 
@@ -19,7 +19,7 @@ public abstract class DynamicValueWidget extends Widget {
     protected Supplier<?> valueSupplier;
 
     public DynamicValueWidget(WidgetData<?> data, String modID, String registryID, String registryKey) {
-        this(data, modID, Anchor.CENTER, registryID, registryKey);
+        this(data, modID, Anchor._default(), registryID, registryKey);
     }
 
     public DynamicValueWidget(WidgetData<?> data, String modId, Anchor anchor, String registryID, String registryKey) {
@@ -36,21 +36,21 @@ public abstract class DynamicValueWidget extends Widget {
     }
 
     @Override
-    public void writeToTag(NbtCompound tag) {
+    public void writeToTag(CompoundTag tag) {
         super.writeToTag(tag);
         tag.putString("RegistryID", registryID);
         tag.putString("RegistryKey", registryKey);
     }
 
     @Override
-    public void readFromTag(NbtCompound tag) {
+    public void readFromTag(CompoundTag tag) {
         super.readFromTag(tag);
         registryID = tag.getString("RegistryID").orElse(DynamicValueRegistry.GLOBAL_ID);
         registryKey = tag.getString("RegistryKey").orElse("null");
 
         initializeValueSupplier();
 
-        if (valueSupplier == null) throw new IllegalStateException("Value supplier remains null");
+        if (valueSupplier == null) throw new IllegalStateException("Value supplier cannot be null. Invalid registry data found!");
     }
 
     /**

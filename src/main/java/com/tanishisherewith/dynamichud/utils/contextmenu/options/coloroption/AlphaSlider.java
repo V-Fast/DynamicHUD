@@ -2,7 +2,8 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption;
 
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.util.Mth;
 
 import java.awt.*;
 
@@ -22,16 +23,16 @@ public class AlphaSlider {
         this.color = color;
         this.x = x;
         this.y = y;
-        this.alpha = color.getAlpha() / 255f;
+        updateAlphaFromColor(color);
     }
 
-    public void render(DrawContext drawContext, int x, int y) {
+    public void render(GuiGraphics graphics, int x, int y) {
         this.x = x;
         this.y = y;
 
-        DrawHelper.drawOutlinedBox(drawContext, x - 2, y - 2, x + width + 2, y + height + 2, Color.WHITE.getRGB());
-        DrawHelper.drawGradient(drawContext, x, y, width, height, color.getRGB(), ColorHelper.changeAlpha(color, 0).getRGB(), DrawHelper.Direction.TOP_BOTTOM);
-        drawContext.fill(x - 2, y + alphaHandleY - 1, x + width + 2, y + alphaHandleY + 1, Color.WHITE.getRGB());
+        DrawHelper.drawOutlinedBox(graphics, x - 2, y - 2, x + width + 2, y + height + 2, Color.WHITE.getRGB());
+        DrawHelper.drawGradient(graphics, x, y, width, height, color.getRGB(), ColorHelper.changeAlpha(color, 0).getRGB(), DrawHelper.Direction.TOP_BOTTOM);
+        graphics.fill(x - 2, y + alphaHandleY - 1, x + width + 2, y + alphaHandleY + 1, Color.WHITE.getRGB());
     }
 
     public Color getColor() {
@@ -40,19 +41,38 @@ public class AlphaSlider {
 
     public void setColor(Color color) {
         this.color = color;
+        updateAlphaFromColor(color);
+    }
+
+    private void updateAlphaFromColor(Color color) {
+        this.alpha = color.getAlpha() / 255f;
+        // Maps the 0.0 - 1.0 float range back into screen pixel offset
+        this.alphaHandleY = Math.round((1.0f - this.alpha) * this.height);
     }
 
     public void onClick(double mouseX, double mouseY, int button) {
         if (button == 0 && isMouseOver(mouseX, mouseY)) {
-            alphaHandleY = (int) mouseY - y;
-            alpha = 1.0f - (alphaHandleY / (float) height);
-            if (alpha < 0.0f) {
-                alpha = 0.0f;
-            } else if (alpha > 1.0f) {
-                alpha = 1.0f;
-            }
             this.isDragging = true;
+            handleMouseMovement(mouseY);
         }
+    }
+
+    public void onDrag(double mouseX, double mouseY, int button) {
+        if (this.isDragging) {
+            handleMouseMovement(mouseY);
+        }
+    }
+
+    public void onRelease(double mouseX, double mouseY, int button) {
+        if (button == 0) {
+            this.isDragging = false;
+        }
+    }
+
+    private void handleMouseMovement(double mouseY) {
+        // Clamp mouse delta pos so the handle dooesnt jump out of the bar bounds
+        this.alphaHandleY = Mth.clamp((int) mouseY - this.y, 0, this.height);
+        this.alpha = 1.0f - (this.alphaHandleY / (float) this.height);
     }
 
     public void setY(int y) {
@@ -73,23 +93,5 @@ public class AlphaSlider {
 
     public boolean isMouseOver(double mouseX, double mouseY) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
-    }
-
-    public void onRelease(double mouseX, double mouseY, int button) {
-        if (button == 0) {
-            isDragging = false;
-        }
-    }
-
-    public void onDrag(double mouseX, double mouseY, int button) {
-        if (isDragging && mouseY >= y && mouseY <= y + height) {
-            alphaHandleY = (int) mouseY - y;
-            alpha = 1.0f - (alphaHandleY / (float) height);
-            if (alpha < 0.0f) {
-                alpha = 0.0f;
-            } else if (alpha > 1.0f) {
-                alpha = 1.0f;
-            }
-        }
     }
 }

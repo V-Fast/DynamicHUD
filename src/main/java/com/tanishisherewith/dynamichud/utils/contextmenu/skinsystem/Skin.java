@@ -5,8 +5,8 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.OptionGroup;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.GroupableSkin;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public abstract class Skin {
-    protected static final MinecraftClient mc = MinecraftClient.getInstance();
+    protected static final Minecraft mc = Minecraft.getInstance();
     protected ContextMenu<?> contextMenu;
     protected Map<Class<? extends Option<?>>, Supplier<SkinRenderer<? extends Option<?>>>> renderers = new HashMap<>();
     private boolean createNewScreen;
@@ -54,7 +54,7 @@ public abstract class Skin {
      * Flatten a list of options, expanding any groups into their constituent options.
      * Used by skins that don't support group rendering.
      */
-    protected List<Option<?>> flattenOptions(List<Option<?>> options) {
+    public static List<Option<?>> flattenOptions(List<Option<?>> options) {
         List<Option<?>> flattened = new ArrayList<>();
 
         for (Option<?> option : options) {
@@ -70,7 +70,7 @@ public abstract class Skin {
         return flattened;
     }
 
-    protected List<Option<?>> getOptions(ContextMenu<?> menu) {
+    public List<Option<?>> getOptions(ContextMenu<?> menu) {
         return supportsGroups() ? menu.getOptions() : flattenOptions(menu.getOptions());
     }
 
@@ -82,7 +82,7 @@ public abstract class Skin {
         this.renderers = renderers;
     }
 
-    public abstract void renderContextMenu(DrawContext drawContext, ContextMenu<?> contextMenu, int mouseX, int mouseY);
+    public abstract void renderContextMenu(GuiGraphics graphics, ContextMenu<?> contextMenu, int mouseX, int mouseY);
 
     public boolean mouseClicked(ContextMenu<?> menu, double mouseX, double mouseY, int button) {
         return false;
@@ -102,6 +102,9 @@ public abstract class Skin {
     public void keyReleased(ContextMenu<?> menu, int key, int scanCode, int modifiers) {
     }
 
+    public void charTyped(ContextMenu<?> menu, char c, int modifiers) {
+    }
+
     public void mouseScrolled(ContextMenu<?> menu, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
     }
 
@@ -113,7 +116,7 @@ public abstract class Skin {
         this.createNewScreen = createNewScreen;
     }
 
-    protected boolean isMouseOver(double mouseX, double mouseY, double x, double y, double width, double height) {
+    public static boolean isMouseOver(double mouseX, double mouseY, double x, double y, double width, double height) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
 

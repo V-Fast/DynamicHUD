@@ -1,8 +1,8 @@
-package com.tanishisherewith.dynamichud.utils.contextmenu.contextmenuscreen;
+package com.tanishisherewith.dynamichud.utils.contextmenu.screen.factory;
 
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 /**
  * We will use this interface to provide the context menu with the screen required by its skins.

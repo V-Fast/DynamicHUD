@@ -2,19 +2,20 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 // A group is just another type of Option that contains other options
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class OptionGroup extends Option<OptionGroup> {
     private final List<Option<?>> groupOptions = new ArrayList<>();
     protected boolean expanded; // Skins can choose to use this or ignore it
 
-    public OptionGroup(Text name) {
+    public OptionGroup(Component name) {
         super(name, () -> null, (v) -> {}, () -> true);
         this.expanded = false;
     }
@@ -27,6 +28,7 @@ public class OptionGroup extends Option<OptionGroup> {
         return Collections.unmodifiableList(groupOptions);
     }
 
+
     @Override
     public void updateProperties(ContextMenuProperties properties) {
         super.updateProperties(properties);
@@ -38,8 +40,8 @@ public class OptionGroup extends Option<OptionGroup> {
     }
 
     @Override
-    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
-        super.render(drawContext,x,y,mouseX,mouseY);
+    public void render(GuiGraphics graphics, int x, int y, int mouseX, int mouseY) {
+        super.render(graphics,x,y,mouseX,mouseY);
     }
 
     public boolean isExpanded() {
@@ -65,16 +67,20 @@ public class OptionGroup extends Option<OptionGroup> {
 
     public static class OptionGroupRenderer implements SkinRenderer<Option<OptionGroup>> {
         @Override
-        public void render(DrawContext drawContext, Option<OptionGroup> option, int x, int y, int mouseX, int mouseY) {}
+        public void render(GuiGraphics graphics, Option<OptionGroup> option, int x, int y, int mouseX, int mouseY) {}
 
         @Override
         public boolean mouseClicked(Option<OptionGroup> option2, double mouseX, double mouseY, int button) {
             OptionGroup option = (OptionGroup) option2;
 
-            for (Option subOption : option.getGroupOptions()) {
-                subOption.getRenderer().mouseClicked(subOption, mouseX, mouseY, button);
+            if (option.isExpanded()) {
+                for (Option subOption : option.getGroupOptions()) {
+                    if (subOption.getRenderer().mouseClicked(subOption, mouseX, mouseY, button)) {
+                        return true;
+                    }
+                }
             }
-            return SkinRenderer.super.mouseClicked(option, mouseX, mouseY, button);
+            return false;
         }
 
         @Override
@@ -82,9 +88,9 @@ public class OptionGroup extends Option<OptionGroup> {
             OptionGroup option = (OptionGroup) option2;
 
             for (Option subOption : option.getGroupOptions()) {
-                subOption.getRenderer().mouseReleased(subOption, mouseX, mouseY, button);
+                if(subOption.getRenderer().mouseReleased(subOption, mouseX, mouseY, button)) return true;
             }
-            return SkinRenderer.super.mouseReleased(option, mouseX, mouseY, button);
+            return false;
         }
 
         @Override
@@ -92,9 +98,9 @@ public class OptionGroup extends Option<OptionGroup> {
             OptionGroup option = (OptionGroup) option2;
 
             for (Option subOption : option.getGroupOptions()) {
-                subOption.getRenderer().mouseDragged(subOption, mouseX, mouseY, button, deltaX, deltaY);
+                if(subOption.getRenderer().mouseDragged(subOption, mouseX, mouseY, button, deltaX, deltaY)) return true;
             }
-            return SkinRenderer.super.mouseDragged(option, mouseX, mouseY, button, deltaX, deltaY);
+            return false;
         }
 
         @Override

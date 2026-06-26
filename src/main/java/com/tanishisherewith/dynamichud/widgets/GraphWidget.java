@@ -1,9 +1,9 @@
 package com.tanishisherewith.dynamichud.widgets;
 
-import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
-import com.tanishisherewith.dynamichud.helpers.animationhelper.animations.MathAnimations;
+import com.tanishisherewith.dynamichud.renderstates.GradientShadowRenderState;
+import com.tanishisherewith.dynamichud.renderstates.InterpolatedCurveRenderState;
 import com.tanishisherewith.dynamichud.utils.CustomRenderLayers;
 import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
@@ -14,16 +14,17 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.options.BooleanOption;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.ColorOption;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.DoubleOption;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
+import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.MinecraftSkin;
 import com.tanishisherewith.dynamichud.widget.DynamicValueWidget;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
 import com.twelvemonkeys.lang.Validate;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
-import org.joml.Matrix4f;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Util;
+import org.joml.Matrix3x2f;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -49,20 +50,26 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     private float lineThickness;
     private boolean showGrid;
     private int gridLines;
-    private float width;
-    private float height;
+    private float gWidth;
+    private float gHeight;
     private String label;
     /// Automatically update the min and max of the graph
     private boolean autoUpdateRange = false;
+    ///The min range between the min/max of graph
+    public float minRangeSpan = 10f;
+
     private float stepY;
     private float valueStep;
-    private float scale;
+    private float valueScale;
     int offset = -2;
 
-    public GraphWidget(String registryID, String registryKey, String modId, Anchor anchor, float width, float height, int maxDataPoints, float minValue, float maxValue, Color graphColor, Color backgroundColor, float lineThickness, boolean showGrid, int gridLines, String label) {
+    private long lastSampleTime = 0;
+    private long sampleIntervalMs = 100;
+
+    public GraphWidget(String registryID, String registryKey, String modId, Anchor anchor, float gWidth, float gHeight, int maxDataPoints, float minValue, float maxValue, Color graphColor, Color backgroundColor, float lineThickness, boolean showGrid, int gridLines, String label) {
         super(DATA, modId, anchor, registryID, registryKey);
-        this.width = width;
-        this.height = height;
+        this.gWidth = gWidth;
+        this.gHeight = gHeight;
         this.maxDataPoints = maxDataPoints;
         this.graphColor = graphColor;
         this.backgroundColor = backgroundColor;
@@ -74,8 +81,6 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         this.setMaxValue(maxValue);
 
         internal_init();
-
-        createMenu();
         ContextMenuManager.getInstance().registerProvider(this);
     }
 
@@ -83,22 +88,24 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         Validate.isTrue(maxDataPoints > 2, "MaxDataPoints should be more than 2.");
         this.dataPoints = new float[maxDataPoints];
         this.label = label.trim();
-        this.widgetBox = new WidgetBox(x, y, (int) width, (int) height);
-        this.stepY = height / (gridLines + 1);
+        this.widgetBox.setDimensions(x, y, (int) gWidth, (int) gHeight, canScale);
+        this.stepY = gHeight / (gridLines + 1);
         this.valueStep = (maxValue - minValue) / (gridLines + 1);
-        this.scale = (float) MathHelper.clamp((stepY / 9.5), 0.0f, 1.0f);
+        this.valueScale = (float) Math.clamp((stepY / 9.5), 0.0f, 1.0f);
+
         computeOffset();
 
-        setTooltipText(Text.of("Graph displaying: " + label));
+        setTooltipText(Component.literal("Graph displaying: " + label));
+        createMenu();
     }
 
     public GraphWidget() {
-        this(DynamicValueRegistry.GLOBAL_ID, "unknown", "unknown", Anchor.CENTER, 0, 0, 5, 0, 10, Color.RED, Color.GREEN, 0, false, 0, "empty");
+        this(DynamicValueRegistry.GLOBAL_ID, "unknown", "unknown", Anchor._default(), 0, 0, 5, 0, 10, Color.RED, Color.GREEN, 0, false, 0, "empty");
     }
 
     @Override
     public void init() {
-        // Initialize the buffer with minValue, mimicking ArrayList behavior
+        // init the buffer with minValue
         for (int i = 0; i < maxDataPoints; i++) {
             dataPoints[i] = minValue;
         }
@@ -110,106 +117,217 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         return this;
     }
 
-    public void addDataPoint(Float value) {
-        if (value == null) return;
-        if (autoUpdateRange) {
-            if (getMaxValue() < value) {
-                setMaxValue(value + 10);
-                float diff = getMaxValue() - getPrevMaxValue();
-                setMinValue(getMinValue() + diff);
-            }
-            if (getMinValue() > value) {
-                setMinValue(value - 10);
-                float diff = getPrevMinValue() - getMinValue();
-                setMaxValue(getMaxValue() - diff);
-            }
+    /**
+     * Sets the timeline resolution (how many historical points are drawn on the graph width).
+     * Resizes the internal array live and shifts elements in order to prevent data loss.
+     */
+    public void setMaxDataPoints(int newMax) {
+        if (newMax <= 2 || newMax == this.maxDataPoints) return;
+
+        float[] newData = new float[newMax];
+        int oldSize = this.maxDataPoints;
+
+        // get historical data in order [oldest -> newest]
+        float[] chronologicalData = new float[oldSize];
+        for (int i = 0; i < oldSize; i++) {
+            chronologicalData[i] = dataPoints[(head + i) % oldSize];
         }
 
+        if (newMax >= oldSize) {
+            // Expand graph
+            float paddingValue = chronologicalData[0];
+            int padCount = newMax - oldSize;
+            for (int i = 0; i < padCount; i++) {
+                newData[i] = paddingValue;
+            }
+            System.arraycopy(chronologicalData, 0, newData, padCount, oldSize);
+        } else {
+            // Shrink graph
+            int skipCount = oldSize - newMax;
+            System.arraycopy(chronologicalData, skipCount, newData, 0, newMax);
+        }
+
+        this.dataPoints = newData;
+        this.maxDataPoints = newMax;
+        this.head = 0; // Buffer is now sequential, next insertion index is flatly at 0
+
+        if (autoUpdateRange) {
+            recalculateDynamicBounds();
+        }
+    }
+
+    /**
+     * Sets the active polling sample throttle interval
+     *
+     * @param ms Time window separation between new samples in milliseconds.
+     */
+    public GraphWidget setSampleInterval(long ms) {
+        this.sampleIntervalMs = Math.max(1L, ms);
+        return this;
+    }
+
+    public long getSampleInterval() {
+        return this.sampleIntervalMs;
+    }
+
+    /**
+     * check the active ring buffer values to adjust min/max boundaries
+     */
+    private void recalculateDynamicBounds() {
+        float currentMin = Float.MAX_VALUE;
+        float currentMax = -Float.MAX_VALUE;
+
+        for (float val : dataPoints) {
+            if (val < currentMin) currentMin = val;
+            if (val > currentMax) currentMax = val;
+        }
+
+        int intervals = gridLines + 1;
+        float rawSpan = currentMax - currentMin;
+
+        // Apply 15% padding on top and bottom of the raw range
+        float paddedSpan = rawSpan * 1.30f;
+        float requiredSpan = Math.max(paddedSpan, minRangeSpan);
+
+        // Find the most appropriate whole number step size
+        float stepSize = 1.0f;
+        float[] candidates = {1f, 2f, 5f, 10f, 20f, 25f, 50f, 100f, 200f, 500f, 1000f, 2000f, 5000f};
+        for (float c : candidates) {
+            if (c * intervals >= requiredSpan) {
+                stepSize = c;
+                break;
+            }
+            stepSize = c; // Fallback to maximum candidate if range is massive
+        }
+
+        float center = (currentMin + currentMax) / 2.0f;
+        float targetMin = center - (intervals * stepSize) / 2.0f;
+        targetMin = Math.round(targetMin / stepSize) * stepSize;
+        float targetMax = targetMin + (intervals * stepSize);
+
+        setMinValue(targetMin);
+        setMaxValue(targetMax);
+
+        this.computeOffset();
+    }
+
+    public void addDataPoint(Float value) {
+        if (value == null) return;
+
         int index = (head) % maxDataPoints;
-        dataPoints[index] = MathHelper.clamp(value, minValue, maxValue);
-        head = (head + 1) % maxDataPoints; // Buffer full, overwrite oldest and move head
+        dataPoints[index] = value;
+        head = (head + 1) % maxDataPoints;
+
+        if (autoUpdateRange) {
+            recalculateDynamicBounds();
+        } else {
+            dataPoints[index] = Math.clamp(value, minValue, maxValue);
+        }
     }
 
     private List<float[]> getInterpolatedPoints() {
         List<float[]> points = new ArrayList<>();
         if (dataPoints.length < 2) return points;
 
-        float xStep = width / (dataPoints.length - 1);
+        float xStep = gWidth / (dataPoints.length - 1);
+        float range = Math.max(maxValue - minValue, 0.0001f);
+
+        float[] yVals = new float[dataPoints.length];
+        for (int i = 0; i < dataPoints.length; i++) {
+            int index = (head + i) % dataPoints.length;
+            yVals[i] = y + gHeight - ((dataPoints[index] - minValue) / range * gHeight);
+        }
+
+        // Calculate Monotone Cubic Spline Tangents
+        float[] m = new float[dataPoints.length];
+        for (int i = 0; i < dataPoints.length; i++) {
+            if (i == 0) {
+                m[i] = yVals[1] - yVals[0];
+            } else if (i == dataPoints.length - 1) {
+                m[i] = yVals[dataPoints.length - 1] - yVals[dataPoints.length - 2];
+            } else {
+                float sPrev = yVals[i] - yVals[i - 1];
+                float sNext = yVals[i + 1] - yVals[i];
+
+                if (sPrev * sNext <= 0) {
+                    m[i] = 0;
+                } else {
+                    m[i] = (sPrev + sNext) / 2.0f;
+                    float maxMag = 3.0f * Math.min(Math.abs(sPrev), Math.abs(sNext));
+                    if (Math.abs(m[i]) > maxMag) {
+                        m[i] = Math.signum(m[i]) * maxMag;
+                    }
+                }
+            }
+        }
+
+        int stepsPerSegment = 32;
+        float stepSize = 1.0f / stepsPerSegment;
+
         for (int i = 0; i < dataPoints.length - 1; i++) {
-            int index1 = (head + i) % dataPoints.length;
-            int index2 = (head + i + 1) % dataPoints.length;
+            float y0 = yVals[i];
+            float y1 = yVals[i + 1];
+            float m0 = m[i];
+            float m1 = m[i + 1];
+            float x0 = x + i * xStep;
 
-            float x1 = x + i * xStep;
-            float y1 = y + height - ((dataPoints[index1] - minValue) / (maxValue - minValue) * height);
-            float x2 = x + (i + 1) * xStep;
-            float y2 = y + height - ((dataPoints[index2] - minValue) / (maxValue - minValue) * height);
+            for (int step = 0; step <= stepsPerSegment; step++) {
+                // Avoid redundant overlapping nodes between adjoining segments
+                if (step == stepsPerSegment && i < dataPoints.length - 2) continue;
 
-            // Add interpolated points using hermite spline (simplified)
-            for (float t = 0; t <= 1; t += 0.03f) {
+                float t = step * stepSize;
                 float t2 = t * t;
                 float t3 = t2 * t;
+
+                // Cubic Hermite Spline formulation
                 float h00 = 2 * t3 - 3 * t2 + 1;
                 float h10 = t3 - 2 * t2 + t;
                 float h01 = -2 * t3 + 3 * t2;
+                float h11 = t3 - t2;
 
-                float px = h00 * x1 + h10 * xStep + h01 * x2;
-                float py = h00 * y1 + h10 * (y2 - y1) + h01 * y2;
-                points.add(new float[]{px, py});
+                float px = x0 + t * xStep;
+                float py = h00 * y0 + h10 * m0 + h01 * y1 + h11 * m1;
+
+                py = Math.clamp(py, y, y + gHeight);
+
+                if (points.isEmpty()) {
+                    points.add(new float[]{px, py});
+                } else {
+                    float[] lastP = points.getLast();
+                    float distanceSq = (px - lastP[0]) * (px - lastP[0]) + (py - lastP[1]) * (py - lastP[1]);
+                    if (distanceSq > 0.005f) {
+                        points.add(new float[]{px, py});
+                    }
+                }
             }
         }
         return points;
     }
 
     // draw a continuous interpolated curve
-    private void drawInterpolatedCurve(DrawContext drawContext, List<float[]> points, int color, float thickness) {
+    private void drawInterpolatedCurve(GuiGraphics graphics, List<float[]> points, int color, float thickness) {
         if (points.size() < 2) return;
 
-        drawContext.draw(vcp -> {
-            Matrix4f matrix = drawContext.getMatrices().peek().getPositionMatrix();
-            VertexConsumer consumer = vcp.getBuffer(CustomRenderLayers.TRIANGLE_STRIP);
-
-            for (int i = 0; i < points.size(); i++) {
-                float[] point = points.get(i);
-                float x = point[0];
-                float y = point[1];
-
-                // Create a thick line by offsetting vertices perpendicular to the curve
-                float dx = (i < points.size() - 1) ? points.get(i + 1)[0] - x : x - points.get(i - 1)[0];
-                float dy = (i < points.size() - 1) ? points.get(i + 1)[1] - y : y - points.get(i - 1)[1];
-                float length = (float) Math.sqrt(dx * dx + dy * dy);
-                if (length == 0) continue;
-
-                float offsetX = (thickness * 0.5f * dy) / length;
-                float offsetY = (thickness * 0.5f * -dx) / length;
-
-                consumer.vertex(matrix, x + offsetX, y + offsetY, 0).color(color);
-                consumer.vertex(matrix, x - offsetX, y - offsetY, 0).color(color);
-            }
-        });
+        graphics.guiRenderState.submitGuiElement(
+                new InterpolatedCurveRenderState(points, thickness, color, new Matrix3x2f(graphics.pose()), CustomRenderLayers.QUADS_CUSTOM_BLEND, (int) gWidth, (int) gHeight, graphics.scissorStack.peek())
+        );
     }
 
     // draw a gradient shadow under the curve
-    private void drawGradientShadow(DrawContext context, List<float[]> points, float bottomY, int startColor, int endColor) {
+    private void drawGradientShadow(GuiGraphics graphics, List<float[]> points, float bottomY, int startColor, int endColor) {
         if (points.size() < 2) return;
 
-        context.draw(vcp -> {
-            Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-            VertexConsumer consumer = vcp.getBuffer(CustomRenderLayers.TRIANGLE_STRIP);
-
-            for (float[] point : points) {
-                float x = point[0];
-                float y = point[1];
-
-                consumer.vertex(matrix, x, y, 0).color(startColor);
-                consumer.vertex(matrix, x, bottomY, 0).color(endColor);
-            }
-        });
+       graphics.guiRenderState.submitGuiElement(
+                new GradientShadowRenderState(points,bottomY, startColor, endColor, new Matrix3x2f(graphics.pose()), RenderPipelines.DEBUG_QUADS, (int) gWidth, (int) gHeight, graphics.scissorStack.peek())
+        );
     }
 
     @Override
-    public void renderWidget(DrawContext context, int mouseX, int mouseY) {
-        if (valueSupplier != null) {
+    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY) {
+        long currentTime = Util.getMillis();
+        if (valueSupplier != null && (currentTime - lastSampleTime >= sampleIntervalMs)) {
             addDataPoint(getValue());
+            lastSampleTime = currentTime;
         }
 
         // Safety check. Happens on startup
@@ -217,20 +335,20 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
         if(graphColorRainbow) graphColor = ColorHelper.getRainbowColor(100);
 
-        DrawHelper.enableScissor(widgetBox);
+   //     DrawHelper.enableScissor(widgetBox);
 
-        // Draw gradient background with rounded.fsh corners
+        // Draw gradient background with rounded corners
         if (!isInEditor) {
             DrawHelper.drawRoundedRectangle(
-                    context,
+                    graphics,
                     x + offset,
                     y,
                     false,
                     true,
                     false,
                     false,
-                    width,
-                    height,
+                    gWidth,
+                    gHeight,
                     4,
                     backgroundColor.getRGB()
             );
@@ -238,143 +356,176 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
         // Draw grid lines and value markings
         if (showGrid) {
-            //TODO: The scale is too small when no. of grid lines is greater than 21 (20 is the barely visible threshold)
+            //TODO: The valueScale is too small when no. of grid lines is greater than 21 (20 is the barely visible threshold)
 
             for (int i = 1; i <= gridLines; i++) {
                 float yPos = y + stepY * i;
-                DrawHelper.drawHorizontalLine(context, x + offset, width, yPos, 0.5f, 0x4DFFFFFF); // Semi-transparent white
+                DrawHelper.drawHorizontalLine(graphics, x + offset, gWidth, yPos, 0.5f, 0x4DFFFFFF); // Semi-transparent white
 
                 // Draw value labels on the left axis
                 float value = maxValue - (i * valueStep);
                 String valueText = formatValue(value);
 
-                float texWidth = mc.textRenderer.getWidth(valueText) * scale;
+                float texWidth = mc.font.width(valueText);
 
-                //Scale the text to its proper position and size with grid lines
-                DrawHelper.scaleAndPosition(context.getMatrices(), x - 2, yPos, scale);
-                context.drawText(mc.textRenderer, valueText, Math.round(x + offset - texWidth), (int) (yPos - (mc.textRenderer.fontHeight * scale) / 2.0f), 0xFFFFFFFF, true);
-                DrawHelper.stopScaling(context.getMatrices());
+                //Scale the Component to its proper position and size with grid lines
+                DrawHelper.scaleAndPosition(graphics.pose(), x + offset - texWidth/2.0f, yPos - (mc.font.lineHeight * valueScale) / 2.0f,texWidth,mc.font.lineHeight * valueScale, valueScale);
+                graphics.drawString(mc.font, valueText, Math.round(x + offset - texWidth), (int) (yPos - (mc.font.lineHeight * valueScale) / 2), 0xFFFFFFFF, true);
+                DrawHelper.stopScaling(graphics.pose());
             }
 
-            // Update the offsets for the rest of the elements drawn.
             x += offset;
 
             // Draw vertical grid lines (time axis)
-            float stepX = width / 5; // 5 vertical lines
+            float stepX = gWidth / 5; // 5 vertical lines
             for (int i = 1; i < 5; i++) {
                 float xPos = x + stepX * i;
-                DrawHelper.drawVerticalLine(context, xPos, y, height, 0.5f, 0x4DFFFFFF);
+                DrawHelper.drawVerticalLine(graphics, xPos, y, gHeight, 0.5f, 0x4DFFFFFF);
             }
         }
 
-        // Draw interpolated graph curve
         List<float[]> points = getInterpolatedPoints();
-        drawInterpolatedCurve(context, points, graphColor.getRGB(), lineThickness);
+
 
         // Draw shadow effect under the graph
         drawGradientShadow(
-                context, points, y + height,
-                ColorHelper.changeAlpha(graphColor, 50).getRGB(),
+                graphics, points, y + gHeight,
+                ColorHelper.changeAlpha(graphColor, 60).getRGB(),
                 0x00000000
         );
 
+        drawInterpolatedCurve(graphics, points, graphColor.getRGB(), lineThickness);
+
+        DrawHelper.scaleAndPosition(graphics.pose(), x + 5, y + 5, 0.5f);
         DrawHelper.drawChromaText(
-                context, label,
+                graphics, label,
                 x + 5, y + 5,
                 1.0f, 0.8f, 1.0f, 0.05f, true
         );
+        DrawHelper.stopScaling(graphics.pose());
+
+        if (!points.isEmpty()) {
+            float[] livePoint = points.getLast();
+
+            DrawHelper.drawFilledCircle(graphics, livePoint[0], livePoint[1], 0.9f, 0x26FFFFFF);
+        }
 
 
         // Draw axes
-        DrawHelper.drawHorizontalLine(context, x, width, y + height - 1, 1.0f, 0xFFFFFFFF); // X-axis
-        DrawHelper.drawVerticalLine(context, x, y, height, 1.0f, 0xFFFFFFFF); // Y-axis
+        DrawHelper.drawHorizontalLine(graphics, x, gWidth, y + gHeight - 1, 1.0f, 0xFFFFFFFF); // X-axis
+        DrawHelper.drawVerticalLine(graphics, x, y, gHeight, 1.0f, 0xFFFFFFFF); // Y-axis
 
         // Draw min and max value labels with formatted values
         /*
         DrawHelper.scaleAndPosition(context.getMatrices(),x - 5,y,0.5f);
         String formattedMaxVal = formatValue(maxValue);
-        context.drawText(mc.textRenderer, formattedMaxVal, x - 5 - mc.textRenderer.getWidth(formattedMaxVal), y - 4, 0xFFFFFFFF, true);
+        context.drawText(mc.font, formattedMaxVal, x - 5 - mc.font.gWidth(formattedMaxVal), y - 4, 0xFFFFFFFF, true);
         DrawHelper.stopScaling(context.getMatrices());
 
          */
 
-        DrawHelper.scaleAndPosition(context.getMatrices(), x - 5, y + height, 0.5f);
         String formattedMinVal = formatValue(minValue);
-        context.drawText(mc.textRenderer, formattedMinVal, x - mc.textRenderer.getWidth(formattedMinVal), (int) (y + height - 4), 0xFFFFFFFF, true);
-        DrawHelper.stopScaling(context.getMatrices());
+
+        DrawHelper.scaleAndPosition(graphics.pose(), x - mc.font.width(formattedMinVal)/2.0f, y + gHeight,mc.font.width(formattedMinVal),mc.font.lineHeight * 0.6f, 0.6f);
+        graphics.drawString(mc.font, formattedMinVal, x - mc.font.width(formattedMinVal), (int) (y + gHeight - 1), 0xFFFFFFFF, true);
+        DrawHelper.stopScaling(graphics.pose());
 
         if(showGrid) x -= offset;
 
-        this.widgetBox.setDimensions(x, y, width + offset, height, shouldScale, GlobalConfig.get().getScale());
-        DrawHelper.disableScissor();
+        this.widgetBox.setDimensions(x, y, gWidth + offset, gHeight, canScale);
+     //   DrawHelper.disableScissor();
 
         if (menu != null) menu.set(getX(), getY(), (int) Math.ceil(getHeight()));
     }
 
     // format large values (like: 1000 -> 1K, 1000000 -> 1M)
     private String formatValue(float value) {
-        if (Math.abs(value) >= 1_000_000) {
-            return String.format("%.1fM", value / 1_000_000).trim();
-        } else if (Math.abs(value) >= 1_000) {
-            return String.format("%.1fK", value / 1_000).trim();
+        float absVal = Math.abs(value);
+
+        if (absVal >= 1_000_000) {
+            long rounded = Math.round(value / 1_000_000f);
+            return String.format("%dM", rounded);
+        } else if (absVal >= 1_000) {
+            long rounded = Math.round(value / 1_000f);
+            return String.format("%dK", rounded);
         } else {
-            return String.format("%.0f", value).trim();
+            return String.format("%d", (int) value);
         }
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        menu.toggleDisplay(widgetBox, mouseX, mouseY, button);
-        return super.mouseClicked(mouseX, mouseY, button);
+        return menu.toggleDisplay(widgetBox, mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
     }
 
     public void createMenu() {
-        ContextMenuProperties properties = ContextMenuProperties.builder().build();
+        ContextMenuProperties properties = ContextMenuProperties.builder().skin(new MinecraftSkin(MinecraftSkin.PanelColor.FOREST_GREEN)).build();
         menu = new ContextMenu<>(getX(), (int) (getY() + widgetBox.getHeight()), properties);
 
-        menu.addOption(new BooleanOption(Text.of("Show Grid"),
-                () -> this.showGrid, value -> this.showGrid = value,
+        menu.addOption(new BooleanOption(Component.literal("Show Grid"),
+                () -> this.showGrid, value -> {
+                        this.showGrid = value;
+                        this.computeOffset();
+                },
                 BooleanOption.BooleanType.YES_NO)
-                .description(Text.of("Shows a grid and Y axis values"))
+                .description(Component.literal("Shows a grid and Y axis values"))
         );
-        menu.addOption(new DoubleOption(Text.of("Number of Grid Lines"),
+        menu.addOption(new DoubleOption(Component.literal("Number of Grid Lines"),
                 1, 25, 1,
                 () -> (double) this.gridLines, value -> {
                        this.setGridLines(value.intValue());
-                       computeOffset();
+                       this.computeOffset();
                 }, menu)
                 .renderWhen(() -> this.showGrid)
         );
-        menu.addOption(new ColorOption(Text.of("Graph Line Color"),
-                () -> this.graphColor, value -> this.graphColor = value, menu)
-                .description(Text.of("Specify the color you want for the graph's lines"))
+        menu.addOption(new DoubleOption(Component.literal("Timeline Points"),
+                        10, 300, 5,
+                        () -> (double) this.maxDataPoints, value -> {
+                    this.setMaxDataPoints(value.intValue());
+                    this.computeOffset();
+                }, menu).description(Component.literal("Adjusts how many total data points are saved on the visual timeline"))
+                .withComplexity(Option.Complexity.Enhanced)
         );
-        menu.addOption(new BooleanOption(Text.of("Rainbow Graph Line Color"),
-                () -> this.graphColorRainbow, value -> this.graphColorRainbow = value)
-                .description(Text.of("Color your graph line with funny rainbow"))
+        menu.addOption(new DoubleOption(Component.literal("Sample Cooldown (ms)"),
+                        10, 2000, 10,
+                        () -> (double) this.sampleIntervalMs, value -> {
+                    this.setSampleInterval(value.longValue());
+                }, menu).description(Component.literal("Sets how often the graph polls for a new data point (in milliseconds)"))
                 .withComplexity(Option.Complexity.Pro)
         );
-        menu.addOption(new ColorOption(Text.of("Graph Background Color"),
-                () -> this.backgroundColor, value -> this.backgroundColor = value, menu)
-                .description(Text.of("Specify the color you want for the graph's background"))
+        menu.addOption(new ColorOption(Component.literal("Graph Line Color"),
+                () -> this.graphColor, value -> this.graphColor = value, menu)
+                .description(Component.literal("Specify the color you want for the graph's lines"))
         );
-        menu.addOption(new DoubleOption(Text.of("Line Thickness"),
-                0.5f, 5.0f, 0.1f,
+        menu.addOption(new BooleanOption(Component.literal("Rainbow Graph Line Color"),
+                () -> this.graphColorRainbow, value -> this.graphColorRainbow = value)
+                .description(Component.literal("Color your graph line with funny rainbow"))
+                .withComplexity(Option.Complexity.Pro)
+        );
+        menu.addOption(new ColorOption(Component.literal("Graph Background Color"),
+                () -> this.backgroundColor, value -> this.backgroundColor = value, menu)
+                .description(Component.literal("Specify the color you want for the graph's background"))
+        );
+        menu.addOption(new DoubleOption(Component.literal("Line Thickness"),
+                0.5f, 1f, 0.01f,
                 () -> (double) this.lineThickness, value -> this.lineThickness = value.floatValue(), menu)
         );
     }
 
     private void computeOffset(){
-        // The first text is usually the largest but a negative value may occupy more width so we check the first and last text.
-        // Idk how this will break.
-        if(mc.textRenderer == null) return;
+        if(!showGrid) {
+            offset = 0;
+            return;
+        }
 
+        // The first Component is usually the largest but a negative value may occupy more gWidth so we check the first and last Component.
+        // Idk how this will break.
         String firstText = formatValue(maxValue - valueStep);
         String lastText = formatValue(maxValue - (gridLines * valueStep));
 
         offset = Math.max(
-                (int) Math.ceil(mc.textRenderer.getWidth(firstText) * this.scale),
-                (int) Math.ceil(mc.textRenderer.getWidth(lastText) * this.scale)
+                (int) Math.ceil(mc.font.width(firstText) * this.valueScale),
+                (int) Math.ceil(mc.font.width(lastText) * this.valueScale)
         );
     }
 
@@ -430,33 +581,15 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         this.label = label;
     }
 
-    @Override
-    public float getHeight() {
-        return height;
-    }
-
-    public void setHeight(float height) {
-        this.height = height;
-    }
-
-    @Override
-    public float getWidth() {
-        return width;
-    }
-
-    public void setWidth(float width) {
-        this.width = width;
-    }
-
     public int getGridLines() {
         return gridLines;
     }
 
     public void setGridLines(int gridLines) {
         this.gridLines = gridLines;
-        this.stepY = height / (gridLines + 1);
+        this.stepY = gHeight / (gridLines + 1);
         this.valueStep = (maxValue - minValue) / (gridLines + 1);
-        this.scale = (float) MathHelper.clamp((stepY / 9.5), 0.0f, 1.0f);
+        this.valueScale = (float) Math.clamp((stepY / 9.5), 0.0f, 1.0f);
     }
 
     public boolean isShowGrid() {
@@ -490,10 +623,10 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     }
 
     @Override
-    public void writeToTag(NbtCompound tag) {
+    public void writeToTag(CompoundTag tag) {
         super.writeToTag(tag);
-        tag.putFloat("width", width);
-        tag.putFloat("height", height);
+        tag.putFloat("gWidth", gWidth);
+        tag.putFloat("gHeight", gHeight);
         tag.putInt("maxDataPoints", maxDataPoints);
         tag.putFloat("minValue", minValue);
         tag.putFloat("maxValue", maxValue);
@@ -508,10 +641,10 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     }
 
     @Override
-    public void readFromTag(NbtCompound tag) {
+    public void readFromTag(CompoundTag tag) {
         super.readFromTag(tag);
-        this.width = tag.getFloat("width").orElse(100f);
-        this.height = tag.getFloat("height").orElse(50f);
+        this.gWidth = tag.getFloat("gWidth").orElse(100f);
+        this.gHeight = tag.getFloat("gHeight").orElse(50f);
         this.maxDataPoints = tag.getInt("maxDataPoints").orElse(100);
         this.minValue = tag.getFloat("minValue").orElse(0f);
         this.maxValue = tag.getFloat("maxValue").orElse(1f);
@@ -528,7 +661,6 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         this.setMaxValue(maxValue);
 
         internal_init();
-        createMenu();
     }
 
     @Override
@@ -537,9 +669,8 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     }
 
     public static class GraphWidgetBuilder extends DynamicValueWidgetBuilder<GraphWidgetBuilder, GraphWidget> {
-        private Anchor anchor = Anchor.CENTER;
-        private float width = 100;
-        private float height = 50;
+        private float gWidth = 100;
+        private float gHeight = 50;
         private int maxDataPoints = 50;
         private float minValue = 0;
         private float maxValue = 100;
@@ -549,6 +680,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         private boolean showGrid = true;
         private int gridLines = 4;
         private String label = "Graph";
+        private long sampleIntervalMs = 100;
 
         public GraphWidgetBuilder() {
         }
@@ -558,18 +690,13 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
             return this;
         }
 
-        public GraphWidgetBuilder anchor(Anchor anchor) {
-            this.anchor = anchor;
+        public GraphWidgetBuilder gWidth(float gWidth) {
+            this.gWidth = gWidth;
             return this;
         }
 
-        public GraphWidgetBuilder width(float width) {
-            this.width = width;
-            return this;
-        }
-
-        public GraphWidgetBuilder height(float height) {
-            this.height = height;
+        public GraphWidgetBuilder gHeight(float gHeight) {
+            this.gHeight = gHeight;
             return this;
         }
 
@@ -613,6 +740,11 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
             return this;
         }
 
+        public GraphWidgetBuilder sampleInterval(long ms) {
+            this.sampleIntervalMs = ms;
+            return this;
+        }
+
         @Override
         protected GraphWidgetBuilder self() {
             return this;
@@ -620,11 +752,12 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
         @Override
         public GraphWidget build() {
-            GraphWidget widget = new GraphWidget(registryID, registryKey, modID, anchor, width, height, maxDataPoints, minValue, maxValue, graphColor, backgroundColor, lineThickness, showGrid, gridLines, label);
+            GraphWidget widget = new GraphWidget(registryID, registryKey, modID, anchor, gWidth, gHeight, maxDataPoints, minValue, maxValue, graphColor, backgroundColor, lineThickness, showGrid, gridLines, label);
+            widget.setSampleInterval(sampleIntervalMs);
             widget.setPosition(x, y);
             widget.setDraggable(isDraggable);
-            widget.setShouldScale(shouldScale);
-            widget.isVisible = display;
+            widget.setCanScale(shouldScale);
+            widget.isVisible = isVisible;
             return widget;
         }
     }

@@ -1,9 +1,10 @@
 package com.tanishisherewith.dynamichud.helpers;
 
+import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.util.Window;
+import com.tanishisherewith.dynamichud.DynamicHUD;
+import net.minecraft.client.Minecraft;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
@@ -22,18 +23,20 @@ public class MouseColorQuery {
             pendingRequest = new SampleRequest(mouseX, mouseY, callback);
         }
     }
+    public static void request(Consumer<int[]> callback) {
+        request(DynamicHUD.MC.mouseHandler.xpos(), DynamicHUD.MC.mouseHandler.ypos(), callback);
+    }
 
     public static void processIfPending() {
         if (pendingRequest == null) return;
 
-        MinecraftClient client = MinecraftClient.getInstance();
-        Framebuffer framebuffer = client.getFramebuffer();
-        Window window = client.getWindow();
+        RenderTarget framebuffer = DynamicHUD.MC.getMainRenderTarget();
+        Window window = DynamicHUD.MC.getWindow();
 
         int windowWidth = window.getWidth();
         int windowHeight = window.getHeight();
-        int framebufferWidth = framebuffer.textureWidth;
-        int framebufferHeight = framebuffer.textureHeight;
+        int framebufferWidth = framebuffer.width;
+        int framebufferHeight = framebuffer.height;
 
         double scaleX = (double) framebufferWidth / windowWidth;
         double scaleY = (double) framebufferHeight / windowHeight;
@@ -50,10 +53,8 @@ public class MouseColorQuery {
         // Make sure rendering is complete
         RenderSystem.assertOnRenderThread();
 
-
         // buffer to store the pixel data
         ByteBuffer buffer = BufferUtils.createByteBuffer(4);
-
 
         GL11.glReadPixels(x, y, 1, 1, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
 

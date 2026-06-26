@@ -1,7 +1,7 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption;
 
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.awt.*;
 
@@ -31,20 +31,17 @@ public class HueSlider {
         this.y = y;
     }
 
-    public void render(DrawContext drawContext, int x, int y) {
+    public void render(GuiGraphics graphics, int x, int y) {
         setPosition(x, y);
-        drawContext.getMatrices().push();
-        drawContext.getMatrices().translate(0, 0, 401);
-        DrawHelper.drawOutlinedBox(drawContext, x - 2, y - 2, x + width + 2, y + height + 2, -1);
+        DrawHelper.drawOutlinedBox(graphics, x - 2, y - 2, x + width + 2, y + height + 2, -1);
 
         // Draw the gradient
         for (int i = 0; i < width; i++) {
             float hue = (float) i / width;
             int color = Color.HSBtoRGB(hue, 1.0f, 1.0f);
             color = (color & 0x00FFFFFF) | (255 << 24);
-            drawContext.fill(x + i, y, x + i + 1, y + height, color);
+            graphics.fill(x + i, y, x + i + 1, y + height, color);
         }
-        drawContext.draw();
 
 
         // Draw the handle
@@ -53,8 +50,7 @@ public class HueSlider {
         float handleX = x + hue * width - handleWidth / 2.0f;
         float handleY = y - (handleHeight - height) / 2.0f;
 
-        DrawHelper.drawRectangle(drawContext, handleX, handleY, handleWidth, handleHeight, -1);
-        drawContext.getMatrices().pop();
+        DrawHelper.drawRectangle(graphics, handleX, handleY, handleWidth, handleHeight, -1);
     }
 
     public int getHeight() {
