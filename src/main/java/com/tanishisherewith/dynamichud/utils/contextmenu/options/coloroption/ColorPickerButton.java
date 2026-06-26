@@ -38,7 +38,7 @@ public class ColorPickerButton {
     public boolean onClick(double mouseX, double mouseY, int button) {
         if (button == 0) {
             if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height) {
-                isPicking = true;
+                isPicking = !isPicking;
                 return true;
             }
         }

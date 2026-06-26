@@ -16,7 +16,7 @@ public class ColorOption extends Option<Color> {
     public ColorOption(Component name, Supplier<Color> getter, Consumer<Color> setter, ContextMenu<?> parentMenu) {
         super(name, getter, setter);
         this.parentMenu = parentMenu;
-        this.colorGradient = new ColorGradient(x + this.parentMenu.getWidth(), y - 10, get(), this::set, 50, 150);
+        this.colorGradient = new ColorGradient(x + this.parentMenu.getWidth(), y - 10, get(), this::set, 50, 100);
     }
 
     @Override

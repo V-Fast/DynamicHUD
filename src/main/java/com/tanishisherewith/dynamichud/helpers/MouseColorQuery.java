@@ -3,6 +3,7 @@ package com.tanishisherewith.dynamichud.helpers;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.tanishisherewith.dynamichud.DynamicHUD;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -22,13 +23,15 @@ public class MouseColorQuery {
             pendingRequest = new SampleRequest(mouseX, mouseY, callback);
         }
     }
+    public static void request(Consumer<int[]> callback) {
+        request(DynamicHUD.MC.mouseHandler.xpos(), DynamicHUD.MC.mouseHandler.ypos(), callback);
+    }
 
     public static void processIfPending() {
         if (pendingRequest == null) return;
 
-        Minecraft client = Minecraft.getInstance();
-        RenderTarget framebuffer = client.getMainRenderTarget();
-        Window window = client.getWindow();
+        RenderTarget framebuffer = DynamicHUD.MC.getMainRenderTarget();
+        Window window = DynamicHUD.MC.getWindow();
 
         int windowWidth = window.getWidth();
         int windowHeight = window.getHeight();

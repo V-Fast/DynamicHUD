@@ -187,12 +187,13 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
         renderSearchBox(graphics, mouseX, mouseY);
 
-        this.enableContextMenuScissor(graphics);
-
         contextMenu.setWidth(panelWidth - 4);
         contextMenu.y = imageY;
 
         renderOptionGroups(graphics, mouseX, mouseY);
+
+        this.enableContextMenuScissor(graphics);
+
         renderSelectedGroupOptions(graphics, mouseX, mouseY);
 
         contextMenu.setHeight(getContentHeight() + 15);
@@ -491,6 +492,8 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             graphics.drawString(mc.font, option.name, x + 15, y + 25 / 2 - 5, -1, true);
 
             int width = 50;
+            option.setPosition(x + panelWidth - 75, y);
+            option.setWidth(width);
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, isMouseOver(mouseX, mouseY,x + panelWidth - 75, y, width, 20)), x + panelWidth - 75, y, width, 20);
 
             Component Component = option.getBooleanType().getText(option.value);
@@ -540,7 +543,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             option.setWidth(width);
 
             if (option.getColorGradient().getColorPickerButton().isPicking()) {
-                DrawHelper.disableScissor(graphics);
+              //  DrawHelper.disableScissor(graphics);
             }
 
             int colorGradientWidth = option.getColorGradient().getBoxSize() + option.getColorGradient().getAlphaSlider().getWidth() + option.getColorGradient().getColorPickerButton().getWidth();
@@ -562,7 +565,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             }
 
             if (option.getColorGradient().getColorPickerButton().isPicking()) {
-                DrawHelper.enableScissor(imageX, imageY + 2, panelWidth, panelHeight - 4, graphics);
+              //  DrawHelper.enableScissor(imageX, imageY + 2, panelWidth, panelHeight - 4, graphics);
             }
         }
 

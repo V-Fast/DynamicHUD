@@ -371,7 +371,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
         drawInterpolatedCurve(graphics, points, graphColor.getRGB(), lineThickness);
 
-        DrawHelper.scaleAndPosition(graphics.pose(), x + 5, y + 5, 0.75f);
+        DrawHelper.scaleAndPosition(graphics.pose(), x + 5, y + 5, 0.5f);
         DrawHelper.drawChromaText(
                 graphics, label,
                 x + 5, y + 5,
@@ -452,13 +452,6 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
                        this.computeOffset();
                 }, menu)
                 .renderWhen(() -> this.showGrid)
-        );
-        menu.addOption(new BooleanOption(Component.literal("Auto Scale Range"),
-                        () -> this.autoUpdateRange, value -> {
-                    this.autoUpdateRange = value;
-                    if (value) recalculateDynamicBounds();
-                }, BooleanOption.BooleanType.YES_NO).description(Component.literal("Automatically updates Y-axis limits dynamically based on current values"))
-                .withComplexity(Option.Complexity.Simple)
         );
         menu.addOption(new DoubleOption(Component.literal("Timeline Points"),
                         10, 300, 5,
