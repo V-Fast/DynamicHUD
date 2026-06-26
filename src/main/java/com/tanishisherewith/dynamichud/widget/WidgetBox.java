@@ -84,11 +84,11 @@ public class WidgetBox {
         }
     }
 
-    public void setDimensions(float x, float y, float width, float height, boolean shouldScale) {
-        this.setDimensions(x,y,width,height,shouldScale,getScale());
+    public void setDimensions(float x, float y, float width, float height, boolean canScale) {
+        this.setDimensions(x,y,width,height,canScale,getScale());
     }
 
-    public void setSize(float width, float height, boolean shouldScale) {
-        this.setSize(width,height,shouldScale,getScale());
+    public void setSize(float width, float height, boolean canScale) {
+        this.setSize(width,height,canScale,getScale());
     }
 }

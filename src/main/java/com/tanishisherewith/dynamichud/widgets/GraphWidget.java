@@ -55,6 +55,9 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     private String label;
     /// Automatically update the min and max of the graph
     private boolean autoUpdateRange = false;
+    ///The min range between the min/max of graph
+    public float minRangeSpan = 10f;
+
     private float stepY;
     private float valueStep;
     private float valueScale;
@@ -85,7 +88,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         Validate.isTrue(maxDataPoints > 2, "MaxDataPoints should be more than 2.");
         this.dataPoints = new float[maxDataPoints];
         this.label = label.trim();
-        this.widgetBox = new WidgetBox(x, y, (int) gWidth, (int) gHeight);
+        this.widgetBox.setDimensions(x, y, (int) gWidth, (int) gHeight, canScale);
         this.stepY = gHeight / (gridLines + 1);
         this.valueStep = (maxValue - minValue) / (gridLines + 1);
         this.valueScale = (float) Math.clamp((stepY / 9.5), 0.0f, 1.0f);
@@ -179,11 +182,33 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
             if (val > currentMax) currentMax = val;
         }
 
-        float padding = (currentMax - currentMin) * 0.15f;
-        if (padding <= 0) padding = 2.0f; // Prevent division-by-zero
+        int intervals = gridLines + 1;
+        float rawSpan = currentMax - currentMin;
 
-        setMinValue(currentMin - padding);
-        setMaxValue(currentMax + padding);
+        // Apply 15% padding on top and bottom of the raw range
+        float paddedSpan = rawSpan * 1.30f;
+        float requiredSpan = Math.max(paddedSpan, minRangeSpan);
+
+        // Find the most appropriate whole number step size
+        float stepSize = 1.0f;
+        float[] candidates = {1f, 2f, 5f, 10f, 20f, 25f, 50f, 100f, 200f, 500f, 1000f, 2000f, 5000f};
+        for (float c : candidates) {
+            if (c * intervals >= requiredSpan) {
+                stepSize = c;
+                break;
+            }
+            stepSize = c; // Fallback to maximum candidate if range is massive
+        }
+
+        float center = (currentMin + currentMax) / 2.0f;
+        float targetMin = center - (intervals * stepSize) / 2.0f;
+        targetMin = Math.round(targetMin / stepSize) * stepSize;
+        float targetMax = targetMin + (intervals * stepSize);
+
+        setMinValue(targetMin);
+        setMaxValue(targetMax);
+
+        this.computeOffset();
     }
 
     public void addDataPoint(Float value) {
@@ -401,7 +426,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
         String formattedMinVal = formatValue(minValue);
 
-        DrawHelper.scaleAndPosition(graphics.pose(), x - mc.font.width(formattedMinVal)/2.0f, y + gHeight,mc.font.width(formattedMinVal),mc.font.lineHeight * 0.5f, 0.5f);
+        DrawHelper.scaleAndPosition(graphics.pose(), x - mc.font.width(formattedMinVal)/2.0f, y + gHeight,mc.font.width(formattedMinVal),mc.font.lineHeight * 0.6f, 0.6f);
         graphics.drawString(mc.font, formattedMinVal, x - mc.font.width(formattedMinVal), (int) (y + gHeight - 1), 0xFFFFFFFF, true);
         DrawHelper.stopScaling(graphics.pose());
 

@@ -121,7 +121,7 @@ public class DynamicHudConfigurator {
         ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> saveWidgetsSafely(widgetsFile, FILE_MAP.get(widgetsFile.getName())));
 
         //When minecraft closes
-       ClientLifecycleEvents.CLIENT_STOPPING.register((mc)-> saveWidgetsSafely(widgetsFile, FILE_MAP.get(widgetsFile.getName())));
+        ClientLifecycleEvents.CLIENT_STOPPING.register((mc)-> saveWidgetsSafely(widgetsFile, FILE_MAP.get(widgetsFile.getName())));
     }
 
     @ApiStatus.Internal

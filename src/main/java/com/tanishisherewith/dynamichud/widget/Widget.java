@@ -64,7 +64,7 @@ public abstract class Widget implements Input {
     protected Anchor anchor;         // The chosen anchor point
 
     //Dimensions of the widget
-    protected WidgetBox widgetBox;
+    protected final WidgetBox widgetBox;
 
     private int startX, startY;
     protected int offsetX, offsetY;  // Offset from the anchor point
@@ -376,7 +376,6 @@ public abstract class Widget implements Input {
         isVisible = tag.getBoolean("isVisible").orElse(true);
         isDraggable = tag.getBoolean("isDraggable").orElse(true);
         canScale = tag.getBoolean("canScale").orElse(true);
-
         widgetBox.setScale(tag.getFloat("widgetScale").orElse(1.0f));
     }
 
