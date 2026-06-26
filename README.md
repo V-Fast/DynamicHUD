@@ -3,7 +3,7 @@
 DynamicHUD is a special tool for Minecraft mod creators who use Fabric. It works with Minecraft 1.19.1 and newer versions. With DynamicHUD, you can make your own HUD parts that players can change and interact with, making their game look and feel better.
 
 # Examples
-- [_DynamicHUDtest.java_](src/main/java/com/tanishisherewith/dynamichud/DynamicHUDtest.java)
+- [_IntegrationTest.java_](src/main/java/com/tanishisherewith/dynamichud/IntegrationTest.java)
 ## Demo
 
 *May vary from version to version*
