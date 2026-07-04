@@ -121,7 +121,49 @@ public abstract class Widget implements Input {
     public float getWidth() { return widgetBox.getWidth(); }
     public float getHeight() { return widgetBox.getHeight(); }
 
+    private Anchor determineBestAnchor(int x, int y, int width, int height, int screenWidth, int screenHeight) {
+        if (screenWidth <= 0 || screenHeight <= 0) return Anchor.TOP_LEFT;
+
+        int centerX = x + width / 2;
+        int centerY = y + height / 2;
+
+        int xZone = 0; // 0 = Left, 1 = Center, 2 = Right
+        if (centerX < screenWidth / 3) {
+            xZone = 0;
+        } else if (centerX < 2 * screenWidth / 3) {
+            xZone = 1;
+        } else {
+            xZone = 2;
+        }
+
+        int yZone = 0; // 0 = Top, 1 = Center, 2 = Bottom
+        if (centerY < screenHeight / 3) {
+            yZone = 0;
+        } else if (centerY < 2 * screenHeight / 3) {
+            yZone = 1;
+        } else {
+            yZone = 2;
+        }
+
+        if (xZone == 0) {
+            if (yZone == 0) return Anchor.TOP_LEFT;
+            if (yZone == 1) return Anchor.CENTER_LEFT;
+            return Anchor.BOTTOM_LEFT;
+        } else if (xZone == 1) {
+            if (yZone == 0) return Anchor.TOP_CENTER;
+            if (yZone == 1) return Anchor.CENTER;
+            return Anchor.BOTTOM_CENTER;
+        } else {
+            if (yZone == 0) return Anchor.TOP_RIGHT;
+            if (yZone == 1) return Anchor.CENTER_RIGHT;
+            return Anchor.BOTTOM_RIGHT;
+        }
+    }
+
     private void calculateOffset(int initialX, int initialY, int screenWidth, int screenHeight) {
+        if (screenWidth > 0 && screenHeight > 0) {
+            this.anchor = determineBestAnchor(initialX, initialY, (int) getWidth(), (int) getHeight(), screenWidth, screenHeight);
+        }
         int anchorX = anchor.getBaseX(screenWidth);
         int anchorY = anchor.getBaseY(screenHeight);
         this.offsetX = initialX - anchorX;
@@ -130,15 +172,12 @@ public abstract class Widget implements Input {
 
     // Update position based on anchor and offset
     void updatePosition(int screenWidth, int screenHeight) {
-        if (offsetX == 0 && offsetY == 0) {
-            calculateOffset(x, y, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
-        }
-
         int anchorX = anchor.getBaseX(screenWidth);
         int anchorY = anchor.getBaseY(screenHeight);
         this.x = anchorX + offsetX;
         this.y = anchorY + offsetY;
         clampPosition();
+        calculateOffset(x, y, screenWidth, screenHeight);
     }
 
     public void setPosition(int x, int y) {
@@ -220,7 +259,9 @@ public abstract class Widget implements Input {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (widgetBox.isMouseOver(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             wasDragged = false;
-            if (!isLocked) {
+            if (isLocked) {
+                toggle(); // Static widgets toggle immediately
+            } else {
                 startX = (int) (mouseX - x);
                 startY = (int) (mouseY - y);
                 dragging = true;
@@ -232,8 +273,6 @@ public abstract class Widget implements Input {
                         }
                     }
                 }
-            } else {
-                toggle(); // Static widgets toggle immediately
             }
             return true;
         }
