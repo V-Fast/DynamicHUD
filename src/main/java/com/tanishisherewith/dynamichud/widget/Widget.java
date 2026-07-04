@@ -3,9 +3,7 @@ package com.tanishisherewith.dynamichud.widget;
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
-import com.tanishisherewith.dynamichud.internal.UID;
 import com.tanishisherewith.dynamichud.utils.Input;
-import com.tanishisherewith.dynamichud.widgets.GraphWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;
@@ -14,12 +12,13 @@ import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
+import java.util.UUID;
 
 /**
  * This is the base Widget class that handles the rendering, scaling, dragging, anchoring and positioning of the Widget.
  * <p>
  * Default fields are made to help with all the basic functions of a widget.
- * Main fields include: {@link #uid},{@link #isVisible},{@link #isDraggable},{@link #canScale},{@link #isInEditor},{@link #widgetBox},{@link #DATA}
+ * Main fields include: {@link #uid},{@link #isVisible},{@link #isLocked},{@link #canScale},{@link #isInEditor},{@link #widgetBox},{@link #DATA}
  */
 public abstract class Widget implements Input {
     public static Minecraft mc = Minecraft.getInstance();
@@ -31,15 +30,14 @@ public abstract class Widget implements Input {
      *
      * @see #modId
      */
-    public UID uid = UID.generate();
+    public UUID uid = UUID.randomUUID();
     // Whether the widget is enabled and should be displayed.
     protected boolean isVisible = true;
-    protected boolean isDraggable = true;
-    //Boolean to check if the widget is being dragged
+    protected boolean isLocked = false;
+    protected float minScale = 0.3f;
+    protected float maxScale = 3.0f;
     public boolean dragging;
     private boolean wasDragged = false;
-
-    //To enable/disable snapping
     public boolean isShiftDown = false;
     /**
      * An identifier for widgets to group them under one ID.
@@ -65,6 +63,16 @@ public abstract class Widget implements Input {
 
     //Dimensions of the widget
     protected final WidgetBox widgetBox;
+
+    protected WidgetGroup group;
+
+    public WidgetGroup getGroup() {
+        return group;
+    }
+
+    public void setGroup(WidgetGroup group) {
+        this.group = group;
+    }
 
     private int startX, startY;
     protected int offsetX, offsetY;  // Offset from the anchor point
@@ -114,36 +122,20 @@ public abstract class Widget implements Input {
     public float getHeight() { return widgetBox.getHeight(); }
 
     private void calculateOffset(int initialX, int initialY, int screenWidth, int screenHeight) {
-        int anchorX = getAnchorX(screenWidth);
-        int anchorY = getAnchorY(screenHeight);
+        int anchorX = anchor.getBaseX(screenWidth);
+        int anchorY = anchor.getBaseY(screenHeight);
         this.offsetX = initialX - anchorX;
         this.offsetY = initialY - anchorY;
     }
 
-    private int getAnchorX(int screenWidth) {
-        return switch (anchor) {
-            case TOP_RIGHT, BOTTOM_RIGHT -> screenWidth;
-            case CENTER -> screenWidth / 2;
-            default -> 0; // TOP_LEFT and BOTTOM_LEFT
-        };
-    }
-
-    private int getAnchorY(int screenHeight) {
-        return switch (anchor) {
-            case BOTTOM_LEFT, BOTTOM_RIGHT -> screenHeight;
-            case CENTER -> screenHeight / 2;
-            default -> 0; // TOP_LEFT and TOP_RIGHT
-        };
-    }
-
     // Update position based on anchor and offset
     void updatePosition(int screenWidth, int screenHeight) {
-        if (offsetX == 0 || offsetY == 0) {
+        if (offsetX == 0 && offsetY == 0) {
             calculateOffset(x, y, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
         }
 
-        int anchorX = getAnchorX(screenWidth);
-        int anchorY = getAnchorY(screenHeight);
+        int anchorX = anchor.getBaseX(screenWidth);
+        int anchorY = anchor.getBaseY(screenHeight);
         this.x = anchorX + offsetX;
         this.y = anchorY + offsetY;
         clampPosition();
@@ -158,9 +150,7 @@ public abstract class Widget implements Input {
         }
     }
 
-    public void setDraggable(boolean draggable) {
-        isDraggable = draggable;
-    }
+
 
     public boolean isOverlapping(Widget other) {
         return this.getX() < other.getX() + other.getWidgetBox().getWidth() && this.getX() + this.getWidgetBox().getWidth() > other.getX() &&
@@ -230,10 +220,18 @@ public abstract class Widget implements Input {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (widgetBox.isMouseOver(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             wasDragged = false;
-            if (isDraggable) {
+            if (!isLocked) {
                 startX = (int) (mouseX - x);
                 startY = (int) (mouseY - y);
                 dragging = true;
+                if (group != null) {
+                    for (Widget member : group.getMembers()) {
+                        if (member != this) {
+                            member.wasDragged = false;
+                            member.dragging = false;
+                        }
+                    }
+                }
             } else {
                 toggle(); // Static widgets toggle immediately
             }
@@ -255,7 +253,7 @@ public abstract class Widget implements Input {
     }
 
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY, int snapSize) {
-        if (!isDraggable) return false;
+        if (isLocked) return false;
 
         if (dragging && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             wasDragged = true;
@@ -263,23 +261,35 @@ public abstract class Widget implements Input {
             int newX = (int) (mouseX - startX);
             int newY = (int) (mouseY - startY);
 
-            // Divides the screen into several "grid boxes" which the elements snap to.
-            // Higher the snapSize, more the grid boxes
             if (this.isShiftDown) {
-                // Calculate the size of each snap box
                 int snapBoxWidth = mc.getWindow().getGuiScaledWidth() / snapSize;
                 int snapBoxHeight = mc.getWindow().getGuiScaledHeight() / snapSize;
 
-                // Calculate the index of the snap box that the new position would be in and
-                // snap the new position to the top-left corner of the snap box
                 newX = (newX / snapBoxWidth) * snapBoxWidth;
                 newY = (newY / snapBoxHeight) * snapBoxHeight;
             }
 
-            this.x = (int) Mth.clamp(newX, 0, mc.getWindow().getGuiScaledWidth() - getWidth());
-            this.y = (int) Mth.clamp(newY, 0, mc.getWindow().getGuiScaledHeight() - getHeight());
+            newX = (int) Mth.clamp(newX, 0, mc.getWindow().getGuiScaledWidth() - getWidth());
+            newY = (int) Mth.clamp(newY, 0, mc.getWindow().getGuiScaledHeight() - getHeight());
 
-            calculateOffset(x, y, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());  // Set initial offset
+            int deltaXMove = newX - this.x;
+            int deltaYMove = newY - this.y;
+
+            if (deltaXMove != 0 || deltaYMove != 0) {
+                if (group != null) {
+                    for (Widget member : group.getMembers()) {
+                        if (member.isLocked()) continue;
+                        member.x += deltaXMove;
+                        member.y += deltaYMove;
+                        member.clampPosition();
+                        member.calculateOffset(member.x, member.y, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
+                    }
+                } else {
+                    this.x = newX;
+                    this.y = newY;
+                    calculateOffset(x, y, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
+                }
+            }
 
             return true;
         }
@@ -310,7 +320,8 @@ public abstract class Widget implements Input {
     @Override
     public void mouseScrolled(double mouseX, double mouseY, double vAmount, double hAmount) {
         if (canScale && widgetBox.isMouseOver(mouseX,mouseY) && GLFW.glfwGetKey(mc.getWindow().handle(),GLFW.GLFW_KEY_LEFT_CONTROL) == GLFW.GLFW_PRESS) {
-            widgetBox.setScale(widgetBox.getScale() + (float) vAmount * 0.05f);
+            float newScale = widgetBox.getScale() + (float) vAmount * 0.05f;
+            widgetBox.setScale(Mth.clamp(newScale, minScale, maxScale));
 
             clampPosition();
             calculateOffset(x, y, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
@@ -335,6 +346,10 @@ public abstract class Widget implements Input {
 
     public void onClose() {
         this.isShiftDown = false;
+    }
+
+    public boolean isMouseOverWidget(double mouseX, double mouseY) {
+        return this.widgetBox.isMouseOver(mouseX, mouseY);
     }
 
     /**
@@ -367,36 +382,39 @@ public abstract class Widget implements Input {
 
     public void readFromTag(CompoundTag tag) {
         modId = tag.getString("modId").orElse("unknown");
-        uid = tag.contains("UID") ? new UID(tag.getString("UID").get()) : UID.generate();
-        //     x = tag.getInt("x");
-        //     y = tag.getInt("y");
+        uid = tag.contains("UID") ? UUID.fromString(tag.getString("UID").get()) : UUID.randomUUID();
         anchor = Anchor.valueOf(tag.getString("anchor").orElse("TOP_LEFT"));
         offsetX = tag.getIntOr("offsetX", 0);
         offsetY = tag.getIntOr("offsetY",0);
         isVisible = tag.getBoolean("isVisible").orElse(true);
-        isDraggable = tag.getBoolean("isDraggable").orElse(true);
+        isLocked = tag.getBoolean("isLocked").orElse(tag.getBoolean("isDraggable").orElse(false));
         canScale = tag.getBoolean("canScale").orElse(true);
         widgetBox.setScale(tag.getFloat("widgetScale").orElse(1.0f));
+        if (tag.contains("groupId")) {
+            UUID groupId = UUID.fromString(tag.getString("groupId").get());
+            String groupName = tag.getString("groupName").orElse("Group");
+            WidgetGroup g = WidgetManager.getOrCreateGroup(groupId, groupName);
+            g.addMember(this);
+        }
+
+        updatePosition(mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
     }
 
-    /**
-     * Writes the state of this widget to the given tag.
-     *
-     * @param tag The tag to write to
-     */
     public void writeToTag(CompoundTag tag) {
         tag.putString("name", DATA.name());
         tag.putString("modId", modId);
-        tag.putString("UID", uid.getUniqueID());
-        tag.putBoolean("isDraggable", isDraggable);
+        tag.putString("UID", uid.toString());
+        tag.putBoolean("isLocked", isLocked);
         tag.putBoolean("canScale", canScale);
         tag.putFloat("widgetScale", widgetBox.getScale());
-        //    tag.putInt("x", x);
-        //     tag.putInt("y", y);
         tag.putString("anchor", anchor.name());
         tag.putInt("offsetX", offsetX);
         tag.putInt("offsetY", offsetY);
         tag.putBoolean("isVisible", isVisible);
+        if (group != null) {
+            tag.putString("groupId", group.getId().toString());
+            tag.putString("groupName", group.getName());
+        }
     }
 
     public boolean isVisible() {
@@ -411,6 +429,34 @@ public abstract class Widget implements Input {
         this.canScale = canScale;
     }
 
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.isLocked = locked;
+    }
+
+    public boolean canToggleLock() {
+        return true;
+    }
+
+    public float getMinScale() {
+        return minScale;
+    }
+
+    public void setMinScale(float minScale) {
+        this.minScale = minScale;
+    }
+
+    public float getMaxScale() {
+        return maxScale;
+    }
+
+    public void setMaxScale(float maxScale) {
+        this.maxScale = maxScale;
+    }
+
     public String getModId() {
         return modId;
     }
@@ -418,24 +464,33 @@ public abstract class Widget implements Input {
     @Override
     public String toString() {
         return this.getClass().getName() + "{" +
-                "uniqueId='" + uid.getUniqueID() + '\'' +
+                "uniqueId='" + uid.toString() + '\'' +
                 ", x=" + x +
                 ", y=" + y +
                 ", offsetX=" + offsetX +
                 ", offsetY=" + offsetY +
                 ", isVisible=" + isVisible +
-                ", isDraggable=" + isDraggable +
+                ", isLocked=" + isLocked +
                 ", shiftDown=" + isShiftDown +
                 ", canScale=" + canScale +
                 '}';
     }
 
     public enum Anchor {
-        TOP_LEFT,
-        TOP_RIGHT,
-        BOTTOM_LEFT,
-        BOTTOM_RIGHT,
-        CENTER;
+        TOP_LEFT(0.0f, 0.0f), TOP_CENTER(0.5f, 0.0f), TOP_RIGHT(1.0f, 0.0f),
+        CENTER_LEFT(0.0f, 0.5f), CENTER(0.5f, 0.5f), CENTER_RIGHT(1.0f, 0.5f),
+        BOTTOM_LEFT(0.0f, 1.0f), BOTTOM_CENTER(0.5f, 1.0f), BOTTOM_RIGHT(1.0f, 1.0f);
+
+        private final float xRatio;
+        private final float yRatio;
+
+        Anchor(float xRatio, float yRatio) {
+            this.xRatio = xRatio;
+            this.yRatio = yRatio;
+        }
+
+        public int getBaseX(int screenWidth) { return (int) (screenWidth * xRatio); }
+        public int getBaseY(int screenHeight) { return (int) (screenHeight * yRatio); }
 
         public static Anchor _default(){
             return TOP_LEFT;
@@ -446,7 +501,7 @@ public abstract class Widget implements Input {
         protected int x;
         protected int y;
         protected boolean isVisible = true;
-        protected boolean isDraggable = true;
+        protected boolean isLocked = false;
         protected boolean shouldScale = true;
         protected String modID = "unknown";
         protected Anchor anchor = Anchor._default();
@@ -472,8 +527,8 @@ public abstract class Widget implements Input {
             return self();
         }
 
-        public T setDraggable(boolean isDraggable) {
-            this.isDraggable = isDraggable;
+        public T setLocked(boolean isLocked) {
+            this.isLocked = isLocked;
             return self();
         }
 

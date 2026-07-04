@@ -83,7 +83,7 @@ jar {
 publishing {
     publications {
         mavenFabric(MavenPublication) {
-            artifactId = rootProject.archives_base_name + "-" + project.name
+            artifactId = project.base.archivesName.get() + "-" + project.name
             from components.java
         }
     }

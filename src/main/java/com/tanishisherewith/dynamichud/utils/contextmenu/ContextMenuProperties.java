@@ -9,12 +9,10 @@ import java.awt.*;
  * Note: Not all of these properties are used in all skins or all places.
  */
 public class ContextMenuProperties {
-    protected Color backgroundColor = new Color(107, 112, 126, 124);
+    protected Color backgroundColor = new Color(20, 20, 20, 180);
     protected Color accentColor = new Color(104, 151, 187, 255); // Color.CYAN.darker().darker();
     protected Color borderColor = Color.BLACK;
     protected float borderWidth = 1f;
-    protected int padding = 5;  // The amount of padding around the rectangle
-    protected int heightOffset = 4; // Height offset from the widget
     protected boolean drawBorder = true;
     protected boolean shadow = true;
     protected boolean roundedCorners = true;
@@ -46,18 +44,6 @@ public class ContextMenuProperties {
 
     public float getBorderWidth() {
         return borderWidth;
-    }
-
-    public int getPadding() {
-        return padding;
-    }
-
-    public int getHeightOffset() {
-        return heightOffset;
-    }
-
-    public void setHeightOffset(int heightOffset) {
-        this.heightOffset = heightOffset;
     }
 
     public boolean shouldDrawBorder() {
@@ -108,8 +94,6 @@ public class ContextMenuProperties {
                 .backgroundColor(backgroundColor)
                 .borderColor(borderColor)
                 .borderWidth(borderWidth)
-                .padding(padding)
-                .heightOffset(heightOffset)
                 .drawBorder(drawBorder)
                 .shadow(shadow)
                 .roundedCorners(roundedCorners)
@@ -166,16 +150,6 @@ public class ContextMenuProperties {
 
         public Builder<T> borderWidth(float borderWidth) {
             properties.borderWidth = borderWidth;
-            return this;
-        }
-
-        public Builder<T> padding(int padding) {
-            properties.padding = padding;
-            return this;
-        }
-
-        public Builder<T> heightOffset(int heightOffset) {
-            properties.heightOffset = heightOffset;
             return this;
         }
 

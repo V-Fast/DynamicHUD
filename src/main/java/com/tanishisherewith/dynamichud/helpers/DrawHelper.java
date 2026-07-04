@@ -593,6 +593,23 @@ public class DrawHelper {
     }
 
     /**
+     * Draws an dashed outlined box on the screen.
+     * @param color The color to draw the box with
+     */
+    public static void drawDashedOutlineBox(GuiGraphics graphics, float x, float y, float width, float height, float thickness, int dashLength, int gapLength, int color) {
+        for (float i = 0; i < width; i += dashLength + gapLength) {
+            float dw = Math.min(dashLength, width - i);
+            drawRectangle(graphics, x + i, y, dw, thickness, color);
+            drawRectangle(graphics, x + i, y + height - thickness, dw, thickness, color);
+        }
+        for (float i = 0; i < height; i += dashLength + gapLength) {
+            float dh = Math.min(dashLength, height - i);
+            drawRectangle(graphics, x, y + i, thickness, dh, color);
+            drawRectangle(graphics, x + width - thickness, y + i, thickness, dh, color);
+        }
+    }
+
+    /**
      * Draws an outlined box on the screen.
      *
      * @param x1    The x position of the top left corner of the box

@@ -1,9 +1,13 @@
 package com.tanishisherewith.dynamichud.utils;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
+import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.OptionGroup;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.Skin;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import org.apache.commons.text.similarity.FuzzyScore;
 
 import java.util.*;
@@ -128,6 +132,29 @@ public class Util {
         return scoreMap.getOrDefault(opt, 0);
     }
 
+    public static MutableComponent getTruncatedName(Component name, int maxTextWidth) {
+        String raw = name.getString();
+        if (DynamicHUD.MC.font.width(raw) > maxTextWidth) {
+            String truncated = DynamicHUD.MC.font.plainSubstrByWidth(raw, maxTextWidth - DynamicHUD.MC.font.width("...")) + "...";
+            return Component.literal(truncated);
+        }
+        return name.copy();
+    }
+
+    public static void drawScaledText(GuiGraphics graphics, Component text, int x, int y, float textScale, int color) {
+        DrawHelper.scaleAndPosition(graphics.pose(), x, y, textScale);
+        graphics.drawString(DynamicHUD.MC.font, text, x, y, color, false);
+        DrawHelper.stopScaling(graphics.pose());
+    }
+
+    public static void drawTruncatedScaledText(GuiGraphics graphics, Component text, int x, int y, int maxTextWidth, float textScale, int color) {
+        int allowedWidth = (int) (maxTextWidth / textScale);
+        Component truncated = getTruncatedName(text, allowedWidth);
+
+        DrawHelper.scaleAndPosition(graphics.pose(), x, y, textScale);
+        graphics.drawString(DynamicHUD.MC.font, truncated, x, y, color, false);
+        DrawHelper.stopScaling(graphics.pose());
+    }
 
     public static boolean isSafeToContinue() {
         return DynamicHUD.MC.getWindow() != null && DynamicHUD.MC.font != null;

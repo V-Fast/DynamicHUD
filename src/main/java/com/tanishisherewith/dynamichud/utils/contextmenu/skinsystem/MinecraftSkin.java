@@ -84,6 +84,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         addRenderer(SubMenuOption.class, MinecraftSubMenuRenderer::new);
         addRenderer(RunnableOption.class, MinecraftRunnableRenderer::new);
         addRenderer(ColorOption.class, MinecraftColorOptionRenderer::new);
+        addRenderer(KeybindOption.class, MinecraftKeybindRenderer::new);
 
         // if in case of different texture support.
         this.panelHeight = DEFAULT_PANEL_HEIGHT;
@@ -690,6 +691,35 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(!option.value, option.isMouseOver(mouseX, mouseY)), option.getX(), y, option.getWidth(), 20);
             graphics.drawString(mc.font, "Run", option.getX() + option.getWidth() / 2 - mc.font.width("Run") / 2, y + 5, option.value ? DARK_GREEN.getRGB() : DARK_RED.getRGB(), true);
+        }
+    }
+
+    public class MinecraftKeybindRenderer implements SkinRenderer<KeybindOption> {
+        @Override
+        public void render(GuiGraphics graphics, KeybindOption option, int x, int y, int mouseX, int mouseY) {
+            graphics.drawString(mc.font, option.name, x + 15, y + 25 / 2 - 5, -1, true);
+
+            int width = 70;
+            int buttonX = x + panelWidth - 95;
+            option.setPosition(buttonX, y);
+            option.setWidth(width);
+
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, isMouseOver(mouseX, mouseY, buttonX, y, width, 20)), buttonX, y, width, 20);
+
+            String text = option.isListening() ? "> ??? <" : KeybindOption.getKeyName(option.get());
+            int color = option.isListening() ? Color.YELLOW.getRGB() : Color.WHITE.getRGB();
+            graphics.drawString(mc.font, text, (int) (buttonX + (width / 2.0f) - (mc.font.width(text) / 2.0f)), y + 6, color, true);
+        }
+
+        @Override
+        public boolean mouseClicked(KeybindOption option, double mouseX, double mouseY, int button) {
+            int width = 70;
+            int buttonX = option.getX();
+            if (isMouseOver(mouseX, mouseY, buttonX, option.getY(), width, 20)) {
+                option.setListening(true);
+                return true;
+            }
+            return false;
         }
     }
 

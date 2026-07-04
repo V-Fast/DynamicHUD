@@ -23,6 +23,28 @@ public final class GlobalConfig {
             .build();
 
     private static final GlobalConfig INSTANCE = new GlobalConfig();
+
+    @SerialEntry
+    private boolean dragSelectionEnabled = true;
+
+    @SerialEntry
+    private Color dashedOutlineColor = Color.WHITE;
+
+    @SerialEntry
+    private float dashedOutlineThickness = 1.0f;
+
+    @SerialEntry
+    private boolean showLockButton = true;
+
+    @SerialEntry
+    private int lockButtonSize = 6;
+
+    @SerialEntry
+    private int scaleDotSize = 3;
+
+    @SerialEntry
+    private float scaleSensitivity = 1.0f;
+
     /**
      * Common scale for all widgets.
      */
@@ -138,6 +160,61 @@ public final class GlobalConfig {
                                 )
                                 .build())
                         .build())
+                .category(ConfigCategory.createBuilder()
+                        .name(Component.literal("Advanced UI"))
+                        .tooltip(Component.literal("Configure drag selection, lock size, keybind shortcuts, and outlines."))
+                        .group(OptionGroup.createBuilder()
+                                .name(Component.literal("Drag & Grouping"))
+                                .description(OptionDescription.of(Component.literal("Configure grouping and selection.")))
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Component.literal("Enable Drag Selection"))
+                                        .description(OptionDescription.of(Component.literal("Draw selection boxes on empty space to select widgets.")))
+                                        .binding(true, () -> this.dragSelectionEnabled, newVal -> this.dragSelectionEnabled = newVal)
+                                        .controller(booleanOption -> BooleanControllerBuilder.create(booleanOption).yesNoFormatter())
+                                        .build())
+
+                                .build())
+                        .group(OptionGroup.createBuilder()
+                                .name(Component.literal("Overlays & Sizing"))
+                                .description(OptionDescription.of(Component.literal("Configure thickness, colors, and button sizes.")))
+                                .option(Option.<Color>createBuilder()
+                                        .name(Component.literal("Dashed Outline Color"))
+                                        .description(OptionDescription.of(Component.literal("Color of the dashed bounding boxes of hovered/selected widgets.")))
+                                        .binding(Color.WHITE, () -> this.dashedOutlineColor, newVal -> this.dashedOutlineColor = newVal)
+                                        .controller(ColorControllerBuilder::create)
+                                        .build())
+                                .option(Option.<Float>createBuilder()
+                                        .name(Component.literal("Dashed Outline Thickness"))
+                                        .description(OptionDescription.of(Component.literal("Thickness of the dashed bounding boxes.")))
+                                        .binding(1.0f, () -> this.dashedOutlineThickness, newVal -> this.dashedOutlineThickness = newVal)
+                                        .controller(floatOption -> FloatSliderControllerBuilder.create(floatOption).range(0.5f, 3.0f).step(0.1f))
+                                        .build())
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Component.literal("Show Lock Button"))
+                                        .description(OptionDescription.of(Component.literal("Show the lock toggle icon on hovered widgets.")))
+                                        .binding(true, () -> this.showLockButton, newVal -> this.showLockButton = newVal)
+                                        .controller(booleanOption -> BooleanControllerBuilder.create(booleanOption).yesNoFormatter())
+                                        .build())
+                                .option(Option.<Integer>createBuilder()
+                                        .name(Component.literal("Lock Button Size"))
+                                        .description(OptionDescription.of(Component.literal("Dimensions of the lock toggle button.")))
+                                        .binding(6, () -> this.lockButtonSize, newVal -> this.lockButtonSize = newVal)
+                                        .controller(integerOption -> IntegerSliderControllerBuilder.create(integerOption).range(4, 12).step(1))
+                                        .build())
+                                .option(Option.<Integer>createBuilder()
+                                        .name(Component.literal("Scale Dot Size"))
+                                        .description(OptionDescription.of(Component.literal("Dimensions of the resize anchor dot.")))
+                                        .binding(3, () -> this.scaleDotSize, newVal -> this.scaleDotSize = newVal)
+                                        .controller(integerOption -> IntegerSliderControllerBuilder.create(integerOption).range(1, 6).step(1))
+                                        .build())
+                                .option(Option.<Float>createBuilder()
+                                        .name(Component.literal("Scale Sensitivity"))
+                                        .description(OptionDescription.of(Component.literal("Sensitivity multiplier for resize-dragging (1.0 is exact visual tracking).")))
+                                        .binding(1.0f, () -> this.scaleSensitivity, newVal -> this.scaleSensitivity = newVal)
+                                        .controller(floatOption -> FloatSliderControllerBuilder.create(floatOption).range(0.1f, 3.0f).step(0.1f))
+                                        .build())
+                                .build())
+                        .build())
                 .save(HANDLER::save)
                 .build()
                 .generateScreen(Minecraft.getInstance().screen);
@@ -181,5 +258,35 @@ public final class GlobalConfig {
 
     public com.tanishisherewith.dynamichud.utils.contextmenu.options.Option.Complexity complexity() {
         return complexity;
+    }
+
+    public boolean isDragSelectionEnabled() {
+        return dragSelectionEnabled;
+    }
+
+
+
+    public Color getDashedOutlineColor() {
+        return dashedOutlineColor;
+    }
+
+    public float getDashedOutlineThickness() {
+        return dashedOutlineThickness;
+    }
+
+    public boolean showLockButton() {
+        return showLockButton;
+    }
+
+    public int getLockButtonSize() {
+        return lockButtonSize;
+    }
+
+    public int getScaleDotSize() {
+        return scaleDotSize;
+    }
+
+    public float getScaleSensitivity() {
+        return scaleSensitivity;
     }
 }

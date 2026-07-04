@@ -11,6 +11,10 @@ import org.joml.Vector2d;
 
 import java.util.List;
 
+/**
+ * Layout engine that coordinates layouts, spaces options, and applies layouts.
+ * Manages item spacing, padding, min width, and active layout strategies.
+ */
 public class LayoutEngine {
     private int horizontalPadding = 8;
     private int verticalPadding = 4;
@@ -18,7 +22,9 @@ public class LayoutEngine {
     private int minWidth = 80;
     private LayoutStrategy activeStrategy;
 
-    public LayoutEngine() {}
+    public LayoutEngine() {
+         this(4, 3, 2, 80);
+    }
 
     public LayoutEngine(int horizontalPadding, int verticalPadding, int itemSpacing, int minWidth) {
          this(horizontalPadding,verticalPadding,itemSpacing,minWidth,new VerticalFlowStrategy());
@@ -101,32 +107,36 @@ public class LayoutEngine {
         public void layout(ContextMenu<?> menu, LayoutEngine engine) {
             if (menu == null) return;
 
-            Font font = Minecraft.getInstance().font;
+            Font font = DynamicHUD.MC.font;
             List<Option<?>> visibleOptions = menu.getProperties().getSkin().getOptions(menu);
-            int paddingValue = menu.getProperties().getPadding();
 
-            // width calc
+            if (menu.getRootNode() == null) {
+                ColumnNode column = new ColumnNode(engine.getItemSpacing());
+                for (Option<?> option : visibleOptions) {
+                    column.addChild(new OptionNode(option));
+                }
+                menu.setRootNode(new PaddingNode(column,
+                        engine.getHorizontalPadding(),
+                        engine.getHorizontalPadding(),
+                        engine.getVerticalPadding(),
+                        engine.getVerticalPadding()
+                ));
+            }
+
             int maxInnerWidth = engine.getMinWidth();
             for (Option<?> option : visibleOptions) {
                 if (!option.shouldRender()) continue;
-                int preferredWidth = option.getWidth() > 0 ? option.getWidth() : font.width(option.getName());
+                int preferredWidth = option.getWidth() > 0 ? option.getWidth() : font.width(option.name);
                 maxInnerWidth = Math.max(maxInnerWidth, preferredWidth);
             }
 
-            int totalMenuWidth = maxInnerWidth + (engine.getHorizontalPadding() * 2) + paddingValue;
+            int totalMenuWidth = maxInnerWidth + (engine.getHorizontalPadding() * 2);
 
-            // height calc
-            int currentY = menu.getY() + engine.getVerticalPadding() + 3;
-            int currentX = menu.getX() + engine.getHorizontalPadding();
-            int targetWidth = totalMenuWidth - (engine.getHorizontalPadding() * 2) - paddingValue;
-
-            for (Option<?> option : visibleOptions) {
-                if (!option.shouldRender()) continue;
-                currentY = engine.layoutOption(option, currentX, currentY, targetWidth);
-            }
+            menu.getRootNode().layout(totalMenuWidth);
+            menu.getRootNode().setPosition(menu.getX(), menu.getY());
 
             menu.setWidth(totalMenuWidth);
-            menu.setHeight(currentY - menu.getY());
+            menu.setHeight(menu.getRootNode().getHeight());
         }
     }
 

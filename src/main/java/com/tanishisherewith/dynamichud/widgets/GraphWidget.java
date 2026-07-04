@@ -427,12 +427,12 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         String formattedMinVal = formatValue(minValue);
 
         DrawHelper.scaleAndPosition(graphics.pose(), x - mc.font.width(formattedMinVal)/2.0f, y + gHeight,mc.font.width(formattedMinVal),mc.font.lineHeight * 0.6f, 0.6f);
-        graphics.drawString(mc.font, formattedMinVal, x - mc.font.width(formattedMinVal), (int) (y + gHeight - 1), 0xFFFFFFFF, true);
+        graphics.drawString(mc.font, formattedMinVal, x - mc.font.width(formattedMinVal) + 1, (int) (y + gHeight - 1), 0xFFFFFFFF, true);
         DrawHelper.stopScaling(graphics.pose());
 
         if(showGrid) x -= offset;
 
-        this.widgetBox.setDimensions(x, y, gWidth + offset, gHeight, canScale);
+        this.widgetBox.setDimensions(x, y, gWidth + offset, gHeight + mc.font.lineHeight * 0.6f, canScale);
      //   DrawHelper.disableScissor();
 
         if (menu != null) menu.set(getX(), getY(), (int) Math.ceil(getHeight()));
@@ -459,7 +459,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     }
 
     public void createMenu() {
-        ContextMenuProperties properties = ContextMenuProperties.builder().build();
+        ContextMenuProperties properties = ContextMenuProperties.builder().backgroundColor(new Color(107, 112, 126, 124)).build();
         menu = new ContextMenu<>(getX(), (int) (getY() + widgetBox.getHeight()), properties);
 
         menu.addOption(new BooleanOption(Component.literal("Show Grid"),
@@ -497,10 +497,10 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
                 () -> this.graphColor, value -> this.graphColor = value, menu)
                 .description(Component.literal("Specify the color you want for the graph's lines"))
         );
-        menu.addOption(new BooleanOption(Component.literal("Rainbow Graph Line Color"),
+        menu.addOption(new BooleanOption(Component.literal("Rainbow GraphLine"),
                 () -> this.graphColorRainbow, value -> this.graphColorRainbow = value)
                 .description(Component.literal("Color your graph line with funny rainbow"))
-                .withComplexity(Option.Complexity.Pro)
+                .withComplexity(Option.Complexity.Simple)
         );
         menu.addOption(new ColorOption(Component.literal("Graph Background Color"),
                 () -> this.backgroundColor, value -> this.backgroundColor = value, menu)
@@ -755,7 +755,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
             GraphWidget widget = new GraphWidget(registryID, registryKey, modID, anchor, gWidth, gHeight, maxDataPoints, minValue, maxValue, graphColor, backgroundColor, lineThickness, showGrid, gridLines, label);
             widget.setSampleInterval(sampleIntervalMs);
             widget.setPosition(x, y);
-            widget.setDraggable(isDraggable);
+            widget.setLocked(isLocked);
             widget.setCanScale(shouldScale);
             widget.isVisible = isVisible;
             return widget;

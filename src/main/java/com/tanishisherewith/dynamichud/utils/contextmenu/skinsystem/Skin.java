@@ -35,9 +35,13 @@ public abstract class Skin {
 
     @SuppressWarnings("unchecked")
     public <T extends Option<?>> SkinRenderer<T> getRenderer(Class<T> optionClass) {
-        Supplier<SkinRenderer<? extends Option<?>>> supplier = renderers.get(optionClass);
-        if (supplier != null) {
-            return (SkinRenderer<T>) supplier.get();
+        Class<?> current = optionClass;
+        while (current != null && Option.class.isAssignableFrom(current)) {
+            Supplier<SkinRenderer<? extends Option<?>>> supplier = renderers.get(current);
+            if (supplier != null) {
+                return (SkinRenderer<T>) supplier.get();
+            }
+            current = current.getSuperclass();
         }
         return null;
     }

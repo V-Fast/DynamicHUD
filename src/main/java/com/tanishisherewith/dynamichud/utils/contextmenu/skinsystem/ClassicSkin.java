@@ -2,6 +2,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem;
 
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
+import com.tanishisherewith.dynamichud.utils.Util;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
@@ -9,6 +10,8 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.S
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.util.FormattedCharSequence;
 
 import java.awt.*;
 /**
@@ -25,6 +28,7 @@ public class ClassicSkin extends Skin {
         addRenderer(SubMenuOption.class, ClassicSubMenuRenderer::new);
         addRenderer(RunnableOption.class, ClassicRunnableRenderer::new);
         addRenderer(DoubleOption.class, ClassicDoubleRenderer::new);
+        addRenderer(KeybindOption.class, ClassicKeybindRenderer::new);
 
         setCreateNewScreen(false);
     }
@@ -42,8 +46,10 @@ public class ClassicSkin extends Skin {
             if (properties.hoverEffect() && contextMenu.isMouseOver(mouseX, mouseY, option.getX() - 3, option.getY() - 1, contextMenu.getWidth() - 2, option.getHeight())) {
                 drawBackground(graphics, contextMenu, properties, option.getY() - 1, contextMenu.getWidth(), option.getHeight() + 1, properties.getHoverColor().getRGB(), false);
             }
+        }
 
-            option.render(graphics, option.getX(), option.getY(), mouseX, mouseY);
+        if (contextMenu.getRootNode() != null) {
+            contextMenu.getRootNode().render(graphics, mouseX, mouseY);
         }
 
         if (properties.shouldDrawBorder()) {
@@ -89,7 +95,8 @@ public class ClassicSkin extends Skin {
         @Override
         public void render(GuiGraphics graphics, BooleanOption option, int x, int y, int mouseX, int mouseY) {
             int color = option.get() ? Color.GREEN.getRGB() : Color.RED.getRGB();
-            graphics.drawString(mc.font, option.name, x, y, color, false);
+            Component displayName = Util.getTruncatedName(option.name, option.getWidth());
+            graphics.drawString(mc.font, displayName, x, y, color, false);
         }
     }
 
@@ -97,11 +104,12 @@ public class ClassicSkin extends Skin {
         @Override
         public void render(GuiGraphics graphics, ColorOption option, int x, int y, int mouseX, int mouseY) {
             int color = option.isVisible ? Color.GREEN.getRGB() : Color.RED.getRGB();
-            graphics.drawString(mc.font, option.name, x, y, color, false);
+            Component text = Util.getTruncatedName(option.name,option.getWidth() - 4);
+            graphics.drawString(mc.font, text, x, y, color, false);
 
             int shadowOpacity = Math.min(option.value.getAlpha(), 90);
             DrawHelper.drawRoundedRectangleWithShadowBadWay(graphics,
-                    x + option.getWidth() - 10,
+                    x + option.getWidth() - 8,
                     y - 1,
                     8,
                     8,
@@ -118,8 +126,11 @@ public class ClassicSkin extends Skin {
     public static class ClassicCycleRenderer<E> implements SkinRenderer<CycleOption<E>> {
         @Override
         public void render(GuiGraphics graphics, CycleOption<E> option, int x, int y, int mouseX, int mouseY) {
-            graphics.drawString(mc.font, option.name.copy().append(": "), x, y, Color.WHITE.getRGB(), false);
-            graphics.drawString(mc.font, option.get().toString(), x + mc.font.width(option.name + ": ") + 1, y, Color.CYAN.getRGB(), false);
+            String valStr = option.get().toString();
+            int valueWidth = mc.font.width(": " + valStr);
+            Component displayName = Util.getTruncatedName(option.name, option.getWidth() - valueWidth - 2);
+            graphics.drawString(mc.font, displayName.copy().append(": "), x, y, Color.WHITE.getRGB(), false);
+            graphics.drawString(mc.font, valStr, x + mc.font.width(displayName.getString() + ": ") + 1, y, Color.CYAN.getRGB(), false);
         }
     }
 
@@ -127,8 +138,9 @@ public class ClassicSkin extends Skin {
         @Override
         public void render(GuiGraphics graphics, SubMenuOption option, int x, int y, int mouseX, int mouseY) {
             int color = option.value ? Color.GREEN.getRGB() : Color.RED.getRGB();
-            graphics.drawString(mc.font, option.name, x, y, color, false);
-            graphics.drawString(mc.font, option.getSubMenu().isVisible() ? "-" : "+", x + Math.max(option.getParentMenu().getWidth() - 12, mc.font.width(option.name) + 2), y, color, false);
+            Component displayName = Util.getTruncatedName(option.name, option.getParentMenu().getWidth() - 14);
+            graphics.drawString(mc.font, displayName, x, y, color, false);
+            graphics.drawString(mc.font, option.getSubMenu().isVisible() ? "-" : "+", x + Math.max(option.getParentMenu().getWidth() - 12, mc.font.width(displayName) + 2), y, color, false);
 
             option.getSubMenu().render(graphics, x + option.getParentMenu().getWidth(), y - 1, mouseX, mouseY);
         }
@@ -138,7 +150,8 @@ public class ClassicSkin extends Skin {
         @Override
         public void render(GuiGraphics graphics, RunnableOption option, int x, int y, int mouseX, int mouseY) {
             int color = option.value ? ColorHelper.DARK_GREEN.getRGB() : ColorHelper.DARK_RED.getRGB();
-            graphics.drawString(mc.font, Component.literal("Run: ").append(option.name), x, y, color, false);
+            Component displayName = Util.getTruncatedName(Component.literal("Run: ").append(option.name), option.getWidth());
+            graphics.drawString(mc.font, displayName, x, y, color, false);
         }
     }
 
@@ -146,10 +159,13 @@ public class ClassicSkin extends Skin {
         @Override
         public void render(GuiGraphics graphics, DoubleOption option, int x, int y, int mouseX, int mouseY) {
             Font font = mc.font;
-            DrawHelper.scaleAndPosition(graphics.pose(), x, y, 0.7f);
-            Component labelText = option.name.copy().append(": " + String.format("%.1f", option.value));
-            graphics.drawString(font, labelText, x, y + 1, 0xFFFFFFFF, true);
-            DrawHelper.stopScaling(graphics.pose());
+            int decimalPlaces = String.valueOf(option.step).split("\\.")[1].length();
+
+            String decimalValue = String.format("%." + decimalPlaces + "f", option.value);
+            float scale = 0.7f;
+            //get the truncated text with the scaled width
+            Component labelText = Util.getTruncatedName(option.name, (int)(option.getWidth()*(1/scale)) - (int)(mc.font.width(": " + decimalValue) * scale) - 2).append(": " + decimalValue);
+            Util.drawScaledText(graphics, labelText, x, y + 1, scale, 0xFFFFFFFF);
 
             float handleWidth = 3;
             float handleHeight = 8;
@@ -168,6 +184,27 @@ public class ClassicSkin extends Skin {
                     90,
                     0.6f,
                     0.6f);
+        }
+    }
+
+    public static class ClassicKeybindRenderer implements SkinRenderer<KeybindOption> {
+        @Override
+        public void render(GuiGraphics graphics, KeybindOption option, int x, int y, int mouseX, int mouseY) {
+            String valueText = option.isListening() ? "???" : KeybindOption.getKeyName(option.get());
+            int valueColor = option.isListening() ? Color.YELLOW.getRGB() : Color.CYAN.getRGB();
+            int valueWidth = mc.font.width(": " + valueText);
+            Component displayName = Util.getTruncatedName(option.name, option.getWidth() - valueWidth - 2);
+            graphics.drawString(mc.font, displayName.copy().append(": "), x, y, Color.WHITE.getRGB(), false);
+            graphics.drawString(mc.font, valueText, x + mc.font.width(displayName.getString() + ": ") + 1, y, valueColor, false);
+        }
+
+        @Override
+        public boolean mouseClicked(KeybindOption option, double mouseX, double mouseY, int button) {
+            if (option.isMouseOver(mouseX, mouseY)) {
+                option.setListening(true);
+                return true;
+            }
+            return false;
         }
     }
 }

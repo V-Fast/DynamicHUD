@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.widgets;
 
+import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.integration.IntegrationManager;
 import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
@@ -9,7 +10,6 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProvider;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.ClassicSkin;
-import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.ModernSkin;
 import com.tanishisherewith.dynamichud.widget.DynamicValueWidget;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
 import net.minecraft.client.gui.GuiGraphics;
@@ -51,7 +51,7 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
     }
 
     public void createMenu() {
-        menu = new ContextMenu<>(getX(), getY(),ContextMenuProperties.builder().skin(new ClassicSkin()).build());
+        menu = new ContextMenu<>(getX(), getY(),ContextMenuProperties.builder().skin(new ClassicSkin()).backgroundColor(new Color(107, 112, 126, 124)).build());
 
     //    if(IntegrationManager.IS_TEST_MODE) menu.setLayoutEngine(new LayoutEngine(20,20,20,80));
 
@@ -65,9 +65,9 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
                 BooleanOption.BooleanType.ON_OFF)
                 .description(Component.literal("Adds rainbow effect to your Component"))
         );
-        menu.addOption(new ColorOption(Component.literal("Component Color"),
+        menu.addOption(new ColorOption(Component.literal("Text Color"),
                 () -> this.textColor, value -> this.textColor = value, menu)
-                .description(Component.literal("Specify the color you want to add to your Component"))
+                .description(Component.literal("Specify the color you want to add to your text"))
                 .renderWhen(() -> !this.rainbow)
         );
         menu.addOption(new DoubleOption(Component.literal("Rainbow Speed"),
@@ -93,7 +93,7 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
                 .renderWhen(() -> this.rainbow)
                 .withComplexity(Option.Complexity.Pro)
         );
-        if(IntegrationManager.IS_TEST_MODE) {
+        if(IntegrationManager.IS_TEST_MODE && false) {
             // Runnable Option
             AtomicBoolean ran = new AtomicBoolean(false);
             menu.addOption(new RunnableOption(Component.literal("Reset Position"),
@@ -232,7 +232,7 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
             TextWidget widget = new TextWidget(registryID, registryKey, shadow, rainbow, textColor, modID);
 
             widget.setPosition(x, y);
-            widget.setDraggable(isDraggable);
+            widget.setLocked(isLocked);
             widget.setCanScale(shouldScale);
             return widget;
         }

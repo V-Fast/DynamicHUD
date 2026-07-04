@@ -38,11 +38,11 @@ import static com.tanishisherewith.dynamichud.helpers.ColorHelper.DARK_GREEN;
 import static com.tanishisherewith.dynamichud.helpers.ColorHelper.DARK_RED;
 
 public class ModernSkin extends Skin implements GroupableSkin {
-    static Color DARK_GRAY = new Color(20, 20, 20, 180);
-    static Color DARKER_GRAY = new Color(10, 10, 10, 243);
-    static Color DARKER_GRAY_2 = new Color(12, 12, 12, 246);
+    private Color BASE_COLOR = new Color(20, 20, 20, 180);
+    private final Color DARKER_GRAY = new Color(10, 10, 10, 243);
+    private final Color DARKER_GRAY_2 = new Color(12, 12, 12, 246);
 
-    private final float radius;
+    private float radius;
     private final Component defaultToolTipHeader;
     private final Component defaultToolTipText;
     private int contextMenuX = 0, contextMenuY = 0;
@@ -76,6 +76,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         addRenderer(SubMenuOption.class, ModernSubMenuRenderer::new);
         addRenderer(RunnableOption.class, ModernRunnableRenderer::new);
         addRenderer(ColorOption.class, ModernColorOptionRenderer::new);
+        addRenderer(KeybindOption.class, ModernKeybindRenderer::new);
 
         this.scrollHandler = new ScrollHandler();
 
@@ -121,7 +122,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
     }
 
     private int calcOptionHeight(Option<?> option) {
-        if (option instanceof BooleanOption || option instanceof DoubleOption) return 14;
+        if (option instanceof BooleanOption || option instanceof DoubleOption || option instanceof KeybindOption) return 14;
         if (option instanceof CycleOption) return 14;
         if (option instanceof SubMenuOption) return 14;
         if (option instanceof RunnableOption) return mc.font.lineHeight + 6;
@@ -156,7 +157,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
     // Adds a nice animation while opening and closing
     public void renderGroup(GuiGraphics graphics, OptionGroup group, int groupX, int groupY, int targetWidth, int mouseX, int mouseY) {
-        GroupAnimData animData = groupAnimations.computeIfAbsent(group, g -> new GroupAnimData(16f));
+        GroupAnimData animData = groupAnimations.computeIfAbsent(group, g -> new GroupAnimData());
         if (group.isExpanded() && animData.value <= 16) {
             int fullHeight = computeGroupFullHeight(group, groupX, groupY, targetWidth);
             animData.value = (float) fullHeight;
@@ -198,6 +199,9 @@ public class ModernSkin extends Skin implements GroupableSkin {
                 if (!option.shouldRender()) continue;
                 option.setHeight(calcOptionHeight(option));
                 yOffset = contextMenu.getLayoutEngine().layoutOption(option, groupX + nestedIndent, yOffset, subWidth);
+                if (option.isMouseOver(mouseX, mouseY)) {
+                    setTooltipText(option.name, option.description);
+                }
                 option.render(graphics, option.getX(), option.getY(), mouseX, mouseY);
             }
 
@@ -224,6 +228,11 @@ public class ModernSkin extends Skin implements GroupableSkin {
     public void renderContextMenu(GuiGraphics graphics, ContextMenu<?> contextMenu, int mouseX, int mouseY) {
         SCALE_FACTOR = mc.getWindow().calculateScale(0, mc.isEnforceUnicode());
         this.contextMenu = contextMenu;
+        if (contextMenu != null && contextMenu.getProperties() != null) {
+            Color base = contextMenu.getProperties().getBackgroundColor();
+            this.BASE_COLOR = base;
+            this.radius = contextMenu.getProperties().roundedCorners() ? contextMenu.getProperties().getCornerRadius() : 0.0f;
+        }
 
         DrawHelper.scaledProjection(SCALE_FACTOR, graphics);
 
@@ -246,7 +255,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
         // Background behind the options scroll area
         DrawHelper.drawRoundedRectangle(graphics,
-                optionStartX, contextMenuY + 19, width * 0.8f - 14, height - 23, radius, DARK_GRAY.getRGB());
+                optionStartX, contextMenuY + 19, width * 0.8f - 14, height - 23, radius, BASE_COLOR.getRGB());
 
         enableSkinScissor(graphics);
 
@@ -255,12 +264,12 @@ public class ModernSkin extends Skin implements GroupableSkin {
         for (Option<?> option : getOptions(contextMenu)) {
             if (!option.shouldRender()) continue;
 
+            option.setHeight(calcOptionHeight(option));
+            int nextY = contextMenu.getLayoutEngine().layoutOption(option, optionStartX + 2, yPos, targetWidth);
+
             if (option.isMouseOver(mouseX, mouseY)) {
                 setTooltipText(option.name, option.description);
             }
-
-            option.setHeight(calcOptionHeight(option));
-            int nextY = contextMenu.getLayoutEngine().layoutOption(option, optionStartX + 2, yPos, targetWidth);
 
             if (option instanceof OptionGroup group) {
                 this.renderGroup(graphics, group, optionStartX + 2, yPos, mouseX, mouseY);
@@ -330,7 +339,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                 toolTipWidth,
                 toolTipHeight,
                 radius,
-                DARK_GRAY.getRGB()
+                BASE_COLOR.getRGB()
         );
         DrawHelper.drawHorizontalLine(
                 graphics,
@@ -350,7 +359,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
         graphics.drawString(
                 mc.font,
-                TOOLTIP_HEAD,
+                Util.getTruncatedName(TOOLTIP_HEAD, toolTipWidth),
                 contextMenuX + 4,
                 tooltipY + 4,
                 -1,
@@ -448,7 +457,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                         boolean willBeExpanded = !group.isExpanded();
                         group.setExpanded(willBeExpanded);
 
-                        GroupAnimData animData = groupAnimations.computeIfAbsent(group, g -> new GroupAnimData(16f));
+                        GroupAnimData animData = groupAnimations.computeIfAbsent(group, g -> new GroupAnimData());
                         float current = animData.value;
                         float target;
                         if (willBeExpanded) {
@@ -1026,6 +1035,9 @@ public class ModernSkin extends Skin implements GroupableSkin {
         GroupAnimData(float initial) {
             this.value = initial;
         }
+        GroupAnimData() {
+            this.value = 16f;
+        }
     }
 
     public class ModernSearchBox extends EditBox {
@@ -1087,7 +1099,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                 int glowColor = ColorHelper.changeAlpha(getThemeColor(), glowAlpha).getRGB();
                 DrawHelper.drawOutlineRoundedBox(graphics, x, y, w, h, CORNER_RADIUS, 1f, glowColor);
             } else {
-                DrawHelper.drawOutlineRoundedBox(graphics, x, y, w, h, CORNER_RADIUS, 1f, DARK_GRAY.getRGB());
+                DrawHelper.drawOutlineRoundedBox(graphics, x, y, w, h, CORNER_RADIUS, 1f, BASE_COLOR.getRGB());
             }
 
 
@@ -1161,6 +1173,48 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
         private Color getThemeColor() {
             return ModernSkin.this.getThemeColor();
+        }
+    }
+
+    public class ModernKeybindRenderer implements SkinRenderer<KeybindOption> {
+        @Override
+        public void render(GuiGraphics graphics, KeybindOption option, int x, int y, int mouseX, int mouseY) {
+            mouseX = (int) (mc.mouseHandler.xpos() / SCALE_FACTOR);
+            mouseY = (int) (mc.mouseHandler.ypos() / SCALE_FACTOR);
+
+            graphics.drawString(mc.font, option.name, x + 4, y + 2, -1, false);
+
+            String text = option.isListening() ? "..." : KeybindOption.getKeyName(option.get());
+            int textWidth = mc.font.width(text);
+            int boxWidth = Math.max(30, textWidth + 8);
+            int boxX = x + option.getWidth() - boxWidth - 10;
+            int boxY = y + 1;
+            int boxHeight = 10;
+
+            boolean hovered = isMouseOver(mouseX, mouseY, boxX, boxY, boxWidth, boxHeight);
+            Color boxBgColor = option.isListening() ? getThemeColor() : (hovered ? DARKER_GRAY_2 : BASE_COLOR);
+
+            DrawHelper.drawRoundedRectangle(graphics, boxX, boxY, boxWidth, boxHeight, 2, boxBgColor.getRGB());
+            graphics.drawString(mc.font, text, boxX + boxWidth / 2 - textWidth / 2, boxY + 1, -1, false);
+        }
+
+        @Override
+        public boolean mouseClicked(KeybindOption option, double mouseX, double mouseY, int button) {
+            mouseX = (int) (mc.mouseHandler.xpos() / SCALE_FACTOR);
+            mouseY = (int) (mc.mouseHandler.ypos() / SCALE_FACTOR);
+
+            String text = option.isListening() ? "..." : KeybindOption.getKeyName(option.get());
+            int textWidth = mc.font.width(text);
+            int boxWidth = Math.max(30, textWidth + 8);
+            int boxX = option.getX() + option.getWidth() - boxWidth - 10;
+            int boxY = option.getY() + 1;
+            int boxHeight = 10;
+
+            if (isMouseOver(mouseX, mouseY, boxX, boxY, boxWidth, boxHeight)) {
+                option.setListening(true);
+                return true;
+            }
+            return false;
         }
     }
 }

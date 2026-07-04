@@ -100,24 +100,8 @@ public class WidgetManager {
      */
     public static void onScreenResized(int newWidth, int newHeight, int previousWidth, int previousHeight) {
         for (Widget widget : widgets) {
-            // To ensure that infinite coordinates is not returned for the first time its resized.
-
+            if (widget.isLocked()) continue;
             widget.updatePosition(newWidth, newHeight);
-
-            /*
-            if (widget.xPercent <= 0.0f) {
-                widget.xPercent = (float) widget.getX() / previousWidth;
-            }
-            if (widget.yPercent <= 0.0f) {
-                widget.yPercent = (float) widget.getY() / previousHeight;
-            }
-
-            widget.updatePositionFromPercentages(newWidth, newHeight);
-
-            widget.xPercent = (widget.getX() + widget.getWidth() / 2) / newWidth;
-            widget.yPercent = (widget.getY() + widget.getHeight() / 2) / newHeight;
-
-             */
         }
     }
 
@@ -249,5 +233,15 @@ public class WidgetManager {
 
     public static Map<String, WidgetData<?>> getWidgetDataMap() {
         return widgetDataMap;
+    }
+
+    private static final Map<UUID, WidgetGroup> groups = new HashMap<>();
+
+    public static WidgetGroup getOrCreateGroup(UUID id, String name) {
+        return groups.computeIfAbsent(id, k -> new WidgetGroup(id, name));
+    }
+
+    public static Map<UUID, WidgetGroup> getGroups() {
+        return groups;
     }
 }
