@@ -58,12 +58,12 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
         menu.addOption(new BooleanOption(Component.literal("Shadow"),
                 () -> this.shadow, value -> this.shadow = value,
                 BooleanOption.BooleanType.ON_OFF)
-                .description(Component.literal("Adds shadow to your Component"))
+                .description(Component.literal("Adds shadow to your text"))
         );
         menu.addOption(new BooleanOption(Component.literal("Rainbow"),
                 () -> this.rainbow, value -> this.rainbow = value,
                 BooleanOption.BooleanType.ON_OFF)
-                .description(Component.literal("Adds rainbow effect to your Component"))
+                .description(Component.literal("Adds rainbow effect to your text"))
         );
         menu.addOption(new ColorOption(Component.literal("Text Color"),
                 () -> this.textColor, value -> this.textColor = value, menu)

@@ -7,6 +7,8 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.G
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,6 +116,31 @@ public abstract class Skin {
 
     public boolean shouldCreateNewScreen() {
         return createNewScreen;
+    }
+
+    public boolean showHoverTooltips() {
+        return true;
+    }
+
+    public void renderTooltipIfHovered(GuiGraphics graphics, Option<?> option, int x, int y, int mouseX, int mouseY, int maxTextWidth) {
+        if (!showHoverTooltips()) return;
+
+        if (isMouseOver(mouseX, mouseY, x, y, option.getWidth(), option.getHeight())) {
+            List<FormattedCharSequence> tooltipLines = new ArrayList<>();
+            boolean isTruncated = mc.font.width(option.name.getString()) > maxTextWidth;
+
+            if (isTruncated) {
+                tooltipLines.add(option.name.copy().withStyle(style -> style.withColor(0xFFFFAA00).withBold(true)).getVisualOrderText());
+            }
+
+            if (option.description != null && !option.description.getString().isEmpty()) {
+                tooltipLines.addAll(mc.font.split(option.description, 200));
+            }
+
+            if (!tooltipLines.isEmpty()) {
+                graphics.setTooltipForNextFrame(mc.font, tooltipLines, mouseX, mouseY);
+            }
+        }
     }
 
     public void setCreateNewScreen(boolean createNewScreen) {

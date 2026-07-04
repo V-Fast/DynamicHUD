@@ -90,13 +90,13 @@ public class ClassicSkin extends Skin {
         return new ClassicSkin();
     }
 
-
     public static class ClassicBooleanRenderer implements SkinRenderer<BooleanOption> {
         @Override
         public void render(GuiGraphics graphics, BooleanOption option, int x, int y, int mouseX, int mouseY) {
             int color = option.get() ? Color.GREEN.getRGB() : Color.RED.getRGB();
             Component displayName = Util.getTruncatedName(option.name, option.getWidth());
             graphics.drawString(mc.font, displayName, x, y, color, false);
+            option.getProperties().getSkin().renderTooltipIfHovered(graphics, option, x, y, mouseX, mouseY, option.getWidth());
         }
     }
 
@@ -104,7 +104,7 @@ public class ClassicSkin extends Skin {
         @Override
         public void render(GuiGraphics graphics, ColorOption option, int x, int y, int mouseX, int mouseY) {
             int color = option.isVisible ? Color.GREEN.getRGB() : Color.RED.getRGB();
-            Component text = Util.getTruncatedName(option.name,option.getWidth() - 4);
+            Component text = Util.getTruncatedName(option.name, option.getWidth() - 4);
             graphics.drawString(mc.font, text, x, y, color, false);
 
             int shadowOpacity = Math.min(option.value.getAlpha(), 90);
@@ -120,6 +120,7 @@ public class ClassicSkin extends Skin {
                     1);
 
             option.getColorGradient().render(graphics, x + option.getParentMenu().getWidth() + 7, y - 10, mouseX, mouseY);
+            option.getProperties().getSkin().renderTooltipIfHovered(graphics, option, x, y, mouseX, mouseY, option.getWidth() - 4);
         }
     }
 
@@ -131,6 +132,7 @@ public class ClassicSkin extends Skin {
             Component displayName = Util.getTruncatedName(option.name, option.getWidth() - valueWidth - 2);
             graphics.drawString(mc.font, displayName.copy().append(": "), x, y, Color.WHITE.getRGB(), false);
             graphics.drawString(mc.font, valStr, x + mc.font.width(displayName.getString() + ": ") + 1, y, Color.CYAN.getRGB(), false);
+            option.getProperties().getSkin().renderTooltipIfHovered(graphics, option, x, y, mouseX, mouseY, option.getWidth() - valueWidth - 2);
         }
     }
 
@@ -143,6 +145,7 @@ public class ClassicSkin extends Skin {
             graphics.drawString(mc.font, option.getSubMenu().isVisible() ? "-" : "+", x + Math.max(option.getParentMenu().getWidth() - 12, mc.font.width(displayName) + 2), y, color, false);
 
             option.getSubMenu().render(graphics, x + option.getParentMenu().getWidth(), y - 1, mouseX, mouseY);
+            option.getProperties().getSkin().renderTooltipIfHovered(graphics, option, x, y, mouseX, mouseY, option.getParentMenu().getWidth() - 14);
         }
     }
 
@@ -152,6 +155,7 @@ public class ClassicSkin extends Skin {
             int color = option.value ? ColorHelper.DARK_GREEN.getRGB() : ColorHelper.DARK_RED.getRGB();
             Component displayName = Util.getTruncatedName(Component.literal("Run: ").append(option.name), option.getWidth());
             graphics.drawString(mc.font, displayName, x, y, color, false);
+            option.getProperties().getSkin().renderTooltipIfHovered(graphics, option, x, y, mouseX, mouseY, option.getWidth());
         }
     }
 
@@ -164,7 +168,8 @@ public class ClassicSkin extends Skin {
             String decimalValue = String.format("%." + decimalPlaces + "f", option.value);
             float scale = 0.7f;
             //get the truncated text with the scaled width
-            Component labelText = Util.getTruncatedName(option.name, (int)(option.getWidth()*(1/scale)) - (int)(mc.font.width(": " + decimalValue) * scale) - 2).append(": " + decimalValue);
+            int maxTextWidth = (int)(option.getWidth()*(1/scale)) - (int)(mc.font.width(": " + decimalValue) * scale) - 2;
+            Component labelText = Util.getTruncatedName(option.name, maxTextWidth).append(": " + decimalValue);
             Util.drawScaledText(graphics, labelText, x, y + 1, scale, 0xFFFFFFFF);
 
             float handleWidth = 3;
@@ -184,6 +189,7 @@ public class ClassicSkin extends Skin {
                     90,
                     0.6f,
                     0.6f);
+            option.getProperties().getSkin().renderTooltipIfHovered(graphics, option, x, y, mouseX, mouseY, maxTextWidth);
         }
     }
 
@@ -196,6 +202,7 @@ public class ClassicSkin extends Skin {
             Component displayName = Util.getTruncatedName(option.name, option.getWidth() - valueWidth - 2);
             graphics.drawString(mc.font, displayName.copy().append(": "), x, y, Color.WHITE.getRGB(), false);
             graphics.drawString(mc.font, valueText, x + mc.font.width(displayName.getString() + ": ") + 1, y, valueColor, false);
+            option.getProperties().getSkin().renderTooltipIfHovered(graphics, option, x, y, mouseX, mouseY, option.getWidth() - valueWidth - 2);
         }
 
         @Override

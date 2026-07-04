@@ -1024,6 +1024,11 @@ public class ModernSkin extends Skin implements GroupableSkin {
     }
 
     @Override
+    public boolean showHoverTooltips() {
+        return false;
+    }
+
+    @Override
     public Skin clone() {
         return new ModernSkin(radius, defaultToolTipHeader, defaultToolTipText);
     }
