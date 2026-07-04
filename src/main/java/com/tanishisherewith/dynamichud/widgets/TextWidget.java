@@ -51,7 +51,7 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
     }
 
     public void createMenu() {
-        menu = new ContextMenu<>(getX(), getY(),ContextMenuProperties.builder().skin(new ClassicSkin()).backgroundColor(new Color(107, 112, 126, 124)).build());
+        menu = new ContextMenu<>(getX(), getY(),ContextMenuProperties.builder().backgroundColor(new Color(107, 112, 126, 124)).build());
 
     //    if(IntegrationManager.IS_TEST_MODE) menu.setLayoutEngine(new LayoutEngine(20,20,20,80));
 
