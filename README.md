@@ -43,6 +43,33 @@ DynamicHUD is a special tool for Minecraft mod creators who use Fabric. It works
 - **Easy Integration**: Simple setup for quick implementation into your projects.
 - **Comprehensive Wiki**: A detailed guide and reference for all features of DynamicHUD, available at https://tanishisherewith.gitbook.io/dynamic-hud.
 
+# Keybinds
+
+> Currently these keybinds are unmodifiable
+
+### 1. Grouping and multi-selection
+
+#### Keyboard shortcuts
+
+* **Drag selection window**: Click and drag on empty space to draw a selection window. Any widget that overlaps this area will be selected.
+* **`CTRL + Left Click` multi-selection**: Hold `CTRL` and left click on individual widgets to toggle their selection state.
+* **Group or ungroup toggle**: Press `CTRL + G` to group the selected widgets. Press `CTRL + G` again to ungroup them.
+
+#### Notes
+
+* Dragging any widget in a group moves all unlocked widgets in that group.
+* Locked widgets with `isLocked` set to `true` do not move with the group.
+* Hovering a group shows a dashed green bounding box around all grouped widgets.
+
+***
+
+### 2. Scaling widgets
+
+Widgets can be scaled individually in the editor in two ways:
+
+* **Scaling keybind**: Hover a widget and use `CTRL + Mouse Wheel Scroll` to increase or decrease its local scale.
+* **Scale dot**: Selected widgets render a small scale dot in the bottom-right corner. Drag that dot to scale the widget dynamically.
+* 
 ## Disclaimer
 DynamicHUD is a library for Minecraft Fabric designed to provide developers with the tools to create customizable HUD elements. It does not add widgets or any functionality on its own. Interaction with DynamicHUD's internals and utilization of its features can only be done through mods that implement this library. Users looking for in-game HUD elements should refer to mods that use DynamicHUD.
 
