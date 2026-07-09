@@ -3,7 +3,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.MouseColorQuery;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import org.lwjgl.glfw.GLFW;
 
@@ -58,7 +58,7 @@ public class ColorGradient {
         this.hoveredColorPreview = null;
     }
 
-    public void render(GuiGraphics graphics, int x1, int y1, int mouseX, int mouseY) {
+    public void render(GuiGraphicsExtractor graphics, int x1, int y1, int mouseX, int mouseY) {
         setPos(x1, y1);
         if (!display) {
             return;
@@ -86,7 +86,7 @@ public class ColorGradient {
         }
     }
 
-    public void renderPickerPreview(GuiGraphics graphics, int mouseX, int mouseY) {
+    public void renderPickerPreview(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (hoveredColorPreview != null && colorPickerButton.isPicking() && GlobalConfig.get().showColorPickerPreview()) {
             // Temporarily pop all active clipping zones off the scissor stack
             // This will allow the preview to render over all screen scissors

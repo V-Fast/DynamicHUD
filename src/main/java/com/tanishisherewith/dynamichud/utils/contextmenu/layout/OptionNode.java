@@ -2,7 +2,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.layout;
 
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /**
  * A leaf node wrapping a single option. Handles delegation of layout, position,
@@ -66,7 +66,7 @@ public class OptionNode implements LayoutNode {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY) {
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (!shouldRender()) return;
         option.render(graphics, x, y, mouseX, mouseY);
     }

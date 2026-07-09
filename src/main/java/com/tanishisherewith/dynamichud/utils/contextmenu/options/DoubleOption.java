@@ -2,7 +2,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.Validate;
 import org.lwjgl.glfw.GLFW;
@@ -30,7 +30,7 @@ public class DoubleOption extends Option<Double> {
         Validate.isTrue(this.step > 0.0f, "Step cannot be less than or equal to 0 (zero)");
     }
 
-    public void drawSlider(GuiGraphics graphics, int sliderX, int sliderY, int sliderWidth, double handleX) {
+    public void drawSlider(GuiGraphicsExtractor graphics, int sliderX, int sliderY, int sliderWidth, double handleX) {
         DrawHelper.drawRectangle(graphics, sliderX, sliderY, sliderWidth, 2, 0xFFFFFFFF);
         if (handleX - sliderX > 0) {
             DrawHelper.drawRectangle(graphics, (float) sliderX, (float) sliderY, (float) ((value - minValue) / (maxValue - minValue) * (width - 3)), 2, Color.ORANGE.getRGB());

@@ -2,7 +2,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options;
 
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class OptionGroup extends Option<OptionGroup> {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int x, int y, int mouseX, int mouseY) {
+    public void render(GuiGraphicsExtractor graphics, int x, int y, int mouseX, int mouseY) {
         super.render(graphics,x,y,mouseX,mouseY);
     }
 
@@ -67,7 +67,7 @@ public class OptionGroup extends Option<OptionGroup> {
 
     public static class OptionGroupRenderer implements SkinRenderer<Option<OptionGroup>> {
         @Override
-        public void render(GuiGraphics graphics, Option<OptionGroup> option, int x, int y, int mouseX, int mouseY) {}
+        public void render(GuiGraphicsExtractor graphics, Option<OptionGroup> option, int x, int y, int mouseX, int mouseY) {}
 
         @Override
         public boolean mouseClicked(Option<OptionGroup> option2, double mouseX, double mouseY, int button) {

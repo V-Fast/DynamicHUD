@@ -6,7 +6,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.options.OptionGroup;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.GroupableSkin;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 
@@ -88,7 +88,7 @@ public abstract class Skin {
         this.renderers = renderers;
     }
 
-    public abstract void renderContextMenu(GuiGraphics graphics, ContextMenu<?> contextMenu, int mouseX, int mouseY);
+    public abstract void renderContextMenu(GuiGraphicsExtractor graphics, ContextMenu<?> contextMenu, int mouseX, int mouseY);
 
     public boolean mouseClicked(ContextMenu<?> menu, double mouseX, double mouseY, int button) {
         return false;
@@ -122,7 +122,7 @@ public abstract class Skin {
         return true;
     }
 
-    public void renderTooltipIfHovered(GuiGraphics graphics, Option<?> option, int x, int y, int mouseX, int mouseY, int maxTextWidth) {
+    public void renderTooltipIfHovered(GuiGraphicsExtractor graphics, Option<?> option, int x, int y, int mouseX, int mouseY, int maxTextWidth) {
         if (!showHoverTooltips()) return;
 
         if (isMouseOver(mouseX, mouseY, x, y, option.getWidth(), option.getHeight())) {

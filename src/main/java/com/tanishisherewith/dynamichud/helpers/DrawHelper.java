@@ -5,9 +5,8 @@ import com.tanishisherewith.dynamichud.renderstates.QuadColorRectRenderState;
 import com.tanishisherewith.dynamichud.renderstates.RoundedRectRenderState;
 import com.tanishisherewith.dynamichud.utils.CustomRenderLayers;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
-import net.fabricmc.fabric.api.renderer.v1.render.RenderLayerHelper;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -47,7 +46,7 @@ public class DrawHelper {
      * @param endColor   end color of the gradient
      * @param direction  Draws the gradient in the given direction
      */
-    public static void drawGradient(GuiGraphics g, float x, float y, float width, float height, int startColor, int endColor, Direction direction) {
+    public static void drawGradient(GuiGraphicsExtractor g, float x, float y, float width, float height, int startColor, int endColor, Direction direction) {
             int[] c = switch(direction) {
                 case TOP_BOTTOM -> new int[]{startColor, startColor, endColor, endColor};
                 case LEFT_RIGHT -> new int[]{startColor, endColor, endColor, startColor};
@@ -55,21 +54,21 @@ public class DrawHelper {
                 case BOTTOM_TOP -> new int[]{endColor, endColor, startColor, startColor};
             };
 
-            g.guiRenderState.submitGuiElement(
+            g.guiRenderState.addGuiElement(
                     new QuadColorRectRenderState(RenderPipelines.GUI,new Matrix3x2f(g.pose()),x,y,width,height,c,
                             g.scissorStack.peek())
             );
     }
 
-    public static void enableScissor(int x, int y, int width, int height, GuiGraphics graphics) {
+    public static void enableScissor(int x, int y, int width, int height, GuiGraphicsExtractor graphics) {
         enableScissor(x, y, width, height, mc.getWindow().getGuiScale(),graphics);
     }
 
-    public static void enableScissor(WidgetBox box,GuiGraphics graphics) {
+    public static void enableScissor(WidgetBox box,GuiGraphicsExtractor graphics) {
         enableScissor((int) box.x, (int) box.y, (int) box.getWidth(), (int) box.getHeight(), mc.getWindow().getGuiScale(),graphics);
     }
 
-    public static void enableScissor(int x, int y, int width, int height, float scaleFactor, GuiGraphics graphics) {
+    public static void enableScissor(int x, int y, int width, int height, float scaleFactor, GuiGraphicsExtractor graphics) {
         scaleFactor = scaleFactor / mc.getWindow().getGuiScale();
         int scissorX = (int) (x * scaleFactor);
         int scissorY = (int) (y * scaleFactor);
@@ -88,7 +87,7 @@ public class DrawHelper {
     }
 
 
-    public static void disableScissor(GuiGraphics graphics) {
+    public static void disableScissor(GuiGraphicsExtractor graphics) {
         graphics.disableScissor();
     }
 
@@ -101,7 +100,7 @@ public class DrawHelper {
      * @param height   Height of the rectangle
      * @param color    Color of the rectangle
      */
-    public static void drawRectangle(GuiGraphics graphics, float x, float y, float width, float height, int color) {
+    public static void drawRectangle(GuiGraphicsExtractor graphics, float x, float y, float width, float height, int color) {
         drawGradient(graphics,x,y,width,height,color,color,Direction.LEFT_RIGHT);
     }
 
@@ -116,7 +115,7 @@ public class DrawHelper {
      * @param height   Height of the rectangle
      * @param color    Color of the rectangle
      */
-    public static void drawOutlineBox(GuiGraphics graphics, float x, float y, float width, float height, float thickness, int color) {
+    public static void drawOutlineBox(GuiGraphicsExtractor graphics, float x, float y, float width, float height, float thickness, int color) {
         drawRectangle(graphics, x, y, width, thickness, color);
         drawRectangle(graphics, x, y + height - thickness, width, thickness, color);
         drawRectangle(graphics, x, y + thickness, thickness, height - thickness * 2, color);
@@ -136,7 +135,7 @@ public class DrawHelper {
      * @param shadowOffsetX X position Offset of the shadow from the main rectangle X pos
      * @param shadowOffsetY Y position Offset of the shadow from the main rectangle Y pos
      */
-    public static void drawRectangleWithShadowBadWay(GuiGraphics graphics, float x, float y, float width, float height, int color, int shadowOpacity, float shadowOffsetX, float shadowOffsetY) {
+    public static void drawRectangleWithShadowBadWay(GuiGraphicsExtractor graphics, float x, float y, float width, float height, int color, int shadowOpacity, float shadowOffsetX, float shadowOffsetY) {
         // First, render the shadow
         drawRectangle(graphics, x + shadowOffsetX, y + shadowOffsetY, width, height, ColorHelper.getColor(0, 0, 0, shadowOpacity));
 
@@ -155,12 +154,12 @@ public class DrawHelper {
      * @param color     Color of the rounded.fsh rectangle
      * @param thickness thickness of the outline
      */
-    public static void drawOutlineRoundedBox(GuiGraphics graphics, float x, float y, float width, float height, float radius, float thickness, int color) {
+    public static void drawOutlineRoundedBox(GuiGraphicsExtractor graphics, float x, float y, float width, float height, float radius, float thickness, int color) {
         Color c = new Color(color, true);
         drawOutlineRoundedBox(graphics,x,y,width,height,new Vector4f(radius),thickness,c,c,c,c);
     }
 
-    public static void drawOutlineRoundedBox(GuiGraphics graphics, float x, float y, float width, float height, Vector4f radii, float thickness,  Color tl, Color tr, Color br, Color bl) {
+    public static void drawOutlineRoundedBox(GuiGraphicsExtractor graphics, float x, float y, float width, float height, Vector4f radii, float thickness,  Color tl, Color tr, Color br, Color bl) {
         if (width <= 0 || height <= 0) return;
         float maxRadius = Math.min(width, height) / 2;
         radii.set(Math.min(radii.x, maxRadius), // top-left
@@ -170,7 +169,7 @@ public class DrawHelper {
         );
         int[] intColors = {tl.getRGB(),tr.getRGB(),br.getRGB(),bl.getRGB()};
 
-        graphics.guiRenderState.submitGuiElement(new RoundedRectRenderState(
+        graphics.guiRenderState.addGuiElement(new RoundedRectRenderState(
                 RenderPipelines.DEBUG_QUADS,
                 new Matrix3x2f(graphics.pose()),
                 x, y, width, height, thickness, intColors, radii, graphics.scissorStack.peek()
@@ -190,7 +189,7 @@ public class DrawHelper {
      * @param spread      How much the color difference should be between each character (ideally between 0.001 to 0.2)
      * @param shadow      Whether to render the Component as shadow.
      */
-    public static void drawChromaText(@NotNull GuiGraphics graphics, String Component, int x, int y, float speed, float saturation, float brightness, float spread, boolean shadow) {
+    public static void drawChromaText(@NotNull GuiGraphicsExtractor graphics, String Component, int x, int y, float speed, float saturation, float brightness, float spread, boolean shadow) {
         long time = System.currentTimeMillis();
         int length = Component.length();
 
@@ -198,7 +197,7 @@ public class DrawHelper {
             float hue = (time % (int) (5000 / speed)) / (5000f / speed) + (i * spread); // Adjust the hue based on time and character position
             hue = floorMod(hue, 1.0f); //  hue should stay within the range [0, 1]
             int color = Color.HSBtoRGB(hue, saturation, brightness);
-            graphics.drawString(mc.font, String.valueOf(Component.charAt(i)), x + mc.font.width(Component.substring(0, i)), y, color, shadow);
+            graphics.text(mc.font, String.valueOf(Component.charAt(i)), x + mc.font.width(Component.substring(0, i)), y, color, shadow);
         }
     }
 
@@ -214,7 +213,7 @@ public class DrawHelper {
      * @param radius   radius of the circle outline
      * @param color    color of the circle outline
      */
-    public static void drawOutlineCircle(GuiGraphics graphics, float xCenter, float yCenter, float radius, float lineWidth, int color) {
+    public static void drawOutlineCircle(GuiGraphicsExtractor graphics, float xCenter, float yCenter, float radius, float lineWidth, int color) {
         int segments = 72; // 5-degree steps
         float[] verts = new float[(segments + 1) * 4];
         int[] colors = new int[(segments + 1) * 2];
@@ -233,7 +232,7 @@ public class DrawHelper {
             verts[base + 3] = yCenter + cos * (radius + lineWidth);
         }
 
-        graphics.guiRenderState.submitGuiElement(new GeometryRenderState(
+        graphics.guiRenderState.addGuiElement(new GeometryRenderState(
                 CustomRenderLayers.TRIANGLE_STRIP,
                 new Matrix3x2f(graphics.pose()),
                 verts, colors, graphics.scissorStack.peek()
@@ -248,7 +247,7 @@ public class DrawHelper {
      * @param radius   radius of the circle outline
      * @param color    color of the circle outline
      */
-    public static void drawFilledCircle(GuiGraphics graphics, float xCenter, float yCenter, float radius, int color) {
+    public static void drawFilledCircle(GuiGraphicsExtractor graphics, float xCenter, float yCenter, float radius, int color) {
         int segments = 36;
         float[] verts = new float[segments * 4 * 2];
         int[] colors = new int[segments * 4];
@@ -273,7 +272,7 @@ public class DrawHelper {
             colors[cIdx++] = color;
         }
 
-        graphics.guiRenderState.submitGuiElement(new GeometryRenderState(
+        graphics.guiRenderState.addGuiElement(new GeometryRenderState(
                 CustomRenderLayers.QUADS_CUSTOM_BLEND,
                 new Matrix3x2f(graphics.pose()),
                 verts, colors, graphics.scissorStack.peek()
@@ -291,7 +290,7 @@ public class DrawHelper {
      * @param shadowOffsetY X position of the circle shadow offset from main circle
      * @param shadowOpacity Opacity of the circle shadow offset from main circle
      */
-    public static void drawCircleWithShadow(GuiGraphics graphics, float xCenter, float yCenter, float radius, int color, int shadowOpacity, float shadowOffsetX, float shadowOffsetY) {
+    public static void drawCircleWithShadow(GuiGraphicsExtractor graphics, float xCenter, float yCenter, float radius, int color, int shadowOpacity, float shadowOffsetX, float shadowOffsetY) {
         // First, render the shadow
         drawFilledCircle(graphics, xCenter + shadowOffsetX, yCenter + shadowOffsetY, radius, ColorHelper.getColor(0, 0, 0, shadowOpacity));
 
@@ -311,7 +310,7 @@ public class DrawHelper {
      * @param endColor   end color of the gradient
      * @param quadrant   Integer value of the quadrant of the circle. 1 == Top Right, 2 == Top Left, 3 == Bottom Right, 4 == Bottom Left
      */
-    public static void drawFilledGradientQuadrant(GuiGraphics graphics, float xCenter, float yCenter, float radius, int startColor, int endColor, int quadrant) {
+    public static void drawFilledGradientQuadrant(GuiGraphicsExtractor graphics, float xCenter, float yCenter, float radius, int startColor, int endColor, int quadrant) {
         int segments = 18; // 90 degrees / 5
         float[] verts = new float[(segments + 2) * 2];
         int[] colors = new int[segments + 2];
@@ -329,7 +328,7 @@ public class DrawHelper {
             colors[i + 1] = ARGB.linearLerp((float) i / segments, startColor, endColor);
         }
 
-        graphics.guiRenderState.submitGuiElement(new GeometryRenderState(
+        graphics.guiRenderState.addGuiElement(new GeometryRenderState(
                 CustomRenderLayers.TRIANGLE_FAN_CUSTOM_BLEND,
                 new Matrix3x2f(graphics.pose()),
                 verts, colors, graphics.scissorStack.peek()
@@ -346,7 +345,7 @@ public class DrawHelper {
      * @param endAngle   end Angle of the arc
      * @param thickness  Thickness of the arc (width of the arc)
      */
-    public static void drawArc(GuiGraphics graphics, float xCenter, float yCenter, float radius, float thickness, int color, int startAngle, int endAngle) {
+    public static void drawArc(GuiGraphicsExtractor graphics, float xCenter, float yCenter, float radius, float thickness, int color, int startAngle, int endAngle) {
         int segments = Math.max(1, (endAngle - startAngle) / 5);
         float[] verts = new float[(segments + 1) * 4];
         int[] colors = new int[(segments + 1) * 2];
@@ -369,7 +368,7 @@ public class DrawHelper {
             verts[base + 3] = yCenter + cos * radius;
         }
 
-        graphics.guiRenderState.submitGuiElement(new GeometryRenderState(
+        graphics.guiRenderState.addGuiElement(new GeometryRenderState(
                 CustomRenderLayers.TRIANGLE_FAN_CUSTOM_BLEND,
                 new Matrix3x2f(graphics.pose()),
                 verts, colors, graphics.scissorStack.peek()
@@ -386,14 +385,14 @@ public class DrawHelper {
      * @param color    color of the quadrant
      * @param quadrant Integer value of the quadrant of the circle. 1 == Top Right, 2 == Top Left, 3 == Bottom Right, 4 == Bottom Left
      */
-    public static void drawFilledQuadrant(GuiGraphics graphics, float xCenter, float yCenter, float radius, int color, int quadrant) {
+    public static void drawFilledQuadrant(GuiGraphicsExtractor graphics, float xCenter, float yCenter, float radius, int color, int quadrant) {
         drawFilledGradientQuadrant(graphics, xCenter, yCenter, radius, color, color, quadrant);
     }
 
     /**
      * Draws a Triangle with the given coordinates
      */
-    public static void drawOutlineTriangle(GuiGraphics graphics, int x1, int y1, int x2, int y2, int x3, int y3, int color) {
+    public static void drawOutlineTriangle(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, int x3, int y3, int color) {
         // 3 lines require 6 vertices (1-2, 2-3, 3-1) to form a closed loop
         float[] vertices = {
                 (float)x1, (float)y1, (float)x2, (float)y2, // Line 1
@@ -404,7 +403,7 @@ public class DrawHelper {
         int[] colors = new int[6];
         java.util.Arrays.fill(colors, color);
 
-        graphics.guiRenderState.submitGuiElement(new GeometryRenderState(
+        graphics.guiRenderState.addGuiElement(new GeometryRenderState(
                 CustomRenderLayers.COLOR_LINE,
                 new Matrix3x2f(graphics.pose()),
                 vertices,
@@ -421,7 +420,7 @@ public class DrawHelper {
      * @param color    color of the quadrant
      * @param quadrant Integer value of the quadrant of the circle. 1 == Top Right, 2 == Top Left, 3 == Bottom Right, 4 == Bottom Left
      */
-    public static void drawOutlineQuadrant(GuiGraphics graphics, float xCenter, float yCenter, float radius, int quadrant, int color) {
+    public static void drawOutlineQuadrant(GuiGraphicsExtractor graphics, float xCenter, float yCenter, float radius, int quadrant, int color) {
         int startAngle = 0;
         int endAngle = 0;
 
@@ -451,7 +450,7 @@ public class DrawHelper {
      * @param radius   Radius of the quadrants / the rounded.fsh rectangle
      * @param color    Color of the rounded.fsh rectangle
      */
-    public static void drawRoundedRectangle(GuiGraphics graphics, float x, float y, float width, float height, float radius, int color) {
+    public static void drawRoundedRectangle(GuiGraphicsExtractor graphics, float x, float y, float width, float height, float radius, int color) {
         drawRoundedRectangle(graphics, x, y, true, true, true, true, width, height, radius, color);
     }
 
@@ -471,7 +470,7 @@ public class DrawHelper {
      * @param radius   Radius of the quadrants / the rounded.fsh rectangle
      * @param color    Color of the rounded.fsh rectangle
      */
-    public static void drawRoundedRectangle(GuiGraphics graphics, float x, float y, boolean TL, boolean TR, boolean BL, boolean BR, float width, float height, float radius, int color) {
+    public static void drawRoundedRectangle(GuiGraphicsExtractor graphics, float x, float y, boolean TL, boolean TR, boolean BL, boolean BR, float width, float height, float radius, int color) {
         Vector4f radii = new Vector4f(TL ? radius : 0.0f, TR ? radius : 0.0f, BR ? radius : 0.0f, BL ? radius : 0.0f);
 
         // Turns out Color class takes rgb by default not rgba
@@ -481,7 +480,7 @@ public class DrawHelper {
 
     /**
      * Draws a rounded rectangle with customizable corner radii, corner colors, and selective corner rounding.
-     * @param graphics GuiGraphics for rendering
+     * @param graphics GuiGraphicsExtractor for rendering
      * @param x X position
      * @param y Y position
      *
@@ -490,7 +489,7 @@ public class DrawHelper {
      * @param height Height of the rectangle
      * @param radii Vector4f specifying radii for top-left, top-right, bottom-right, bottom-left corners
      */
-    public static void drawRoundedRectangle(GuiGraphics graphics, float x, float y, float width, float height,
+    public static void drawRoundedRectangle(GuiGraphicsExtractor graphics, float x, float y, float width, float height,
                                             Vector4f radii, Color tl, Color tr, Color br, Color bl) {
         if (width <= 0 || height <= 0) return;
         float maxRadius = Math.min(width, height) / 2;
@@ -501,7 +500,7 @@ public class DrawHelper {
         );
         int[] intColors = {tl.getRGB(),tr.getRGB(),br.getRGB(),bl.getRGB()};
 
-        graphics.guiRenderState.submitGuiElement(new RoundedRectRenderState(
+        graphics.guiRenderState.addGuiElement(new RoundedRectRenderState(
                 RenderPipelines.DEBUG_QUADS,
                 new Matrix3x2f(graphics.pose()),
                 x, y, width, height, -1f, intColors, radii, graphics.scissorStack.peek()
@@ -522,7 +521,7 @@ public class DrawHelper {
      * @param height   Height of rounded.fsh gradient rectangle
      * @param radius   Radius of the quadrants / the rounded.fsh gradient rectangle
      */
-    public static void drawOutlineGradientRoundedBox(GuiGraphics graphics, float x, float y, float width, float height, float radius, float thickness, Color tl, Color tr, Color br, Color bl) {
+    public static void drawOutlineGradientRoundedBox(GuiGraphicsExtractor graphics, float x, float y, float width, float height, float radius, float thickness, Color tl, Color tr, Color br, Color bl) {
         drawOutlineRoundedBox(graphics,x,y,width,height,new Vector4f(radius),thickness,tl, tr, br,bl);
     }
 
@@ -539,7 +538,7 @@ public class DrawHelper {
      * @param shadowOffsetX X offset of the shadow
      * @param shadowOffsetY Y offset of the shadow
      */
-    public static void drawRoundedRectangleWithShadowBadWay(GuiGraphics graphics, float x, float y, float width, float height, float radius, int color, int shadowOpacity, float shadowOffsetX, float shadowOffsetY) {
+    public static void drawRoundedRectangleWithShadowBadWay(GuiGraphicsExtractor graphics, float x, float y, float width, float height, float radius, int color, int shadowOpacity, float shadowOffsetX, float shadowOffsetY) {
         // First, render the shadow
         drawRoundedRectangle(graphics, x + shadowOffsetX, y + shadowOffsetY, width, height, radius, ColorHelper.getColor(0, 0, 0, shadowOpacity));
 
@@ -560,7 +559,7 @@ public class DrawHelper {
      * @param height Height of rounded.fsh gradient rectangle
      * @param radius Radius of the quadrants / the rounded.fsh gradient rectangle
      */
-    public static void drawRoundedGradientRectangle(GuiGraphics graphics, Color tl, Color tr, Color br, Color bl, float x, float y, float width, float height, float radius) {
+    public static void drawRoundedGradientRectangle(GuiGraphicsExtractor graphics, Color tl, Color tr, Color br, Color bl, float x, float y, float width, float height, float radius) {
         drawRoundedGradientRectangle(graphics, tl,tr,br,bl, x, y, width, height, radius, true, true, true, true);
     }
 
@@ -577,18 +576,18 @@ public class DrawHelper {
      * @param height Height of rounded.fsh gradient rectangle
      * @param radius Radius of the quadrants / the rounded.fsh gradient rectangle
      */
-    public static void drawRoundedGradientRectangle(GuiGraphics graphics, Color tl, Color tr, Color br, Color bl, float x, float y, float width, float height, float radius, boolean TL, boolean TR, boolean BL, boolean BR) {
+    public static void drawRoundedGradientRectangle(GuiGraphicsExtractor graphics, Color tl, Color tr, Color br, Color bl, float x, float y, float width, float height, float radius, boolean TL, boolean TR, boolean BL, boolean BR) {
         drawRoundedRectangle(graphics, x, y, width, height,
                 new Vector4f(TR ? radius : 0.0f, BR ? radius : 0.0f, TL ? radius : 0.0f, BL ? radius : 0.0f),
                 tl,tr,br,bl);
     }
 
     /* ==== Drawing Lines ==== */
-    public static void drawVerticalLine(GuiGraphics graphics, float x, float y1, float height, float thickness, int color) {
+    public static void drawVerticalLine(GuiGraphicsExtractor graphics, float x, float y1, float height, float thickness, int color) {
         drawRectangle(graphics, x, y1, thickness, height, color);
     }
 
-    public static void drawHorizontalLine(GuiGraphics graphics, float x1, float width, float y, float thickness, int color) {
+    public static void drawHorizontalLine(GuiGraphicsExtractor graphics, float x1, float width, float y, float thickness, int color) {
         drawRectangle(graphics, x1, y, width, thickness, color);
     }
 
@@ -596,7 +595,7 @@ public class DrawHelper {
      * Draws an dashed outlined box on the screen.
      * @param color The color to draw the box with
      */
-    public static void drawDashedOutlineBox(GuiGraphics graphics, float x, float y, float width, float height, float thickness, int dashLength, int gapLength, int color) {
+    public static void drawDashedOutlineBox(GuiGraphicsExtractor graphics, float x, float y, float width, float height, float thickness, int dashLength, int gapLength, int color) {
         for (float i = 0; i < width; i += dashLength + gapLength) {
             float dw = Math.min(dashLength, width - i);
             drawRectangle(graphics, x + i, y, dw, thickness, color);
@@ -618,14 +617,14 @@ public class DrawHelper {
      * @param y2    The y position of the bottom right corner of the box
      * @param color The color to draw the box with
      */
-    public static void drawOutlinedBox(GuiGraphics graphics, int x1, int y1, int x2, int y2, int color) {
+    public static void drawOutlinedBox(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, int color) {
         graphics.fill(x1, y1, x2, y1 + 1, color);
         graphics.fill(x1, y2 - 1, x2, y2, color);
         graphics.fill(x1, y1 + 1, x1 + 1, y2 - 1, color);
         graphics.fill(x2 - 1, y1 + 1, x2, y2 - 1, color);
     }
 
-    public static void scaledProjection(float scale, GuiGraphics graphics) {
+    public static void scaledProjection(float scale, GuiGraphicsExtractor graphics) {
         graphics.pose().pushMatrix();
         graphics.pose().scale(scale/mc.getWindow().getGuiScale());
     }
@@ -683,7 +682,7 @@ public class DrawHelper {
     /**
      * From minecraft
      */
-    public static void drawScrollableText(GuiGraphics graphics, Font font, Component Component, int centerX, int startX, int startY, int endX, int endY, int color) {
+    public static void drawScrollableText(GuiGraphicsExtractor graphics, Font font, Component Component, int centerX, int startX, int startY, int endX, int endY, int color) {
         int i = font.width(Component);
         int var10000 = startY + endY;
         Objects.requireNonNull(font);
@@ -697,11 +696,11 @@ public class DrawHelper {
             double f = Math.sin(1.5707963267948966 * Math.cos(6.283185307179586 * d / e)) / 2.0 + 0.5;
             double g = org.joml.Math.lerp(f, 0.0, l);
             graphics.enableScissor(startX, startY, endX, endY);
-            graphics.drawString(font, Component, startX - (int) g, j, color,true);
+            graphics.text(font, Component, startX - (int) g, j, color,true);
             graphics.disableScissor();
         } else {
             l = Math.clamp(centerX, startX + i / 2, endX - i / 2);
-            graphics.drawCenteredString(font, Component, l, j, color);
+            graphics.centeredText(font, Component, l, j, color);
         }
 
     }

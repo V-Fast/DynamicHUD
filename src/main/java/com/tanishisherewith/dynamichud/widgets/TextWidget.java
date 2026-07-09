@@ -9,10 +9,9 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProvider;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
-import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.ClassicSkin;
 import com.tanishisherewith.dynamichud.widget.DynamicValueWidget;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 
@@ -93,7 +92,7 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
                 .renderWhen(() -> this.rainbow)
                 .withComplexity(Option.Complexity.Pro)
         );
-        if(IntegrationManager.IS_TEST_MODE && false) {
+        if(IntegrationManager.IS_TEST_MODE) {
             // Runnable Option
             AtomicBoolean ran = new AtomicBoolean(false);
             menu.addOption(new RunnableOption(Component.literal("Reset Position"),
@@ -137,7 +136,7 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
     }
 
     @Override
-    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY) {
+    public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (menu == null) return;
         //int color = rainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % (5000 * rainbowSpeed) / (5000f * rainbowSpeed))) : textColor.getRGB();
         int color = textColor.getRGB();
@@ -146,7 +145,7 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
             if (rainbow) {
                 DrawHelper.drawChromaText(graphics, Component, getX() + 2, getY() + 2, rainbowSpeed / 2f, rainbowSaturation, rainbowBrightness, rainbowSpread, shadow);
             } else {
-                graphics.drawString(mc.font, Component, getX() + 2, getY() + 2, color, shadow);
+                graphics.text(mc.font, Component, getX() + 2, getY() + 2, color, shadow);
             }
             widgetBox.setDimensions(getX(), getY(), mc.font.width(Component) + 3, mc.font.lineHeight + 2, this.canScale);
         }

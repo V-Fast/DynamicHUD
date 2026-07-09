@@ -6,7 +6,7 @@ import com.tanishisherewith.dynamichud.utils.Input;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
 import java.util.function.Consumer;
@@ -64,7 +64,7 @@ public abstract class Option<T> implements Input {
         this.renderer.init(this);
     }
 
-    public void render(GuiGraphics graphics, int x, int y, int mouseX, int mouseY) {
+    public void render(GuiGraphicsExtractor graphics, int x, int y, int mouseX, int mouseY) {
         this.x = x;
         this.y = y;
         this.value = get();

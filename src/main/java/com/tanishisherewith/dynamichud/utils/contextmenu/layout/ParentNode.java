@@ -1,6 +1,6 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.layout;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +56,7 @@ public abstract class ParentNode implements LayoutNode {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY) {
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (!shouldRender()) return;
         for (LayoutNode child : children) {
             if (child.shouldRender()) {

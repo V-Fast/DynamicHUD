@@ -1,6 +1,6 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.layout;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /**
  * Interface representing a node in the context menu layout tree.
@@ -14,7 +14,7 @@ public interface LayoutNode {
     void setPosition(int x, int y);
     void setSize(int width, int height);
     void layout(int maxWidth);
-    void render(GuiGraphics graphics, int mouseX, int mouseY);
+    void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY);
     boolean mouseClicked(double mouseX, double mouseY, int button);
     boolean mouseReleased(double mouseX, double mouseY, int button);
     boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY);

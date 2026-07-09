@@ -3,7 +3,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.screen;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
@@ -28,7 +28,7 @@ public class ContextMenuScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         contextMenu.update();
         DrawHelper.scaleAndPosition(graphics.pose(), (float) width / 2, (float) height / 2, contextMenu.getMenuScale());
 
@@ -43,7 +43,7 @@ public class ContextMenuScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(@NonNull GuiGraphics guiGraphics, int i, int j, float f) {
+    public void extractBackground(@NonNull GuiGraphicsExtractor GuiGraphicsExtractor, int i, int j, float f) {
 
     }
 
@@ -82,7 +82,7 @@ public class ContextMenuScreen extends Screen {
 
     @Override
     public boolean charTyped(CharacterEvent characterEvent) {
-        contextMenu.charTyped(characterEvent.codepointAsString().charAt(0), characterEvent.modifiers());
+        contextMenu.charTyped(characterEvent.codepointAsString().charAt(0), 0);
         return super.charTyped(characterEvent);
     }
 

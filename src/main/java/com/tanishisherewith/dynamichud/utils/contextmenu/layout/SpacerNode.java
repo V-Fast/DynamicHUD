@@ -1,6 +1,6 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.layout;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /**
  * A layout node that occupies a fixed amount of horizontal and vertical space without rendering anything.
@@ -45,7 +45,7 @@ public class SpacerNode implements LayoutNode {
     public void layout(int maxWidth) {}
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY) {}
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {}
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) { return false; }

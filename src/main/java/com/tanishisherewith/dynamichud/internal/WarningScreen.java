@@ -3,7 +3,7 @@ package com.tanishisherewith.dynamichud.internal;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.Skin;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -43,16 +43,16 @@ public class WarningScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        super.render(graphics, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(graphics, mouseX, mouseY, delta);
 
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
-        graphics.drawCenteredString(this.font, "Mods with bad implementation of DynamicHUD found!", this.width / 2, 35, Color.ORANGE.getRGB());
+        graphics.centeredText(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
+        graphics.centeredText(this.font, "Mods with bad implementation of DynamicHUD found!", this.width / 2, 35, Color.ORANGE.getRGB());
 
         int y = 60;
         for (ModError error : modErrors) {
             Component modName = Component.literal("> \"" + error.modName() + "\"").withStyle(ChatFormatting.RED);
-            graphics.drawString(this.font, modName, this.width / 2 - 100, y, -1, false);
+            graphics.text(this.font, modName, this.width / 2 - 100, y, -1, false);
             List<FormattedCharSequence> errorMessage =
                     this.font.split(Component.literal("Error: " + error.errorMessage()), this.width / 2);
 
@@ -63,8 +63,8 @@ public class WarningScreen extends Screen {
         }
 
         y += 5;
-        graphics.drawCenteredString(this.font, Component.literal("Please report this problem to the respective mod owners."), this.width / 2, y, -1);
-        graphics.drawCenteredString(this.font, Component.literal("Widgets of these mods won't work.").withStyle(ChatFormatting.YELLOW), this.width / 2, y + 10, -1);
-        graphics.drawCenteredString(this.font, Component.literal("Check latest.log for more details").withStyle(ChatFormatting.ITALIC), this.width / 2, y + 30, -1);
+        graphics.centeredText(this.font, Component.literal("Please report this problem to the respective mod owners."), this.width / 2, y, -1);
+        graphics.centeredText(this.font, Component.literal("Widgets of these mods won't work.").withStyle(ChatFormatting.YELLOW), this.width / 2, y + 10, -1);
+        graphics.centeredText(this.font, Component.literal("Check latest.log for more details").withStyle(ChatFormatting.ITALIC), this.width / 2, y + 30, -1);
     }
 }

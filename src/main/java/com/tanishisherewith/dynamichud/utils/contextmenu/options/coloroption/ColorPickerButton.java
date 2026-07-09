@@ -1,7 +1,7 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import java.awt.*;
 
@@ -19,12 +19,12 @@ public class ColorPickerButton {
         this.height = height;
     }
 
-    public void render(GuiGraphics graphics, int x, int y) {
+    public void render(GuiGraphicsExtractor graphics, int x, int y) {
         this.x = x;
         this.y = y;
         // Draw the button
         graphics.fill(x + 2, y + 2, x + width - 2, y + height - 2, isPicking() ? Color.GREEN.getRGB() : 0xFFAAAAAA);
-        graphics.drawCenteredString(Minecraft.getInstance().font, "Pick", x + width / 2, y + (height - 8) / 2, 0xFFFFFFFF);
+        graphics.centeredText(Minecraft.getInstance().font, "Pick", x + width / 2, y + (height - 8) / 2, 0xFFFFFFFF);
     }
 
     public int getHeight() {

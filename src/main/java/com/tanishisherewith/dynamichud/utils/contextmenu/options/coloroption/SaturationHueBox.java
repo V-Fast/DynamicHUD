@@ -1,7 +1,7 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption;
 
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import java.awt.*;
 
@@ -21,7 +21,7 @@ public class SaturationHueBox {
         this.size = size;
     }
 
-    public void render(GuiGraphics graphics, int x, int y) {
+    public void render(GuiGraphicsExtractor graphics, int x, int y) {
         setPosition(x, y);
         DrawHelper.drawOutlinedBox(graphics, x - 2, y - 2, x + size + 2, y + size + 2, -1);
 

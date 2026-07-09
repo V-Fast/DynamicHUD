@@ -1,6 +1,6 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.layout;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /**
  * A wrapper node that applies custom top, bottom, left, and right padding to its child node.
@@ -71,7 +71,7 @@ public class PaddingNode implements LayoutNode {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY) {
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (!shouldRender()) return;
         child.render(graphics, mouseX, mouseY);
     }

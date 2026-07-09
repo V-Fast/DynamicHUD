@@ -6,7 +6,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetRenderer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
 import net.minecraft.client.input.CharacterEvent;
@@ -62,8 +62,8 @@ public abstract class AbstractMoveableScreen extends Screen {
     @Override
     public boolean charTyped(CharacterEvent event) {
         char c = Character.toString(event.codepoint()).charAt(0);
-        widgetRenderer.charTyped(c, event.modifiers());
-        ContextMenuManager.getInstance().charTyped(c, event.modifiers());
+        widgetRenderer.charTyped(c, 0);
+        ContextMenuManager.getInstance().charTyped(c, 0);
         return super.charTyped(event);
     }
 
@@ -108,11 +108,11 @@ public abstract class AbstractMoveableScreen extends Screen {
      * @param delta       The time elapsed since the last frame in seconds
      */
     @Override
-    public void render(@NonNull GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         if (this.minecraft.level == null) {
-            renderBackground(graphics,mouseX,mouseY,delta);
+            extractBackground(graphics,mouseX,mouseY,delta);
         }
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, this.font.lineHeight / 2,-1);
+        graphics.centeredText(this.font, this.title, this.width / 2, this.font.lineHeight / 2,-1);
 
         // Draw each widget
         widgetRenderer.renderWidgets(graphics, mouseX, mouseY);

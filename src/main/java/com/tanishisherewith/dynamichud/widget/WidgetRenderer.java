@@ -1,5 +1,7 @@
 package com.tanishisherewith.dynamichud.widget;
 
+import com.mojang.blaze3d.platform.cursor.CursorType;
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
@@ -7,7 +9,7 @@ import com.tanishisherewith.dynamichud.internal.System;
 import com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen;
 import com.tanishisherewith.dynamichud.utils.Input;
 import com.tanishisherewith.dynamichud.utils.contextmenu.screen.ContextMenuScreenRegistry;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import org.lwjgl.glfw.GLFW;
@@ -46,6 +48,8 @@ public class WidgetRenderer implements Input {
     private boolean selectedViaDragWindow = false;
 
     private static final float OVERLAY_FADE_SPEED = 0.8f;
+
+    public static final CursorType NSWE_CURSOR = CursorType.createStandardCursor(GLFW.GLFW_RESIZE_NWSE_CURSOR,"nwse",CursorType.DEFAULT);
 
     /**
      * Add the list of widgets the widgetRenderer should render
@@ -115,7 +119,7 @@ public class WidgetRenderer implements Input {
         return !DynamicHUD.MC.getDebugOverlay().showDebugScreen();
     }
 
-    public void renderWidgets(GuiGraphics graphics, int mouseX, int mouseY) {
+    public void renderWidgets(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (WidgetManager.getWidgets().isEmpty() || !renderInDebugScreen()) return;
 
         Screen currentScreen = DynamicHUD.MC.screen;
@@ -219,12 +223,8 @@ public class WidgetRenderer implements Input {
             }
 
             // Update GLFW Mouse cursor on scale hover
-            long targetCursor = getTargetCursor(mouseX, mouseY);
-            if (targetCursor != currentCursor) {
-                long windowHandle = DynamicHUD.MC.getWindow().handle();
-                GLFW.glfwSetCursor(windowHandle, targetCursor);
-                currentCursor = targetCursor;
-            }
+            boolean requestCursor = shouldChangeCursor(mouseX, mouseY);
+            if(requestCursor) graphics.requestCursor(NSWE_CURSOR);
 
             if(GlobalConfig.get().doSmartSnapping()) {
                 drawSnapGuides(graphics);
@@ -240,7 +240,7 @@ public class WidgetRenderer implements Input {
         }
     }
 
-    private long getTargetCursor(int mouseX, int mouseY) {
+    private boolean shouldChangeCursor(int mouseX, int mouseY) {
         boolean hoveringAnyScaleDot = false;
         for (Widget widget : widgets) {
             if (widget.canScale && widget.isMouseOverWidget(mouseX, mouseY)) {
@@ -256,10 +256,10 @@ public class WidgetRenderer implements Input {
             }
         }
 
-        return (hoveringAnyScaleDot || scaleDragging) ? getNwseCursor() : 0L;
+        return hoveringAnyScaleDot || scaleDragging;
     }
 
-    private void renderEditorOverlay(GuiGraphics graphics, Widget widget, int mouseX, int mouseY, float alpha) {
+    private void renderEditorOverlay(GuiGraphicsExtractor graphics, Widget widget, int mouseX, int mouseY, float alpha) {
         WidgetBox box = widget.getWidgetBox();
         Color outlineCol = GlobalConfig.get().getDashedOutlineColor();
         int dashColor = new Color(outlineCol.getRed(), outlineCol.getGreen(), outlineCol.getBlue(), (int)(255 * alpha)).getRGB();
@@ -279,7 +279,7 @@ public class WidgetRenderer implements Input {
         }
     }
 
-    private void renderLockIcon(GuiGraphics graphics, Widget widget, int mouseX, int mouseY, float alpha) {
+    private void renderLockIcon(GuiGraphicsExtractor graphics, Widget widget, int mouseX, int mouseY, float alpha) {
         WidgetBox box = widget.getWidgetBox();
         int lockSize = GlobalConfig.get().getLockButtonSize();
         float iconX = Math.clamp(box.x + box.getWidth() - lockSize - 3, box.x + 2, box.x + box.getWidth() - lockSize - 2);
@@ -308,14 +308,14 @@ public class WidgetRenderer implements Input {
         String icon = locked ? "\uD83D\uDD12" : "\uD83D\uDD13";
         int textColor = new Color(255, 255, 255, (int)(255 * alpha)).getRGB();
         DrawHelper.scaleAndPosition(graphics.pose(), iconX + lockSize / 2f, iconY + lockSize / 2f, 0.5f);
-        graphics.drawString(DynamicHUD.MC.font, icon,
+        graphics.text(DynamicHUD.MC.font, icon,
                 Math.round(iconX + lockSize / 2f - DynamicHUD.MC.font.width(icon) / 2f),
                 Math.round(iconY + lockSize / 2f - DynamicHUD.MC.font.lineHeight / 2f),
                 textColor, false);
         DrawHelper.stopScaling(graphics.pose());
     }
 
-    private void renderScaleDot(GuiGraphics graphics, Widget widget, int mouseX, int mouseY, float alpha) {
+    private void renderScaleDot(GuiGraphicsExtractor graphics, Widget widget, int mouseX, int mouseY, float alpha) {
         if (!widget.canScale) return;
 
         WidgetBox box = widget.getWidgetBox();
@@ -481,11 +481,6 @@ public class WidgetRenderer implements Input {
     public void onCloseScreen() {
         clearSnapLines();
         selectedViaDragWindow = false;
-        if (currentCursor != 0L) {
-            long windowHandle = DynamicHUD.MC.getWindow().handle();
-            GLFW.glfwSetCursor(windowHandle, 0L);
-            currentCursor = 0L;
-        }
         if (DynamicHUD.MC.screen instanceof AbstractMoveableScreen) {
             for (Widget widget : widgets) {
                 widget.onClose();
@@ -650,7 +645,7 @@ public class WidgetRenderer implements Input {
     /**
      * Renders alignment and screen axis guidelines if snapping conditions are met.
      */
-    private void drawSnapGuides(GuiGraphics graphics) {
+    private void drawSnapGuides(GuiGraphicsExtractor graphics) {
         int screenWidth = DynamicHUD.MC.getWindow().getGuiScaledWidth();
         int screenHeight = DynamicHUD.MC.getWindow().getGuiScaledHeight();
 
@@ -835,14 +830,4 @@ public class WidgetRenderer implements Input {
      //   this.Z_Index = z_Index;
    //     return this;
    // }
-
-    private static long nwseCursor = 0L;
-    private static long currentCursor = 0L;
-
-    private static long getNwseCursor() {
-        if (nwseCursor == 0L) {
-            nwseCursor = GLFW.glfwCreateStandardCursor(GLFW.GLFW_RESIZE_NWSE_CURSOR);
-        }
-        return nwseCursor;
-    }
 }

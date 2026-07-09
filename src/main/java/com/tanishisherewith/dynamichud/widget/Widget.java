@@ -5,7 +5,7 @@ import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.utils.Input;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -199,7 +199,7 @@ public abstract class Widget implements Input {
     /**
      * Renders the widget on the screen.
      */
-    public final void render(GuiGraphics graphics, int mouseX, int mouseY) {
+    public final void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (!isVisible()) return;
 
 
@@ -217,7 +217,7 @@ public abstract class Widget implements Input {
     /**
      * Renders the widget on the editor screen.
      */
-    public final void renderInEditor(GuiGraphics graphics, int mouseX, int mouseY) {
+    public final void renderInEditor(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (!isInEditor) return;
 
         drawWidgetBackground(graphics,mouseX,mouseY);
@@ -239,17 +239,17 @@ public abstract class Widget implements Input {
      * The mouse position values are only passed when in a {@link com.tanishisherewith.dynamichud.screens.AbstractMoveableScreen} screen.
      * </p>
      *
-     * @param graphics GuiGraphics Object
+     * @param graphics GuiGraphicsExtractor Object
      * @param mouseX  X position of mouse.
      * @param mouseY  Y position of mouse
      */
-    public abstract void renderWidget(GuiGraphics graphics, int mouseX, int mouseY);
+    public abstract void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY);
 
     /**
      * Renders the widget in the editor screen with a background.
      * Could also be used to display placeholder values.
      */
-    private void renderWidgetInEditor(GuiGraphics graphics, int mouseX, int mouseY) {
+    private void renderWidgetInEditor(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         //drawWidgetBackground(graphics);
 
         renderWidget(graphics, mouseX, mouseY);
@@ -394,7 +394,7 @@ public abstract class Widget implements Input {
     /**
      * Displays a faint grayish background if enabled or faint reddish background if disabled.
      */
-    protected void drawWidgetBackground(GuiGraphics graphics, int mouseX, int mouseY) {
+    protected void drawWidgetBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         boolean isHovered = widgetBox.isMouseOver(mouseX, mouseY);
         Color backgroundColor = this.isVisible() ? GlobalConfig.get().getHudActiveColor() : GlobalConfig.get().getHudInactiveColor();
         WidgetBox box = this.getWidgetBox();

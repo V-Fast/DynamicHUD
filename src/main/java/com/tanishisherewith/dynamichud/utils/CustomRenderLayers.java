@@ -1,6 +1,7 @@
 package com.tanishisherewith.dynamichud.utils;
 
 import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.DestFactor;
 import com.mojang.blaze3d.platform.SourceFactor;
@@ -28,7 +29,7 @@ public class CustomRenderLayers {
             .withFragmentShader(Identifier.withDefaultNamespace("core/position_color"))
             .build();
 
-    public static RenderPipeline TRIANGLE_STRIP = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.GUI_SNIPPET)
+    public static final RenderPipeline TRIANGLE_STRIP = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.GUI_SNIPPET)
             .withLocation(Identifier.fromNamespaceAndPath("dynamichud", "pipeline/triangle_strip"))
             .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLES)
             .build()
@@ -36,11 +37,11 @@ public class CustomRenderLayers {
 
     // Width/Height in UV1
     public static final VertexFormatElement ELM_WIDTH_HEIGHT =
-            new VertexFormatElement(1, 2, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.UV, 8);
+            VertexFormatElement.register(getNewVertexFormatElementsId(), 1, VertexFormatElement.Type.FLOAT, false, 2);
 
     // Roundness in UV2
     public static final VertexFormatElement ELM_ROUNDNESS =
-            new VertexFormatElement(2, 4, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.UV, 16);
+            VertexFormatElement.register(getNewVertexFormatElementsId(), 2, VertexFormatElement.Type.FLOAT, false, 4);
 
     public static final VertexFormat ROUNDED_FORMAT = VertexFormat.builder()
             .add("Position", VertexFormatElement.POSITION)
@@ -53,40 +54,39 @@ public class CustomRenderLayers {
 
     public static final RenderPipeline ROUNDED_RECT = RenderPipelines.register(
             RenderPipeline.builder()
-                    .withVertexFormat(ROUNDED_FORMAT, VertexFormat.Mode.QUADS)
-                    .withBlend(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA))
-                    .withFragmentShader(Identifier.fromNamespaceAndPath("dynamichud", "core/rounded"))
-                    .withVertexShader(Identifier.fromNamespaceAndPath("dynamichud", "core/rounded"))
-                    .withLocation(Identifier.fromNamespaceAndPath("dynamichud", "pipeline/rounded"))
-                    .withUniform("Roundness", UniformType.UNIFORM_BUFFER)
-                    .withUniform("widthHeight", UniformType.UNIFORM_BUFFER)
-                    .build()
+                     .withVertexFormat(ROUNDED_FORMAT, VertexFormat.Mode.QUADS)
+                     .withColorTargetState(new ColorTargetState(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA)))
+                     .withFragmentShader(Identifier.fromNamespaceAndPath("dynamichud", "core/rounded"))
+                     .withVertexShader(Identifier.fromNamespaceAndPath("dynamichud", "core/rounded"))
+                     .withLocation(Identifier.fromNamespaceAndPath("dynamichud", "pipeline/rounded"))
+                     .withUniform("Roundness", UniformType.UNIFORM_BUFFER)
+                     .withUniform("widthHeight", UniformType.UNIFORM_BUFFER)
+                     .build()
     );
 
     public static final RenderPipeline ROUNDED_RECT_OUTLINE = RenderPipelines.register(
             RenderPipeline.builder()
-                    .withVertexFormat(ROUNDED_FORMAT, VertexFormat.Mode.QUADS)
-                    .withBlend(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA))
-                    .withFragmentShader(Identifier.fromNamespaceAndPath("dynamichud", "core/rounded_outline"))
-                    .withVertexShader(Identifier.fromNamespaceAndPath("dynamichud", "core/rounded"))
-                    .withLocation(Identifier.fromNamespaceAndPath("dynamichud", "pipeline/rounded_outline"))
-                    .withUniform("Roundness", UniformType.UNIFORM_BUFFER)
-                    .withUniform("widthHeight", UniformType.UNIFORM_BUFFER)
-                    .withUniform("Thickness", UniformType.UNIFORM_BUFFER)
-                    .build()
+                     .withVertexFormat(ROUNDED_FORMAT, VertexFormat.Mode.QUADS)
+                     .withColorTargetState(new ColorTargetState(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA)))
+                     .withFragmentShader(Identifier.fromNamespaceAndPath("dynamichud", "core/rounded_outline"))
+                     .withVertexShader(Identifier.fromNamespaceAndPath("dynamichud", "core/rounded"))
+                     .withLocation(Identifier.fromNamespaceAndPath("dynamichud", "pipeline/rounded_outline"))
+                     .withUniform("Roundness", UniformType.UNIFORM_BUFFER)
+                     .withUniform("widthHeight", UniformType.UNIFORM_BUFFER)
+                     .withUniform("Thickness", UniformType.UNIFORM_BUFFER)
+                     .build()
     );
 
-    public static RenderPipeline QUADS_CUSTOM_BLEND = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.GUI_SNIPPET)
+    public static final RenderPipeline QUADS_CUSTOM_BLEND = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.GUI_SNIPPET)
             .withLocation(Identifier.fromNamespaceAndPath("dynamichud", "pipeline/quad_custom_blend_func"))
             .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
-            .withBlend(new BlendFunction(SourceFactor.DST_ALPHA, DestFactor.ONE_MINUS_DST_ALPHA))
+            .withColorTargetState(new ColorTargetState(new BlendFunction(SourceFactor.DST_ALPHA, DestFactor.ONE_MINUS_DST_ALPHA)))
             .build()
     );
 
-    public static RenderPipeline TRIANGLE_FAN_CUSTOM_BLEND = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.GUI_SNIPPET)
+    public static final RenderPipeline TRIANGLE_FAN_CUSTOM_BLEND = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.GUI_SNIPPET)
             .withLocation(Identifier.fromNamespaceAndPath("dynamichud", "pipeline/triangle_fan_custom_blend_func"))
             .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_FAN)
-           // .withBlend(new BlendFunction(SourceFactor.DST_ALPHA, DestFactor.ONE_MINUS_DST_ALPHA))
             .build()
     );
 

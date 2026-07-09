@@ -2,7 +2,7 @@ package com.tanishisherewith.dynamichud.utils.contextmenu.options.coloroption;
 
 import com.tanishisherewith.dynamichud.helpers.ColorHelper;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.Mth;
 
 import java.awt.*;
@@ -26,7 +26,7 @@ public class AlphaSlider {
         updateAlphaFromColor(color);
     }
 
-    public void render(GuiGraphics graphics, int x, int y) {
+    public void render(GuiGraphicsExtractor graphics, int x, int y) {
         this.x = x;
         this.y = y;
 

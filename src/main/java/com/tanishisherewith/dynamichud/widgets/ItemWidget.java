@@ -2,7 +2,7 @@ package com.tanishisherewith.dynamichud.widgets;
 
 import com.tanishisherewith.dynamichud.widget.Widget;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -24,8 +24,8 @@ public class ItemWidget extends Widget {
     }
 
     @Override
-    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY) {
-        graphics.renderItem(item, x, y);
+    public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+        graphics.item(item, x, y);
         widgetBox.setDimensions(getX(), getY(), 16, 16, this.canScale);
     }
 

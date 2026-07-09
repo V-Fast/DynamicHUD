@@ -16,7 +16,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.screen.ContextMenuScree
 import com.tanishisherewith.dynamichud.utils.contextmenu.screen.factory.DefaultContextMenuScreenFactory;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -101,7 +101,7 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
         this.menuScale = Math.clamp(menuScale, 0.3f, 2.0f);
     }
 
-    public void render(GuiGraphics graphics, int xPos, int yPos, int mouseX, int mouseY) {
+    public void render(GuiGraphicsExtractor graphics, int xPos, int yPos, int mouseX, int mouseY) {
         if (newScreenFlag && screenFactory != null) {
             DynamicHUD.MC.setScreen(screenFactory.create(this, properties));
             newScreenFlag = false;

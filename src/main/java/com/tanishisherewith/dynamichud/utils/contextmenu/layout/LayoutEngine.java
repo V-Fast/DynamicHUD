@@ -6,7 +6,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.Skin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.joml.Vector2d;
 
 import java.util.List;

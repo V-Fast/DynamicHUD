@@ -19,7 +19,7 @@ import com.tanishisherewith.dynamichud.widget.DynamicValueWidget;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
 import com.tanishisherewith.dynamichud.widget.WidgetData;
 import com.twelvemonkeys.lang.Validate;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -305,25 +305,25 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     }
 
     // draw a continuous interpolated curve
-    private void drawInterpolatedCurve(GuiGraphics graphics, List<float[]> points, int color, float thickness) {
+    private void drawInterpolatedCurve(GuiGraphicsExtractor graphics, List<float[]> points, int color, float thickness) {
         if (points.size() < 2) return;
 
-        graphics.guiRenderState.submitGuiElement(
+        graphics.guiRenderState.addGuiElement(
                 new InterpolatedCurveRenderState(points, thickness, color, new Matrix3x2f(graphics.pose()), CustomRenderLayers.QUADS_CUSTOM_BLEND, (int) gWidth, (int) gHeight, graphics.scissorStack.peek())
         );
     }
 
     // draw a gradient shadow under the curve
-    private void drawGradientShadow(GuiGraphics graphics, List<float[]> points, float bottomY, int startColor, int endColor) {
+    private void drawGradientShadow(GuiGraphicsExtractor graphics, List<float[]> points, float bottomY, int startColor, int endColor) {
         if (points.size() < 2) return;
 
-       graphics.guiRenderState.submitGuiElement(
+       graphics.guiRenderState.addGuiElement(
                 new GradientShadowRenderState(points,bottomY, startColor, endColor, new Matrix3x2f(graphics.pose()), RenderPipelines.DEBUG_QUADS, (int) gWidth, (int) gHeight, graphics.scissorStack.peek())
         );
     }
 
     @Override
-    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY) {
+    public void renderWidget(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         long currentTime = Util.getMillis();
         if (valueSupplier != null && (currentTime - lastSampleTime >= sampleIntervalMs)) {
             addDataPoint(getValue());
@@ -370,7 +370,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
                 //Scale the Component to its proper position and size with grid lines
                 DrawHelper.scaleAndPosition(graphics.pose(), x + offset - texWidth/2.0f, yPos - (mc.font.lineHeight * valueScale) / 2.0f,texWidth,mc.font.lineHeight * valueScale, valueScale);
-                graphics.drawString(mc.font, valueText, Math.round(x + offset - texWidth), (int) (yPos - (mc.font.lineHeight * valueScale) / 2), 0xFFFFFFFF, true);
+                graphics.text(mc.font, valueText, Math.round(x + offset - texWidth), (int) (yPos - (mc.font.lineHeight * valueScale) / 2), 0xFFFFFFFF, true);
                 DrawHelper.stopScaling(graphics.pose());
             }
 
@@ -427,7 +427,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
         String formattedMinVal = formatValue(minValue);
 
         DrawHelper.scaleAndPosition(graphics.pose(), x - mc.font.width(formattedMinVal)/2.0f, y + gHeight,mc.font.width(formattedMinVal),mc.font.lineHeight * 0.6f, 0.6f);
-        graphics.drawString(mc.font, formattedMinVal, x - mc.font.width(formattedMinVal) + 1, (int) (y + gHeight - 1), 0xFFFFFFFF, true);
+        graphics.text(mc.font, formattedMinVal, x - mc.font.width(formattedMinVal) + 1, (int) (y + gHeight - 1), 0xFFFFFFFF, true);
         DrawHelper.stopScaling(graphics.pose());
 
         if(showGrid) x -= offset;

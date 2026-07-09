@@ -10,7 +10,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.fabric.impl.client.rendering.hud.HudElementRegistryImpl;
@@ -29,7 +29,7 @@ public class DynamicHUD implements ClientModInitializer {
     public static final Logger logger = LoggerFactory.getLogger("DynamicHud");
     public static String MOD_ID = "dynamichud";
 
-    static KeyMapping EDITOR_SCREEN_KEYBIND = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+    static KeyMapping EDITOR_SCREEN_KEYBIND = KeyMappingHelper.registerKeyMapping(new KeyMapping(
             "DynamicHud Editor Screen",
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_RIGHT_SHIFT,

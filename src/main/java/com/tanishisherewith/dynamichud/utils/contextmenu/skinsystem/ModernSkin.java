@@ -15,7 +15,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.G
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
 import com.tanishisherewith.dynamichud.utils.handlers.ScrollHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
@@ -111,12 +111,12 @@ public class ModernSkin extends Skin implements GroupableSkin {
         return new LayoutEngine.Offset(4, 2);
     }
 
-    public void enableSkinScissor(GuiGraphics graphics) {
+    public void enableSkinScissor(GuiGraphicsExtractor graphics) {
         DrawHelper.enableScissor(contextMenuX + (int) (width * 0.2f) + 10, contextMenuY + 19, (int) (width * 0.8f - 14), height - 23, SCALE_FACTOR, graphics);
     }
 
     @Override
-    public void renderGroup(GuiGraphics graphics, OptionGroup group, int groupX, int groupY, int mouseX, int mouseY) {
+    public void renderGroup(GuiGraphicsExtractor graphics, OptionGroup group, int groupX, int groupY, int mouseX, int mouseY) {
         int targetWidth = (int) (width * 0.8f - 18);
         renderGroup(graphics, group, groupX, groupY, targetWidth, mouseX, mouseY);
     }
@@ -135,9 +135,9 @@ public class ModernSkin extends Skin implements GroupableSkin {
         return option.getHeight() > 0 ? option.getHeight() : mc.font.lineHeight;
     }
 
-    private void renderSearchBox(GuiGraphics graphics, int mouseX, int mouseY){
+    private void renderSearchBox(GuiGraphicsExtractor graphics, int mouseX, int mouseY){
         searchBox.setTotalBounds(searchBoxX, searchBoxY, searchBoxWidth, searchBoxHeight);
-        searchBox.render(graphics, mouseX, mouseY, mc.getDeltaTracker().getGameTimeDeltaTicks());
+        searchBox.extractRenderState(graphics, mouseX, mouseY, mc.getDeltaTracker().getGameTimeDeltaTicks());
     }
 
     private int computeGroupFullHeight(OptionGroup group, int groupX, int groupY, int targetWidth) {
@@ -156,7 +156,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
     }
 
     // Adds a nice animation while opening and closing
-    public void renderGroup(GuiGraphics graphics, OptionGroup group, int groupX, int groupY, int targetWidth, int mouseX, int mouseY) {
+    public void renderGroup(GuiGraphicsExtractor graphics, OptionGroup group, int groupX, int groupY, int targetWidth, int mouseX, int mouseY) {
         GroupAnimData animData = groupAnimations.computeIfAbsent(group, g -> new GroupAnimData());
         if (group.isExpanded() && animData.value <= 16) {
             int fullHeight = computeGroupFullHeight(group, groupX, groupY, targetWidth);
@@ -182,7 +182,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         DrawHelper.drawRoundedRectangle(graphics,
                 groupX + 1, groupY + 1, true, true, !group.isExpanded(), !group.isExpanded(), mc.font.width(groupText) + 6, 16, radius, DARKER_GRAY_2.getRGB());
 
-        graphics.drawString(mc.font, groupText, groupX + 4, groupY + 5, -1, true);
+        graphics.text(mc.font, groupText, groupX + 4, groupY + 5, -1, true);
 
         if (group.isExpanded() && groupHeight > 16) {
             int clipX = groupX + 1;
@@ -212,7 +212,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         group.setHeight(groupHeight);
     }
 
-    private void drawScrollbar(GuiGraphics graphics) {
+    private void drawScrollbar(GuiGraphicsExtractor graphics) {
         if (getMaxScrollOffset() > 0) {
             int scrollbarX = contextMenuX + width + 5;
             int scrollbarY = contextMenuY + 19;
@@ -225,7 +225,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
     }
 
     @Override
-    public void renderContextMenu(GuiGraphics graphics, ContextMenu<?> contextMenu, int mouseX, int mouseY) {
+    public void renderContextMenu(GuiGraphicsExtractor graphics, ContextMenu<?> contextMenu, int mouseX, int mouseY) {
         SCALE_FACTOR = mc.getWindow().calculateScale(0, mc.isEnforceUnicode());
         this.contextMenu = contextMenu;
         if (contextMenu != null && contextMenu.getProperties() != null) {
@@ -307,7 +307,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         searchBoxY = contextMenuY + 2;
     }
 
-    public void drawBackButton(GuiGraphics graphics, int mouseX, int mouseY) {
+    public void drawBackButton(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         String backText = "< Back";
         int textWidth = mc.font.width(backText);
 
@@ -317,10 +317,10 @@ public class ModernSkin extends Skin implements GroupableSkin {
         DrawHelper.drawRoundedRectangleWithShadowBadWay(graphics,
                 contextMenuX + 2, contextMenuY + 2, textWidth + 8, 14, radius, color, 125, 2, 2);
 
-        graphics.drawString(mc.font, backText, contextMenuX + 6, contextMenuY + 5, -1, true);
+        graphics.text(mc.font, backText, contextMenuX + 6, contextMenuY + 5, -1, true);
     }
 
-    public void renderToolTipText(GuiGraphics graphics, int mouseX, int mouseY) {
+    public void renderToolTipText(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         int tooltipY = contextMenuY + 19;
         int toolTipWidth = (int) (width * 0.2f) + 4;
         int toolTipHeight = (int) (height * 0.16f);
@@ -357,7 +357,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
         DrawHelper.enableScissor(contextMenuX + 2, tooltipY,toolTipWidth,toolTipHeight,SCALE_FACTOR,graphics);
 
-        graphics.drawString(
+        graphics.text(
                 mc.font,
                 Util.getTruncatedName(TOOLTIP_HEAD, toolTipWidth),
                 contextMenuX + 4,
@@ -372,7 +372,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
         int textY = tooltipY + 19;
         for (FormattedCharSequence line : wrappedText) {
-            graphics.drawString(
+            graphics.text(
                     mc.font,
                     line,
                     contextMenuX + 2 + 2,
@@ -416,7 +416,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
     @Override
     public void charTyped(ContextMenu<?> menu, char c, int modifiers) {
-        if (searchBox.charTyped(new CharacterEvent((int) c,modifiers))) {
+        if (searchBox.charTyped(new CharacterEvent((int) c))) {
             return;
         }
         super.charTyped(menu, c, modifiers);
@@ -519,7 +519,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         private long animationStartTime;
 
         @Override
-        public void render(GuiGraphics graphics, BooleanOption option, int x, int y, int mouseX, int mouseY) {
+        public void render(GuiGraphicsExtractor graphics, BooleanOption option, int x, int y, int mouseX, int mouseY) {
             int toggleBgX = x + option.getWidth() - 30;
             boolean active = option.get();
             Color backgroundColor = active ? getThemeColor() : DARKER_GRAY;
@@ -540,7 +540,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
             DrawHelper.drawFilledCircle(graphics, toggleX, y + 2 + 3.3f, 2.8f, Color.WHITE.getRGB());
 
-            graphics.drawString(
+            graphics.text(
                     mc.font,
                     option.name,
                     x + 4,
@@ -587,10 +587,10 @@ public class ModernSkin extends Skin implements GroupableSkin {
         }
 
         @Override
-        public void render(GuiGraphics graphics, ColorOption option, int x, int y, int mouseX, int mouseY) {
+        public void render(GuiGraphicsExtractor graphics, ColorOption option, int x, int y, int mouseX, int mouseY) {
             update(option);
 
-            graphics.drawString(
+            graphics.text(
                     mc.font,
                     option.name,
                     x + 4,
@@ -621,7 +621,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                     1,
                     1);
 
-            graphics.drawString(
+            graphics.text(
                     mc.font,
                     option.getColorGradient().shouldDisplay() ? "^" : "v",
                     x + option.getWidth() - 21,
@@ -698,8 +698,8 @@ public class ModernSkin extends Skin implements GroupableSkin {
         int sliderBackgroundHeight = 2;
 
         @Override
-        public void render(GuiGraphics graphics, DoubleOption option, int x, int y, int mouseX, int mouseY) {
-            graphics.drawString(
+        public void render(GuiGraphicsExtractor graphics, DoubleOption option, int x, int y, int mouseX, int mouseY) {
+            graphics.text(
                     mc.font,
                     option.name,
                     x + 4,
@@ -731,7 +731,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             // Format option.value to the determined number of decimal places
             String label = String.format("%." + decimalPlaces + "f", displayValue);
             DrawHelper.scaleAndPosition(graphics.pose(), sliderX + sliderBackgroundWidth - mc.font.width(label), y + 7, 0.6f);
-            graphics.drawString(
+            graphics.text(
                     mc.font,
                     label,
                     sliderX + sliderBackgroundWidth + 10 - mc.font.width(label),
@@ -780,12 +780,12 @@ public class ModernSkin extends Skin implements GroupableSkin {
         private final SquishAnimator rightAnim = new SquishAnimator(1.0f,0.9f);
 
         @Override
-        public void render(GuiGraphics graphics, CycleOption<E> option, int x, int y, int mouseX, int mouseY) {
+        public void render(GuiGraphicsExtractor graphics, CycleOption<E> option, int x, int y, int mouseX, int mouseY) {
             y += 2;
             option.setHeight(mc.font.lineHeight + 2);
 
             Component mainLabel = option.name.copy().append(": ");
-            graphics.drawString(mc.font, mainLabel, x + 4, y + 2, -1, false);
+            graphics.text(mc.font, mainLabel, x + 4, y + 2, -1, false);
 
             String selectedOption = option.get().toString();
 
@@ -817,7 +817,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                     x + 4 + mainLabelWidth, y, selectedOptionWidth + 5, mc.font.lineHeight + 2, 2,
                     fillColor.getRGB()
             );
-            graphics.drawString(mc.font, selectedOption, x + 6 + mainLabelWidth, y + 2, Color.WHITE.getRGB(), hoveredOverText);
+            graphics.text(mc.font, selectedOption, x + 6 + mainLabelWidth, y + 2, Color.WHITE.getRGB(), hoveredOverText);
 
             DrawHelper.stopScaling(graphics.pose());
 
@@ -838,7 +838,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                     leftWidth + 5, mc.font.lineHeight, 2,
                     hoveredOverLeft ? getThemeColor().darker().darker().getRGB() : getThemeColor().getRGB()
             );
-            graphics.drawString(mc.font, "<", leftX + leftWidth / 2 + 1, y + 3, -1, false);
+            graphics.text(mc.font, "<", leftX + leftWidth / 2 + 1, y + 3, -1, false);
 
             DrawHelper.stopScaling(graphics.pose());
 
@@ -851,7 +851,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                     rightWidth + 5, mc.font.lineHeight, 2,
                     hoveredOverRight ? getThemeColor().darker().darker().getRGB() : getThemeColor().getRGB()
             );
-            graphics.drawString(mc.font, ">", leftX + leftWidth + 7 + rightWidth / 2, y + 3, -1, false);
+            graphics.text(mc.font, ">", leftX + leftWidth + 7 + rightWidth / 2, y + 3, -1, false);
             DrawHelper.stopScaling(graphics.pose());
 
             //todo: unsure whether to keep this or not? it removes the 3D illusion
@@ -911,7 +911,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         private final SquishAnimator animator = new SquishAnimator();
 
         @Override
-        public void render(GuiGraphics graphics, SubMenuOption option, int x, int y, int mouseX, int mouseY) {
+        public void render(GuiGraphicsExtractor graphics, SubMenuOption option, int x, int y, int mouseX, int mouseY) {
             String textLabel = "Open";
             int xPos = x + option.getWidth() - 40;
             float width = mc.font.width(textLabel) + 5;
@@ -920,7 +920,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             boolean isDown = isHovering && GLFW.glfwGetMouseButton(mc.getWindow().handle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;
             animator.update(isDown);
 
-            graphics.drawString(mc.font, option.name, x + 4, y + 4, -1, false);
+            graphics.text(mc.font, option.name, x + 4, y + 4, -1, false);
 
             Color fillColor = isHovering ? getThemeColor().darker().darker() : getThemeColor();
 
@@ -943,7 +943,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                     0.7f,
                     Color.WHITE.getRGB()
             );
-            graphics.drawString(mc.font, textLabel, xPos + 2, y + 3, Color.WHITE.getRGB(), true);
+            graphics.text(mc.font, textLabel, xPos + 2, y + 3, Color.WHITE.getRGB(), true);
 
             DrawHelper.stopScaling(graphics.pose());
 
@@ -973,7 +973,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         private final SquishAnimator animator = new SquishAnimator();
 
         @Override
-        public void render(GuiGraphics graphics, RunnableOption option, int x, int y, int mouseX, int mouseY) {
+        public void render(GuiGraphicsExtractor graphics, RunnableOption option, int x, int y, int mouseX, int mouseY) {
             String labelText = "Run ▶";
             float labelWidth = mc.font.width(labelText) + 5;
 
@@ -985,7 +985,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             boolean isDown = isHovering && GLFW.glfwGetMouseButton(mc.getWindow().handle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;
             animator.update(isDown);
 
-            graphics.drawString(mc.font, option.name, x + 4, y + 4, -1, false);
+            graphics.text(mc.font, option.name, x + 4, y + 4, -1, false);
 
             Color fillColor = isHovering ? getThemeColor().darker().darker() : getThemeColor();
 
@@ -1002,7 +1002,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                     1
             );
 
-            graphics.drawString(mc.font, labelText, xPos + 2, y + 4, option.value ? DARK_GREEN.getRGB() : DARK_RED.getRGB(), true);
+            graphics.text(mc.font, labelText, xPos + 2, y + 4, option.value ? DARK_GREEN.getRGB() : DARK_RED.getRGB(), true);
             DrawHelper.stopScaling(graphics.pose());
         }
 
@@ -1086,7 +1086,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         }
 
         @Override
-        public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        public void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
             if (!this.visible) return;
 
             int x = totalX;
@@ -1112,14 +1112,14 @@ public class ModernSkin extends Skin implements GroupableSkin {
             int iconX = x + ICON_PADDING;
             int iconY = y + (h - mc.font.lineHeight) / 2 + 1;
             int iconColor = isFocused()? Color.WHITE.getRGB() : 0x80FFFFFF;
-            graphics.drawString(mc.font, icon, iconX, iconY, iconColor, false);
+            graphics.text(mc.font, icon, iconX, iconY, iconColor, false);
 
 
             //Rendering the original edit-box widget without its border and background, and translating it to fit inside our search box
             // EditBox handles the rest of the text and highlight rendering
             graphics.pose().pushMatrix();
             graphics.pose().translate(-1,3);
-            super.renderWidget(graphics, mouseX, mouseY, delta);
+            super.extractWidgetRenderState(graphics, mouseX, mouseY, delta);
             graphics.pose().popMatrix();
 
             String clearText = "✕";
@@ -1136,7 +1136,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                 int bgH = mc.font.lineHeight;
                 DrawHelper.scaleAndPosition(graphics.pose(), clearX - 0.25f, clearY + 0.5f, bgW, bgH, scale);
                 DrawHelper.drawRoundedRectangle(graphics, clearX - 0.25f, clearY + 0.5f, bgW, bgH, 4, clearBgColor);
-                graphics.drawString(mc.font, clearText, clearX + 2, clearY + 1,
+                graphics.text(mc.font, clearText, clearX + 2, clearY + 1,
                         isClearHovered ? 0xFFFFFFFF : 0xB0FFFFFF, false);
                 DrawHelper.stopScaling(graphics.pose());
             }
@@ -1183,11 +1183,11 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
     public class ModernKeybindRenderer implements SkinRenderer<KeybindOption> {
         @Override
-        public void render(GuiGraphics graphics, KeybindOption option, int x, int y, int mouseX, int mouseY) {
+        public void render(GuiGraphicsExtractor graphics, KeybindOption option, int x, int y, int mouseX, int mouseY) {
             mouseX = (int) (mc.mouseHandler.xpos() / SCALE_FACTOR);
             mouseY = (int) (mc.mouseHandler.ypos() / SCALE_FACTOR);
 
-            graphics.drawString(mc.font, option.name, x + 4, y + 2, -1, false);
+            graphics.text(mc.font, option.name, x + 4, y + 2, -1, false);
 
             String text = option.isListening() ? "..." : KeybindOption.getKeyName(option.get());
             int textWidth = mc.font.width(text);
@@ -1200,7 +1200,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             Color boxBgColor = option.isListening() ? getThemeColor() : (hovered ? DARKER_GRAY_2 : BASE_COLOR);
 
             DrawHelper.drawRoundedRectangle(graphics, boxX, boxY, boxWidth, boxHeight, 2, boxBgColor.getRGB());
-            graphics.drawString(mc.font, text, boxX + boxWidth / 2 - textWidth / 2, boxY + 1, -1, false);
+            graphics.text(mc.font, text, boxX + boxWidth / 2 - textWidth / 2, boxY + 1, -1, false);
         }
 
         @Override

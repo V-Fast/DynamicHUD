@@ -1,10 +1,10 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces;
 
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.Option;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public interface SkinRenderer<T extends Option<?>> {
-    void render(GuiGraphics graphics, T option, int x, int y, int mouseX, int mouseY);
+    void render(GuiGraphicsExtractor graphics, T option, int x, int y, int mouseX, int mouseY);
 
     default boolean mouseClicked(T option, double mouseX, double mouseY, int button) {
         return option.mouseClicked(mouseX, mouseY, button);

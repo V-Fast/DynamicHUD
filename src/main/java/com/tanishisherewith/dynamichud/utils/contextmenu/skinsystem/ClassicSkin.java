@@ -8,7 +8,7 @@ import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
 import com.tanishisherewith.dynamichud.utils.contextmenu.options.*;
 import com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem.interfaces.SkinRenderer;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
@@ -34,7 +34,7 @@ public class ClassicSkin extends Skin {
     }
 
     @Override
-    public void renderContextMenu(GuiGraphics graphics, ContextMenu<?> contextMenu, int mouseX, int mouseY) {
+    public void renderContextMenu(GuiGraphicsExtractor graphics, ContextMenu<?> contextMenu, int mouseX, int mouseY) {
         this.contextMenu = contextMenu;
         ContextMenuProperties properties = contextMenu.getProperties();
 
@@ -57,11 +57,11 @@ public class ClassicSkin extends Skin {
         }
     }
 
-    private void drawBackground(GuiGraphics graphics, ContextMenu<?> contextMenu, ContextMenuProperties properties) {
+    private void drawBackground(GuiGraphicsExtractor graphics, ContextMenu<?> contextMenu, ContextMenuProperties properties) {
         drawBackground(graphics, contextMenu, properties, contextMenu.y, contextMenu.getWidth(), contextMenu.getHeight(), properties.getBackgroundColor().getRGB(), properties.shadow());
     }
 
-    private void drawBackground(GuiGraphics graphics, ContextMenu<?> contextMenu, ContextMenuProperties properties, int yOffset, int width, int height, int color, boolean shadow) {
+    private void drawBackground(GuiGraphicsExtractor graphics, ContextMenu<?> contextMenu, ContextMenuProperties properties, int yOffset, int width, int height, int color, boolean shadow) {
         if (properties.roundedCorners()) {
             if (shadow) {
                 DrawHelper.drawRoundedRectangleWithShadowBadWay(graphics, contextMenu.x, yOffset, width, height, properties.getCornerRadius(), color, 150, 1, 1);
@@ -77,7 +77,7 @@ public class ClassicSkin extends Skin {
         }
     }
 
-    private void drawBorder(GuiGraphics graphics, ContextMenu<?> contextMenu, ContextMenuProperties properties) {
+    private void drawBorder(GuiGraphicsExtractor graphics, ContextMenu<?> contextMenu, ContextMenuProperties properties) {
         if (properties.roundedCorners()) {
             DrawHelper.drawOutlineRoundedBox(graphics, contextMenu.x, contextMenu.y, contextMenu.getWidth(), contextMenu.getHeight(), properties.getCornerRadius(), properties.getBorderWidth(), properties.getBorderColor().getRGB());
         } else {
@@ -92,20 +92,20 @@ public class ClassicSkin extends Skin {
 
     public static class ClassicBooleanRenderer implements SkinRenderer<BooleanOption> {
         @Override
-        public void render(GuiGraphics graphics, BooleanOption option, int x, int y, int mouseX, int mouseY) {
+        public void render(GuiGraphicsExtractor graphics, BooleanOption option, int x, int y, int mouseX, int mouseY) {
             int color = option.get() ? Color.GREEN.getRGB() : Color.RED.getRGB();
             Component displayName = Util.getTruncatedName(option.name, option.getWidth());
-            graphics.drawString(mc.font, displayName, x, y, color, false);
+            graphics.text(mc.font, displayName, x, y, color, false);
             option.getProperties().getSkin().renderTooltipIfHovered(graphics, option, x, y, mouseX, mouseY, option.getWidth());
         }
     }
 
     public static class ClassicColorOptionRenderer implements SkinRenderer<ColorOption> {
         @Override
-        public void render(GuiGraphics graphics, ColorOption option, int x, int y, int mouseX, int mouseY) {
+        public void render(GuiGraphicsExtractor graphics, ColorOption option, int x, int y, int mouseX, int mouseY) {
             int color = option.isVisible ? Color.GREEN.getRGB() : Color.RED.getRGB();
             Component text = Util.getTruncatedName(option.name, option.getWidth() - 4);
-            graphics.drawString(mc.font, text, x, y, color, false);
+            graphics.text(mc.font, text, x, y, color, false);
 
             int shadowOpacity = Math.min(option.value.getAlpha(), 90);
             DrawHelper.drawRoundedRectangleWithShadowBadWay(graphics,
@@ -126,23 +126,23 @@ public class ClassicSkin extends Skin {
 
     public static class ClassicCycleRenderer<E> implements SkinRenderer<CycleOption<E>> {
         @Override
-        public void render(GuiGraphics graphics, CycleOption<E> option, int x, int y, int mouseX, int mouseY) {
+        public void render(GuiGraphicsExtractor graphics, CycleOption<E> option, int x, int y, int mouseX, int mouseY) {
             String valStr = option.get().toString();
             int valueWidth = mc.font.width(": " + valStr);
             Component displayName = Util.getTruncatedName(option.name, option.getWidth() - valueWidth - 2);
-            graphics.drawString(mc.font, displayName.copy().append(": "), x, y, Color.WHITE.getRGB(), false);
-            graphics.drawString(mc.font, valStr, x + mc.font.width(displayName.getString() + ": ") + 1, y, Color.CYAN.getRGB(), false);
+            graphics.text(mc.font, displayName.copy().append(": "), x, y, Color.WHITE.getRGB(), false);
+            graphics.text(mc.font, valStr, x + mc.font.width(displayName.getString() + ": ") + 1, y, Color.CYAN.getRGB(), false);
             option.getProperties().getSkin().renderTooltipIfHovered(graphics, option, x, y, mouseX, mouseY, option.getWidth() - valueWidth - 2);
         }
     }
 
     public static class ClassicSubMenuRenderer implements SkinRenderer<SubMenuOption> {
         @Override
-        public void render(GuiGraphics graphics, SubMenuOption option, int x, int y, int mouseX, int mouseY) {
+        public void render(GuiGraphicsExtractor graphics, SubMenuOption option, int x, int y, int mouseX, int mouseY) {
             int color = option.value ? Color.GREEN.getRGB() : Color.RED.getRGB();
             Component displayName = Util.getTruncatedName(option.name, option.getParentMenu().getWidth() - 14);
-            graphics.drawString(mc.font, displayName, x, y, color, false);
-            graphics.drawString(mc.font, option.getSubMenu().isVisible() ? "-" : "+", x + Math.max(option.getParentMenu().getWidth() - 12, mc.font.width(displayName) + 2), y, color, false);
+            graphics.text(mc.font, displayName, x, y, color, false);
+            graphics.text(mc.font, option.getSubMenu().isVisible() ? "-" : "+", x + Math.max(option.getParentMenu().getWidth() - 12, mc.font.width(displayName) + 2), y, color, false);
 
             option.getSubMenu().render(graphics, x + option.getParentMenu().getWidth(), y - 1, mouseX, mouseY);
             option.getProperties().getSkin().renderTooltipIfHovered(graphics, option, x, y, mouseX, mouseY, option.getParentMenu().getWidth() - 14);
@@ -151,17 +151,17 @@ public class ClassicSkin extends Skin {
 
     public static class ClassicRunnableRenderer implements SkinRenderer<RunnableOption> {
         @Override
-        public void render(GuiGraphics graphics, RunnableOption option, int x, int y, int mouseX, int mouseY) {
+        public void render(GuiGraphicsExtractor graphics, RunnableOption option, int x, int y, int mouseX, int mouseY) {
             int color = option.value ? ColorHelper.DARK_GREEN.getRGB() : ColorHelper.DARK_RED.getRGB();
             Component displayName = Util.getTruncatedName(Component.literal("Run: ").append(option.name), option.getWidth());
-            graphics.drawString(mc.font, displayName, x, y, color, false);
+            graphics.text(mc.font, displayName, x, y, color, false);
             option.getProperties().getSkin().renderTooltipIfHovered(graphics, option, x, y, mouseX, mouseY, option.getWidth());
         }
     }
 
     public static class ClassicDoubleRenderer implements SkinRenderer<DoubleOption> {
         @Override
-        public void render(GuiGraphics graphics, DoubleOption option, int x, int y, int mouseX, int mouseY) {
+        public void render(GuiGraphicsExtractor graphics, DoubleOption option, int x, int y, int mouseX, int mouseY) {
             Font font = mc.font;
             int decimalPlaces = String.valueOf(option.step).split("\\.")[1].length();
 
@@ -195,13 +195,13 @@ public class ClassicSkin extends Skin {
 
     public static class ClassicKeybindRenderer implements SkinRenderer<KeybindOption> {
         @Override
-        public void render(GuiGraphics graphics, KeybindOption option, int x, int y, int mouseX, int mouseY) {
+        public void render(GuiGraphicsExtractor graphics, KeybindOption option, int x, int y, int mouseX, int mouseY) {
             String valueText = option.isListening() ? "???" : KeybindOption.getKeyName(option.get());
             int valueColor = option.isListening() ? Color.YELLOW.getRGB() : Color.CYAN.getRGB();
             int valueWidth = mc.font.width(": " + valueText);
             Component displayName = Util.getTruncatedName(option.name, option.getWidth() - valueWidth - 2);
-            graphics.drawString(mc.font, displayName.copy().append(": "), x, y, Color.WHITE.getRGB(), false);
-            graphics.drawString(mc.font, valueText, x + mc.font.width(displayName.getString() + ": ") + 1, y, valueColor, false);
+            graphics.text(mc.font, displayName.copy().append(": "), x, y, Color.WHITE.getRGB(), false);
+            graphics.text(mc.font, valueText, x + mc.font.width(displayName.getString() + ": ") + 1, y, valueColor, false);
             option.getProperties().getSkin().renderTooltipIfHovered(graphics, option, x, y, mouseX, mouseY, option.getWidth() - valueWidth - 2);
         }
 
