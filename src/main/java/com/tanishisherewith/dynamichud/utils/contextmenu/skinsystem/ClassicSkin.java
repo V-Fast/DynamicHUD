@@ -34,6 +34,11 @@ public class ClassicSkin extends Skin {
     }
 
     @Override
+    public boolean showHoverTooltips() {
+        return true;
+    }
+
+    @Override
     public void renderContextMenu(GuiGraphicsExtractor graphics, ContextMenu<?> contextMenu, int mouseX, int mouseY) {
         this.contextMenu = contextMenu;
         ContextMenuProperties properties = contextMenu.getProperties();

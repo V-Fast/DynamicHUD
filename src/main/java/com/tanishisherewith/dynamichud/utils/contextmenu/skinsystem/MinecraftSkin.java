@@ -44,6 +44,11 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             Identifier.withDefaultNamespace("widget/button_disabled"),
             Identifier.withDefaultNamespace("widget/button_highlighted")
     );
+    public static final WidgetSprites CROSS_BUTTON_SPRITES = new WidgetSprites(
+            Identifier.withDefaultNamespace("widget/cross_button"),
+            Identifier.withDefaultNamespace("widget/locked_button_disabled"),
+            Identifier.withDefaultNamespace("widget/cross_button_highlighted")
+    );
     public static final Identifier DEFAULT_BACKGROUND_PANEL = Identifier.fromNamespaceAndPath(DynamicHUD.MOD_ID,"textures/minecraftskin/demo_background.png");
     public static final Identifier SCROLLER_TEXTURE = Identifier.withDefaultNamespace("widget/scroller");
     public static final Identifier SCROLL_BAR_BACKGROUND = Identifier.withDefaultNamespace("widget/scroller_background");
@@ -101,12 +106,19 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             scrollHandler.setScrollOffset(0);
         });
         searchBox.setHint(Component.literal("Search..."));
+
+        setTooltipDelayMs(3000L); // 3 seconds
+    }
+
+    @Override
+    public boolean showHoverTooltips() {
+        return true;
     }
 
     @Override
     public List<Option<?>> getOptions(ContextMenu<?> menu) {
-        if(searchQuery != null && !searchQuery.isEmpty()) {
-            return Util.getSearchResults(searchQuery,-1, contextMenu.getOptions());
+        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            return Util.getSearchResults(searchQuery, -1, contextMenu.getOptions(),true);
         }
         return super.getOptions(menu);
     }
@@ -126,7 +138,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
                 generalGroup.addOption(option);
             }
         }
-        if(optionGroups.isEmpty()) optionGroups.addFirst(generalGroup);
+        if(!generalGroup.getGroupOptions().isEmpty()) optionGroups.addFirst(generalGroup);
     }
 
     private void initOptionGroups() {
@@ -178,7 +190,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
         int size = (int) (groupPanelWidth * 0.5f);
         drawSingularButton(graphics, "^", mouseX, mouseY, groupPanelX.getAsInt() + groupPanelWidth / 2 - size / 2, imageY - 14, size, 14, groupScrollHandler.isOffsetWithinBounds(-10));
-        drawSingularButton(graphics, "v", mouseX, mouseY, groupPanelX.getAsInt() + groupPanelWidth / 2 - size / 2, imageY + panelHeight - 2, size, 14, groupScrollHandler.isOffsetWithinBounds(10));
+        drawSingularButton(graphics, "v", mouseX, mouseY, groupPanelX.getAsInt() + groupPanelWidth / 2 - size / 2, imageY + panelHeight + 2, size, 14, groupScrollHandler.isOffsetWithinBounds(10));
         // graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, isMouseOver(mouseX, mouseY, imageX + 3, imageY + 3, 14, 14)), imageX + 3, imageY + 3, 14, 14);
         // graphics.text(mc.font, "X", imageX + 10 - mc.font.width("X") / 2, imageY + 6, -1, true);
 
@@ -200,12 +212,10 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
         contextMenu.setHeight(getContentHeight() + 15);
 
-        drawScrollbar(graphics);
-
-        scrollHandler.updateScrollOffset(getMaxScrollOffset());
-
-        // Disable scissor after rendering
         DrawHelper.disableScissor(graphics);
+
+        drawScrollbar(graphics);
+        scrollHandler.updateScrollOffset(getMaxScrollOffset());
     }
 
     private void renderSearchBox(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
@@ -223,6 +233,20 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         //DrawHelper.drawRectangle(graphics,iconX - 2, iconY - 1, mc.font.width(icon) + 3, mc.font.lineHeight + 2,Color.BLACK.getRGB());
         //DrawHelper.drawOutlineBox(graphics,iconX - 2, iconY - 1, mc.font.width(icon) + 3,mc.font.lineHeight + 2,1f,Color.GRAY.getRGB());
         graphics.text(mc.font, icon, iconX, iconY, iconColor, false);
+
+        int clearButtonSize = 14;
+        int clearX = searchBoxX + searchBoxWidth + 2;
+        int clearY = searchBoxY + (searchBoxHeight - clearButtonSize) / 2;
+
+        boolean isClearHovered = Skin.isMouseOver(mouseX, mouseY, clearX, clearY, clearButtonSize, clearButtonSize);
+
+        if (!searchQuery.isEmpty()) {
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, CROSS_BUTTON_SPRITES.get(true, isClearHovered),
+                    clearX,
+                    clearY,
+                    clearButtonSize,
+                    clearButtonSize);
+        }
     }
 
     public void drawSingularButton(GuiGraphicsExtractor graphics, String Component, int mouseX, int mouseY, int x, int y, int width, int height, boolean enabled) {
@@ -269,6 +293,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             optionsToRender = selectedGroup.getGroupOptions();
         }
 
+
         for (Option<?> option : optionsToRender) {
             if (!option.shouldRender()) continue;
 
@@ -277,6 +302,8 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
             if (option.getY() >= imageY - option.getHeight() && option.getY() <= imageY + option.getHeight() + panelHeight) {
                 option.render(graphics, option.getX(), option.getY(), mouseX, mouseY);
+
+                renderTooltipIfHovered(graphics, option, option.getX(), option.getY(), mouseX, mouseY, targetWidth);
             }
         }
         return yOffset;
@@ -286,7 +313,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         if (getMaxScrollOffset() > 0) {
             int scrollbarX = imageX + panelWidth + 10;
             int scrollbarY = imageY;
-            double ratio = (double) panelHeight / getContentHeight();
+            double ratio = (double) (panelHeight - 8) / getContentHeight();
             double handleHeight = panelHeight * ratio;
             int handleY = (int) (scrollbarY + (panelHeight - handleHeight) * ((double) scrollHandler.getScrollOffset() / getMaxScrollOffset()));
 
@@ -323,8 +350,19 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             searchBox.setFocused(false);
         }
 
-
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            if(!searchQuery.isEmpty()){
+                int clearButtonSize = 14;
+                int clearX = searchBoxX + searchBoxWidth + 2;
+                int clearY = searchBoxY + (searchBoxHeight - clearButtonSize) / 2;
+
+                boolean isClearHovered = Skin.isMouseOver(mouseX, mouseY, clearX, clearY, clearButtonSize, clearButtonSize);
+                if(isClearHovered){
+                    searchBox.setValue("");
+                    searchBox.setFocused(false);
+                    return true;
+                }
+            }
             if (isMouseOver(mouseX, mouseY, imageX + 3, imageY + 3, 14, 14)) {
                 mc.getSoundManager().play(SimpleSoundInstance.forUI(
                         SoundEvents.UI_BUTTON_CLICK, 1.0F));
@@ -335,19 +373,19 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             }
             int size = (int) (groupPanelWidth * 0.5f);
             //Up and down button
-            if (groupScrollHandler.isOffsetWithinBounds(-10) && isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() + (double) groupPanelWidth / 2 - size / 2, imageY - 14, size, 14)) {
+            if (groupScrollHandler.isOffsetWithinBounds(-10) && isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() + groupPanelWidth / 2.0 - size / 2.0, imageY - 14, size, 14)) {
                 mc.getSoundManager().play(SimpleSoundInstance.forUI(
                         SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 groupScrollHandler.addOffset(-10);
             }
-            if (groupScrollHandler.isOffsetWithinBounds(10) && isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() + (double) groupPanelWidth / 2 - size / 2, imageY + panelHeight - 2, size, 14)) {
+            if (groupScrollHandler.isOffsetWithinBounds(10) && isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() + groupPanelWidth / 2.0 - size / 2.0, imageY + panelHeight + 2, size, 14)) {
                 mc.getSoundManager().play(SimpleSoundInstance.forUI(
                         SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 groupScrollHandler.addOffset(10);
             }
 
             if (isMouseOver(mouseX, mouseY, imageX + panelWidth + 10, imageY, 10, panelHeight)) {
-                scrollHandler.startDragging(mouseY);
+                if(!scrollHandler.isDragging()) scrollHandler.startDragging(mouseY);
                 return true;
             }
             int groupX = groupPanelX.getAsInt();

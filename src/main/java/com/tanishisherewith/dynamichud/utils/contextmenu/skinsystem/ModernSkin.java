@@ -93,7 +93,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
     @Override
     public List<Option<?>> getOptions(ContextMenu<?> menu) {
         if(searchQuery != null && !searchQuery.isEmpty()) {
-            return Util.getSearchResults(searchQuery,-1, contextMenu.getOptions());
+            return Util.getSearchResults(searchQuery,-1, contextMenu.getOptions(), false);
         }
         return super.getOptions(menu);
     }
@@ -436,10 +436,11 @@ public class ModernSkin extends Skin implements GroupableSkin {
         mouseY = mc.mouseHandler.ypos() / SCALE_FACTOR;
 
         MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
-        searchBox.mouseClicked(event,false);
+        if(searchBox.mouseClicked(event,false)) return true;
 
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX, mouseY, contextMenuX + width - 5, contextMenuY + 19, 7, height)) {
-            scrollHandler.startDragging(mouseY);
+            if(!scrollHandler.isDragging()) scrollHandler.startDragging(mouseY);
+            return true;
         }
 
         if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {

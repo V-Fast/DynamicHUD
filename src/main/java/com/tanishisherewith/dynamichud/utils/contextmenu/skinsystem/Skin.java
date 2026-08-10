@@ -22,6 +22,15 @@ public abstract class Skin {
     protected Map<Class<? extends Option<?>>, Supplier<SkinRenderer<? extends Option<?>>>> renderers = new HashMap<>();
     private boolean createNewScreen;
 
+
+    // this is for just the tooltips :0
+    private long tooltipDelayMs = 1000L; //  delay in milliseconds
+    private static final long IDLE_PERIOD_MS = 300L;
+    private Option<?> currentlyHoveredOption = null;
+    private long hoverStartTime = 0L;
+    private long lastTooltipDismissTime = 0L;
+
+
     public Skin(ContextMenu<?> menu) {
         this();
         this.contextMenu = menu;
@@ -46,6 +55,14 @@ public abstract class Skin {
             current = current.getSuperclass();
         }
         return null;
+    }
+
+    public void setTooltipDelayMs(long delayMs) {
+        this.tooltipDelayMs = delayMs;
+    }
+
+    public long getTooltipDelayMs() {
+        return this.tooltipDelayMs;
     }
 
     /**
@@ -119,27 +136,48 @@ public abstract class Skin {
     }
 
     public boolean showHoverTooltips() {
-        return true;
+        return false;
     }
 
     public void renderTooltipIfHovered(GuiGraphicsExtractor graphics, Option<?> option, int x, int y, int mouseX, int mouseY, int maxTextWidth) {
         if (!showHoverTooltips()) return;
 
-        if (isMouseOver(mouseX, mouseY, x, y, option.getWidth(), option.getHeight())) {
-            List<FormattedCharSequence> tooltipLines = new ArrayList<>();
-            boolean isTruncated = mc.font.width(option.getName().getString()) > maxTextWidth;
+        boolean isHovered = isMouseOver(mouseX, mouseY, x, y, option.getWidth(), option.getHeight());
 
-            if (isTruncated) {
-                tooltipLines.add(option.getName().copy().withStyle(style -> style.withColor(0xFFFFAA00).withBold(true)).getVisualOrderText());
+        if (isHovered) {
+            long currentTime = System.currentTimeMillis();
+            if (currentlyHoveredOption != option) {
+                currentlyHoveredOption = option;
+
+                if (currentTime - lastTooltipDismissTime <= IDLE_PERIOD_MS) {
+                    hoverStartTime = currentTime - tooltipDelayMs;
+                } else {
+                    hoverStartTime = currentTime;
+                }
             }
 
-            if (option.getDescription() != null && !option.getDescription().getString().isEmpty()) {
-                tooltipLines.addAll(mc.font.split(option.getDescription(), 200));
-            }
+            if (currentTime - hoverStartTime >= tooltipDelayMs) {
+                lastTooltipDismissTime = currentTime;
 
-            if (!tooltipLines.isEmpty()) {
-                graphics.setTooltipForNextFrame(mc.font, tooltipLines, mouseX, mouseY);
+                List<FormattedCharSequence> tooltipLines = new ArrayList<>();
+                boolean isTruncated = mc.font.width(option.getName().getString()) > maxTextWidth;
+
+                if (isTruncated) {
+                    Component fullNameHeader = option.getName().copy()
+                            .withStyle(style -> style.withColor(0xFFFFAA00).withBold(true));
+                    tooltipLines.add(fullNameHeader.getVisualOrderText());
+                }
+
+                if (option.getDescription() != null && !option.getDescription().getString().isEmpty()) {
+                    tooltipLines.addAll(mc.font.split(option.getDescription(), 200));
+                }
+
+                if (!tooltipLines.isEmpty()) {
+                    graphics.setTooltipForNextFrame(mc.font, tooltipLines, mouseX, mouseY);
+                }
             }
+        } else if (currentlyHoveredOption == option) {
+            currentlyHoveredOption = null;
         }
     }
 

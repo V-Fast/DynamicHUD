@@ -52,7 +52,7 @@ public class DynamicHUD implements ClientModInitializer {
         //Config load
         GlobalConfig.loadOrCreate();
 
-        ClientLifecycleEvents.CLIENT_STARTED.register((minecraft)-> IntegrationManager.integrate());
+        ClientLifecycleEvents.CLIENT_STARTED.register((_)-> IntegrationManager.integrate());
 
 
         //In game screen render.

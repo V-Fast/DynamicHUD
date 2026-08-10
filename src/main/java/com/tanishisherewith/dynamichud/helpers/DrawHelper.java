@@ -5,12 +5,17 @@ import com.tanishisherewith.dynamichud.renderstates.QuadColorRectRenderState;
 import com.tanishisherewith.dynamichud.renderstates.RoundedRectRenderState;
 import com.tanishisherewith.dynamichud.utils.CustomRenderLayers;
 import com.tanishisherewith.dynamichud.widget.WidgetBox;
+import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.TextAlignment;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.gui.screens.options.UnsupportedGraphicsWarningScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
@@ -683,26 +688,22 @@ public class DrawHelper {
      * From minecraft
      */
     public static void drawScrollableText(GuiGraphicsExtractor graphics, Font font, Component Component, int centerX, int startX, int startY, int endX, int endY, int color) {
-        int i = font.width(Component);
-        int var10000 = startY + endY;
-        Objects.requireNonNull(font);
-        int j = (var10000 - 9) / 2 + 1;
-        int k = endX - startX;
-        int l;
-        if (i > k) {
-            l = i - k;
-            double d = (double) Util.getMillis() / 1000.0;
-            double e = Math.max((double) l * 0.5, 3.0);
-            double f = Math.sin(1.5707963267948966 * Math.cos(6.283185307179586 * d / e)) / 2.0 + 0.5;
-            double g = org.joml.Math.lerp(f, 0.0, l);
+        int lineWidth = font.width(Component);
+        int textTop = (startY + endY - font.lineHeight) / 2 + 1;
+        int availableMessageWidth = endX - startX;
+        if (lineWidth > availableMessageWidth) {
+            int maxPosition = lineWidth - availableMessageWidth;
+            double time = (double)Util.getMillis() / (double)1000.0F;
+            double period = Math.max((double)maxPosition * (double)0.5F, (double)3.0F);
+            double alpha = Math.sin((Math.PI / 2D) * Math.cos((Math.PI * 2D) * time / period)) / (double)2.0F + (double)0.5F;
+            double pos = Mth.lerp(alpha, (double)0.0F, (double)maxPosition);
             graphics.enableScissor(startX, startY, endX, endY);
-            graphics.text(font, Component, startX - (int) g, j, color,true);
+            graphics.text(font, Component, startX - (int) pos, textTop, color,true);
             graphics.disableScissor();
         } else {
-            l = Math.clamp(centerX, startX + i / 2, endX - i / 2);
-            graphics.centeredText(font, Component, l, j, color);
+            int textX = Mth.clamp(centerX, startX + lineWidth / 2, endX - lineWidth / 2);
+            graphics.centeredText(font, Component, textX, textTop, color);
         }
-
     }
 
     public static float floorMod(float x, float y) {

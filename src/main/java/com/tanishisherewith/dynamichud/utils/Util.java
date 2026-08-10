@@ -13,6 +13,8 @@ import org.apache.commons.text.similarity.FuzzyScore;
 import java.util.*;
 
 public class Util {
+    public static final FuzzyScore FUZZY_SCORE = new FuzzyScore(Locale.ENGLISH);
+
     public static Quadrant getQuadrant(int x, int y) {
         int screenWidth = DynamicHUD.MC.getWindow().getGuiScaledWidth();
         int screenHeight = DynamicHUD.MC.getWindow().getGuiScaledHeight();
@@ -50,37 +52,64 @@ public class Util {
      * Returns a list of options sorted by higher fuzzy score from the query string.
      * If minimumScore is -1, then two typos from query string will be tolerated.
      */
-    public static List<Option<?>> getSearchResults(String query, int minimumScore, List<Option<?>> options) {
+    public static List<Option<?>> getSearchResults(String query, int minimumScore, List<Option<?>> options, boolean flatten) {
         if(options.isEmpty()) return new ArrayList<>();
 
         if (query == null || query.trim().isEmpty()) {
             return new ArrayList<>(options);
         }
 
-        FuzzyScore FUZZY_SCORE = new FuzzyScore(Locale.ENGLISH);
-
         String lowerQuery = query.toLowerCase().trim();
+
+        //Allow 2 typos for a min score of -1 using the query length
+        int threshold = (minimumScore == -1) ? Math.max(1, lowerQuery.length() - 2) : minimumScore;
+
         Map<Option<?>, Integer> scoreMap = new HashMap<>();
+        List<Option<?>> matched = new ArrayList<>();
 
-        List<Option<?>> allOptions = Skin.flattenOptions(options);
-
-        for (Option<?> opt : allOptions) {
+        for (Option<?> opt : Skin.flattenOptions(options)) {
             if (!opt.shouldRender()) continue;
-            String name = opt.getName().getString();
-            String desc = opt.getDescription().getString();
-            int nameScore = FUZZY_SCORE.fuzzyScore(name, lowerQuery);
-            int descScore = FUZZY_SCORE.fuzzyScore(desc, lowerQuery);
-            int best = Math.max(nameScore, descScore);
-            scoreMap.put(opt, best);
+
+            String name = opt.getName().getString().toLowerCase();
+            String desc = opt.getDescription() != null ? opt.getDescription().getString().toLowerCase() : "";
+
+            int score = calculateWeightedScore(lowerQuery, name, desc);
+
+            if (score >= threshold) {
+                scoreMap.put(opt, score);
+                matched.add(opt);
+            }
         }
 
 
         if (scoreMap.isEmpty()) return new ArrayList<>();
 
-        //Allow 2 typos for a min score of -1 using the query length
-        int threshold = (minimumScore == -1) ? lowerQuery.length() - 2: minimumScore;
+        if (flatten) {
+            matched.sort((a, b) -> Integer.compare(scoreMap.get(b), scoreMap.get(a)));
+            return matched;
+        }
 
         return filterAndSortOptions(options, threshold, scoreMap);
+    }
+
+    /**
+     * Calculates a weighted score for exact and prefix matches of options
+     */
+    public static int calculateWeightedScore(String query, String name, String desc) {
+        int nameScore = FUZZY_SCORE.fuzzyScore(name, query);
+        int descScore = FUZZY_SCORE.fuzzyScore(desc, query);
+
+        // add score heavily if the name contains or starts with the exact query
+        if (name.equalsIgnoreCase(query)) {
+            nameScore += 100; // exact match
+        } else if (name.startsWith(query)) {
+            nameScore += 50;  // starts with
+        } else if (name.contains(query)) {
+            nameScore += 25;  // substring match
+        }
+
+        // higher score to option names (twice as much)
+        return Math.max(nameScore * 2, descScore);
     }
 
     /**
@@ -93,12 +122,17 @@ public class Util {
             if (opt instanceof OptionGroup group) {
                 // Process children first
                 List<Option<?>> filteredChildren = filterAndSortOptions(group.getGroupOptions(), threshold, scoreMap);
-                int groupScore = scoreMap.getOrDefault(group, 0);
-                boolean groupMatches = groupScore >= threshold;
 
-                if (groupMatches || !filteredChildren.isEmpty()) {
+                if (!filteredChildren.isEmpty()) {
                     OptionGroup newGroup = new OptionGroup(group.getName());
                     newGroup.setExpanded(true);
+
+                    // sort children inside group by score
+                    filteredChildren.sort((a, b) -> Integer.compare(
+                            getEffectiveScore(b, scoreMap),
+                            getEffectiveScore(a, scoreMap)
+                    ));
+
                     for (Option<?> child : filteredChildren) {
                         newGroup.addOption(child);
                     }
@@ -115,7 +149,6 @@ public class Util {
             int sb = getEffectiveScore(b, scoreMap);
             return Integer.compare(sb, sa);
         });
-        System.out.println("RESULT: " + result);
         return result;
     }
 
@@ -155,9 +188,5 @@ public class Util {
         DrawHelper.scaleAndPosition(graphics.pose(), x, y, textScale);
         graphics.text(DynamicHUD.MC.font, truncated, x, y, color, false);
         DrawHelper.stopScaling(graphics.pose());
-    }
-
-    public static boolean isSafeToContinue() {
-        return DynamicHUD.MC.getWindow() != null && DynamicHUD.MC.font != null;
     }
 }

@@ -59,9 +59,7 @@ public class ScrollHandler {
     public void updateScrollPosition(double mouseY) {
         if (isDragging && maxScrollOffset > 0) {
             double deltaY = mouseY - lastMouseY;
-            double scrollRatio = (double) maxScrollOffset / Math.max(1, trackHeight);
-            double offsetDelta = deltaY * scrollRatio;
-            this.targetScrollOffset = Mth.clamp(targetScrollOffset + offsetDelta, 0.0, maxScrollOffset);
+            this.targetScrollOffset = Mth.clamp(targetScrollOffset + deltaY, 0.0, maxScrollOffset);
             lastMouseY = mouseY;
         }
     }

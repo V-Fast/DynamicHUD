@@ -22,7 +22,6 @@ public class ColorGradient {
     private final int boxSize;
     private int x, y;
     private boolean display = false;
-
     private Color hoveredColorPreview = null;
 
     public ColorGradient(int x, int y, Color initialColor, Consumer<Color> onColorSelected, int boxSize, int colors) {

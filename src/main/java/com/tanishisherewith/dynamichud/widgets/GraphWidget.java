@@ -380,6 +380,8 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
                 float xPos = x + stepX * i;
                 DrawHelper.drawVerticalLine(graphics, xPos, y, gHeight, 0.5f, 0x4DFFFFFF);
             }
+        } else {
+            x += offset;
         }
 
         List<float[]> points = getInterpolatedPoints();
@@ -423,12 +425,13 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
          */
 
         String formattedMinVal = formatValue(minValue);
+        int minValWidth = mc.font.width(formattedMinVal);
 
-        DrawHelper.scaleAndPosition(graphics.pose(), x - mc.font.width(formattedMinVal)/2.0f, y + gHeight,mc.font.width(formattedMinVal),mc.font.lineHeight * 0.6f, 0.6f);
-        graphics.text(mc.font, formattedMinVal, x - mc.font.width(formattedMinVal) + 1, (int) (y + gHeight - 1), 0xFFFFFFFF, true);
+        DrawHelper.scaleAndPosition(graphics.pose(), x - minValWidth/2.0f, y + gHeight, minValWidth,mc.font.lineHeight * 0.6f, 0.6f);
+        graphics.text(mc.font, formattedMinVal, x - minValWidth, (int) (y + gHeight - 1), 0xFFFFFFFF, true);
         DrawHelper.stopScaling(graphics.pose());
 
-        if(showGrid) x -= offset;
+        x -= offset;
 
         this.widgetBox.setDimensions(x, y, gWidth + offset, gHeight + mc.font.lineHeight * 0.6f, canScale);
      //   DrawHelper.disableScissor();
@@ -511,8 +514,11 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     }
 
     private void computeOffset(){
+        String formattedMinVal = formatValue(minValue);
+        int minValWidth = mc.font.width(formattedMinVal);
+
         if(!showGrid) {
-            offset = 0;
+            offset = Math.round(minValWidth * 0.6f);
             return;
         }
 
@@ -525,6 +531,8 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
                 (int) Math.ceil(mc.font.width(firstText) * this.valueScale),
                 (int) Math.ceil(mc.font.width(lastText) * this.valueScale)
         );
+
+        offset = Math.max(offset, Math.round(minValWidth * 0.6f));
     }
 
     public float getMinValue() {

@@ -127,18 +127,18 @@ public final class GlobalConfig {
         general.addOption(new CycleOption<Object>(Component.literal("Settings Complexity"), () -> cfg.complexity, newVal -> cfg.complexity = (Option.Complexity) newVal, Option.Complexity.values()).description(Component.literal("The level of options to display. Options equal to or below cfg level will be displayed")));
 
         OptionGroup colors = new OptionGroup(Component.literal("Colors"));
-        colors.addOption(new ColorOption(Component.literal("Widget HUD Active Background Color"), () -> cfg.hudActiveColor, newVal -> cfg.hudActiveColor = newVal, temp).description(Component.literal("Color of the background of the widget when it will be rendered")));
-        colors.addOption(new ColorOption(Component.literal("Widget HUD Inactive Background Color"), () -> cfg.hudInactiveColor, newVal -> cfg.hudInactiveColor = newVal, temp).description(Component.literal("Color of the background of the widget when it will NOT be rendered")));
+        colors.addOption(new ColorOption(Component.literal("Widget Active Background Color"), () -> cfg.hudActiveColor, newVal -> cfg.hudActiveColor = newVal, temp).description(Component.literal("Color of the background of the widget when it will be rendered")));
+        colors.addOption(new ColorOption(Component.literal("Widget Inactive Background Color"), () -> cfg.hudInactiveColor, newVal -> cfg.hudInactiveColor = newVal, temp).description(Component.literal("Color of the background of the widget when it will NOT be rendered")));
         colors.addOption(new ColorOption(Component.literal("Dashed Outline Color"), () -> cfg.dashedOutlineColor, newVal -> cfg.dashedOutlineColor = newVal, temp).description(Component.literal("Color of the dashed bounding boxes of hovered/selected widgets.")));
 
-        OptionGroup advancedUI = new OptionGroup(Component.literal("Advanced UI"));
+        OptionGroup advancedUI = new OptionGroup(Component.literal("Advanced UI 23"));
         advancedUI.description(Component.literal("Configure drag selection, lock size, keybind shortcuts, and outlines"));
         advancedUI.addOption(new BooleanOption(Component.literal("Enable Drag Selection"), () -> cfg.dragSelectionEnabled, newVal -> cfg.dragSelectionEnabled = newVal).description(Component.literal("Draw selection boxes on empty space to select widgets")));
         advancedUI.addOption(new DoubleOption(Component.literal("Dashed Outline Thickness"), 0.5f, 3.0f, 0.1f, () -> (double) cfg.dashedOutlineThickness, newVal -> cfg.dashedOutlineThickness = newVal.floatValue(), temp).description(Component.literal("Grid size for snapping widgets")));
         advancedUI.addOption(new BooleanOption(Component.literal("Show Lock Button"), () -> cfg.showLockButton, newVal -> cfg.showLockButton = newVal).description(Component.literal("Show the lock toggle icon on hovered widgets")));
         advancedUI.addOption(new DoubleOption(Component.literal("Lock Button Size"), 4, 12, 1, () -> (double) cfg.lockButtonSize, newVal -> cfg.lockButtonSize = newVal.intValue(), temp).description(Component.literal("Grid size for snapping widgets")));
         advancedUI.addOption(new DoubleOption(Component.literal("Scale Dot Size"), 1, 6, 1, () -> (double) cfg.scaleDotSize, newVal -> cfg.scaleDotSize = newVal.intValue(), temp).description(Component.literal("Dimensions of the resize anchor dot")));
-        advancedUI.addOption(new DoubleOption(Component.literal("Scale Dot Size"), 0.1f, 3.0f, 0.1f, () -> (double) cfg.scaleSensitivity, newVal -> cfg.scaleSensitivity = newVal.floatValue(), temp).description(Component.literal("Sensitivity multiplier for resize-dragging (1.0 is exact visual tracking)")));
+        advancedUI.addOption(new DoubleOption(Component.literal("Scale Sensitivity"), 0.1f, 3.0f, 0.1f, () -> (double) cfg.scaleSensitivity, newVal -> cfg.scaleSensitivity = newVal.floatValue(), temp).description(Component.literal("Sensitivity multiplier for resize-dragging (1.0 is exact visual tracking)")));
 
         temp.addOption(general);
         temp.addOption(colors);
