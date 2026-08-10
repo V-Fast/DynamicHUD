@@ -131,7 +131,7 @@ public final class GlobalConfig {
         colors.addOption(new ColorOption(Component.literal("Widget Inactive Background Color"), () -> cfg.hudInactiveColor, newVal -> cfg.hudInactiveColor = newVal, temp).description(Component.literal("Color of the background of the widget when it will NOT be rendered")));
         colors.addOption(new ColorOption(Component.literal("Dashed Outline Color"), () -> cfg.dashedOutlineColor, newVal -> cfg.dashedOutlineColor = newVal, temp).description(Component.literal("Color of the dashed bounding boxes of hovered/selected widgets.")));
 
-        OptionGroup advancedUI = new OptionGroup(Component.literal("Advanced UI 23"));
+        OptionGroup advancedUI = new OptionGroup(Component.literal("Advanced UI"));
         advancedUI.description(Component.literal("Configure drag selection, lock size, keybind shortcuts, and outlines"));
         advancedUI.addOption(new BooleanOption(Component.literal("Enable Drag Selection"), () -> cfg.dragSelectionEnabled, newVal -> cfg.dragSelectionEnabled = newVal).description(Component.literal("Draw selection boxes on empty space to select widgets")));
         advancedUI.addOption(new DoubleOption(Component.literal("Dashed Outline Thickness"), 0.5f, 3.0f, 0.1f, () -> (double) cfg.dashedOutlineThickness, newVal -> cfg.dashedOutlineThickness = newVal.floatValue(), temp).description(Component.literal("Grid size for snapping widgets")));
