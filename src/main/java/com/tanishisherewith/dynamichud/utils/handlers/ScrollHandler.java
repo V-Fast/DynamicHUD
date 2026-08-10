@@ -68,8 +68,7 @@ public class ScrollHandler {
 
     private void displayValuePosition(double val) {
         this.targetScrollOffset = Mth.clamp(val, 0.0, maxScrollOffset);
-        this.displayValue = this.targetScrollOffset;
-        this.scrollOffset = this.targetScrollOffset;
+        this.displayValue = this.scrollOffset = this.targetScrollOffset;
     }
 
     public boolean isOffsetWithinBounds(int offset) {

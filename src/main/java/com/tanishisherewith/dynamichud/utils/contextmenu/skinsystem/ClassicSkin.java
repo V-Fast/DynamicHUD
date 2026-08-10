@@ -94,7 +94,7 @@ public class ClassicSkin extends Skin {
         @Override
         public void render(GuiGraphicsExtractor graphics, BooleanOption option, int x, int y, int mouseX, int mouseY) {
             int color = option.get() ? Color.GREEN.getRGB() : Color.RED.getRGB();
-            Component displayName = Util.getTruncatedName(option.name, option.getWidth());
+            Component displayName = Util.getTruncatedName(option.getName(), option.getWidth());
             graphics.text(mc.font, displayName, x, y, color, false);
             option.getProperties().getSkin().renderTooltipIfHovered(graphics, option, x, y, mouseX, mouseY, option.getWidth());
         }
@@ -104,17 +104,17 @@ public class ClassicSkin extends Skin {
         @Override
         public void render(GuiGraphicsExtractor graphics, ColorOption option, int x, int y, int mouseX, int mouseY) {
             int color = option.isVisible ? Color.GREEN.getRGB() : Color.RED.getRGB();
-            Component text = Util.getTruncatedName(option.name, option.getWidth() - 4);
+            Component text = Util.getTruncatedName(option.getName(), option.getWidth() - 4);
             graphics.text(mc.font, text, x, y, color, false);
 
-            int shadowOpacity = Math.min(option.value.getAlpha(), 90);
+            int shadowOpacity = Math.min(option.get().getAlpha(), 90);
             DrawHelper.drawRoundedRectangleWithShadowBadWay(graphics,
                     x + option.getWidth() - 8,
                     y - 1,
                     8,
                     8,
                     3,
-                    option.value.getRGB(),
+                    option.get().getRGB(),
                     shadowOpacity,
                     1,
                     1);
@@ -129,7 +129,7 @@ public class ClassicSkin extends Skin {
         public void render(GuiGraphicsExtractor graphics, CycleOption<E> option, int x, int y, int mouseX, int mouseY) {
             String valStr = option.get().toString();
             int valueWidth = mc.font.width(": " + valStr);
-            Component displayName = Util.getTruncatedName(option.name, option.getWidth() - valueWidth - 2);
+            Component displayName = Util.getTruncatedName(option.getName(), option.getWidth() - valueWidth - 2);
             graphics.text(mc.font, displayName.copy().append(": "), x, y, Color.WHITE.getRGB(), false);
             graphics.text(mc.font, valStr, x + mc.font.width(displayName.getString() + ": ") + 1, y, Color.CYAN.getRGB(), false);
             option.getProperties().getSkin().renderTooltipIfHovered(graphics, option, x, y, mouseX, mouseY, option.getWidth() - valueWidth - 2);
@@ -139,8 +139,8 @@ public class ClassicSkin extends Skin {
     public static class ClassicSubMenuRenderer implements SkinRenderer<SubMenuOption> {
         @Override
         public void render(GuiGraphicsExtractor graphics, SubMenuOption option, int x, int y, int mouseX, int mouseY) {
-            int color = option.value ? Color.GREEN.getRGB() : Color.RED.getRGB();
-            Component displayName = Util.getTruncatedName(option.name, option.getParentMenu().getWidth() - 14);
+            int color = option.get() ? Color.GREEN.getRGB() : Color.RED.getRGB();
+            Component displayName = Util.getTruncatedName(option.getName(), option.getParentMenu().getWidth() - 14);
             graphics.text(mc.font, displayName, x, y, color, false);
             graphics.text(mc.font, option.getSubMenu().isVisible() ? "-" : "+", x + Math.max(option.getParentMenu().getWidth() - 12, mc.font.width(displayName) + 2), y, color, false);
 
@@ -152,8 +152,8 @@ public class ClassicSkin extends Skin {
     public static class ClassicRunnableRenderer implements SkinRenderer<RunnableOption> {
         @Override
         public void render(GuiGraphicsExtractor graphics, RunnableOption option, int x, int y, int mouseX, int mouseY) {
-            int color = option.value ? ColorHelper.DARK_GREEN.getRGB() : ColorHelper.DARK_RED.getRGB();
-            Component displayName = Util.getTruncatedName(Component.literal("Run: ").append(option.name), option.getWidth());
+            int color = option.get() ? ColorHelper.DARK_GREEN.getRGB() : ColorHelper.DARK_RED.getRGB();
+            Component displayName = Util.getTruncatedName(Component.literal("Run: ").append(option.getName()), option.getWidth());
             graphics.text(mc.font, displayName, x, y, color, false);
             option.getProperties().getSkin().renderTooltipIfHovered(graphics, option, x, y, mouseX, mouseY, option.getWidth());
         }
@@ -165,16 +165,16 @@ public class ClassicSkin extends Skin {
             Font font = mc.font;
             int decimalPlaces = String.valueOf(option.step).split("\\.")[1].length();
 
-            String decimalValue = String.format("%." + decimalPlaces + "f", option.value);
+            String decimalValue = String.format("%." + decimalPlaces + "f", option.get());
             float scale = 0.7f;
             //get the truncated text with the scaled width
             int maxTextWidth = (int)(option.getWidth()*(1/scale)) - (int)(mc.font.width(": " + decimalValue) * scale) - 2;
-            Component labelText = Util.getTruncatedName(option.name, maxTextWidth).append(": " + decimalValue);
+            Component labelText = Util.getTruncatedName(option.getName(), maxTextWidth).append(": " + decimalValue);
             Util.drawScaledText(graphics, labelText, x, y + 1, scale, 0xFFFFFFFF);
 
             float handleWidth = 3;
             float handleHeight = 8;
-            double handleX = x + (option.value - option.minValue) / (option.maxValue - option.minValue) * (option.getWidth() - handleWidth);
+            double handleX = x + (option.get() - option.minValue) / (option.maxValue - option.minValue) * (option.getWidth() - handleWidth);
             double handleY = y + font.lineHeight + 1 + ((2 - handleHeight) / 2);
 
             option.drawSlider(graphics, x, y + font.lineHeight + 1, option.getWidth(), handleX);
@@ -199,7 +199,7 @@ public class ClassicSkin extends Skin {
             String valueText = option.isListening() ? "???" : KeybindOption.getKeyName(option.get());
             int valueColor = option.isListening() ? Color.YELLOW.getRGB() : Color.CYAN.getRGB();
             int valueWidth = mc.font.width(": " + valueText);
-            Component displayName = Util.getTruncatedName(option.name, option.getWidth() - valueWidth - 2);
+            Component displayName = Util.getTruncatedName(option.getName(), option.getWidth() - valueWidth - 2);
             graphics.text(mc.font, displayName.copy().append(": "), x, y, Color.WHITE.getRGB(), false);
             graphics.text(mc.font, valueText, x + mc.font.width(displayName.getString() + ": ") + 1, y, valueColor, false);
             option.getProperties().getSkin().renderTooltipIfHovered(graphics, option, x, y, mouseX, mouseY, option.getWidth() - valueWidth - 2);

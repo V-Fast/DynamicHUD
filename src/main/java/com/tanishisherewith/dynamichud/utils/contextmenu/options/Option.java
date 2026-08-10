@@ -13,8 +13,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class Option<T> implements Input {
-    public Component name, description = Component.empty();
-    public T value = null;
+    protected Component name, description = Component.empty();
+    protected T value = null;
     protected int x, y;
     protected int width = 0;
     protected int height = 0;
@@ -184,6 +184,10 @@ public abstract class Option<T> implements Input {
 
     public Component getDescription() {
         return description;
+    }
+
+    public T getCurrentValue() {
+        return value;
     }
 
     @Override

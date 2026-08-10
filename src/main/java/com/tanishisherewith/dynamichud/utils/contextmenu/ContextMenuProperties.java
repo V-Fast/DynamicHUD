@@ -22,8 +22,7 @@ public class ContextMenuProperties {
     protected boolean enableAnimations = true;
     protected Skin skin = new ClassicSkin();
 
-    protected ContextMenuProperties() {
-    }
+    protected ContextMenuProperties() {}
 
     public static Builder<?> builder() {
         return new Builder<>(new ContextMenuProperties());

@@ -20,6 +20,10 @@ public class ContextMenuScreen extends Screen {
         this.contextMenu = menu;
         this.properties = properties;
     }
+    public ContextMenuScreen(ContextMenu<?> menu) {
+        this(menu, menu.getProperties());
+    }
+
 
     @Override
     public void added() {

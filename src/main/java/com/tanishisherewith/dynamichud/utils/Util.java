@@ -97,7 +97,7 @@ public class Util {
                 boolean groupMatches = groupScore >= threshold;
 
                 if (groupMatches || !filteredChildren.isEmpty()) {
-                    OptionGroup newGroup = new OptionGroup(group.name);
+                    OptionGroup newGroup = new OptionGroup(group.getName());
                     newGroup.setExpanded(true);
                     for (Option<?> child : filteredChildren) {
                         newGroup.addOption(child);
@@ -115,6 +115,7 @@ public class Util {
             int sb = getEffectiveScore(b, scoreMap);
             return Integer.compare(sb, sa);
         });
+        System.out.println("RESULT: " + result);
         return result;
     }
 

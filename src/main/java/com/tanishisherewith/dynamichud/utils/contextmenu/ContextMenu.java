@@ -113,7 +113,7 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
 
         update();
 
-        if (animScale <= 0.0f || newScreenFlag) return;
+        if (animScale <= 0.01f || newScreenFlag) return;
 
         int screenWidth = DynamicHUD.MC.getWindow().getGuiScaledWidth();
         int screenHeight = DynamicHUD.MC.getWindow().getGuiScaledHeight();
@@ -195,11 +195,17 @@ public class ContextMenu<T extends ContextMenuProperties> implements Input {
     }
 
     protected double getTMouseX(double mouseX) {
-        return mouseX / getMenuScale();
+        if(getMenuScale() < 1.0f) {
+            return DynamicHUD.MC.mouseHandler.xpos() / getMenuScale();
+        }
+        return mouseX;
     }
 
     protected double getTMouseY(double mouseY) {
-        return mouseY / getMenuScale();
+        if(getMenuScale() < 1.0f) {
+            return DynamicHUD.MC.mouseHandler.ypos() / getMenuScale();
+        }
+        return mouseY;
     }
 
     public boolean toggleDisplay(WidgetBox widgetBox, double mouseX, double mouseY, int button) {

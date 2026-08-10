@@ -127,14 +127,14 @@ public abstract class Skin {
 
         if (isMouseOver(mouseX, mouseY, x, y, option.getWidth(), option.getHeight())) {
             List<FormattedCharSequence> tooltipLines = new ArrayList<>();
-            boolean isTruncated = mc.font.width(option.name.getString()) > maxTextWidth;
+            boolean isTruncated = mc.font.width(option.getName().getString()) > maxTextWidth;
 
             if (isTruncated) {
-                tooltipLines.add(option.name.copy().withStyle(style -> style.withColor(0xFFFFAA00).withBold(true)).getVisualOrderText());
+                tooltipLines.add(option.getName().copy().withStyle(style -> style.withColor(0xFFFFAA00).withBold(true)).getVisualOrderText());
             }
 
-            if (option.description != null && !option.description.getString().isEmpty()) {
-                tooltipLines.addAll(mc.font.split(option.description, 200));
+            if (option.getDescription() != null && !option.getDescription().getString().isEmpty()) {
+                tooltipLines.addAll(mc.font.split(option.getDescription(), 200));
             }
 
             if (!tooltipLines.isEmpty()) {

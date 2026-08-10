@@ -49,8 +49,8 @@ public class DynamicHUD implements ClientModInitializer {
     public void onInitializeClient() {
         printInfo("Initialising DynamicHUD");
 
-        //YACL load
-        GlobalConfig.HANDLER.load();
+        //Config load
+        GlobalConfig.loadOrCreate();
 
         ClientLifecycleEvents.CLIENT_STARTED.register((minecraft)-> IntegrationManager.integrate());
 

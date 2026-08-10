@@ -16,10 +16,10 @@ import java.util.List;
  * Manages item spacing, padding, min width, and active layout strategies.
  */
 public class LayoutEngine {
-    private int horizontalPadding = 8;
-    private int verticalPadding = 4;
-    private int itemSpacing = 2;
-    private int minWidth = 80;
+    private int horizontalPadding;
+    private int verticalPadding;
+    private int itemSpacing;
+    private int minWidth;
     private LayoutStrategy activeStrategy;
 
     public LayoutEngine() {
@@ -126,7 +126,7 @@ public class LayoutEngine {
             int maxInnerWidth = engine.getMinWidth();
             for (Option<?> option : visibleOptions) {
                 if (!option.shouldRender()) continue;
-                int preferredWidth = option.getWidth() > 0 ? option.getWidth() : font.width(option.name);
+                int preferredWidth = option.getWidth() > 0 ? option.getWidth() : font.width(option.getName());
                 maxInnerWidth = Math.max(maxInnerWidth, preferredWidth);
             }
 

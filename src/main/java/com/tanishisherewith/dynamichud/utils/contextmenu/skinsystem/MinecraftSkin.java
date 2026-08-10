@@ -44,7 +44,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             Identifier.withDefaultNamespace("widget/button_disabled"),
             Identifier.withDefaultNamespace("widget/button_highlighted")
     );
-    public static final Identifier DEFAULT_BACKGROUND_PANEL = Identifier.withDefaultNamespace("textures/gui/demo_background.png");
+    public static final Identifier DEFAULT_BACKGROUND_PANEL = Identifier.fromNamespaceAndPath(DynamicHUD.MOD_ID,"textures/minecraftskin/demo_background.png");
     public static final Identifier SCROLLER_TEXTURE = Identifier.withDefaultNamespace("widget/scroller");
     public static final Identifier SCROLL_BAR_BACKGROUND = Identifier.withDefaultNamespace("widget/scroller_background");
     public static final Identifier GROUP_BACKGROUND = Identifier.fromNamespaceAndPath(DynamicHUD.MOD_ID, "textures/minecraftskin/group_panel.png");
@@ -116,6 +116,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     }
 
     private void createGroups() {
+        optionGroups.clear();
         OptionGroup generalGroup = new OptionGroup(Component.literal("General"));
         for (Option<?> option : getOptions(contextMenu)) {
             if (option instanceof OptionGroup og) {
@@ -125,7 +126,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
                 generalGroup.addOption(option);
             }
         }
-        optionGroups.addFirst(generalGroup);
+        if(optionGroups.isEmpty()) optionGroups.addFirst(generalGroup);
     }
 
     private void initOptionGroups() {
@@ -290,7 +291,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             int handleY = (int) (scrollbarY + (panelHeight - handleHeight) * ((double) scrollHandler.getScrollOffset() / getMaxScrollOffset()));
 
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLL_BAR_BACKGROUND, scrollbarX, scrollbarY, DEFAULT_SCROLLBAR_WIDTH, panelHeight);
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_TEXTURE, scrollbarX, handleY, DEFAULT_SCROLLBAR_WIDTH, (int) handleHeight);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_TEXTURE, scrollbarX, handleY, DEFAULT_SCROLLBAR_WIDTH, (int) Math.floor(handleHeight));
         }
     }
 
@@ -356,7 +357,8 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             for (OptionGroup group : optionGroups) {
                 if (yOffset >= groupY && yOffset <= groupY + panelHeight) {
                     // Handle click to select the group
-                    if (isMouseOver(mouseX, mouseY, groupX + 10, yOffset, groupPanelWidth - 20, 20)) {
+                    if (isMouseOver(mouseX, mouseY, groupX, yOffset, groupPanelWidth, 20)) {
+                        scrollHandler.setScrollOffset(0);
                         selectedGroup.setExpanded(false);
                         selectedGroup = group;
                         selectedGroup.setExpanded(true);
@@ -490,15 +492,15 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     public class MinecraftBooleanRenderer implements SkinRenderer<BooleanOption> {
         @Override
         public void render(GuiGraphicsExtractor graphics, BooleanOption option, int x, int y, int mouseX, int mouseY) {
-            graphics.text(mc.font, option.name, x + 15, y + 25 / 2 - 5, -1, true);
+            graphics.text(mc.font, option.getName(), x + 15, y + 25 / 2 - 5, -1, true);
 
             int width = 50;
             option.setPosition(x + panelWidth - 75, y);
             option.setWidth(width);
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, isMouseOver(mouseX, mouseY,x + panelWidth - 75, y, width, 20)), x + panelWidth - 75, y, width, 20);
 
-            Component Component = option.getBooleanType().getText(option.value);
-            int color = option.value ? Color.GREEN.getRGB() : Color.RED.getRGB();
+            Component Component = option.getBooleanType().getText(option.get());
+            int color = option.get() ? Color.GREEN.getRGB() : Color.RED.getRGB();
             graphics.text(mc.font, Component, (int) (x + panelWidth - 75 + (width / 2.0f) - (mc.font.width(Component) / 2.0f)), y + 5, color, true);
         }
     }
@@ -525,18 +527,18 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
                 scaleAnimation.update();
             }
 
-            graphics.text(mc.font, option.name, x + 15, y + 25 / 2 - 5, -1, true);
+            graphics.text(mc.font, option.getName(), x + 15, y + 25 / 2 - 5, -1, true);
 
             int width = 20;
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(!option.isVisible, isMouseOver(mouseX, mouseY,x + panelWidth - 45, y, width, 20)), x + panelWidth - 45, y, width, 20);
 
-            int shadowOpacity = Math.min(option.value.getAlpha(), 45);
+            int shadowOpacity = Math.min(option.get().getAlpha(), 45);
             DrawHelper.drawRectangleWithShadowBadWay(graphics,
                     x + panelWidth - 45 + 4,
                     y + 4,
                     width - 8,
                     12,
-                    option.value.getRGB(),
+                    option.get().getRGB(),
                     shadowOpacity,
                     1,
                     1);
@@ -616,12 +618,12 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
         @Override
         public void render(GuiGraphicsExtractor graphics, DoubleOption option, int x, int y, int mouseX, int mouseY) {
-            graphics.text(mc.font, option.name, x + 15, y + 25 / 2 - 5, -1, true);
+            graphics.text(mc.font, option.getName(), x + 15, y + 25 / 2 - 5, -1, true);
 
             option.setWidth(panelWidth - 150);
             option.setPosition(x + panelWidth - 122, y);
 
-            double sliderX = option.getX() + ((option.value - option.minValue) / (option.maxValue - option.minValue)) * (option.getWidth() - 8);
+            double sliderX = option.getX() + ((option.get() - option.minValue) / (option.maxValue - option.minValue)) * (option.getWidth() - 8);
             boolean isMouseOverHandle = isMouseOver(mouseX, mouseY, sliderX, y, 10, 20);
 
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, option.isMouseOver(mouseX, mouseY) ? HIGHLIGHTED_TEXTURE : TEXTURE, option.getX(), y, option.getWidth(), 20);
@@ -629,8 +631,8 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
             int decimalPlaces = String.valueOf(option.step).split("\\.")[1].length();
 
-            // Format option.value to the determined number of decimal places
-            String formattedValue = String.format("%." + decimalPlaces + "f", option.value);
+            // Format option.get() to the determined number of decimal places
+            String formattedValue = String.format("%." + decimalPlaces + "f", option.get());
             graphics.centeredText(mc.font, formattedValue, option.getX() + option.getWidth() / 2, y + Math.round((float) mc.font.lineHeight /2), -1);
         }
     }
@@ -652,7 +654,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             calculateMaxWidth(option);
             option.setWidth(maxWidth);
 
-            graphics.text(mc.font, option.name.copy().append(": "), x + 15, y + 25 / 2 - 5, -1, true);
+            graphics.text(mc.font, option.getName().copy().append(": "), x + 15, y + 25 / 2 - 5, -1, true);
 
             option.setPosition(x + panelWidth - maxWidth - 25, y);
 
@@ -667,7 +669,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         public void render(GuiGraphicsExtractor graphics, SubMenuOption option, int x, int y, int mouseX, int mouseY) {
             option.setWidth(30);
 
-            graphics.text(mc.font, option.name, x + 15, y + 25 / 2 - 5, -1, true);
+            graphics.text(mc.font, option.getName(), x + 15, y + 25 / 2 - 5, -1, true);
 
             option.setPosition(x + panelWidth - 55, y);
 
@@ -685,19 +687,19 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         public void render(GuiGraphicsExtractor graphics, RunnableOption option, int x, int y, int mouseX, int mouseY) {
             option.setWidth(26);
 
-            graphics.text(mc.font, option.name.copy().append(": "), x + 15, y + 25 / 2 - 5, -1, true);
+            graphics.text(mc.font, option.getName().copy().append(": "), x + 15, y + 25 / 2 - 5, -1, true);
 
             option.setPosition(x + panelWidth - 51, y);
 
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(!option.value, option.isMouseOver(mouseX, mouseY)), option.getX(), y, option.getWidth(), 20);
-            graphics.text(mc.font, "Run", option.getX() + option.getWidth() / 2 - mc.font.width("Run") / 2, y + 5, option.value ? DARK_GREEN.getRGB() : DARK_RED.getRGB(), true);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(!option.get(), option.isMouseOver(mouseX, mouseY)), option.getX(), y, option.getWidth(), 20);
+            graphics.text(mc.font, "Run", option.getX() + option.getWidth() / 2 - mc.font.width("Run") / 2, y + 5, option.get() ? DARK_GREEN.getRGB() : DARK_RED.getRGB(), true);
         }
     }
 
     public class MinecraftKeybindRenderer implements SkinRenderer<KeybindOption> {
         @Override
         public void render(GuiGraphicsExtractor graphics, KeybindOption option, int x, int y, int mouseX, int mouseY) {
-            graphics.text(mc.font, option.name, x + 15, y + 25 / 2 - 5, -1, true);
+            graphics.text(mc.font, option.getName(), x + 15, y + 25 / 2 - 5, -1, true);
 
             int width = 70;
             int buttonX = x + panelWidth - 95;

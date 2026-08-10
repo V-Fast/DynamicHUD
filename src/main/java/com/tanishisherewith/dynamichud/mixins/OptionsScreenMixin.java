@@ -2,13 +2,19 @@ package com.tanishisherewith.dynamichud.mixins;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
+import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.options.OptionsScreen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,6 +22,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Supplier;
 
@@ -45,12 +52,11 @@ public abstract class OptionsScreenMixin extends Screen {
     )
     private void injectDHLayout(CallbackInfo ci, @Local(ordinal = 0) LinearLayout header) {
         this.header = header;
-        dhButton = openScreenButton(Component.literal("DH"), () -> GlobalConfig.get().createYACLGUI());
+        dhButton = openScreenButton(Component.literal("DH"), () -> GlobalConfig.get().openMenu());
         dhButton.setPosition(this.width / 2 - 150 - 24 - 8, header.getY() + header.getHeight() - 20);
         dhButton.setSize(20,20);
         this.addRenderableWidget(dhButton);
     }
-
 
     @Inject(
             method = "repositionElements",

@@ -161,7 +161,7 @@ public class WidgetManager {
         // If save operation was successful, replace the old file with the new one
         Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-        GlobalConfig.HANDLER.save();
+        GlobalConfig.get().save();
     }
 
     /**

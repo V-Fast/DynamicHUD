@@ -177,7 +177,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                     groupX + 1, groupY + 14, width - groupX - 8 + contextMenuX, groupHeight - 16 + getGroupIndent().top(), radius, DARKER_GRAY_2.getRGB());
         }
 
-        Component groupText = group.name.copy().append(" " + (group.isExpanded() ? "-" : "+"));
+        Component groupText = group.getName().copy().append(" " + (group.isExpanded() ? "-" : "+"));
 
         DrawHelper.drawRoundedRectangle(graphics,
                 groupX + 1, groupY + 1, true, true, !group.isExpanded(), !group.isExpanded(), mc.font.width(groupText) + 6, 16, radius, DARKER_GRAY_2.getRGB());
@@ -200,7 +200,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                 option.setHeight(calcOptionHeight(option));
                 yOffset = contextMenu.getLayoutEngine().layoutOption(option, groupX + nestedIndent, yOffset, subWidth);
                 if (option.isMouseOver(mouseX, mouseY)) {
-                    setTooltipText(option.name, option.description);
+                    setTooltipText(option.getName(), option.getDescription());
                 }
                 option.render(graphics, option.getX(), option.getY(), mouseX, mouseY);
             }
@@ -268,7 +268,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             int nextY = contextMenu.getLayoutEngine().layoutOption(option, optionStartX + 2, yPos, targetWidth);
 
             if (option.isMouseOver(mouseX, mouseY)) {
-                setTooltipText(option.name, option.description);
+                setTooltipText(option.getName(), option.getDescription());
             }
 
             if (option instanceof OptionGroup group) {
@@ -451,7 +451,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                 if (!option.shouldRender()) continue;
                 int optHeight = calcOptionHeight(option);
                 if (option instanceof OptionGroup group) {
-                    Component groupText = group.name.copy().append(" " + (group.isExpanded() ? "-" : "+"));
+                    Component groupText = group.getName().copy().append(" " + (group.isExpanded() ? "-" : "+"));
                     if (isMouseOver(mouseX, mouseY, optionStartX + 2, yPos,
                             mc.font.width(groupText) + 6, 16)) {
                         boolean willBeExpanded = !group.isExpanded();
@@ -542,7 +542,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
             graphics.text(
                     mc.font,
-                    option.name,
+                    option.getName(),
                     x + 4,
                     y + 2,
                     -1,
@@ -592,7 +592,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
             graphics.text(
                     mc.font,
-                    option.name,
+                    option.getName(),
                     x + 4,
                     y + 5,
                     -1,
@@ -600,7 +600,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             );
 
             int width = 20;
-            int shadowOpacity = Math.min(option.value.getAlpha(), 45);
+            int shadowOpacity = Math.min(option.get().getAlpha(), 45);
 
             boolean isHovering = isMouseOver(mouseX, mouseY, x + option.getWidth() - width - 17, y + 1, width + 2, 14);
             boolean isDown = isHovering && GLFW.glfwGetMouseButton(mc.getWindow().handle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;
@@ -636,7 +636,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                     width - 8,
                     12,
                     1,
-                    option.value.getRGB(),
+                    option.get().getRGB(),
                     shadowOpacity,
                     1,
                     1);
@@ -701,7 +701,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
         public void render(GuiGraphicsExtractor graphics, DoubleOption option, int x, int y, int mouseX, int mouseY) {
             graphics.text(
                     mc.font,
-                    option.name,
+                    option.getName(),
                     x + 4,
                     y + 2,
                     -1,
@@ -728,7 +728,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
             int decimalPlaces = String.valueOf(option.step).split("\\.")[1].length();
 
-            // Format option.value to the determined number of decimal places
+            // Format option.get() to the determined number of decimal places
             String label = String.format("%." + decimalPlaces + "f", displayValue);
             DrawHelper.scaleAndPosition(graphics.pose(), sliderX + sliderBackgroundWidth - mc.font.width(label), y + 7, 0.6f);
             graphics.text(
@@ -784,7 +784,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             y += 2;
             option.setHeight(mc.font.lineHeight + 2);
 
-            Component mainLabel = option.name.copy().append(": ");
+            Component mainLabel = option.getName().copy().append(": ");
             graphics.text(mc.font, mainLabel, x + 4, y + 2, -1, false);
 
             String selectedOption = option.get().toString();
@@ -877,7 +877,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
             int x = option.getX();
             int y = option.getY();
-            Component mainLabel = option.name.copy().append(": ");
+            Component mainLabel = option.getName().copy().append(": ");
             String selectedOption = option.get().toString();
             y += 2;
 
@@ -888,7 +888,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
 
             if (hoveredOverLeft || hoveredOverRight || hoveredOverMainLabel) {
                 List<E> values = option.getValues();
-                int currentIndex = values.indexOf(option.value);
+                int currentIndex = values.indexOf(option.get());
                 int nextIndex;
 
                 if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT || hoveredOverLeft) {
@@ -920,7 +920,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             boolean isDown = isHovering && GLFW.glfwGetMouseButton(mc.getWindow().handle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;
             animator.update(isDown);
 
-            graphics.text(mc.font, option.name, x + 4, y + 4, -1, false);
+            graphics.text(mc.font, option.getName(), x + 4, y + 4, -1, false);
 
             Color fillColor = isHovering ? getThemeColor().darker().darker() : getThemeColor();
 
@@ -985,7 +985,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             boolean isDown = isHovering && GLFW.glfwGetMouseButton(mc.getWindow().handle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;
             animator.update(isDown);
 
-            graphics.text(mc.font, option.name, x + 4, y + 4, -1, false);
+            graphics.text(mc.font, option.getName(), x + 4, y + 4, -1, false);
 
             Color fillColor = isHovering ? getThemeColor().darker().darker() : getThemeColor();
 
@@ -1002,7 +1002,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
                     1
             );
 
-            graphics.text(mc.font, labelText, xPos + 2, y + 4, option.value ? DARK_GREEN.getRGB() : DARK_RED.getRGB(), true);
+            graphics.text(mc.font, labelText, xPos + 2, y + 4, option.get() ? DARK_GREEN.getRGB() : DARK_RED.getRGB(), true);
             DrawHelper.stopScaling(graphics.pose());
         }
 
@@ -1187,7 +1187,7 @@ public class ModernSkin extends Skin implements GroupableSkin {
             mouseX = (int) (mc.mouseHandler.xpos() / SCALE_FACTOR);
             mouseY = (int) (mc.mouseHandler.ypos() / SCALE_FACTOR);
 
-            graphics.text(mc.font, option.name, x + 4, y + 2, -1, false);
+            graphics.text(mc.font, option.getName(), x + 4, y + 2, -1, false);
 
             String text = option.isListening() ? "..." : KeybindOption.getKeyName(option.get());
             int textWidth = mc.font.width(text);
