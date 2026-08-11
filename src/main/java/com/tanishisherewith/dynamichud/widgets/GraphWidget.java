@@ -5,7 +5,6 @@ import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.renderstates.GradientShadowRenderState;
 import com.tanishisherewith.dynamichud.renderstates.InterpolatedCurveRenderState;
 import com.tanishisherewith.dynamichud.utils.CustomRenderLayers;
-import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
@@ -20,6 +19,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import org.apache.commons.lang3.Validate;
 import org.joml.Matrix3x2f;
@@ -32,6 +32,7 @@ import java.util.List;
  * Graph widget to draw a simple but detailed graph.
  * You need to use DynamicValueRegistry to pass a value to the graph.
  * You can use null values to signify the graph should update with a new value yet.
+ *
  */
 public class GraphWidget extends DynamicValueWidget implements ContextMenuProvider {
     public static WidgetData<GraphWidget> DATA = new WidgetData<>("GraphWidget", "Show graph", GraphWidget::new);
@@ -64,8 +65,8 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     private long lastSampleTime = 0;
     private long sampleIntervalMs = 100;
 
-    public GraphWidget(String registryID, String registryKey, String modId, Anchor anchor, float gWidth, float gHeight, int maxDataPoints, float minValue, float maxValue, Color graphColor, Color backgroundColor, float lineThickness, boolean showGrid, int gridLines, String label) {
-        super(DATA, modId, anchor, registryID, registryKey);
+    public GraphWidget(Identifier valueID, String modId, Anchor anchor, float gWidth, float gHeight, int maxDataPoints, float minValue, float maxValue, Color graphColor, Color backgroundColor, float lineThickness, boolean showGrid, int gridLines, String label) {
+        super(DATA, modId, anchor, valueID);
         this.gWidth = gWidth;
         this.gHeight = gHeight;
         this.maxDataPoints = maxDataPoints;
@@ -98,7 +99,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
     }
 
     public GraphWidget() {
-        this(DynamicValueRegistry.GLOBAL_ID, "unknown", "unknown", Anchor._default(), 0, 0, 5, 0, 10, Color.RED, Color.GREEN, 0, false, 0, "empty");
+        this(Identifier.fromNamespaceAndPath("dynamichud","unknown"), "unknown", Anchor._default(), 0, 0, 5, 0, 10, Color.RED, Color.GREEN, 0, false, 0, "empty");
     }
 
     @Override
@@ -398,7 +399,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
         DrawHelper.scaleAndPosition(graphics.pose(), x + 5, y + 5, 0.5f);
         DrawHelper.drawChromaText(
-                graphics, label,
+                graphics, Component.literal(label),
                 x + 5, y + 5,
                 1.0f, 0.8f, 1.0f, 0.05f, true
         );
@@ -758,7 +759,7 @@ public class GraphWidget extends DynamicValueWidget implements ContextMenuProvid
 
         @Override
         public GraphWidget build() {
-            GraphWidget widget = new GraphWidget(registryID, registryKey, modID, anchor, gWidth, gHeight, maxDataPoints, minValue, maxValue, graphColor, backgroundColor, lineThickness, showGrid, gridLines, label);
+            GraphWidget widget = new GraphWidget(valueId, modID, anchor, gWidth, gHeight, maxDataPoints, minValue, maxValue, graphColor, backgroundColor, lineThickness, showGrid, gridLines, label);
             widget.setSampleInterval(sampleIntervalMs);
             widget.setPosition(x, y);
             widget.setLocked(isLocked);

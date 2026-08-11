@@ -5,6 +5,7 @@ import com.tanishisherewith.dynamichud.utils.Util;
 import com.tanishisherewith.dynamichud.widgets.GraphWidget;
 import com.tanishisherewith.dynamichud.widgets.TextWidget;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Supplier;
 
@@ -14,66 +15,73 @@ import java.util.function.Supplier;
  * @see TextWidget
  */
 public abstract class DynamicValueWidget extends Widget {
-    protected String registryKey;
-    protected String registryID;
+    protected Identifier valueId;
     protected Supplier<?> valueSupplier;
 
-    public DynamicValueWidget(WidgetData<?> data, String modID, String registryID, String registryKey) {
-        this(data, modID, Anchor._default(), registryID, registryKey);
+    public DynamicValueWidget(WidgetData<?> data, String modID, Identifier valueId) {
+        this(data, modID, Anchor._default(), valueId);
     }
 
-    public DynamicValueWidget(WidgetData<?> data, String modId, Anchor anchor, String registryID, String registryKey) {
+    public DynamicValueWidget(WidgetData<?> data, String modId, Anchor anchor, Identifier valueId) {
         super(data, modId, anchor);
-        boolean emptyCheck = Util.warnIfTrue(registryID == null || registryID.isEmpty(), "Empty registry ID, using global registry. Widget: {}", this.toString());
-        this.registryID = emptyCheck ? DynamicValueRegistry.GLOBAL_ID : registryID;
-        this.registryKey = registryKey;
+        Util.warnIfTrue(valueId == null,"Null value Identifier, using fallback. Widget: {}", this.toString());
+        this.valueId = valueId == null ? Identifier.fromNamespaceAndPath("dynamichud", "null") : valueId;
 
         initializeValueSupplier();
     }
 
     protected void initializeValueSupplier() {
-        this.valueSupplier = DynamicValueRegistry.getValue(registryID, registryKey);
+        this.valueSupplier = DynamicValueRegistry.get(valueId);
     }
 
     @Override
     public void writeToTag(CompoundTag tag) {
         super.writeToTag(tag);
-        tag.putString("RegistryID", registryID);
-        tag.putString("RegistryKey", registryKey);
+        tag.putString("ValueId", valueId.toString());
     }
 
     @Override
     public void readFromTag(CompoundTag tag) {
         super.readFromTag(tag);
-        registryID = tag.getString("RegistryID").orElse(DynamicValueRegistry.GLOBAL_ID);
-        registryKey = tag.getString("RegistryKey").orElse("null");
 
+        String idString = tag.getString("ValueId").orElse("dynamichud:null");
+        this.valueId = Identifier.tryParse(idString);
+        Util.warnIfTrue(valueId == null,"Failed to parse Identifier '{}', using fallback. Widget: {}", idString, this.toString());
+        if(this.valueId == null) {
+            this.valueId = Identifier.fromNamespaceAndPath("dynamichud", "null");
+        }
         initializeValueSupplier();
 
-        if (valueSupplier == null) throw new IllegalStateException("Value supplier cannot be null. Invalid registry data found!");
+        if (valueSupplier == null) {
+            throw new IllegalStateException("Value supplier cannot be null for " + valueId + ". Was it registered in DynamicValueRegistry?");
+        }
     }
+
 
     /**
      * Subclasses should implement this to get value from the supplier.
      */
     public abstract Object getValue();
 
+    public Identifier getValueId() {
+        return valueId;
+    }
+
     public abstract static class DynamicValueWidgetBuilder<T extends DynamicValueWidgetBuilder<T, W>, W extends DynamicValueWidget> extends WidgetBuilder<T, W> {
-        protected String registryKey = "";
-        protected String registryID = null;
+        protected Identifier valueId;
 
         @SuppressWarnings("unchecked")
         protected T self() {
             return (T) this;
         }
 
-        public T registryKey(String registryKey) {
-            this.registryKey = registryKey;
+        public T valueId(Identifier valueId) {
+            this.valueId = valueId;
             return self();
         }
 
-        public T registryID(String registryID) {
-            this.registryID = registryID;
+        public T valueId(String namespace, String path) {
+            this.valueId = Identifier.fromNamespaceAndPath(namespace, path);
             return self();
         }
     }

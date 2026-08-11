@@ -283,7 +283,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
                 DrawHelper.drawScrollableText(graphics, mc.font, group.getName(), groupX + groupPanelWidth / 2, groupX + 2, yOffset, groupX + groupPanelWidth - 2, yOffset + 20, -1);
 
-                renderTooltipIfHovered(graphics, group, groupX, yOffset, groupPanelWidth,20, mouseX, mouseY, groupPanelWidth,2200L);
+                renderTooltipIfHovered(graphics, group, groupX, yOffset, groupPanelWidth,20, mouseX, mouseY, groupPanelWidth,1500L);
 
                 //Scrollable text uses scissor, so we need to enable the context menu scissor again
                 this.enableContextMenuScissor(graphics);
@@ -316,7 +316,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             if (option.getY() >= imageY - option.getHeight() && option.getY() <= imageY + option.getHeight() + panelHeight) {
                 option.render(graphics, option.getX(), option.getY(), mouseX, mouseY);
 
-                renderTooltipIfHovered(graphics, option, imageX + 4, option.getY(), targetWidth - option.getWidth(),option.getHeight(), mouseX, mouseY, targetWidth);
+                renderTooltipIfHovered(graphics, option, imageX + 4, option.getY(), targetWidth - option.getWidth(),option.getHeight(), mouseX, mouseY, targetWidth - option.getWidth() - 4);
             }
         }
         return yOffset;

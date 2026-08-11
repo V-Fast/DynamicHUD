@@ -1,9 +1,7 @@
 package com.tanishisherewith.dynamichud.widgets;
 
-import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.integration.IntegrationManager;
-import com.tanishisherewith.dynamichud.utils.DynamicValueRegistry;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenu;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuManager;
 import com.tanishisherewith.dynamichud.utils.contextmenu.ContextMenuProperties;
@@ -14,14 +12,23 @@ import com.tanishisherewith.dynamichud.widget.WidgetData;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.resources.Identifier;
 
 import javax.swing.*;
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * TextWidget is best used with a Component rather than a String.
+ * In rainbow mode, all styles of Component except color will be kept as is.
+ */
 public class TextWidget extends DynamicValueWidget implements ContextMenuProvider {
     public static WidgetData<TextWidget> DATA = new WidgetData<>("TextWidget", "Display Component on screen", TextWidget::new);
 
@@ -33,15 +40,11 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
     protected float rainbowSpread = 0.01f, rainbowSaturation = 1.0f, rainbowBrightness = 1.0f;
 
     public TextWidget() {
-        this(DynamicValueRegistry.GLOBAL_ID, "unknown", false, false, Color.WHITE, "unknown");
+        this(Identifier.fromNamespaceAndPath("dynamichud","unknown"), false, false, Color.WHITE, "unknown");
     }
 
-    public TextWidget(DynamicValueRegistry valueRegistry, String registryKey, boolean shadow, boolean rainbow, Color color, String modID) {
-        this(valueRegistry.getId(), registryKey, shadow, rainbow, color, modID);
-    }
-
-    public TextWidget(String registryID, String registryKey, boolean shadow, boolean rainbow, Color color, String modID) {
-        super(DATA, modID, registryID, registryKey);
+    public TextWidget(Identifier valueId, boolean shadow, boolean rainbow, Color color, String modID) {
+        super(DATA, modID, Anchor.CENTER, valueId);
         this.shadow = shadow;
         this.rainbow = rainbow;
         this.textColor = color;
@@ -62,12 +65,12 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
         menu.addOption(new BooleanOption(Component.literal("Rainbow"),
                 () -> this.rainbow, value -> this.rainbow = value,
                 BooleanOption.BooleanType.ON_OFF)
-                .description(Component.literal("Adds rainbow effect to your text"))
+                .description(Component.literal("Cool rainbow effect for your text"))
         );
         menu.addOption(new ColorOption(Component.literal("Text Color"),
                 () -> this.textColor, value -> this.textColor = value, menu)
-                .description(Component.literal("Specify the color you want to add to your text"))
-                .renderWhen(() -> !this.rainbow)
+                .description(Component.literal("The color of text"))
+                .renderWhen(() -> !this.rainbow && hasUncoloredSegment(getValue()))
         );
         menu.addOption(new DoubleOption(Component.literal("Rainbow Speed"),
                 1, 5, 1,
@@ -110,7 +113,6 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
             // Enum Option
             menu.addOption(new CycleOption<>(Component.literal("Alignment"), align::get, align::set, GroupLayout.Alignment.values()));
 
-
             // Option Group
             OptionGroup group = new OptionGroup(Component.literal("Display Options"));
             group.addOption(new BooleanOption(Component.literal("Bold Text"),
@@ -141,13 +143,14 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
         //int color = rainbow ? ColorHelper.getColorFromHue((System.currentTimeMillis() % (5000 * rainbowSpeed) / (5000f * rainbowSpeed))) : textColor.getRGB();
         int color = textColor.getRGB();
         if (valueSupplier != null) {
-            String Component = getValue();
+            Component text = getValue();
             if (rainbow) {
-                DrawHelper.drawChromaText(graphics, Component, getX() + 2, getY() + 2, rainbowSpeed / 2f, rainbowSaturation, rainbowBrightness, rainbowSpread, shadow);
+                DrawHelper.drawChromaText(graphics, text, getX() + 2, getY() + 2, rainbowSpeed / 2f, rainbowSaturation, rainbowBrightness, rainbowSpread, shadow);
             } else {
-                graphics.text(mc.font, Component, getX() + 2, getY() + 2, color, shadow);
+                Component renderedText = withDefaultColor(text, textColor.getRGB());
+                graphics.text(mc.font, renderedText, getX() + 2, getY() + 2, textColor.getRGB(), shadow);
             }
-            widgetBox.setDimensions(getX(), getY(), mc.font.width(Component) + 3, mc.font.lineHeight + 2, this.canScale);
+            widgetBox.setDimensions(getX(), getY(), mc.font.width(text) + 3, mc.font.lineHeight + 2, this.canScale);
         }
 
         menu.set(getX(), getY(), (int) Math.ceil(getHeight()));
@@ -190,16 +193,52 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
         //createMenu();
     }
 
+    /**
+     * Similar to {@link #withDefaultColor(Component, int)} but to find if it has an uncolored segment or not
+     */
+    private boolean hasUncoloredSegment(Component component) {
+        if (component == null) return false;
+        return component.visit((style, text) -> {
+            if (style.getColor() == null && !text.isEmpty()) {
+                return Optional.of(true);
+            }
+            return Optional.empty();
+        }, Style.EMPTY).orElse(false);
+    }
+
+    /**
+     * Since any component with style other than EMPTY will not inherit the custom text color,
+     * this function applies custom color to any part of the component which does not have a style defined.
+     */
+    private static Component withDefaultColor(Component component, int defaultColor) {
+        TextColor fallback = TextColor.fromRgb(defaultColor);
+        MutableComponent result = Component.empty();
+
+        component.visit((style, text) -> {
+            // insert textcolor if this segment has no color of its own
+            Style merged = style.getColor() == null ? style.withColor(fallback) : style;
+            result.append(Component.literal(text).setStyle(merged));
+            return Optional.empty();
+        }, Style.EMPTY);
+
+        return result;
+    }
+
     @Override
-    public String getValue() {
-        return (String) valueSupplier.get();
+    public Component getValue() {
+        Object val = valueSupplier.get();
+        if(val instanceof String) {
+            return Component.literal((String) val);
+        } else if (val instanceof Component) {
+            return (Component) val;
+        }
+        return Component.empty();
     }
 
     @Override
     public ContextMenu<?> getContextMenu() {
         return menu;
     }
-
 
     public static class Builder extends DynamicValueWidgetBuilder<Builder, TextWidget> {
         private boolean shadow = false;
@@ -228,8 +267,7 @@ public class TextWidget extends DynamicValueWidget implements ContextMenuProvide
 
         @Override
         public TextWidget build() {
-            TextWidget widget = new TextWidget(registryID, registryKey, shadow, rainbow, textColor, modID);
-
+            TextWidget widget = new TextWidget(valueId, shadow, rainbow, textColor, modID);
             widget.setPosition(x, y);
             widget.setLocked(isLocked);
             widget.setCanScale(shouldScale);

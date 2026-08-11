@@ -15,6 +15,9 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.options.UnsupportedGraphicsWarningScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
@@ -24,8 +27,10 @@ import org.joml.Matrix3x2fStack;
 import org.joml.Vector4f;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.tanishisherewith.dynamichud.helpers.TextureHelper.mc;
 
@@ -183,30 +188,55 @@ public class DrawHelper {
     }
 
     /**
-     * Draw chroma Component (Component with a nice rainbow effect)
+     * Draw chroma text (Text with a nice rainbow effect)
      *
      * @param graphics A graphics object
-     * @param Component        The Component to display
-     * @param x           X pos of Component
-     * @param y           Y pos of Component
+     * @param text        The text to display
+     * @param x           X pos of text
+     * @param y           Y pos of text
      * @param speed       Speed of rainbow
      * @param saturation  Saturation of the rainbow colors
      * @param brightness  Brightness of the rainbow colors
      * @param spread      How much the color difference should be between each character (ideally between 0.001 to 0.2)
-     * @param shadow      Whether to render the Component as shadow.
+     * @param shadow      Whether to render the text as shadow.
      */
-    public static void drawChromaText(@NotNull GuiGraphicsExtractor graphics, String Component, int x, int y, float speed, float saturation, float brightness, float spread, boolean shadow) {
+    public static void drawChromaText(@NotNull GuiGraphicsExtractor graphics, Component text, int x, int y,
+                                      float speed, float saturation, float brightness, float spread, boolean shadow) {
         long time = System.currentTimeMillis();
-        int length = Component.length();
+        java.util.List<StyledChar> chars = flattenComponent(text);
 
-        for (int i = 0; i < length; i++) {
-            float hue = (time % (int) (5000 / speed)) / (5000f / speed) + (i * spread); // Adjust the hue based on time and character position
-            hue = floorMod(hue, 1.0f); //  hue should stay within the range [0, 1]
-            int color = Color.HSBtoRGB(hue, saturation, brightness);
-            graphics.text(mc.font, String.valueOf(Component.charAt(i)), x + mc.font.width(Component.substring(0, i)), y, color, shadow);
+        float xOffset = 0;
+        for (int i = 0; i < chars.size(); i++) {
+            StyledChar sc = chars.get(i);
+
+            float hue = (time % (int) (5000 / speed)) / (5000f / speed) + (i * spread);
+            hue = floorMod(hue, 1.0f);
+            int color = java.awt.Color.HSBtoRGB(hue, saturation, brightness);
+            Style chromaStyle = sc.style().withColor(TextColor.fromRgb(color));
+
+            MutableComponent charComponent = Component.literal(String.valueOf(sc.c()));
+            charComponent.setStyle(chromaStyle);
+
+            graphics.text(mc.font, charComponent, (int) (x + xOffset), y, color, shadow);
+            xOffset += mc.font.width(charComponent);
         }
     }
 
+    /**
+     * Flatten a component to get individual characters and preserve theire style
+     */
+    private static java.util.List<StyledChar> flattenComponent(Component component) {
+        java.util.List<StyledChar> result = new ArrayList<>();
+        component.visit((style, text) -> {
+            for (int i = 0; i < text.length(); i++) {
+                result.add(new StyledChar(text.charAt(i), style));
+            }
+            return Optional.empty();
+        }, Style.EMPTY);
+        return result;
+    }
+
+    private record StyledChar(char c, Style style) {}
 
 
     /* ====  Drawing filled and outline circles  ==== */
@@ -703,8 +733,8 @@ public class DrawHelper {
     /**
      * From minecraft
      */
-    public static void drawScrollableText(GuiGraphicsExtractor graphics, Font font, Component Component, int centerX, int startX, int startY, int endX, int endY, int color) {
-        int lineWidth = font.width(Component);
+    public static void drawScrollableText(GuiGraphicsExtractor graphics, Font font, Component text, int centerX, int startX, int startY, int endX, int endY, int color) {
+        int lineWidth = font.width(text);
         int textTop = (startY + endY - font.lineHeight) / 2 + 1;
         int availableMessageWidth = endX - startX;
         if (lineWidth > availableMessageWidth) {
@@ -714,11 +744,11 @@ public class DrawHelper {
             double alpha = Math.sin((Math.PI / 2D) * Math.cos((Math.PI * 2D) * time / period)) / (double)2.0F + (double)0.5F;
             double pos = Mth.lerp(alpha, (double)0.0F, (double)maxPosition);
             graphics.enableScissor(startX, startY, endX, endY);
-            graphics.text(font, Component, startX - (int) pos, textTop, color,true);
+            graphics.text(font, text, startX - (int) pos, textTop, color,true);
             graphics.disableScissor();
         } else {
             int textX = Mth.clamp(centerX, startX + lineWidth / 2, endX - lineWidth / 2);
-            graphics.centeredText(font, Component, textX, textTop, color);
+            graphics.centeredText(font, text, textX, textTop, color);
         }
     }
 
