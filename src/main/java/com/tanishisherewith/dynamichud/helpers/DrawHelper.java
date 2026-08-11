@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.helpers;
 
+import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.renderstates.GeometryRenderState;
 import com.tanishisherewith.dynamichud.renderstates.QuadColorRectRenderState;
 import com.tanishisherewith.dynamichud.renderstates.RoundedRectRenderState;
@@ -627,6 +628,21 @@ public class DrawHelper {
         graphics.fill(x1, y2 - 1, x2, y2, color);
         graphics.fill(x1, y1 + 1, x1 + 1, y2 - 1, color);
         graphics.fill(x2 - 1, y1 + 1, x2, y2 - 1, color);
+    }
+
+    public static void drawScaledText(GuiGraphicsExtractor graphics, Component text, int x, int y, float textScale, int color) {
+        DrawHelper.scaleAndPosition(graphics.pose(), x, y, textScale);
+        graphics.text(DynamicHUD.MC.font, text, x, y, color, false);
+        DrawHelper.stopScaling(graphics.pose());
+    }
+
+    public static void drawTruncatedScaledText(GuiGraphicsExtractor graphics, Component text, int x, int y, int maxTextWidth, float textScale, int color) {
+        int allowedWidth = (int) (maxTextWidth / textScale);
+        Component truncated = com.tanishisherewith.dynamichud.utils.Util.getTruncatedName(text, allowedWidth);
+
+        DrawHelper.scaleAndPosition(graphics.pose(), x, y, textScale);
+        graphics.text(DynamicHUD.MC.font, truncated, x, y, color, false);
+        DrawHelper.stopScaling(graphics.pose());
     }
 
     public static void scaledProjection(float scale, GuiGraphicsExtractor graphics) {

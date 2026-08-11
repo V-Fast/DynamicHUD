@@ -175,7 +175,7 @@ public class ClassicSkin extends Skin {
             //get the truncated text with the scaled width
             int maxTextWidth = (int)(option.getWidth()*(1/scale)) - (int)(mc.font.width(": " + decimalValue) * scale) - 2;
             Component labelText = Util.getTruncatedName(option.getName(), maxTextWidth).append(": " + decimalValue);
-            Util.drawScaledText(graphics, labelText, x, y + 1, scale, 0xFFFFFFFF);
+            DrawHelper.drawScaledText(graphics, labelText, x, y + 1, scale, 0xFFFFFFFF);
 
             float handleWidth = 3;
             float handleHeight = 8;

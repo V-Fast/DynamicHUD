@@ -174,19 +174,4 @@ public class Util {
         }
         return name.copy();
     }
-
-    public static void drawScaledText(GuiGraphicsExtractor graphics, Component text, int x, int y, float textScale, int color) {
-        DrawHelper.scaleAndPosition(graphics.pose(), x, y, textScale);
-        graphics.text(DynamicHUD.MC.font, text, x, y, color, false);
-        DrawHelper.stopScaling(graphics.pose());
-    }
-
-    public static void drawTruncatedScaledText(GuiGraphicsExtractor graphics, Component text, int x, int y, int maxTextWidth, float textScale, int color) {
-        int allowedWidth = (int) (maxTextWidth / textScale);
-        Component truncated = getTruncatedName(text, allowedWidth);
-
-        DrawHelper.scaleAndPosition(graphics.pose(), x, y, textScale);
-        graphics.text(DynamicHUD.MC.font, truncated, x, y, color, false);
-        DrawHelper.stopScaling(graphics.pose());
-    }
 }

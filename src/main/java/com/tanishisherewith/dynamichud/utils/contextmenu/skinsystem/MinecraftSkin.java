@@ -28,7 +28,6 @@ import org.lwjgl.glfw.GLFW;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.IntSupplier;
 
 import static com.tanishisherewith.dynamichud.helpers.ColorHelper.DARK_GREEN;
 import static com.tanishisherewith.dynamichud.helpers.ColorHelper.DARK_RED;
@@ -71,7 +70,6 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
     private PanelColor panelColor;
     private final ScrollHandler groupScrollHandler;
-    private final IntSupplier groupPanelX = () -> imageX - groupPanelWidth - 15;
 
     private final EditBox searchBox;
     private String searchQuery = "";
@@ -182,15 +180,17 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         imageX = (screenWidth - panelWidth + 25) / 2;
         imageY = (screenHeight - panelHeight) / 2;
 
-        graphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND_PANEL, imageX, imageY, 0, 0, panelWidth, panelHeight, 256, 254,panelColor.getColor());
+
+
+        graphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND_PANEL, imageX, imageY, 0, 0, panelWidth, panelHeight, 256, 254,panelColor.color());
 
         drawSingularButton(graphics, "X", mouseX, mouseY, imageX + 3, imageY + 3, 14, 14);
 
         //Up and down arrows near the group panel
 
         int size = (int) (groupPanelWidth * 0.5f);
-        drawSingularButton(graphics, "^", mouseX, mouseY, groupPanelX.getAsInt() + groupPanelWidth / 2 - size / 2, imageY - 14, size, 14, groupScrollHandler.isOffsetWithinBounds(-10));
-        drawSingularButton(graphics, "v", mouseX, mouseY, groupPanelX.getAsInt() + groupPanelWidth / 2 - size / 2, imageY + panelHeight + 2, size, 14, groupScrollHandler.isOffsetWithinBounds(10));
+        drawSingularButton(graphics, "^", mouseX, mouseY, getGroupPanelX() + groupPanelWidth / 2 - size / 2, imageY - 14, size, 14, groupScrollHandler.isOffsetWithinBounds(-10));
+        drawSingularButton(graphics, "v", mouseX, mouseY, getGroupPanelX() + groupPanelWidth / 2 - size / 2, imageY + panelHeight + 2, size, 14, groupScrollHandler.isOffsetWithinBounds(10));
         // graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, isMouseOver(mouseX, mouseY, imageX + 3, imageY + 3, 14, 14)), imageX + 3, imageY + 3, 14, 14);
         // graphics.text(mc.font, "X", imageX + 10 - mc.font.width("X") / 2, imageY + 6, -1, true);
 
@@ -217,6 +217,10 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         drawScrollbar(graphics);
         scrollHandler.updateScrollOffset(getMaxScrollOffset());
     }
+    
+    private int getGroupPanelX() {
+        return imageX - groupPanelWidth - 15;
+    }
 
     private void renderSearchBox(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         searchBox.setX(searchBoxX);
@@ -238,10 +242,8 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         int clearX = searchBoxX + searchBoxWidth + 2;
         int clearY = searchBoxY + (searchBoxHeight - clearButtonSize) / 2;
 
-        boolean isClearHovered = Skin.isMouseOver(mouseX, mouseY, clearX, clearY, clearButtonSize, clearButtonSize);
-
         if (!searchQuery.isEmpty()) {
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, CROSS_BUTTON_SPRITES.get(true, isClearHovered),
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, CROSS_BUTTON_SPRITES.get(true, isMouseOverClearButton(mouseX,mouseY)),
                     clearX,
                     clearY,
                     clearButtonSize,
@@ -259,7 +261,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     }
 
     private void renderOptionGroups(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
-        int groupX = groupPanelX.getAsInt();
+        int groupX = getGroupPanelX();
         int groupY = imageY;
 
         graphics.blit(RenderPipelines.GUI_TEXTURED, GROUP_BACKGROUND, groupX - 10, groupY + 2, 0,0,groupPanelWidth + 20, panelHeight - 2,  groupPanelWidth + 20, panelHeight - 3);
@@ -293,7 +295,6 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             optionsToRender = selectedGroup.getGroupOptions();
         }
 
-
         for (Option<?> option : optionsToRender) {
             if (!option.shouldRender()) continue;
 
@@ -321,6 +322,12 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_TEXTURE, scrollbarX, handleY, DEFAULT_SCROLLBAR_WIDTH, (int) Math.floor(handleHeight));
         }
     }
+    private boolean isMouseOverClearButton(double mouseX, double mouseY){
+        int clearButtonSize = 14;
+        int clearX = searchBoxX + searchBoxWidth + 2;
+        int clearY = searchBoxY + (searchBoxHeight - clearButtonSize) / 2;
+        return Skin.isMouseOver(mouseX, mouseY, clearX, clearY, clearButtonSize, clearButtonSize);
+    }
 
     private int getMaxScrollOffset() {
         return getContentHeight() - panelHeight + 10;
@@ -335,7 +342,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         if (isMouseOver(mouseX, mouseY, imageX, imageY, panelWidth, panelHeight)) {
             scrollHandler.mouseScrolled(verticalAmount);
         }
-        if (isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() - 10, imageY, groupPanelWidth + 10, panelHeight)) {
+        if (isMouseOver(mouseX, mouseY, getGroupPanelX() - 10, imageY, groupPanelWidth + 10, panelHeight)) {
             groupScrollHandler.mouseScrolled(verticalAmount);
         }
     }
@@ -352,12 +359,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             if(!searchQuery.isEmpty()){
-                int clearButtonSize = 14;
-                int clearX = searchBoxX + searchBoxWidth + 2;
-                int clearY = searchBoxY + (searchBoxHeight - clearButtonSize) / 2;
-
-                boolean isClearHovered = Skin.isMouseOver(mouseX, mouseY, clearX, clearY, clearButtonSize, clearButtonSize);
-                if(isClearHovered){
+                if(isMouseOverClearButton(mouseX, mouseY)){
                     searchBox.setValue("");
                     searchBox.setFocused(false);
                     return true;
@@ -373,12 +375,12 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             }
             int size = (int) (groupPanelWidth * 0.5f);
             //Up and down button
-            if (groupScrollHandler.isOffsetWithinBounds(-10) && isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() + groupPanelWidth / 2.0 - size / 2.0, imageY - 14, size, 14)) {
+            if (groupScrollHandler.isOffsetWithinBounds(-10) && isMouseOver(mouseX, mouseY, getGroupPanelX() + groupPanelWidth / 2.0 - size / 2.0, imageY - 14, size, 14)) {
                 mc.getSoundManager().play(SimpleSoundInstance.forUI(
                         SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 groupScrollHandler.addOffset(-10);
             }
-            if (groupScrollHandler.isOffsetWithinBounds(10) && isMouseOver(mouseX, mouseY, groupPanelX.getAsInt() + groupPanelWidth / 2.0 - size / 2.0, imageY + panelHeight + 2, size, 14)) {
+            if (groupScrollHandler.isOffsetWithinBounds(10) && isMouseOver(mouseX, mouseY, getGroupPanelX() + groupPanelWidth / 2.0 - size / 2.0, imageY + panelHeight + 2, size, 14)) {
                 mc.getSoundManager().play(SimpleSoundInstance.forUI(
                         SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 groupScrollHandler.addOffset(10);
@@ -388,7 +390,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
                 if(!scrollHandler.isDragging()) scrollHandler.startDragging(mouseY);
                 return true;
             }
-            int groupX = groupPanelX.getAsInt();
+            int groupX = getGroupPanelX();
             int groupY = imageY;
 
             int yOffset = groupY + 10 - groupScrollHandler.getScrollOffset();
@@ -400,6 +402,8 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
                         selectedGroup.setExpanded(false);
                         selectedGroup = group;
                         selectedGroup.setExpanded(true);
+                        mc.getSoundManager().play(SimpleSoundInstance.forUI(
+                                SoundEvents.UI_BUTTON_CLICK, 1.0F));
                     }
                     yOffset += 20;
                 }
@@ -483,63 +487,64 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     public void renderGroup(GuiGraphicsExtractor graphics, OptionGroup group, int groupX, int groupY, int mouseX, int mouseY) {
     }
 
-    public enum PanelColor {
-        COFFEE_BROWN(0.6f, 0.3f, 0.1f, 1.0f),
-        CREAMY(1.0f, 0.9f, 0.8f, 1.0f),
-        DARK_PANEL(0.2f, 0.2f, 0.2f, 1.0f),
-        FOREST_GREEN(0.0f, 0.6f, 0.2f, 1.0f),
-        GOLDEN_YELLOW(1.0f, 0.8f, 0.0f, 1.0f),
-        LAVENDER(0.8f, 0.6f, 1.0f, 1.0f),
-        LIGHT_BLUE(0.6f, 0.8f, 1.0f, 1.0f),
-        LIME_GREEN(0.7f, 1.0f, 0.3f, 1.0f),
-        MIDNIGHT_PURPLE(0.3f, 0.0f, 0.5f, 1.0f),
-        OCEAN_BLUE(0.0f, 0.5f, 1.0f, 1.0f),
-        ROSE_PINK(1.0f, 0.4f, 0.6f, 1.0f),
-        SKY_BLUE(0.5f, 0.8f, 1.0f, 1.0f),
-        SOFT_GREEN(0.6f, 1.0f, 0.6f, 1.0f),
-        SUNSET_ORANGE(1.0f, 0.5f, 0.0f, 1.0f),
-        WARM_YELLOW(1.0f, 1.0f, 0.6f, 1.0f),
-        CUSTOM(0.0f, 0.0f, 0.0f, 0.0f); /// PlaceHolder for custom colors
+    public record PanelColor(int color) {
+            public static final PanelColor COFFEE_BROWN = new PanelColor(0.6f, 0.3f, 0.1f, 1.0f);
+            public static final PanelColor CREAMY = new PanelColor(1.0f, 0.9f, 0.8f, 1.0f);
+            public static final PanelColor DARK_PANEL = new PanelColor(0.2f, 0.2f, 0.2f, 1.0f);
+            public static final PanelColor FOREST_GREEN = new PanelColor(0.0f, 0.6f, 0.2f, 1.0f);
+            public static final PanelColor GOLDEN_YELLOW = new PanelColor(1.0f, 0.8f, 0.0f, 1.0f);
+            public static final PanelColor LAVENDER = new PanelColor(0.8f, 0.6f, 1.0f, 1.0f);
+            public static final PanelColor LIGHT_BLUE = new PanelColor(0.6f, 0.8f, 1.0f, 1.0f);
+            public static final PanelColor LIME_GREEN = new PanelColor(0.7f, 1.0f, 0.3f, 1.0f);
+            public static final PanelColor MIDNIGHT_PURPLE = new PanelColor(0.3f, 0.0f, 0.5f, 1.0f);
+            public static final PanelColor OCEAN_BLUE = new PanelColor(0.0f, 0.5f, 1.0f, 1.0f);
+            public static final PanelColor ROSE_PINK = new PanelColor(1.0f, 0.4f, 0.6f, 1.0f);
+            public static final PanelColor SKY_BLUE = new PanelColor(0.5f, 0.8f, 1.0f, 1.0f);
+            public static final PanelColor SOFT_GREEN = new PanelColor(0.6f, 1.0f, 0.6f, 1.0f);
+            public static final PanelColor SUNSET_ORANGE = new PanelColor(1.0f, 0.5f, 0.0f, 1.0f);
+            public static final PanelColor WARM_YELLOW = new PanelColor(1.0f, 1.0f, 0.6f, 1.0f);
 
-        private float red;
-        private float green;
-        private float blue;
-        private float alpha;
-
-        PanelColor(float red, float green, float blue, float alpha) {
-            this.red = red;
-            this.green = green;
-            this.blue = blue;
-            this.alpha = alpha;
-        }
+            public PanelColor(float red, float green, float blue, float alpha) {
+                this(convert(red, green, blue, alpha));
+            }
 
         public static PanelColor custom(float red, float green, float blue, float alpha) {
-            PanelColor custom = CUSTOM;
-            custom.red = red;
-            custom.green = green;
-            custom.blue = blue;
-            custom.alpha = alpha;
-            return custom;
-        }
+                return new PanelColor(red, green, blue, alpha);
+            }
 
-        public int getColor() {
-            return new Color(red,green,blue,alpha).getRGB();
+            public static PanelColor custom(int argb) {
+                return new PanelColor(argb);
+            }
+
+            private static int convert(float red, float green, float blue, float alpha) {
+                int ired = (int) (red * 255.0f + 0.5f);
+                int igreen = (int) (green * 255.0f + 0.5f);
+                int iblue = (int) (blue * 255.0f + 0.5f);
+                int ialpha = (int) (alpha * 255.0f + 0.5f);
+
+                return ((ialpha & 0xFF) << 24) |
+                        ((ired & 0xFF) << 16) |
+                        ((igreen & 0xFF) << 8) |
+                        (iblue & 0xFF);
+            }
         }
-    }
 
     public class MinecraftBooleanRenderer implements SkinRenderer<BooleanOption> {
         @Override
         public void render(GuiGraphicsExtractor graphics, BooleanOption option, int x, int y, int mouseX, int mouseY) {
-            graphics.text(mc.font, option.getName(), x + 15, y + 25 / 2 - 5, -1, true);
+            int maxTextWidth = panelWidth - 75 - 15 - 5;
+            Component displayName = Util.getTruncatedName(option.getName(), maxTextWidth);
+
+            graphics.text(mc.font, displayName, x + 15, y + 25 / 2 - 5, -1, true);
 
             int width = 50;
             option.setPosition(x + panelWidth - 75, y);
             option.setWidth(width);
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, isMouseOver(mouseX, mouseY,x + panelWidth - 75, y, width, 20)), x + panelWidth - 75, y, width, 20);
 
-            Component Component = option.getBooleanType().getText(option.get());
+            Component text = option.getBooleanType().getText(option.get());
             int color = option.get() ? Color.GREEN.getRGB() : Color.RED.getRGB();
-            graphics.text(mc.font, Component, (int) (x + panelWidth - 75 + (width / 2.0f) - (mc.font.width(Component) / 2.0f)), y + 5, color, true);
+            graphics.text(mc.font, text, (int) (x + panelWidth - 75 + (width / 2.0f) - (mc.font.width(text) / 2.0f)), y + 5, color, true);
         }
     }
 
@@ -565,7 +570,10 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
                 scaleAnimation.update();
             }
 
-            graphics.text(mc.font, option.getName(), x + 15, y + 25 / 2 - 5, -1, true);
+            int maxTextWidth = panelWidth - 45 - 15 - 5;
+            Component displayName = Util.getTruncatedName(option.getName(), maxTextWidth);
+
+            graphics.text(mc.font, displayName, x + 15, y + 25 / 2 - 5, -1, true);
 
             int width = 20;
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(!option.isVisible, isMouseOver(mouseX, mouseY,x + panelWidth - 45, y, width, 20)), x + panelWidth - 45, y, width, 20);
@@ -656,7 +664,10 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
         @Override
         public void render(GuiGraphicsExtractor graphics, DoubleOption option, int x, int y, int mouseX, int mouseY) {
-            graphics.text(mc.font, option.getName(), x + 15, y + 25 / 2 - 5, -1, true);
+            int maxTextWidth = panelWidth - 122 - 15 - 5;
+            Component displayName = Util.getTruncatedName(option.getName(), maxTextWidth);
+
+            graphics.text(mc.font, displayName, x + 15, y + 25 / 2 - 5, -1, true);
 
             option.setWidth(panelWidth - 150);
             option.setPosition(x + panelWidth - 122, y);
@@ -697,8 +708,8 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             option.setPosition(x + panelWidth - maxWidth - 25, y);
 
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, option.isMouseOver(mouseX, mouseY)), option.getX(), y, maxWidth, 20);
-            String Component = option.get().toString();
-            graphics.text(mc.font, Component, option.getX() + maxWidth / 2 - mc.font.width(Component) / 2, y + 5, Color.CYAN.getRGB(), true);
+            String text = option.get().toString();
+            graphics.text(mc.font, text, option.getX() + maxWidth / 2 - mc.font.width(text) / 2, y + 5, Color.CYAN.getRGB(), true);
         }
     }
 
@@ -707,13 +718,16 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         public void render(GuiGraphicsExtractor graphics, SubMenuOption option, int x, int y, int mouseX, int mouseY) {
             option.setWidth(30);
 
-            graphics.text(mc.font, option.getName(), x + 15, y + 25 / 2 - 5, -1, true);
+            int maxTextWidth = panelWidth - 55 - 15 - 5;
+            Component displayName = Util.getTruncatedName(option.getName(), maxTextWidth);
+
+            graphics.text(mc.font, displayName, x + 15, y + 25 / 2 - 5, -1, true);
 
             option.setPosition(x + panelWidth - 55, y);
 
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, option.isMouseOver(mouseX, mouseY)), option.getX(), y, option.getWidth(), 20);
-            String Component = "Open";
-            graphics.text(mc.font, Component, option.getX() + option.getWidth() / 2 - mc.font.width(Component) / 2, y + 5, Color.YELLOW.getRGB(), true);
+            String text = "Open";
+            graphics.text(mc.font, text, option.getX() + option.getWidth() / 2 - mc.font.width(text) / 2, y + 5, Color.YELLOW.getRGB(), true);
 
             option.getSubMenu().render(graphics, x + option.getParentMenu().getWidth(), y, mouseX, mouseY);
         }
@@ -725,7 +739,10 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         public void render(GuiGraphicsExtractor graphics, RunnableOption option, int x, int y, int mouseX, int mouseY) {
             option.setWidth(26);
 
-            graphics.text(mc.font, option.getName().copy().append(": "), x + 15, y + 25 / 2 - 5, -1, true);
+            int maxTextWidth = panelWidth - 51 - 15 - 5;
+            Component displayName = Util.getTruncatedName(option.getName().copy().append(": "), maxTextWidth);
+
+            graphics.text(mc.font, displayName, x + 15, y + 25 / 2 - 5, -1, true);
 
             option.setPosition(x + panelWidth - 51, y);
 
@@ -737,7 +754,10 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     public class MinecraftKeybindRenderer implements SkinRenderer<KeybindOption> {
         @Override
         public void render(GuiGraphicsExtractor graphics, KeybindOption option, int x, int y, int mouseX, int mouseY) {
-            graphics.text(mc.font, option.getName(), x + 15, y + 25 / 2 - 5, -1, true);
+            int maxTextWidth = panelWidth - 95 - 15 - 5;
+            Component displayName = Util.getTruncatedName(option.getName(), maxTextWidth);
+
+            graphics.text(mc.font, displayName, x + 15, y + 25 / 2 - 5, -1, true);
 
             int width = 70;
             int buttonX = x + panelWidth - 95;
