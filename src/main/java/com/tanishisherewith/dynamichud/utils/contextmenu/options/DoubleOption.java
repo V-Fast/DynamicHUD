@@ -49,8 +49,11 @@ public class DoubleOption extends Option<Double> {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        isDragging = false;
-        return super.mouseReleased(mouseX, mouseY, button);
+        if(isDragging){
+            isDragging = false;
+            return true;
+        }
+        return false;
     }
 
     private void step(double mouseX) {

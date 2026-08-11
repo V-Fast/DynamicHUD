@@ -139,10 +139,21 @@ public abstract class Skin {
         return false;
     }
 
-    public void renderTooltipIfHovered(GuiGraphicsExtractor graphics, Option<?> option, int x, int y, int mouseX, int mouseY, int maxTextWidth) {
+    public void renderTooltipIfHovered(GuiGraphicsExtractor graphics, Option<?> option, int x, int y,int mouseX, int mouseY, int maxTextWidth) {
+        this.renderTooltipIfHovered(graphics,option,x,y,option.getWidth(),option.getHeight(),mouseX,mouseY,maxTextWidth, tooltipDelayMs);
+    }
+    public void renderTooltipIfHovered(GuiGraphicsExtractor graphics, Option<?> option, int x, int y, int mouseX, int mouseY, int maxTextWidth, long customDelayMs) {
+        this.renderTooltipIfHovered(graphics,option,x,y,option.getWidth(),option.getHeight(),mouseX,mouseY,maxTextWidth, customDelayMs);
+    }
+
+    public void renderTooltipIfHovered(GuiGraphicsExtractor graphics, Option<?> option, int x, int y, int width, int height, int mouseX, int mouseY, int maxTextWidth) {
+        this.renderTooltipIfHovered(graphics,option,x,y,width,height,mouseX,mouseY,maxTextWidth, tooltipDelayMs);
+    }
+
+    public void renderTooltipIfHovered(GuiGraphicsExtractor graphics, Option<?> option, int x, int y,int width, int height, int mouseX, int mouseY, int maxTextWidth, long customDelayMs) {
         if (!showHoverTooltips()) return;
 
-        boolean isHovered = isMouseOver(mouseX, mouseY, x, y, option.getWidth(), option.getHeight());
+        boolean isHovered = isMouseOver(mouseX, mouseY, x, y, width, height);
 
         if (isHovered) {
             long currentTime = System.currentTimeMillis();
@@ -150,7 +161,7 @@ public abstract class Skin {
                 currentlyHoveredOption = option;
 
                 if (currentTime - lastTooltipDismissTime <= IDLE_PERIOD_MS) {
-                    hoverStartTime = currentTime - tooltipDelayMs;
+                    hoverStartTime = currentTime - customDelayMs;
                 } else {
                     hoverStartTime = currentTime;
                 }

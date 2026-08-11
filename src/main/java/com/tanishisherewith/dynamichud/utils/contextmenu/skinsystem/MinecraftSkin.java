@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.utils.contextmenu.skinsystem;
 
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
 import com.tanishisherewith.dynamichud.helpers.animationhelper.EasingType;
@@ -222,6 +223,10 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
         return imageX - groupPanelWidth - 15;
     }
 
+    public void playClickSound() {
+        mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+    }
+
     private void renderSearchBox(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         searchBox.setX(searchBoxX);
         searchBox.setY(searchBoxY);
@@ -252,8 +257,13 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
     }
 
     public void drawSingularButton(GuiGraphicsExtractor graphics, String Component, int mouseX, int mouseY, int x, int y, int width, int height, boolean enabled) {
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(enabled, isMouseOver(mouseX, mouseY, x, y, width, height)), x, y, width, height);
+        boolean isMouseOverButton = isMouseOver(mouseX, mouseY, x, y, width, height);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(enabled, isMouseOverButton), x, y, width, height);
         graphics.text(mc.font, Component, x + width / 2 - mc.font.width(Component) / 2, y + mc.font.lineHeight / 2 - 1, Color.WHITE.getRGB(), true);
+
+        if (isMouseOverButton) {
+            graphics.requestCursor(CursorTypes.POINTING_HAND);
+        }
     }
 
     public void drawSingularButton(GuiGraphicsExtractor graphics, String Component, int mouseX, int mouseY, int x, int y, int width, int height) {
@@ -273,7 +283,9 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
                 DrawHelper.drawScrollableText(graphics, mc.font, group.getName(), groupX + groupPanelWidth / 2, groupX + 2, yOffset, groupX + groupPanelWidth - 2, yOffset + 20, -1);
 
-                //Scrollable Component uses scissor, so we need to enable the context menu scissor again
+                renderTooltipIfHovered(graphics, group, groupX, yOffset, groupPanelWidth,20, mouseX, mouseY, groupPanelWidth,2200L);
+
+                //Scrollable text uses scissor, so we need to enable the context menu scissor again
                 this.enableContextMenuScissor(graphics);
 
                 yOffset += 20; // Space for the header
@@ -304,7 +316,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             if (option.getY() >= imageY - option.getHeight() && option.getY() <= imageY + option.getHeight() + panelHeight) {
                 option.render(graphics, option.getX(), option.getY(), mouseX, mouseY);
 
-                renderTooltipIfHovered(graphics, option, option.getX(), option.getY(), mouseX, mouseY, targetWidth);
+                renderTooltipIfHovered(graphics, option, imageX + 4, option.getY(), targetWidth - option.getWidth(),option.getHeight(), mouseX, mouseY, targetWidth);
             }
         }
         return yOffset;
@@ -366,9 +378,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
                 }
             }
             if (isMouseOver(mouseX, mouseY, imageX + 3, imageY + 3, 14, 14)) {
-                mc.getSoundManager().play(SimpleSoundInstance.forUI(
-                        SoundEvents.UI_BUTTON_CLICK, 1.0F));
-
+                playClickSound();
                 contextMenu.close();
                 scrollHandler.stopDragging();
                 return true;
@@ -376,13 +386,11 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             int size = (int) (groupPanelWidth * 0.5f);
             //Up and down button
             if (groupScrollHandler.isOffsetWithinBounds(-10) && isMouseOver(mouseX, mouseY, getGroupPanelX() + groupPanelWidth / 2.0 - size / 2.0, imageY - 14, size, 14)) {
-                mc.getSoundManager().play(SimpleSoundInstance.forUI(
-                        SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                playClickSound();
                 groupScrollHandler.addOffset(-10);
             }
             if (groupScrollHandler.isOffsetWithinBounds(10) && isMouseOver(mouseX, mouseY, getGroupPanelX() + groupPanelWidth / 2.0 - size / 2.0, imageY + panelHeight + 2, size, 14)) {
-                mc.getSoundManager().play(SimpleSoundInstance.forUI(
-                        SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                playClickSound();
                 groupScrollHandler.addOffset(10);
             }
 
@@ -540,11 +548,24 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             int width = 50;
             option.setPosition(x + panelWidth - 75, y);
             option.setWidth(width);
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, isMouseOver(mouseX, mouseY,x + panelWidth - 75, y, width, 20)), x + panelWidth - 75, y, width, 20);
+            boolean isMouseOverButton = isMouseOver(mouseX, mouseY,x + panelWidth - 75, y, width, 20);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, isMouseOverButton), x + panelWidth - 75, y, width, 20);
 
             Component text = option.getBooleanType().getText(option.get());
             int color = option.get() ? Color.GREEN.getRGB() : Color.RED.getRGB();
             graphics.text(mc.font, text, (int) (x + panelWidth - 75 + (width / 2.0f) - (mc.font.width(text) / 2.0f)), y + 5, color, true);
+
+            if (isMouseOverButton) {
+                graphics.requestCursor(CursorTypes.POINTING_HAND);
+            }
+        }
+        @Override
+        public boolean mouseClicked(BooleanOption option, double mouseX, double mouseY, int button) {
+            if (option.mouseClicked(mouseX,mouseY,button)) {
+                playClickSound();
+                return true;
+            }
+            return false;
         }
     }
 
@@ -576,7 +597,8 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             graphics.text(mc.font, displayName, x + 15, y + 25 / 2 - 5, -1, true);
 
             int width = 20;
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(!option.isVisible, isMouseOver(mouseX, mouseY,x + panelWidth - 45, y, width, 20)), x + panelWidth - 45, y, width, 20);
+            boolean isMouseOverButton = isMouseOver(mouseX, mouseY,x + panelWidth - 45, y, width, 20);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(!option.isVisible, isMouseOverButton), x + panelWidth - 45, y, width, 20);
 
             int shadowOpacity = Math.min(option.get().getAlpha(), 45);
             DrawHelper.drawRectangleWithShadowBadWay(graphics,
@@ -616,12 +638,15 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             if (option.getColorGradient().getColorPickerButton().isPicking()) {
               //  DrawHelper.enableScissor(imageX, imageY + 2, panelWidth, panelHeight - 4, graphics);
             }
+            if (isMouseOverButton) {
+                graphics.requestCursor(CursorTypes.POINTING_HAND);
+            }
         }
-
         @Override
         public boolean mouseClicked(ColorOption option, double mouseX, double mouseY, int button) {
             if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && isMouseOver(mouseX, mouseY, option.getX() + panelWidth - 45, option.getY(), 20, 20)) {
                 boolean isOpening = !option.getColorGradient().shouldDisplay();
+                playClickSound();
                 scaleAnimation.startValue(scale);
                 if (isOpening) {
                     option.getColorGradient().display();
@@ -674,8 +699,9 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
             double sliderX = option.getX() + ((option.get() - option.minValue) / (option.maxValue - option.minValue)) * (option.getWidth() - 8);
             boolean isMouseOverHandle = isMouseOver(mouseX, mouseY, sliderX, y, 10, 20);
+            boolean isMouseOverSlider = option.isMouseOver(mouseX, mouseY);
 
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, option.isMouseOver(mouseX, mouseY) ? HIGHLIGHTED_TEXTURE : TEXTURE, option.getX(), y, option.getWidth(), 20);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, isMouseOverSlider ? HIGHLIGHTED_TEXTURE : TEXTURE, option.getX(), y, option.getWidth(), 20);
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, isMouseOverHandle ? HANDLE_HIGHLIGHTED_TEXTURE : HANDLE_TEXTURE, (int) Math.round(sliderX), y, 8, 20);
 
             int decimalPlaces = String.valueOf(option.step).split("\\.")[1].length();
@@ -683,6 +709,20 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             // Format option.get() to the determined number of decimal places
             String formattedValue = String.format("%." + decimalPlaces + "f", option.get());
             graphics.centeredText(mc.font, formattedValue, option.getX() + option.getWidth() / 2, y + Math.round((float) mc.font.lineHeight /2), -1);
+
+            if (isMouseOverHandle && option.isDragging()) {
+                graphics.requestCursor(CursorTypes.RESIZE_EW);
+            } else if (isMouseOverSlider) {
+                graphics.requestCursor(CursorTypes.POINTING_HAND);
+            }
+        }
+        @Override
+        public boolean mouseReleased(DoubleOption option, double mouseX, double mouseY, int button) {
+            if (option.mouseReleased(mouseX,mouseY,button)) {
+                playClickSound();
+                return true;
+            }
+            return false;
         }
     }
 
@@ -707,9 +747,23 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
             option.setPosition(x + panelWidth - maxWidth - 25, y);
 
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, option.isMouseOver(mouseX, mouseY)), option.getX(), y, maxWidth, 20);
+            boolean isMouseOverButton = option.isMouseOver(mouseX, mouseY);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, isMouseOverButton), option.getX(), y, maxWidth, 20);
             String text = option.get().toString();
             graphics.text(mc.font, text, option.getX() + maxWidth / 2 - mc.font.width(text) / 2, y + 5, Color.CYAN.getRGB(), true);
+
+            if (isMouseOverButton) {
+                graphics.requestCursor(CursorTypes.POINTING_HAND);
+            }
+        }
+
+        @Override
+        public boolean mouseClicked(CycleOption option, double mouseX, double mouseY, int button) {
+            if (option.mouseClicked(mouseX,mouseY,button)) {
+                playClickSound();
+                return true;
+            }
+            return false;
         }
     }
 
@@ -725,11 +779,24 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
             option.setPosition(x + panelWidth - 55, y);
 
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, option.isMouseOver(mouseX, mouseY)), option.getX(), y, option.getWidth(), 20);
+            boolean isMouseOverButton = option.isMouseOver(mouseX, mouseY);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, isMouseOverButton), option.getX(), y, option.getWidth(), 20);
             String text = "Open";
             graphics.text(mc.font, text, option.getX() + option.getWidth() / 2 - mc.font.width(text) / 2, y + 5, Color.YELLOW.getRGB(), true);
 
             option.getSubMenu().render(graphics, x + option.getParentMenu().getWidth(), y, mouseX, mouseY);
+            if (isMouseOverButton) {
+                graphics.requestCursor(CursorTypes.POINTING_HAND);
+            }
+        }
+
+        @Override
+        public boolean mouseClicked(SubMenuOption option, double mouseX, double mouseY, int button) {
+            if (option.mouseClicked(mouseX,mouseY,button)) {
+                playClickSound();
+                return true;
+            }
+            return false;
         }
     }
 
@@ -746,8 +813,22 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
 
             option.setPosition(x + panelWidth - 51, y);
 
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(!option.get(), option.isMouseOver(mouseX, mouseY)), option.getX(), y, option.getWidth(), 20);
+            boolean isMouseOverButton = option.isMouseOver(mouseX, mouseY);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(!option.get(), isMouseOverButton), option.getX(), y, option.getWidth(), 20);
             graphics.text(mc.font, "Run", option.getX() + option.getWidth() / 2 - mc.font.width("Run") / 2, y + 5, option.get() ? DARK_GREEN.getRGB() : DARK_RED.getRGB(), true);
+            if (isMouseOverButton) {
+                graphics.requestCursor(CursorTypes.POINTING_HAND);
+            }
+        }
+
+
+        @Override
+        public boolean mouseClicked(RunnableOption option, double mouseX, double mouseY, int button) {
+            if (option.mouseClicked(mouseX,mouseY,button)) {
+                playClickSound();
+                return true;
+            }
+            return false;
         }
     }
 
@@ -764,11 +845,16 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             option.setPosition(buttonX, y);
             option.setWidth(width);
 
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, isMouseOver(mouseX, mouseY, buttonX, y, width, 20)), buttonX, y, width, 20);
+            boolean isMouseOverButton = isMouseOver(mouseX, mouseY, buttonX, y, width, 20);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURES.get(true, isMouseOverButton), buttonX, y, width, 20);
 
             String text = option.isListening() ? "> ??? <" : KeybindOption.getKeyName(option.get());
             int color = option.isListening() ? Color.YELLOW.getRGB() : Color.WHITE.getRGB();
             graphics.text(mc.font, text, (int) (buttonX + (width / 2.0f) - (mc.font.width(text) / 2.0f)), y + 6, color, true);
+
+            if (isMouseOverButton) {
+                graphics.requestCursor(CursorTypes.POINTING_HAND);
+            }
         }
 
         @Override
@@ -776,6 +862,7 @@ public class MinecraftSkin extends Skin implements GroupableSkin {
             int width = 70;
             int buttonX = option.getX();
             if (isMouseOver(mouseX, mouseY, buttonX, option.getY(), width, 20)) {
+                playClickSound();
                 option.setListening(true);
                 return true;
             }
