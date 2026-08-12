@@ -47,8 +47,7 @@ processResources {
             expand([
                     "version":  inputs.properties.version,
                     "loader_version":  inputs.properties.loader_version,
-                    "minecraft_version":  inputs.properties.minecraft_version,
-                    "yacl_version":  inputs.properties.yacl_version
+                    "minecraft_version":  inputs.properties.minecraft_version
             ])
     }
 }
