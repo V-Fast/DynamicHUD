@@ -2,12 +2,13 @@ package com.tanishisherewith.dynamichud.utils;
 
 import com.tanishisherewith.dynamichud.internal.System;
 import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Supplier;
 
 /**
- * A flat, static registry for dynamic widget values keyed by {@link net.minecraft.resources.Identifier}.
+ * A registry for dynamic widget values keyed by {@link net.minecraft.resources.Identifier}.
  * <p>
  * The namespace acts as the mod/group ID, the path is the value key
  * <pre>
@@ -54,6 +55,7 @@ public class DynamicValueRegistry {
      *
      * @return the value, or null if not found
      */
+    @Nullable
     public static <T> T getValue(Identifier id) {
         Supplier<T> supplier = get(id);
         return supplier != null ? supplier.get() : null;
@@ -64,6 +66,7 @@ public class DynamicValueRegistry {
      *
      * @return the value, or null if not found
      */
+    @Nullable
     public static <T> T getValue(String namespace, String path) {
         Supplier<T> supplier = get(Identifier.fromNamespaceAndPath(namespace, path));
         return supplier != null ? supplier.get() : null;

@@ -1,5 +1,6 @@
 package com.tanishisherewith.dynamichud.widget;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.tanishisherewith.dynamichud.DynamicHUD;
 import com.tanishisherewith.dynamichud.config.GlobalConfig;
 import com.tanishisherewith.dynamichud.helpers.DrawHelper;
@@ -37,7 +38,7 @@ public abstract class Widget implements Input {
     protected float minScale = 0.3f;
     protected float maxScale = 3.0f;
     public boolean dragging;
-    private boolean wasDragged = false;
+    protected boolean wasDragged = false;
     public boolean isShiftDown = false;
     /**
      * An identifier for widgets to group them under one ID.
@@ -201,7 +202,6 @@ public abstract class Widget implements Input {
      */
     public final void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (!isVisible()) return;
-
 
         if (canScale) {
             DrawHelper.scaleAndPosition(graphics.pose(), getX(), getY(), getScale());
@@ -466,6 +466,10 @@ public abstract class Widget implements Input {
 
     public void setCanScale(boolean canScale) {
         this.canScale = canScale;
+    }
+
+    public boolean getCanScale(){
+        return canScale;
     }
 
     public boolean isLocked() {
