@@ -72,7 +72,7 @@ public class DynamicHUD implements ClientModInitializer {
     }
 
     /**
-     * Get applied scale on all widgets, modified by YACL.
+     * Get applied scale on all widgets.
      * <br>
      * From {@link GlobalConfig#getScale()}
      * @return scale in float
