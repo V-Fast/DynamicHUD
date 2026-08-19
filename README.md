@@ -1,6 +1,20 @@
-# DynamicHUD for Minecraft Fabric
+<div align="center">
 
-DynamicHUD is a dev library for Minecraft mod creators who use Fabric mod loader for the latest minecraft version. With DynamicHUD, you can make your own HUD elements that players can change and interact with, making their game look and feel better.
+<img src="https://cdn.modrinth.com/data/hQbzUScT/5748eb2d8941f930df1e23d8e89d555dc0a5bb6e_96.webp" alt="DynamicHUD Logo" width="128" />
+
+**An in-game HUD engine for Fabric mod creators**
+
+[![Fabric](https://img.shields.io/badge/Platform-Fabric-brightgreen?style=for-the-badge&logo=fabric)](https://fabricmc.net/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](https://github.com/V-Fast/DynamicHUD/blob/master/LICENSE)
+[![Discord](https://img.shields.io/badge/Discord-Join-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/invite/Rqpn3C7yR5)
+[![Docs](https://img.shields.io/badge/Docs-GitBook-informational?style=for-the-badge&logo=gitbook)](https://tanishisherewith.gitbook.io/dynamic-hud)
+
+<br/>
+
+> *Made for Fabric only — there are no plans for Forge ports.*
+
+DynamicHUD is a dev library for the latest minecraft version. With DynamicHUD, you can make your own HUD elements that players can move, change and interact with, making their game look and feel better.
+</div>
 
 # Examples
 - [_IntegrationTest.java_](src/main/java/com/tanishisherewith/dynamichud/IntegrationTest.java)
@@ -30,9 +44,6 @@ DynamicHUD is a dev library for Minecraft mod creators who use Fabric mod loader
   [!Early stage demo video](https://github.com/V-Fast/DynamicHUD/assets/120117618/04de9319-69cd-4456-a555-c026c7e053a2)
 </details>
 
-*_This mod / library is fabric only and has no future plans to be ported to forge._*
-
-
 ## Getting Started For Developers
 > Visit our [wiki](https://tanishisherewith.gitbook.io/dynamic-hud) for more detailed information about the library!
 
@@ -56,24 +67,14 @@ dependencies {
 ```
 
 ## Contributing
-Contributions are welcome! If you’re interested in improving DynamicHUD or adding new features, please review our contributing guidelines.
+Contributions are welcome! If you’re interested to do any help, please review our [contributing guidelines](https://github.com/V-Fast/DynamicHUD/blob/master/CONTRIBUTING.md).
 
+## Quick Setup (For Players)
 
-## Installation for Users
-
-To ensure mods that depend on DynamicHUD work correctly, follow these steps to add DynamicHUD to your Minecraft installation:
-
-0. Make sure you have [Fabric](https://fabricmc.net/) and [Fabric-API](https://modrinth.com/mod/fabric-api/) installed.
-1. Download the `dynamichud-<version>.jar` file from the official [modrinth](https://modrinth.com/mod/dynamichud/versions) or [release](https://github.com/V-Fast/DynamicHUD/releases) page.
-2. Navigate to your Minecraft directory. The default path is usually:
-   - Windows: `%APPDATA%\.minecraft`
-   - macOS: `~/Library/Application Support/minecraft`
-   - Linux: `~/.minecraft`
-3. Locate the `mods` folder within your Minecraft directory. If it doesn't exist, create it.
-4. Place the downloaded DynamicHUD `.jar` file into the `mods` folder.
-5. Run Minecraft with the Fabric loader. DynamicHUD will now be loaded, and any mods with DynamicHUD as a dependency can function properly.
-
-Enjoy the enhanced HUD experience provided by mods utilizing DynamicHUD!
+1. Ensure you have **[Fabric Loader](https://fabricmc.net/)**, **[Fabric API](https://modrinth.com/mod/fabric-api/)**. (**Note**: *You may also need **[YACL](https://modrinth.com/mod/yacl)** installed for older versions of DynamicHUD*).
+3. Download the latest `.jar` from the **[Releases Tab](https://modrinth.com/mod/dynamichud/versions)**.
+4. Drop the file into your `.minecraft/mods` directory.
+5. Launch the game.
 
 ## License
 DynamicHUD is released under the MIT License. Feel free to use and modify it in your mods, with proper attribution back to this repository.
